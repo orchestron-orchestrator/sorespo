@@ -1,4 +1,5 @@
 
+import file
 import xml
 import yang.adata
 import yang.gdata
@@ -10,77 +11,20 @@ from respnet.y_0 import root as cfs_root
 
 import testing
 
-nb_input = """
-<data>
-    <netinfra xmlns="http://example.com/netinfra">
-        <routers>
-            <name>FRA-CORE-1</name>
-            <id>1</id>
-            <role>core</role>
-        </routers>
-        <routers>
-            <name>STO-CORE-1</name>
-            <id>4</id>
-            <role>core</role>
-        </routers>
-        <routers>
-            <name>AMS-CORE-1</name>
-            <id>8</id>
-            <role>edge</role>
-        </routers>
-        <backbone-link>
-            <left-router>AMS-CORE-1</left-router>
-            <left-interface>Bundle-Ether1</left-interface>
-            <right-router>STO-CORE-1</right-router>
-            <right-interface>Bundle-Ether1</right-interface>
-        </backbone-link>
-        <backbone-link>
-            <left-router>FRA-CORE-1</left-router>
-            <left-interface>Bundle-Ether1</left-interface>
-            <right-router>STO-CORE-1</right-router>
-            <right-interface>Bundle-Ether2</right-interface>
-        </backbone-link>
-        <backbone-link>
-            <left-router>AMS-CORE-1</left-router>
-            <left-interface>Bundle-Ether2</left-interface>
-            <right-router>FRA-CORE-1</right-router>
-            <right-interface>Bundle-Ether2</right-interface>
-        </backbone-link>
-    </netinfra>
-    <l3vpn>
-    </l3vpn>
-</data>
-"""
-
-nb_input2 = """
-<data>
-    <netinfra xmlns="http://example.com/netinfra">
-        <routers>
-            <name>NYC-CORE-1</name>
-            <id>1</id>
-            <role>core</role>
-        </routers>
-        <routers>
-            <name>STO-CORE-1</name>
-            <id>4</id>
-            <role>core</role>
-        </routers>
-        <routers>
-            <name>AMS-CORE-1</name>
-            <id>8</id>
-            <role>core</role>
-        </routers>
-    </netinfra>
-    <l3vpn>
-    </l3vpn>
-</data>
-"""
-
 actor main(env):
+    rfcap = file.ReadFileCap(file.FileCap(env.cap))
+    if len(env.argv) <= 1:
+        print("Usage: %s <filename>" % env.argv[0])
+        await async env.exit(1)
+    filename = env.argv[1]
+    f = file.ReadFile(rfcap, filename)
+    nb_input = await async f.read()
+    f.close()
+
     layers = respnet.layers.get_layers()
 
     # Bootstrap first layer config input
-    input_config = cfs_root.from_xml(xml.decode(nb_input))
+    input_config = cfs_root.from_xml(xml.decode(nb_input.decode()))
     config_in = {"source1": input_config.to_gdata()}
 
     config_out = {}
