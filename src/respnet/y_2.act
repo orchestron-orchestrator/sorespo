@@ -1,0 +1,178 @@
+import xml
+import yang.adata
+import yang.gdata
+
+# == This file is generated ==
+
+
+class junos__interfaces__interface_entry(yang.adata.MNode):
+    name: str
+    description: ?str
+
+    def __init__(self, name: str, description: ?str):
+        self.name = name
+        self.description = description
+
+    def to_gdata(self) -> yang.gdata.Node:
+        res = yang.gdata.ListElement([str(self.name)])
+        _name = self.name
+        _description = self.description
+        if _name is not None:
+            res.children['name'] = yang.gdata.Leaf('name', _name)
+        if _description is not None:
+            res.children['description'] = yang.gdata.Leaf('description', _description)
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.Node) -> junos__interfaces__interface_entry:
+        return junos__interfaces__interface_entry(name=n.get_str("name"), description=n.get_opt_str("description"))
+
+    @staticmethod
+    def from_xml(n: xml.Node) -> junos__interfaces__interface_entry:
+        return junos__interfaces__interface_entry(name=yang.gdata.from_xml_str(n, "name"), description=yang.gdata.from_xml_opt_str(n, "description"))
+
+class junos__interfaces__interface(yang.adata.MNode):
+    elements: list[junos__interfaces__interface_entry]
+    def __init__(self, elements=[]):
+        self._name = 'interface'
+        self.elements = elements
+
+    def create(self, name):
+        res = junos__interfaces__interface_entry(name)
+        self.elements.append(res)
+        return res
+
+    def to_gdata(self):
+        res = yang.gdata.List('interface', ['name'])
+        for e in self.elements:
+            e_gdata = e.to_gdata()
+            if isinstance(e_gdata, yang.gdata.ListElement):
+                res.elements.append(e_gdata)
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.List) -> list[junos__interfaces__interface_entry]:
+        res = []
+        for e in n.elements:
+            res.append(junos__interfaces__interface_entry.from_gdata(e))
+        return res
+
+    @staticmethod
+    def from_xml(nodes: list[xml.Node]) -> list[junos__interfaces__interface_entry]:
+        res = []
+        for node in nodes:
+            res.append(junos__interfaces__interface_entry.from_xml(node))
+        return res
+
+
+class junos__interfaces(yang.adata.MNode):
+    interface: junos__interfaces__interface
+
+    def __init__(self, interface: list[junos__interfaces__interface_entry]=[]):
+        self.interface = junos__interfaces__interface(elements=interface)
+
+    def to_gdata(self) -> yang.gdata.Node:
+        res = yang.gdata.Container_('interfaces')
+        _interface = self.interface
+        if _interface is not None:
+            res.children['interface'] = self.interface.to_gdata()
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.Node) -> junos__interfaces:
+        return junos__interfaces(interface=junos__interfaces__interface.from_gdata(n.get_list("interface")))
+
+    @staticmethod
+    def from_xml(n: xml.Node) -> junos__interfaces:
+        return junos__interfaces(interface=junos__interfaces__interface.from_xml(yang.gdata.get_xml_children(n, "interface")))
+
+
+class xr__interface_entry(yang.adata.MNode):
+    name: str
+    description: ?str
+
+    def __init__(self, name: str, description: ?str):
+        self.name = name
+        self.description = description
+
+    def to_gdata(self) -> yang.gdata.Node:
+        res = yang.gdata.ListElement([str(self.name)])
+        _name = self.name
+        _description = self.description
+        if _name is not None:
+            res.children['name'] = yang.gdata.Leaf('name', _name)
+        if _description is not None:
+            res.children['description'] = yang.gdata.Leaf('description', _description)
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.Node) -> xr__interface_entry:
+        return xr__interface_entry(name=n.get_str("name"), description=n.get_opt_str("description"))
+
+    @staticmethod
+    def from_xml(n: xml.Node) -> xr__interface_entry:
+        return xr__interface_entry(name=yang.gdata.from_xml_str(n, "name"), description=yang.gdata.from_xml_opt_str(n, "description"))
+
+class xr__interface(yang.adata.MNode):
+    elements: list[xr__interface_entry]
+    def __init__(self, elements=[]):
+        self._name = 'interface'
+        self.elements = elements
+
+    def create(self, name):
+        res = xr__interface_entry(name)
+        self.elements.append(res)
+        return res
+
+    def to_gdata(self):
+        res = yang.gdata.List('interface', ['name'])
+        for e in self.elements:
+            e_gdata = e.to_gdata()
+            if isinstance(e_gdata, yang.gdata.ListElement):
+                res.elements.append(e_gdata)
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.List) -> list[xr__interface_entry]:
+        res = []
+        for e in n.elements:
+            res.append(xr__interface_entry.from_gdata(e))
+        return res
+
+    @staticmethod
+    def from_xml(nodes: list[xml.Node]) -> list[xr__interface_entry]:
+        res = []
+        for node in nodes:
+            res.append(xr__interface_entry.from_xml(node))
+        return res
+
+
+class root(yang.adata.MNode):
+    interfaces: junos__interfaces
+    interface: xr__interface
+
+    def __init__(self, interfaces: ?junos__interfaces=None, interface: list[xr__interface_entry]=[]):
+        if interfaces is not None:
+            self.interfaces = interfaces
+        else:
+            self.interfaces = junos__interfaces()
+        self.interface = xr__interface(elements=interface)
+
+    def to_gdata(self) -> yang.gdata.Node:
+        res = yang.gdata.Root()
+        _interfaces = self.interfaces
+        _interface = self.interface
+        if _interfaces is not None:
+            res.children['interfaces'] = self.interfaces.to_gdata()
+        if _interface is not None:
+            res.children['interface'] = self.interface.to_gdata()
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.Node) -> root:
+        return root(interfaces=junos__interfaces.from_gdata(n.get_container("interfaces")), interface=xr__interface.from_gdata(n.get_list("interface")))
+
+    @staticmethod
+    def from_xml(n: xml.Node) -> root:
+        return root(interfaces=junos__interfaces.from_xml(yang.gdata.get_xml_child(n, "interfaces")), interface=xr__interface.from_xml(yang.gdata.get_xml_children(n, "interface")))
+

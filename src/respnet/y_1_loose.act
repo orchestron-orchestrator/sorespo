@@ -1,0 +1,223 @@
+import xml
+import yang.adata
+import yang.gdata
+
+# == This file is generated ==
+
+
+class nodes__nodes__routers__backbone_interface__remote(yang.adata.MNode):
+    device: ?str
+    interface: ?str
+
+    def __init__(self, device: ?str, interface: ?str):
+        self.device = device
+        self.interface = interface
+
+    def to_gdata(self) -> yang.gdata.Node:
+        res = yang.gdata.Container_('remote')
+        _device = self.device
+        _interface = self.interface
+        if _device is not None:
+            res.children['device'] = yang.gdata.Leaf('device', _device)
+        if _interface is not None:
+            res.children['interface'] = yang.gdata.Leaf('interface', _interface)
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.Node) -> nodes__nodes__routers__backbone_interface__remote:
+        return nodes__nodes__routers__backbone_interface__remote(device=n.get_str("device"), interface=n.get_str("interface"))
+
+    @staticmethod
+    def from_xml(n: xml.Node) -> nodes__nodes__routers__backbone_interface__remote:
+        return nodes__nodes__routers__backbone_interface__remote(device=yang.gdata.from_xml_str(n, "device"), interface=yang.gdata.from_xml_str(n, "interface"))
+
+
+class nodes__nodes__routers__backbone_interface_entry(yang.adata.MNode):
+    name: str
+    remote: nodes__nodes__routers__backbone_interface__remote
+
+    def __init__(self, name: str, remote: ?nodes__nodes__routers__backbone_interface__remote=None):
+        self.name = name
+        if remote is not None:
+            self.remote = remote
+        else:
+            self.remote = nodes__nodes__routers__backbone_interface__remote()
+
+    def to_gdata(self) -> yang.gdata.Node:
+        res = yang.gdata.ListElement([str(self.name)])
+        _name = self.name
+        _remote = self.remote
+        if _name is not None:
+            res.children['name'] = yang.gdata.Leaf('name', _name)
+        if _remote is not None:
+            res.children['remote'] = self.remote.to_gdata()
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.Node) -> nodes__nodes__routers__backbone_interface_entry:
+        return nodes__nodes__routers__backbone_interface_entry(name=n.get_str("name"), remote=nodes__nodes__routers__backbone_interface__remote.from_gdata(n.get_container("remote")))
+
+    @staticmethod
+    def from_xml(n: xml.Node) -> nodes__nodes__routers__backbone_interface_entry:
+        return nodes__nodes__routers__backbone_interface_entry(name=yang.gdata.from_xml_str(n, "name"), remote=nodes__nodes__routers__backbone_interface__remote.from_xml(yang.gdata.get_xml_child(n, "remote")))
+
+class nodes__nodes__routers__backbone_interface(yang.adata.MNode):
+    elements: list[nodes__nodes__routers__backbone_interface_entry]
+    def __init__(self, elements=[]):
+        self._name = 'backbone-interface'
+        self.elements = elements
+
+    def create(self, name, remote):
+        res = nodes__nodes__routers__backbone_interface_entry(name, remote)
+        self.elements.append(res)
+        return res
+
+    def to_gdata(self):
+        res = yang.gdata.List('backbone-interface', ['name'])
+        for e in self.elements:
+            e_gdata = e.to_gdata()
+            if isinstance(e_gdata, yang.gdata.ListElement):
+                res.elements.append(e_gdata)
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.List) -> list[nodes__nodes__routers__backbone_interface_entry]:
+        res = []
+        for e in n.elements:
+            res.append(nodes__nodes__routers__backbone_interface_entry.from_gdata(e))
+        return res
+
+    @staticmethod
+    def from_xml(nodes: list[xml.Node]) -> list[nodes__nodes__routers__backbone_interface_entry]:
+        res = []
+        for node in nodes:
+            res.append(nodes__nodes__routers__backbone_interface_entry.from_xml(node))
+        return res
+
+
+class nodes__nodes__routers_entry(yang.adata.MNode):
+    name: str
+    id: ?str
+    ipv4_address: ?str
+    ipv6_address: ?str
+    corefoo: ?str
+    backbone_interface: nodes__nodes__routers__backbone_interface
+
+    def __init__(self, name: str, id: ?str, ipv4_address: ?str, ipv6_address: ?str, corefoo: ?str, backbone_interface: list[nodes__nodes__routers__backbone_interface_entry]=[]):
+        self.name = name
+        self.id = id
+        self.ipv4_address = ipv4_address
+        self.ipv6_address = ipv6_address
+        self.corefoo = corefoo
+        self.backbone_interface = nodes__nodes__routers__backbone_interface(elements=backbone_interface)
+
+    def to_gdata(self) -> yang.gdata.Node:
+        res = yang.gdata.ListElement([str(self.name)])
+        _name = self.name
+        _id = self.id
+        _ipv4_address = self.ipv4_address
+        _ipv6_address = self.ipv6_address
+        _corefoo = self.corefoo
+        _backbone_interface = self.backbone_interface
+        if _name is not None:
+            res.children['name'] = yang.gdata.Leaf('name', _name)
+        if _id is not None:
+            res.children['id'] = yang.gdata.Leaf('id', _id)
+        if _ipv4_address is not None:
+            res.children['ipv4-address'] = yang.gdata.Leaf('ipv4-address', _ipv4_address)
+        if _ipv6_address is not None:
+            res.children['ipv6-address'] = yang.gdata.Leaf('ipv6-address', _ipv6_address)
+        if _corefoo is not None:
+            res.children['corefoo'] = yang.gdata.Leaf('corefoo', _corefoo)
+        if _backbone_interface is not None:
+            res.children['backbone-interface'] = self.backbone_interface.to_gdata()
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.Node) -> nodes__nodes__routers_entry:
+        return nodes__nodes__routers_entry(name=n.get_str("name"), id=n.get_opt_str("id"), ipv4_address=n.get_opt_str("ipv4-address"), ipv6_address=n.get_opt_str("ipv6-address"), corefoo=n.get_opt_str("corefoo"), backbone_interface=nodes__nodes__routers__backbone_interface.from_gdata(n.get_list("backbone-interface")))
+
+    @staticmethod
+    def from_xml(n: xml.Node) -> nodes__nodes__routers_entry:
+        return nodes__nodes__routers_entry(name=yang.gdata.from_xml_str(n, "name"), id=yang.gdata.from_xml_opt_str(n, "id"), ipv4_address=yang.gdata.from_xml_opt_str(n, "ipv4-address"), ipv6_address=yang.gdata.from_xml_opt_str(n, "ipv6-address"), corefoo=yang.gdata.from_xml_opt_str(n, "corefoo"), backbone_interface=nodes__nodes__routers__backbone_interface.from_xml(yang.gdata.get_xml_children(n, "backbone-interface")))
+
+class nodes__nodes__routers(yang.adata.MNode):
+    elements: list[nodes__nodes__routers_entry]
+    def __init__(self, elements=[]):
+        self._name = 'routers'
+        self.elements = elements
+
+    def create(self, name):
+        res = nodes__nodes__routers_entry(name)
+        self.elements.append(res)
+        return res
+
+    def to_gdata(self):
+        res = yang.gdata.List('routers', ['name'])
+        for e in self.elements:
+            e_gdata = e.to_gdata()
+            if isinstance(e_gdata, yang.gdata.ListElement):
+                res.elements.append(e_gdata)
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.List) -> list[nodes__nodes__routers_entry]:
+        res = []
+        for e in n.elements:
+            res.append(nodes__nodes__routers_entry.from_gdata(e))
+        return res
+
+    @staticmethod
+    def from_xml(nodes: list[xml.Node]) -> list[nodes__nodes__routers_entry]:
+        res = []
+        for node in nodes:
+            res.append(nodes__nodes__routers_entry.from_xml(node))
+        return res
+
+
+class nodes__nodes(yang.adata.MNode):
+    routers: nodes__nodes__routers
+
+    def __init__(self, routers: list[nodes__nodes__routers_entry]=[]):
+        self.routers = nodes__nodes__routers(elements=routers)
+
+    def to_gdata(self) -> yang.gdata.Node:
+        res = yang.gdata.Container_('nodes')
+        _routers = self.routers
+        if _routers is not None:
+            res.children['routers'] = self.routers.to_gdata()
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.Node) -> nodes__nodes:
+        return nodes__nodes(routers=nodes__nodes__routers.from_gdata(n.get_list("routers")))
+
+    @staticmethod
+    def from_xml(n: xml.Node) -> nodes__nodes:
+        return nodes__nodes(routers=nodes__nodes__routers.from_xml(yang.gdata.get_xml_children(n, "routers")))
+
+
+class root(yang.adata.MNode):
+    nodes: nodes__nodes
+
+    def __init__(self, nodes: ?nodes__nodes=None):
+        if nodes is not None:
+            self.nodes = nodes
+        else:
+            self.nodes = nodes__nodes()
+
+    def to_gdata(self) -> yang.gdata.Node:
+        res = yang.gdata.Root()
+        _nodes = self.nodes
+        if _nodes is not None:
+            res.children['nodes'] = self.nodes.to_gdata()
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.Node) -> root:
+        return root(nodes=nodes__nodes.from_gdata(n.get_container("nodes")))
+
+    @staticmethod
+    def from_xml(n: xml.Node) -> root:
+        return root(nodes=nodes__nodes.from_xml(yang.gdata.get_xml_child(n, "nodes")))
+
