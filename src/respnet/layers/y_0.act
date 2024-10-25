@@ -5,6 +5,33 @@ import yang.gdata
 # == This file is generated ==
 
 
+class l3vpn__l3vpn(yang.adata.MNode):
+    this: ?str
+    that: ?str
+
+    def __init__(self, this: ?str, that: ?str):
+        self.this = this
+        self.that = that
+
+    def to_gdata(self) -> yang.gdata.Node:
+        res = yang.gdata.Container('l3vpn')
+        _this = self.this
+        _that = self.that
+        if _this is not None:
+            res.children['this'] = yang.gdata.Leaf('this', _this)
+        if _that is not None:
+            res.children['that'] = yang.gdata.Leaf('that', _that)
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.Node) -> l3vpn__l3vpn:
+        return l3vpn__l3vpn(this=n.get_opt_str("this"), that=n.get_opt_str("that"))
+
+    @staticmethod
+    def from_xml(n: xml.Node) -> l3vpn__l3vpn:
+        return l3vpn__l3vpn(this=yang.gdata.from_xml_opt_str(n, "this"), that=yang.gdata.from_xml_opt_str(n, "that"))
+
+
 class netinfra__netinfra__routers_entry(yang.adata.MNode):
     name: str
     id: ?str
@@ -149,7 +176,7 @@ class netinfra__netinfra(yang.adata.MNode):
         self.backbone_link = netinfra__netinfra__backbone_link(elements=backbone_link)
 
     def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container_('netinfra')
+        res = yang.gdata.Container('netinfra')
         _routers = self.routers
         _backbone_link = self.backbone_link
         if _routers is not None:
@@ -167,62 +194,35 @@ class netinfra__netinfra(yang.adata.MNode):
         return netinfra__netinfra(routers=netinfra__netinfra__routers.from_xml(yang.gdata.get_xml_children(n, "routers")), backbone_link=netinfra__netinfra__backbone_link.from_xml(yang.gdata.get_xml_children(n, "backbone-link")))
 
 
-class l3vpn__l3vpn(yang.adata.MNode):
-    this: ?str
-    that: ?str
-
-    def __init__(self, this: ?str, that: ?str):
-        self.this = this
-        self.that = that
-
-    def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container_('l3vpn')
-        _this = self.this
-        _that = self.that
-        if _this is not None:
-            res.children['this'] = yang.gdata.Leaf('this', _this)
-        if _that is not None:
-            res.children['that'] = yang.gdata.Leaf('that', _that)
-        return res
-
-    @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> l3vpn__l3vpn:
-        return l3vpn__l3vpn(this=n.get_opt_str("this"), that=n.get_opt_str("that"))
-
-    @staticmethod
-    def from_xml(n: xml.Node) -> l3vpn__l3vpn:
-        return l3vpn__l3vpn(this=yang.gdata.from_xml_opt_str(n, "this"), that=yang.gdata.from_xml_opt_str(n, "that"))
-
-
 class root(yang.adata.MNode):
-    netinfra: netinfra__netinfra
     l3vpn: l3vpn__l3vpn
+    netinfra: netinfra__netinfra
 
-    def __init__(self, netinfra: ?netinfra__netinfra=None, l3vpn: ?l3vpn__l3vpn=None):
-        if netinfra is not None:
-            self.netinfra = netinfra
-        else:
-            self.netinfra = netinfra__netinfra()
+    def __init__(self, l3vpn: ?l3vpn__l3vpn=None, netinfra: ?netinfra__netinfra=None):
         if l3vpn is not None:
             self.l3vpn = l3vpn
         else:
             self.l3vpn = l3vpn__l3vpn()
+        if netinfra is not None:
+            self.netinfra = netinfra
+        else:
+            self.netinfra = netinfra__netinfra()
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.Root()
-        _netinfra = self.netinfra
         _l3vpn = self.l3vpn
-        if _netinfra is not None:
-            res.children['netinfra'] = self.netinfra.to_gdata()
+        _netinfra = self.netinfra
         if _l3vpn is not None:
             res.children['l3vpn'] = self.l3vpn.to_gdata()
+        if _netinfra is not None:
+            res.children['netinfra'] = self.netinfra.to_gdata()
         return res
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> root:
-        return root(netinfra=netinfra__netinfra.from_gdata(n.get_container("netinfra")), l3vpn=l3vpn__l3vpn.from_gdata(n.get_container("l3vpn")))
+        return root(l3vpn=l3vpn__l3vpn.from_gdata(n.get_container("l3vpn")), netinfra=netinfra__netinfra.from_gdata(n.get_container("netinfra")))
 
     @staticmethod
     def from_xml(n: xml.Node) -> root:
-        return root(netinfra=netinfra__netinfra.from_xml(yang.gdata.get_xml_child(n, "netinfra")), l3vpn=l3vpn__l3vpn.from_xml(yang.gdata.get_xml_child(n, "l3vpn")))
+        return root(l3vpn=l3vpn__l3vpn.from_xml(yang.gdata.get_xml_child(n, "l3vpn")), netinfra=netinfra__netinfra.from_xml(yang.gdata.get_xml_child(n, "netinfra")))
 
