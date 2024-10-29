@@ -1,7 +1,7 @@
 import file
 
 import orchestron.build
-import ymodels
+import orchestron.yang as oyang
 
 # Generate the automatically generated code for RESPNET
 #
@@ -132,6 +132,61 @@ nodes_yang = """module nodes {
 }
 """
 
+respnet_rfs_yang = """module respnet-rfs {
+    yang-version "1.1";
+    namespace "http://example.com/respnet-rfs";
+    prefix "respnet-rfs";
+
+    import orchestron-rfs {
+        prefix orfs;
+    }
+
+    augment "/orfs:rfs" {
+        list backbone-interface {
+            key name;
+
+            orchestron:transform respnet.rfs.BBInterface;
+
+            leaf name {
+                type string;
+            }
+
+            leaf ipv4-address {
+                type string;
+            }
+
+            leaf ipv4-prefix-length {
+                type uint8 {
+                    range "0..32";
+                }
+            }
+
+            leaf ipv6-address {
+                type string;
+            }
+
+            leaf ipv6-prefix-length {
+                type uint8 {
+                    range "0..128";
+                }
+            }
+
+            container remote {
+                leaf device {
+                    type string;
+                    mandatory true;
+                }
+                leaf interface {
+                    type string;
+                    mandatory true;
+                }
+            }
+        }
+    }
+}
+"""
+
+
 dev_junos_yang = """module junos {
     yang-version "1.1";
     namespace "http://example.com/junos";
@@ -178,7 +233,7 @@ actor main(env):
     layers = [
         [netinfra_yang, l3vpn_yang],
         [nodes_yang],
-#        [rfs_yang, ymodels.ietf_inet_types],
+        [oyang.rfs, oyang.ietf_inet_types, respnet_rfs_yang],
         [dev_junos_yang, dev_xr_yang],
     ]
     orchestron.build.gen_app(wfc, "respnet", "../src/", layers)

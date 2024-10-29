@@ -6,7 +6,9 @@ import yang.gdata
 import yang.adata
 
 from respnet.layers.y_1 import nodes__nodes__routers_entry
-from respnet.layers.y_1 import root as o_root
+from respnet.layers.y_2_loose import root as o_root
+from respnet.layers.y_2 import orchestron_rfs__rfs__backbone_interface_entry
+from respnet.layers.y_3 import root as dev_root
 
 class Router(ttt.TTTTransform):
     def transform_wrapper(self, i: yang.gdata.Node) -> yang.gdata.Node:
@@ -14,11 +16,32 @@ class Router(ttt.TTTTransform):
         return self.transform(mi).to_gdata()
 
     mut def transform(self, i: nodes__nodes__routers_entry) -> o_root:
+        o = o_root()
         #sto_dev = y_dev.IosXr24()
         print("RFS /nodes/routers transform running", i.name, i.id)
         print("  IPv4 address:", i.ipv4_address)
         print("  IPv6 address:", i.ipv6_address)
+        o.device.create(i.name)
+        rfs_dev = o.rfs.create(i.name)
+
         for bbi in i.backbone_interface.elements:
             print("  Backbone interface: %s [%s] <-> %s [%s]" % (i.name, bbi.name, bbi.remote.device, bbi.remote.interface))
-        o = o_root()
+            rfs_bbi = rfs_dev.backbone_interface.create(bbi.name)
+            rfs_bbi.remote.device = bbi.remote.device
+            rfs_bbi.remote.interface = bbi.remote.interface
+        return o
+
+
+class BBInterface(ttt.TTTRFSTransform):
+    def transform_wrapper(self, i: yang.gdata.Node) -> yang.gdata.Node:
+        mi = orchestron_rfs__rfs__backbone_interface_entry.from_gdata(i)
+        return self.transform(mi).to_gdata()
+
+    mut def transform(self, i: orchestron_rfs__rfs__backbone_interface_entry) -> dev_root:
+        print("RFS /nodes/routers/backbone-interface transform running [%s] <-> %s [%s]" % (i.name, i.remote.device, i.remote.interface))
+        #sto_dev = y_dev.IosXr24()
+        o = dev_root()
+        intf = o.interfaces.interface.create(i.name)
+        intf.description = "Link to %s [%s]" % (i.remote.device, i.remote.interface)
+        #o.device.create(i.name)
         return o

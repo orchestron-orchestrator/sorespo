@@ -21,6 +21,8 @@ class nodes__nodes__routers__backbone_interface__remote(yang.adata.MNode):
             res.children['device'] = yang.gdata.Leaf('device', _device)
         if _interface is not None:
             res.children['interface'] = yang.gdata.Leaf('interface', _interface)
+        for child in res.children.values():
+            child.parent = res
         return res
 
     @staticmethod
@@ -39,6 +41,7 @@ class nodes__nodes__routers__backbone_interface_entry(yang.adata.MNode):
     def __init__(self, name: str, remote: nodes__nodes__routers__backbone_interface__remote):
         self.name = name
         self.remote = remote
+        self.remote._parent = self
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.ListElement([str(self.name)])
@@ -48,6 +51,8 @@ class nodes__nodes__routers__backbone_interface_entry(yang.adata.MNode):
             res.children['name'] = yang.gdata.Leaf('name', _name)
         if _remote is not None:
             res.children['remote'] = self.remote.to_gdata()
+        for child in res.children.values():
+            child.parent = res
         return res
 
     @staticmethod
@@ -107,6 +112,7 @@ class nodes__nodes__routers_entry(yang.adata.MNode):
         self.ipv6_address = ipv6_address
         self.corefoo = corefoo
         self.backbone_interface = nodes__nodes__routers__backbone_interface(elements=backbone_interface)
+        self.backbone_interface._parent = self
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.ListElement([str(self.name)])
@@ -128,6 +134,8 @@ class nodes__nodes__routers_entry(yang.adata.MNode):
             res.children['corefoo'] = yang.gdata.Leaf('corefoo', _corefoo)
         if _backbone_interface is not None:
             res.children['backbone-interface'] = self.backbone_interface.to_gdata()
+        for child in res.children.values():
+            child.parent = res
         return res
 
     @staticmethod
@@ -177,12 +185,15 @@ class nodes__nodes(yang.adata.MNode):
 
     def __init__(self, routers: list[nodes__nodes__routers_entry]=[]):
         self.routers = nodes__nodes__routers(elements=routers)
+        self.routers._parent = self
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.Container('nodes')
         _routers = self.routers
         if _routers is not None:
             res.children['routers'] = self.routers.to_gdata()
+        for child in res.children.values():
+            child.parent = res
         return res
 
     @staticmethod
@@ -202,12 +213,15 @@ class root(yang.adata.MNode):
             self.nodes = nodes
         else:
             self.nodes = nodes__nodes()
+        self.nodes._parent = self
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.Root()
         _nodes = self.nodes
         if _nodes is not None:
             res.children['nodes'] = self.nodes.to_gdata()
+        for child in res.children.values():
+            child.parent = res
         return res
 
     @staticmethod
