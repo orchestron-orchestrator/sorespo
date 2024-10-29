@@ -27,15 +27,22 @@ actor main(env):
     config_in = {"source1": input_config.to_gdata()}
 
     config_out = {}
-    for layer in respnet.layers.get_layers()[:-1]:
+    for idx, layer in enumerate(respnet.layers.get_layers()):
+        print("Computing layer %d" % idx)
+        config_out = {}
         layer.configure(config_in, config_out)
         config_in = config_out
+        print("Layer %d config" % idx)
 
     pieces = list(config_out.values())
-    merged = pieces[0]
-    for piece in pieces[1:]:
-        merged = yang.gdata.merge(merged, piece)
-    print("Final config")
-    print(merged.to_xmlstr())
+    if len(pieces) > 1:
+        merged = pieces[0]
+        if len(pieces) > 1:
+            for piece in pieces[1:]:
+                merged = yang.gdata.merge(merged, piece)
+        print("Final config")
+        print(merged.to_xmlstr())
+    else:
+        print("No config...")
 
     env.exit(0)
