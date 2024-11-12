@@ -11,15 +11,15 @@ from respnet.layers.y_1 import orchestron_rfs__rfs__backbone_interface_entry
 import respnet.devices.CiscoIosXr_24_1_ncs55a1 as xr24
 
 class BaseConfig(ttt.TTTRFSTransform):
-    def transform_wrapper(self, i: yang.gdata.Node) -> yang.gdata.Node:
+    def transform_wrapper(self, i: yang.gdata.Node, di: ttt.DeviceInfo) -> yang.gdata.Node:
         mi = orchestron_rfs__rfs__base_config_entry.from_gdata(i)
-        return self.transform(mi).to_gdata()
+        return self.transform(mi, di).to_gdata()
 
-    mut def transform(self, i: orchestron_rfs__rfs__base_config_entry) -> yang.adata.MNode:
-        print("RFS /rfs{FOO}/base-config transform running", i.name)
+    mut def transform(self, i: orchestron_rfs__rfs__base_config_entry, di) -> yang.adata.MNode:
+        print("RFS /rfs{%s}/base-config transform running" % (di.name))
 
         dev = xr24.root()
-        dev.hostname.system_network_name = i.name
+        dev.hostname.system_network_name = di.name
         intf = dev.interfaces.interface.create("Loopback0")
         intf.ipv4.addresses.create_address("1.2.3.4", "255.255.255.255")
 
@@ -27,12 +27,12 @@ class BaseConfig(ttt.TTTRFSTransform):
 
 
 class BBInterface(ttt.TTTRFSTransform):
-    def transform_wrapper(self, i: yang.gdata.Node) -> yang.gdata.Node:
+    def transform_wrapper(self, i: yang.gdata.Node, di: ttt.DeviceInfo) -> yang.gdata.Node:
         mi = orchestron_rfs__rfs__backbone_interface_entry.from_gdata(i)
-        return self.transform(mi).to_gdata()
+        return self.transform(mi, di).to_gdata()
 
-    mut def transform(self, i: orchestron_rfs__rfs__backbone_interface_entry) -> yang.adata.MNode:
-        print("RFS /rfs[FOO]/backbone-interface transform running [%s] <-> %s [%s]" % (i.name, i.remote.device, i.remote.interface))
+    mut def transform(self, i: orchestron_rfs__rfs__backbone_interface_entry, di) -> yang.adata.MNode:
+        print("RFS /rfs{%s}/backbone-interface transform running [%s] <-> %s [%s]" % (di.name, i.name, i.remote.device, i.remote.interface))
 
         dev = xr24.root()
         intf = dev.interfaces.interface.create(i.name)
