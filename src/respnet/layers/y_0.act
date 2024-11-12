@@ -188,9 +188,9 @@ class netinfra__netinfra(yang.adata.MNode):
         _routers = self.routers
         _backbone_link = self.backbone_link
         if _routers is not None:
-            res.children['routers'] = self.routers.to_gdata()
+            res.children['routers'] = _routers.to_gdata()
         if _backbone_link is not None:
-            res.children['backbone-link'] = self.backbone_link.to_gdata()
+            res.children['backbone-link'] = _backbone_link.to_gdata()
         for child in res.children.values():
             child.parent = res
         return res
@@ -213,21 +213,25 @@ class root(yang.adata.MNode):
             self.l3vpn = l3vpn
         else:
             self.l3vpn = l3vpn__l3vpn()
-        self.l3vpn._parent = self
+        self_l3vpn = self.l3vpn
+        if self_l3vpn is not None:
+            self_l3vpn._parent = self
         if netinfra is not None:
             self.netinfra = netinfra
         else:
             self.netinfra = netinfra__netinfra()
-        self.netinfra._parent = self
+        self_netinfra = self.netinfra
+        if self_netinfra is not None:
+            self_netinfra._parent = self
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.Root()
         _l3vpn = self.l3vpn
         _netinfra = self.netinfra
         if _l3vpn is not None:
-            res.children['l3vpn'] = self.l3vpn.to_gdata()
+            res.children['l3vpn'] = _l3vpn.to_gdata()
         if _netinfra is not None:
-            res.children['netinfra'] = self.netinfra.to_gdata()
+            res.children['netinfra'] = _netinfra.to_gdata()
         for child in res.children.values():
             child.parent = res
         return res

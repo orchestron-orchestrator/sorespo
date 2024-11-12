@@ -5,362 +5,47 @@ import yang.gdata
 # == This file is generated ==
 
 
-class orchestron_rfs__device__address__initial_credentials_entry(yang.adata.MNode):
-    username: str
-    password: str
-    key: str
-
-    def __init__(self, username: str, password: str, key: str):
-        self.username = username
-        self.password = password
-        self.key = key
-
-    def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.username), str(self.password), str(self.key)])
-        _username = self.username
-        _password = self.password
-        _key = self.key
-        if _username is not None:
-            res.children['username'] = yang.gdata.Leaf('username', _username)
-        if _password is not None:
-            res.children['password'] = yang.gdata.Leaf('password', _password)
-        if _key is not None:
-            res.children['key'] = yang.gdata.Leaf('key', _key)
-        for child in res.children.values():
-            child.parent = res
-        return res
-
-    @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__device__address__initial_credentials_entry:
-        return orchestron_rfs__device__address__initial_credentials_entry(username=n.get_str("username"), password=n.get_str("password"), key=n.get_str("key"))
-
-    @staticmethod
-    def from_xml(n: xml.Node) -> orchestron_rfs__device__address__initial_credentials_entry:
-        return orchestron_rfs__device__address__initial_credentials_entry(username=yang.gdata.from_xml_str(n, "username"), password=yang.gdata.from_xml_str(n, "password"), key=yang.gdata.from_xml_str(n, "key"))
-
-class orchestron_rfs__device__address__initial_credentials(yang.adata.MNode):
-    elements: list[orchestron_rfs__device__address__initial_credentials_entry]
-    def __init__(self, elements=[]):
-        self._name = 'initial-credentials'
-        self.elements = elements
-
-    def create(self, username, password, key):
-        res = orchestron_rfs__device__address__initial_credentials_entry(username, password, key)
-        self.elements.append(res)
-        return res
-
-    def to_gdata(self):
-        res = yang.gdata.List('initial-credentials', ['username', 'password', 'key'])
-        for e in self.elements:
-            e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
-
-    @staticmethod
-    def from_gdata(n: yang.gdata.List) -> list[orchestron_rfs__device__address__initial_credentials_entry]:
-        res = []
-        for e in n.elements:
-            res.append(orchestron_rfs__device__address__initial_credentials_entry.from_gdata(e))
-        return res
-
-    @staticmethod
-    def from_xml(nodes: list[xml.Node]) -> list[orchestron_rfs__device__address__initial_credentials_entry]:
-        res = []
-        for node in nodes:
-            res.append(orchestron_rfs__device__address__initial_credentials_entry.from_xml(node))
-        return res
-
-
-class orchestron_rfs__device__address_entry(yang.adata.MNode):
-    host: str
-    initial_credentials: orchestron_rfs__device__address__initial_credentials
-
-    def __init__(self, host: str, initial_credentials: list[orchestron_rfs__device__address__initial_credentials_entry]=[]):
-        self.host = host
-        self.initial_credentials = orchestron_rfs__device__address__initial_credentials(elements=initial_credentials)
-        self.initial_credentials._parent = self
-
-    def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.host)])
-        _host = self.host
-        _initial_credentials = self.initial_credentials
-        if _host is not None:
-            res.children['host'] = yang.gdata.Leaf('host', _host)
-        if _initial_credentials is not None:
-            res.children['initial-credentials'] = self.initial_credentials.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
-
-    @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__device__address_entry:
-        return orchestron_rfs__device__address_entry(host=n.get_str("host"), initial_credentials=orchestron_rfs__device__address__initial_credentials.from_gdata(n.get_list("initial-credentials")))
-
-    @staticmethod
-    def from_xml(n: xml.Node) -> orchestron_rfs__device__address_entry:
-        return orchestron_rfs__device__address_entry(host=yang.gdata.from_xml_str(n, "host"), initial_credentials=orchestron_rfs__device__address__initial_credentials.from_xml(yang.gdata.get_xml_children(n, "initial-credentials")))
-
-class orchestron_rfs__device__address(yang.adata.MNode):
-    elements: list[orchestron_rfs__device__address_entry]
-    def __init__(self, elements=[]):
-        self._name = 'address'
-        self.elements = elements
-
-    def create(self, host):
-        res = orchestron_rfs__device__address_entry(host)
-        self.elements.append(res)
-        return res
-
-    def to_gdata(self):
-        res = yang.gdata.List('address', ['host'])
-        for e in self.elements:
-            e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
-
-    @staticmethod
-    def from_gdata(n: yang.gdata.List) -> list[orchestron_rfs__device__address_entry]:
-        res = []
-        for e in n.elements:
-            res.append(orchestron_rfs__device__address_entry.from_gdata(e))
-        return res
-
-    @staticmethod
-    def from_xml(nodes: list[xml.Node]) -> list[orchestron_rfs__device__address_entry]:
-        res = []
-        for node in nodes:
-            res.append(orchestron_rfs__device__address_entry.from_xml(node))
-        return res
-
-
-class orchestron_rfs__device__credentials__key_entry(yang.adata.MNode):
-    key: str
-    private_key: ?str
-
-    def __init__(self, key: str, private_key: ?str):
-        self.key = key
-        self.private_key = private_key
-
-    def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.key)])
-        _key = self.key
-        _private_key = self.private_key
-        if _key is not None:
-            res.children['key'] = yang.gdata.Leaf('key', _key)
-        if _private_key is not None:
-            res.children['private-key'] = yang.gdata.Leaf('private-key', _private_key)
-        for child in res.children.values():
-            child.parent = res
-        return res
-
-    @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__device__credentials__key_entry:
-        return orchestron_rfs__device__credentials__key_entry(key=n.get_str("key"), private_key=n.get_opt_str("private-key"))
-
-    @staticmethod
-    def from_xml(n: xml.Node) -> orchestron_rfs__device__credentials__key_entry:
-        return orchestron_rfs__device__credentials__key_entry(key=yang.gdata.from_xml_str(n, "key"), private_key=yang.gdata.from_xml_opt_str(n, "private-key"))
-
-class orchestron_rfs__device__credentials__key(yang.adata.MNode):
-    elements: list[orchestron_rfs__device__credentials__key_entry]
-    def __init__(self, elements=[]):
-        self._name = 'key'
-        self.elements = elements
-
-    def create(self, key):
-        res = orchestron_rfs__device__credentials__key_entry(key)
-        self.elements.append(res)
-        return res
-
-    def to_gdata(self):
-        res = yang.gdata.List('key', ['key'])
-        for e in self.elements:
-            e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
-
-    @staticmethod
-    def from_gdata(n: yang.gdata.List) -> list[orchestron_rfs__device__credentials__key_entry]:
-        res = []
-        for e in n.elements:
-            res.append(orchestron_rfs__device__credentials__key_entry.from_gdata(e))
-        return res
-
-    @staticmethod
-    def from_xml(nodes: list[xml.Node]) -> list[orchestron_rfs__device__credentials__key_entry]:
-        res = []
-        for node in nodes:
-            res.append(orchestron_rfs__device__credentials__key_entry.from_xml(node))
-        return res
-
-
-class orchestron_rfs__device__credentials(yang.adata.MNode):
-    username: ?str
-    password: ?str
-    key: orchestron_rfs__device__credentials__key
-
-    def __init__(self, username: ?str, password: ?str, key: list[orchestron_rfs__device__credentials__key_entry]=[]):
-        self.username = username
-        self.password = password
-        self.key = orchestron_rfs__device__credentials__key(elements=key)
-        self.key._parent = self
-
-    def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('credentials')
-        _username = self.username
-        _password = self.password
-        _key = self.key
-        if _username is not None:
-            res.children['username'] = yang.gdata.Leaf('username', _username)
-        if _password is not None:
-            res.children['password'] = yang.gdata.Leaf('password', _password)
-        if _key is not None:
-            res.children['key'] = self.key.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
-
-    @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__device__credentials:
-        return orchestron_rfs__device__credentials(username=n.get_opt_str("username"), password=n.get_opt_str("password"), key=orchestron_rfs__device__credentials__key.from_gdata(n.get_list("key")))
-
-    @staticmethod
-    def from_xml(n: xml.Node) -> orchestron_rfs__device__credentials:
-        return orchestron_rfs__device__credentials(username=yang.gdata.from_xml_opt_str(n, "username"), password=yang.gdata.from_xml_opt_str(n, "password"), key=orchestron_rfs__device__credentials__key.from_xml(yang.gdata.get_xml_children(n, "key")))
-
-
-class orchestron_rfs__device__initial_credentials_entry(yang.adata.MNode):
-    username: str
-    password: str
-    key: str
-
-    def __init__(self, username: str, password: str, key: str):
-        self.username = username
-        self.password = password
-        self.key = key
-
-    def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.username), str(self.password), str(self.key)])
-        _username = self.username
-        _password = self.password
-        _key = self.key
-        if _username is not None:
-            res.children['username'] = yang.gdata.Leaf('username', _username)
-        if _password is not None:
-            res.children['password'] = yang.gdata.Leaf('password', _password)
-        if _key is not None:
-            res.children['key'] = yang.gdata.Leaf('key', _key)
-        for child in res.children.values():
-            child.parent = res
-        return res
-
-    @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__device__initial_credentials_entry:
-        return orchestron_rfs__device__initial_credentials_entry(username=n.get_str("username"), password=n.get_str("password"), key=n.get_str("key"))
-
-    @staticmethod
-    def from_xml(n: xml.Node) -> orchestron_rfs__device__initial_credentials_entry:
-        return orchestron_rfs__device__initial_credentials_entry(username=yang.gdata.from_xml_str(n, "username"), password=yang.gdata.from_xml_str(n, "password"), key=yang.gdata.from_xml_str(n, "key"))
-
-class orchestron_rfs__device__initial_credentials(yang.adata.MNode):
-    elements: list[orchestron_rfs__device__initial_credentials_entry]
-    def __init__(self, elements=[]):
-        self._name = 'initial-credentials'
-        self.elements = elements
-
-    def create(self, username, password, key):
-        res = orchestron_rfs__device__initial_credentials_entry(username, password, key)
-        self.elements.append(res)
-        return res
-
-    def to_gdata(self):
-        res = yang.gdata.List('initial-credentials', ['username', 'password', 'key'])
-        for e in self.elements:
-            e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
-
-    @staticmethod
-    def from_gdata(n: yang.gdata.List) -> list[orchestron_rfs__device__initial_credentials_entry]:
-        res = []
-        for e in n.elements:
-            res.append(orchestron_rfs__device__initial_credentials_entry.from_gdata(e))
-        return res
-
-    @staticmethod
-    def from_xml(nodes: list[xml.Node]) -> list[orchestron_rfs__device__initial_credentials_entry]:
-        res = []
-        for node in nodes:
-            res.append(orchestron_rfs__device__initial_credentials_entry.from_xml(node))
-        return res
-
-
-class orchestron_rfs__device_entry(yang.adata.MNode):
+class xr__interface_entry(yang.adata.MNode):
     name: str
     description: ?str
-    address: orchestron_rfs__device__address
-    credentials: orchestron_rfs__device__credentials
-    initial_credentials: orchestron_rfs__device__initial_credentials
 
-    def __init__(self, name: str, description: ?str, address: list[orchestron_rfs__device__address_entry]=[], credentials: ?orchestron_rfs__device__credentials=None, initial_credentials: list[orchestron_rfs__device__initial_credentials_entry]=[]):
+    def __init__(self, name: str, description: ?str):
         self.name = name
         self.description = description
-        self.address = orchestron_rfs__device__address(elements=address)
-        self.address._parent = self
-        if credentials is not None:
-            self.credentials = credentials
-        else:
-            self.credentials = orchestron_rfs__device__credentials()
-        self.credentials._parent = self
-        self.initial_credentials = orchestron_rfs__device__initial_credentials(elements=initial_credentials)
-        self.initial_credentials._parent = self
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.ListElement([str(self.name)])
         _name = self.name
         _description = self.description
-        _address = self.address
-        _credentials = self.credentials
-        _initial_credentials = self.initial_credentials
         if _name is not None:
             res.children['name'] = yang.gdata.Leaf('name', _name)
         if _description is not None:
             res.children['description'] = yang.gdata.Leaf('description', _description)
-        if _address is not None:
-            res.children['address'] = self.address.to_gdata()
-        if _credentials is not None:
-            res.children['credentials'] = self.credentials.to_gdata()
-        if _initial_credentials is not None:
-            res.children['initial-credentials'] = self.initial_credentials.to_gdata()
         for child in res.children.values():
             child.parent = res
         return res
 
     @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__device_entry:
-        return orchestron_rfs__device_entry(name=n.get_str("name"), description=n.get_opt_str("description"), address=orchestron_rfs__device__address.from_gdata(n.get_list("address")), credentials=orchestron_rfs__device__credentials.from_gdata(n.get_container("credentials")), initial_credentials=orchestron_rfs__device__initial_credentials.from_gdata(n.get_list("initial-credentials")))
+    def from_gdata(n: yang.gdata.Node) -> xr__interface_entry:
+        return xr__interface_entry(name=n.get_str("name"), description=n.get_opt_str("description"))
 
     @staticmethod
-    def from_xml(n: xml.Node) -> orchestron_rfs__device_entry:
-        return orchestron_rfs__device_entry(name=yang.gdata.from_xml_str(n, "name"), description=yang.gdata.from_xml_opt_str(n, "description"), address=orchestron_rfs__device__address.from_xml(yang.gdata.get_xml_children(n, "address")), credentials=orchestron_rfs__device__credentials.from_xml(yang.gdata.get_xml_child(n, "credentials")), initial_credentials=orchestron_rfs__device__initial_credentials.from_xml(yang.gdata.get_xml_children(n, "initial-credentials")))
+    def from_xml(n: xml.Node) -> xr__interface_entry:
+        return xr__interface_entry(name=yang.gdata.from_xml_str(n, "name"), description=yang.gdata.from_xml_opt_str(n, "description"))
 
-class orchestron_rfs__device(yang.adata.MNode):
-    elements: list[orchestron_rfs__device_entry]
+class xr__interface(yang.adata.MNode):
+    elements: list[xr__interface_entry]
     def __init__(self, elements=[]):
-        self._name = 'device'
+        self._name = 'interface'
         self.elements = elements
 
     def create(self, name):
-        res = orchestron_rfs__device_entry(name)
+        res = xr__interface_entry(name)
         self.elements.append(res)
         return res
 
     def to_gdata(self):
-        res = yang.gdata.List('device', ['name'])
+        res = yang.gdata.List('interface', ['name'])
         for e in self.elements:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.ListElement):
@@ -368,222 +53,139 @@ class orchestron_rfs__device(yang.adata.MNode):
         return res
 
     @staticmethod
-    def from_gdata(n: yang.gdata.List) -> list[orchestron_rfs__device_entry]:
+    def from_gdata(n: yang.gdata.List) -> list[xr__interface_entry]:
         res = []
         for e in n.elements:
-            res.append(orchestron_rfs__device_entry.from_gdata(e))
+            res.append(xr__interface_entry.from_gdata(e))
         return res
 
     @staticmethod
-    def from_xml(nodes: list[xml.Node]) -> list[orchestron_rfs__device_entry]:
+    def from_xml(nodes: list[xml.Node]) -> list[xr__interface_entry]:
         res = []
         for node in nodes:
-            res.append(orchestron_rfs__device_entry.from_xml(node))
+            res.append(xr__interface_entry.from_xml(node))
         return res
 
 
-class orchestron_rfs__rfs__backbone_interface__remote(yang.adata.MNode):
-    device: str
-    interface: str
+class junos__interfaces__interface_entry(yang.adata.MNode):
+    name: str
+    description: ?str
 
-    def __init__(self, device: str, interface: str):
-        self.device = device
-        self.interface = interface
+    def __init__(self, name: str, description: ?str):
+        self.name = name
+        self.description = description
 
     def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('remote')
-        _device = self.device
+        res = yang.gdata.ListElement([str(self.name)])
+        _name = self.name
+        _description = self.description
+        if _name is not None:
+            res.children['name'] = yang.gdata.Leaf('name', _name)
+        if _description is not None:
+            res.children['description'] = yang.gdata.Leaf('description', _description)
+        for child in res.children.values():
+            child.parent = res
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.Node) -> junos__interfaces__interface_entry:
+        return junos__interfaces__interface_entry(name=n.get_str("name"), description=n.get_opt_str("description"))
+
+    @staticmethod
+    def from_xml(n: xml.Node) -> junos__interfaces__interface_entry:
+        return junos__interfaces__interface_entry(name=yang.gdata.from_xml_str(n, "name"), description=yang.gdata.from_xml_opt_str(n, "description"))
+
+class junos__interfaces__interface(yang.adata.MNode):
+    elements: list[junos__interfaces__interface_entry]
+    def __init__(self, elements=[]):
+        self._name = 'interface'
+        self.elements = elements
+
+    def create(self, name):
+        res = junos__interfaces__interface_entry(name)
+        self.elements.append(res)
+        return res
+
+    def to_gdata(self):
+        res = yang.gdata.List('interface', ['name'])
+        for e in self.elements:
+            e_gdata = e.to_gdata()
+            if isinstance(e_gdata, yang.gdata.ListElement):
+                res.elements.append(e_gdata)
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.List) -> list[junos__interfaces__interface_entry]:
+        res = []
+        for e in n.elements:
+            res.append(junos__interfaces__interface_entry.from_gdata(e))
+        return res
+
+    @staticmethod
+    def from_xml(nodes: list[xml.Node]) -> list[junos__interfaces__interface_entry]:
+        res = []
+        for node in nodes:
+            res.append(junos__interfaces__interface_entry.from_xml(node))
+        return res
+
+
+class junos__interfaces(yang.adata.MNode):
+    interface: junos__interfaces__interface
+
+    def __init__(self, interface: list[junos__interfaces__interface_entry]=[]):
+        self.interface = junos__interfaces__interface(elements=interface)
+        self.interface._parent = self
+
+    def to_gdata(self) -> yang.gdata.Node:
+        res = yang.gdata.Container('interfaces')
         _interface = self.interface
-        if _device is not None:
-            res.children['device'] = yang.gdata.Leaf('device', _device)
         if _interface is not None:
-            res.children['interface'] = yang.gdata.Leaf('interface', _interface)
+            res.children['interface'] = _interface.to_gdata()
         for child in res.children.values():
             child.parent = res
         return res
 
     @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__backbone_interface__remote:
-        return orchestron_rfs__rfs__backbone_interface__remote(device=n.get_str("device"), interface=n.get_str("interface"))
+    def from_gdata(n: yang.gdata.Node) -> junos__interfaces:
+        return junos__interfaces(interface=junos__interfaces__interface.from_gdata(n.get_list("interface")))
 
     @staticmethod
-    def from_xml(n: xml.Node) -> orchestron_rfs__rfs__backbone_interface__remote:
-        return orchestron_rfs__rfs__backbone_interface__remote(device=yang.gdata.from_xml_str(n, "device"), interface=yang.gdata.from_xml_str(n, "interface"))
-
-
-class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
-    name: str
-    ipv4_address: ?str
-    ipv4_prefix_length: ?int
-    ipv6_address: ?str
-    ipv6_prefix_length: ?int
-    remote: orchestron_rfs__rfs__backbone_interface__remote
-
-    def __init__(self, name: str, remote: orchestron_rfs__rfs__backbone_interface__remote, ipv4_address: ?str, ipv4_prefix_length: ?int, ipv6_address: ?str, ipv6_prefix_length: ?int):
-        self.name = name
-        self.ipv4_address = ipv4_address
-        self.ipv4_prefix_length = ipv4_prefix_length
-        self.ipv6_address = ipv6_address
-        self.ipv6_prefix_length = ipv6_prefix_length
-        self.remote = remote
-        self.remote._parent = self
-
-    def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.name)])
-        _name = self.name
-        _ipv4_address = self.ipv4_address
-        _ipv4_prefix_length = self.ipv4_prefix_length
-        _ipv6_address = self.ipv6_address
-        _ipv6_prefix_length = self.ipv6_prefix_length
-        _remote = self.remote
-        if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', _name)
-        if _ipv4_address is not None:
-            res.children['ipv4-address'] = yang.gdata.Leaf('ipv4-address', _ipv4_address)
-        if _ipv4_prefix_length is not None:
-            res.children['ipv4-prefix-length'] = yang.gdata.Leaf('ipv4-prefix-length', _ipv4_prefix_length)
-        if _ipv6_address is not None:
-            res.children['ipv6-address'] = yang.gdata.Leaf('ipv6-address', _ipv6_address)
-        if _ipv6_prefix_length is not None:
-            res.children['ipv6-prefix-length'] = yang.gdata.Leaf('ipv6-prefix-length', _ipv6_prefix_length)
-        if _remote is not None:
-            res.children['remote'] = self.remote.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
-
-    @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__backbone_interface_entry:
-        return orchestron_rfs__rfs__backbone_interface_entry(name=n.get_str("name"), ipv4_address=n.get_opt_str("ipv4-address"), ipv4_prefix_length=n.get_opt_int("ipv4-prefix-length"), ipv6_address=n.get_opt_str("ipv6-address"), ipv6_prefix_length=n.get_opt_int("ipv6-prefix-length"), remote=orchestron_rfs__rfs__backbone_interface__remote.from_gdata(n.get_container("remote")))
-
-    @staticmethod
-    def from_xml(n: xml.Node) -> orchestron_rfs__rfs__backbone_interface_entry:
-        return orchestron_rfs__rfs__backbone_interface_entry(name=yang.gdata.from_xml_str(n, "name"), ipv4_address=yang.gdata.from_xml_opt_str(n, "ipv4-address"), ipv4_prefix_length=yang.gdata.from_xml_opt_int(n, "ipv4-prefix-length"), ipv6_address=yang.gdata.from_xml_opt_str(n, "ipv6-address"), ipv6_prefix_length=yang.gdata.from_xml_opt_int(n, "ipv6-prefix-length"), remote=orchestron_rfs__rfs__backbone_interface__remote.from_xml(yang.gdata.get_xml_child(n, "remote")))
-
-class orchestron_rfs__rfs__backbone_interface(yang.adata.MNode):
-    elements: list[orchestron_rfs__rfs__backbone_interface_entry]
-    def __init__(self, elements=[]):
-        self._name = 'backbone-interface'
-        self.elements = elements
-
-    def create(self, name, remote):
-        res = orchestron_rfs__rfs__backbone_interface_entry(name, remote)
-        self.elements.append(res)
-        return res
-
-    def to_gdata(self):
-        res = yang.gdata.List('backbone-interface', ['name'])
-        for e in self.elements:
-            e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
-
-    @staticmethod
-    def from_gdata(n: yang.gdata.List) -> list[orchestron_rfs__rfs__backbone_interface_entry]:
-        res = []
-        for e in n.elements:
-            res.append(orchestron_rfs__rfs__backbone_interface_entry.from_gdata(e))
-        return res
-
-    @staticmethod
-    def from_xml(nodes: list[xml.Node]) -> list[orchestron_rfs__rfs__backbone_interface_entry]:
-        res = []
-        for node in nodes:
-            res.append(orchestron_rfs__rfs__backbone_interface_entry.from_xml(node))
-        return res
-
-
-class orchestron_rfs__rfs_entry(yang.adata.MNode):
-    name: str
-    backbone_interface: orchestron_rfs__rfs__backbone_interface
-
-    def __init__(self, name: str, backbone_interface: list[orchestron_rfs__rfs__backbone_interface_entry]=[]):
-        self.name = name
-        self.backbone_interface = orchestron_rfs__rfs__backbone_interface(elements=backbone_interface)
-        self.backbone_interface._parent = self
-
-    def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.name)])
-        _name = self.name
-        _backbone_interface = self.backbone_interface
-        if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', _name)
-        if _backbone_interface is not None:
-            res.children['backbone-interface'] = self.backbone_interface.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
-
-    @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs_entry:
-        return orchestron_rfs__rfs_entry(name=n.get_str("name"), backbone_interface=orchestron_rfs__rfs__backbone_interface.from_gdata(n.get_list("backbone-interface")))
-
-    @staticmethod
-    def from_xml(n: xml.Node) -> orchestron_rfs__rfs_entry:
-        return orchestron_rfs__rfs_entry(name=yang.gdata.from_xml_str(n, "name"), backbone_interface=orchestron_rfs__rfs__backbone_interface.from_xml(yang.gdata.get_xml_children(n, "backbone-interface")))
-
-class orchestron_rfs__rfs(yang.adata.MNode):
-    elements: list[orchestron_rfs__rfs_entry]
-    def __init__(self, elements=[]):
-        self._name = 'rfs'
-        self.elements = elements
-
-    def create(self, name):
-        res = orchestron_rfs__rfs_entry(name)
-        self.elements.append(res)
-        return res
-
-    def to_gdata(self):
-        res = yang.gdata.List('rfs', ['name'])
-        for e in self.elements:
-            e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
-
-    @staticmethod
-    def from_gdata(n: yang.gdata.List) -> list[orchestron_rfs__rfs_entry]:
-        res = []
-        for e in n.elements:
-            res.append(orchestron_rfs__rfs_entry.from_gdata(e))
-        return res
-
-    @staticmethod
-    def from_xml(nodes: list[xml.Node]) -> list[orchestron_rfs__rfs_entry]:
-        res = []
-        for node in nodes:
-            res.append(orchestron_rfs__rfs_entry.from_xml(node))
-        return res
+    def from_xml(n: xml.Node) -> junos__interfaces:
+        return junos__interfaces(interface=junos__interfaces__interface.from_xml(yang.gdata.get_xml_children(n, "interface")))
 
 
 class root(yang.adata.MNode):
-    device: orchestron_rfs__device
-    rfs: orchestron_rfs__rfs
+    interface: xr__interface
+    interfaces: junos__interfaces
 
-    def __init__(self, device: list[orchestron_rfs__device_entry]=[], rfs: list[orchestron_rfs__rfs_entry]=[]):
-        self.device = orchestron_rfs__device(elements=device)
-        self.device._parent = self
-        self.rfs = orchestron_rfs__rfs(elements=rfs)
-        self.rfs._parent = self
+    def __init__(self, interface: list[xr__interface_entry]=[], interfaces: ?junos__interfaces=None):
+        self.interface = xr__interface(elements=interface)
+        self.interface._parent = self
+        if interfaces is not None:
+            self.interfaces = interfaces
+        else:
+            self.interfaces = junos__interfaces()
+        self_interfaces = self.interfaces
+        if self_interfaces is not None:
+            self_interfaces._parent = self
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.Root()
-        _device = self.device
-        _rfs = self.rfs
-        if _device is not None:
-            res.children['device'] = self.device.to_gdata()
-        if _rfs is not None:
-            res.children['rfs'] = self.rfs.to_gdata()
+        _interface = self.interface
+        _interfaces = self.interfaces
+        if _interface is not None:
+            res.children['interface'] = _interface.to_gdata()
+        if _interfaces is not None:
+            res.children['interfaces'] = _interfaces.to_gdata()
         for child in res.children.values():
             child.parent = res
         return res
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> root:
-        return root(device=orchestron_rfs__device.from_gdata(n.get_list("device")), rfs=orchestron_rfs__rfs.from_gdata(n.get_list("rfs")))
+        return root(interface=xr__interface.from_gdata(n.get_list("interface")), interfaces=junos__interfaces.from_gdata(n.get_container("interfaces")))
 
     @staticmethod
     def from_xml(n: xml.Node) -> root:
-        return root(device=orchestron_rfs__device.from_xml(yang.gdata.get_xml_children(n, "device")), rfs=orchestron_rfs__rfs.from_xml(yang.gdata.get_xml_children(n, "rfs")))
+        return root(interface=xr__interface.from_xml(yang.gdata.get_xml_children(n, "interface")), interfaces=junos__interfaces.from_xml(yang.gdata.get_xml_child(n, "interfaces")))
 

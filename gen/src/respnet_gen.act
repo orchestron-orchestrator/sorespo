@@ -34,6 +34,7 @@ netinfra_yang = """module netinfra {
         type string;
       }
     }
+
     list backbone-link {
       key "left-router left-interface right-router right-interface";
 
@@ -78,59 +79,6 @@ l3vpn_yang = """module l3vpn {
 }
 """
 
-nodes_yang = """module nodes {
-  yang-version "1.1";
-  namespace "http://example.com/nodes";
-  prefix "nodes";
-  description "Nodes services";
-  revision 2019-01-01 {
-    description "funky revision";
-    reference "ref1";
-  }
-
-  container nodes {
-    list routers {
-      key name;
-      leaf name {
-        type string;
-      }
-
-      orchestron:transform respnet.rfs.Router;
-
-      leaf id {
-        type string;
-      }
-
-      leaf ipv4-address {
-        type string;
-      }
-
-      leaf ipv6-address {
-        type string;
-      }
-      leaf corefoo {
-        type string;
-      }
-      list backbone-interface {
-        key name;
-        leaf name {
-          type string;
-        }
-        container remote {
-          leaf device {
-            type string;
-            mandatory true;
-          }
-          leaf interface {
-            type string;
-            mandatory true;
-          }
-        }
-      }
-    }
-  }
-}
-"""
 
 respnet_rfs_yang = """module respnet-rfs {
     yang-version "1.1";
@@ -142,6 +90,25 @@ respnet_rfs_yang = """module respnet-rfs {
     }
 
     augment "/orfs:rfs" {
+        // TODO: should really be a P-container
+        list base-config {
+            key name;
+
+            orchestron:transform respnet.rfs.BaseConfig;
+
+            leaf name {
+                type string;
+            }
+
+            leaf ipv4-address {
+                type string;
+            }
+
+            leaf ipv6-address {
+                type string;
+            }
+        }
+
         list backbone-interface {
             key name;
 
@@ -232,7 +199,6 @@ actor main(env):
 
     spec = orchestron.build.SysSpec("respnet", [
         orchestron.build.Layer([netinfra_yang, l3vpn_yang]),
-        orchestron.build.Layer([nodes_yang]),
         orchestron.build.Layer([oyang.rfs, oyang.ietf_inet_types, respnet_rfs_yang]),
         orchestron.build.Layer([dev_junos_yang, dev_xr_yang]),
     ], [

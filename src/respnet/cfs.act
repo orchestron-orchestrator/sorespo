@@ -18,11 +18,11 @@ class Router(ttt.TTTTransform):
     mut def transform(self, i: netinfra__netinfra__routers_entry) -> o_root:
         o = o_root()
         print("CFS router transform running", i.name, i.id)
-        router = o.nodes.routers.create(i.name)
-        router.id = i.id
         sid = i.id
-        router.ipv4_address = "10.0.1.%s/32" % sid if sid is not None else ""
-        router.ipv6_address = "2001:db8:0:1::%s/128" % sid if sid is not None else ""
+        rfs = o.rfs.create(i.name)
+        bc = rfs.base_config.create(i.name) # TODO: should be P-container
+        bc.ipv4_address = "10.0.0.%s/32" % sid if sid is not None else ""
+        bc.ipv6_address = "2001:db8:0:0::%s/128" % sid if sid is not None else ""
         return o
 
 
@@ -36,13 +36,13 @@ class BBLink(ttt.TTTTransform):
         print("CFS backbonelink transform running %s [%s] <-> %s [%s]" % (i.left_router, i.left_interface, i.right_router, i.right_interface))
         o = o_root()
 
-        left_r = o.nodes.routers.create(i.left_router)
-        li = left_r.backbone_interface.create(i.left_interface)
+        left_rfs = o.rfs.create(i.left_router)
+        li = left_rfs.backbone_interface.create(i.left_interface)
         li.remote.device = i.right_router
         li.remote.interface = i.right_interface
 
-        right_r = o.nodes.routers.create(i.right_router)
-        ri = right_r.backbone_interface.create(i.right_interface)
+        right_rfs = o.rfs.create(i.right_router)
+        ri = right_rfs.backbone_interface.create(i.right_interface)
         ri.remote.device = i.left_router
         ri.remote.interface = i.left_interface
 
