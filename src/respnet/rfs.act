@@ -11,11 +11,7 @@ from respnet.layers.y_1 import orchestron_rfs__rfs__backbone_interface_entry
 import respnet.devices.CiscoIosXr_24_1_ncs55a1 as xr24
 
 class BaseConfig(ttt.TTTRFSTransform):
-    def transform_wrapper(self, i: yang.gdata.Node, di: ttt.DeviceInfo) -> yang.gdata.Node:
-        mi = orchestron_rfs__rfs__base_config_entry.from_gdata(i)
-        return self.transform(mi, di).to_gdata()
-
-    mut def transform(self, i: orchestron_rfs__rfs__base_config_entry, di) -> yang.adata.MNode:
+    mut def transform(self, i: orchestron_rfs__rfs__base_config_entry, di: ttt.DeviceInfo) -> yang.adata.MNode:
         print("RFS /rfs{%s}/base-config transform running" % (di.name))
 
         dev = xr24.root()
@@ -27,11 +23,7 @@ class BaseConfig(ttt.TTTRFSTransform):
 
 
 class BBInterface(ttt.TTTRFSTransform):
-    def transform_wrapper(self, i: yang.gdata.Node, di: ttt.DeviceInfo) -> yang.gdata.Node:
-        mi = orchestron_rfs__rfs__backbone_interface_entry.from_gdata(i)
-        return self.transform(mi, di).to_gdata()
-
-    mut def transform(self, i: orchestron_rfs__rfs__backbone_interface_entry, di) -> yang.adata.MNode:
+    mut def transform(self, i: orchestron_rfs__rfs__backbone_interface_entry, di: ttt.DeviceInfo) -> yang.adata.MNode:
         print("RFS /rfs{%s}/backbone-interface transform running [%s] <-> %s [%s]" % (di.name, i.name, i.remote.device, i.remote.interface))
 
         dev = xr24.root()

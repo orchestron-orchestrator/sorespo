@@ -6,10 +6,29 @@ import orchestron.ttt as ttt
 import yang.adata
 import yang.gdata
 
+from respnet.layers.y_0 import netinfra__netinfra__routers_entry
+from respnet.layers.y_0 import netinfra__netinfra__backbone_link_entry
+
 import respnet.cfs
 
+class Router_Wrapper(respnet.cfs.Router):
+    mut def transform_wrapper(self, i: yang.gdata.Node) -> yang.gdata.Node:
+        """Wrap the user provided transform method to convert from gdata to
+        modeled input and back to gdata
+        """
+        modeled_input = netinfra__netinfra__routers_entry.from_gdata(i)
+        return self.transform(modeled_input).to_gdata()
+
+
+class BBLink_Wrapper(respnet.cfs.BBLink):
+    mut def transform_wrapper(self, i: yang.gdata.Node) -> yang.gdata.Node:
+        """Wrap the user provided transform method to convert from gdata to
+        modeled input and back to gdata
+        """
+        modeled_input = netinfra__netinfra__backbone_link_entry.from_gdata(i)
+        return self.transform(modeled_input).to_gdata()
 
 
 def get_ttt() -> ttt.TTTNode:
-    r = ttt.TTTContainer({"l3vpn": ttt.TTTContainer({}), "netinfra": ttt.TTTContainer({"routers": ttt.TTTList(respnet.cfs.Router), "backbone-link": ttt.TTTList(respnet.cfs.BBLink)})})
+    r = ttt.TTTContainer({"l3vpn": ttt.TTTContainer({}), "netinfra": ttt.TTTContainer({"routers": ttt.TTTList(Router_Wrapper), "backbone-link": ttt.TTTList(BBLink_Wrapper)})})
     return r
