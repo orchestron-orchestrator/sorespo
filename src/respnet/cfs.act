@@ -1,17 +1,11 @@
-
-
-import orchestron.ttt as ttt
 import yang.adata
-import yang.gdata
+import orchestron.ttt
 
-from respnet.layers.y_0 import netinfra__netinfra__routers_entry
-from respnet.layers.y_0 import netinfra__netinfra__backbone_link_entry
-from respnet.layers.y_1_loose import root as o_root
+import respnet.layers.base_0 as base
 
-
-class Router(ttt.TTTTransform):
-    mut def transform(self, i: netinfra__netinfra__routers_entry) -> o_root:
-        o = o_root()
+class Router(base.Router):
+    def transform(self, i):
+        o = base.o_root()
         print("CFS router transform running", i.name, i.id)
         sid = i.id
         rfs = o.rfs.create(i.name)
@@ -21,10 +15,10 @@ class Router(ttt.TTTTransform):
         return o
 
 
-class BBLink(ttt.TTTTransform):
-    mut def transform(self, i: netinfra__netinfra__backbone_link_entry) -> o_root:
+class BBLink(base.BBLink):
+    def transform(self, i):
         print("CFS backbonelink transform running %s [%s] <-> %s [%s]" % (i.left_router, i.left_interface, i.right_router, i.right_interface))
-        o = o_root()
+        o = base.o_root()
 
         left_rfs = o.rfs.create(i.left_router)
         li = left_rfs.backbone_interface.create(i.left_interface)
