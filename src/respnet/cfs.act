@@ -7,6 +7,12 @@ class Router(base.Router):
     def transform(self, i):
         o = base.o_root()
         print("CFS router transform running", i.name, i.id)
+        dev = o.device.create(i.name)
+        oob_addr = dev.address.create("oob")
+        oob_addr.address = "127.0.0.1"
+        oob_addr.port = 36819
+        dev.credentials.username = "admin"
+        dev.credentials.password = "admin"
         sid = i.id
         rfs = o.rfs.create(i.name)
         bc = rfs.base_config.create(i.name) # TODO: should be P-container
