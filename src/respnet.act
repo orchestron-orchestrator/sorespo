@@ -33,7 +33,7 @@ actor main(env):
     nb_input = await async f.read()
     f.close()
 
-    dev_mgr = odev.DeviceManager()
+    dev_mgr = odev.DeviceManager(env.cap)
     layers = respnet.layers.get_layers(dev_mgr)
 
     # Bootstrap first layer config input
@@ -45,10 +45,12 @@ actor main(env):
         print("Computing layer %d" % idx)
         config_out = {}
         layer.configure(config_in, config_out)
-        print("=== Layer %d config === START ===" % idx)
+        #print("=== Layer %d config === START ===" % idx)
         mc = merge_confpsrc(config_out)
-        print(mc.to_xmlstr())
-        print("=== Layer %d config === END =====" % idx)
+        #print(mc.to_xmlstr())
+        #print("=== Layer %d config === END =====" % idx)
         config_in = config_out
 
-    env.exit(0)
+    print("Now what...")
+
+    #env.exit(0)

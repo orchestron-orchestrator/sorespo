@@ -9,15 +9,14 @@ class Router(base.Router):
         print("CFS router transform running", i.name, i.id)
         dev = o.device.create(i.name)
         oob_addr = dev.address.create("oob")
-        oob_addr.address = "127.0.0.1"
-        oob_addr.port = 36819
-        dev.credentials.username = "admin"
-        dev.credentials.password = "admin"
+        oob_addr.address = i.name
+        dev.credentials.username = "clab"
+        dev.credentials.password = "clab@123"
         sid = i.id
         rfs = o.rfs.create(i.name)
         bc = rfs.base_config.create(i.name) # TODO: should be P-container
-        bc.ipv4_address = "10.0.0.%s/32" % sid if sid is not None else ""
-        bc.ipv6_address = "2001:db8:0:0::%s/128" % sid if sid is not None else ""
+        bc.ipv4_address = "10.0.0.%s" % sid if sid is not None else ""
+        bc.ipv6_address = "2001:db8:0:0::%s" % sid if sid is not None else ""
         return o
 
 
