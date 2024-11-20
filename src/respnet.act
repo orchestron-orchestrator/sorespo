@@ -3,6 +3,8 @@ import file
 import xml
 import yang.adata
 import yang.gdata
+
+import orchestron.device as odev
 import orchestron.ttt as ttt
 
 import respnet.layers
@@ -31,14 +33,15 @@ actor main(env):
     nb_input = await async f.read()
     f.close()
 
-    layers = respnet.layers.get_layers()
+    dev_mgr = odev.DeviceManager()
+    layers = respnet.layers.get_layers(dev_mgr)
 
     # Bootstrap first layer config input
     input_config = cfs_root.from_xml(xml.decode(nb_input.decode()))
     config_in = {"source1": input_config.to_gdata()}
 
     config_out = {}
-    for idx, layer in enumerate(respnet.layers.get_layers()):
+    for idx, layer in enumerate(layers):
         print("Computing layer %d" % idx)
         config_out = {}
         layer.configure(config_in, config_out)
