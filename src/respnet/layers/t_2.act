@@ -7,11 +7,16 @@ import orchestron.ttt as ttt
 import yang.adata
 import yang.gdata
 
+from respnet.layers.y_2 import orchestron_rfs__rfs__base_config_entry
+from respnet.layers.y_2 import orchestron_rfs__rfs__backbone_interface_entry
+from respnet.layers.y_2 import orchestron_rfs__rfs__vrf_entry
+from respnet.layers.y_2 import orchestron_rfs__rfs__customer_interface_entry
 
-
+import respnet.rfs
 
 def get_ttt(dev_mgr: odev.DeviceManager) -> ttt.TTTNode:
+    def create_list_entry_orchestron_rfs__rfs():
+        return ttt.TTTContainer({"base-config": ttt.TTTList(respnet.rfs.BaseConfig), "backbone-interface": ttt.TTTList(respnet.rfs.BBInterface), "vrf": ttt.TTTList(respnet.rfs.Vrf), "customer-interface": ttt.TTTList(respnet.rfs.CustomerInterface)})
 
-
-    r = ttt.TTTContainer({"devices": ttt.TTTContainer({"device": ttt.TTTList(lambda: ttt.TTTDeviceConfig(dev_mgr))})})
+    r = ttt.TTTContainer({"device": ttt.TTTList(lambda: ttt.TTTDevice(dev_mgr)), "rfs": ttt.TTTList(create_list_entry_orchestron_rfs__rfs)})
     return r

@@ -1,0 +1,130 @@
+import xml
+import yang.adata
+import yang.gdata
+
+# == This file is generated ==
+
+
+class orchestron_device__devices__device_entry(yang.adata.MNode):
+    name: str
+
+    def __init__(self, name: str):
+        self._ns = "http://orchestron.org/yang/orchestron-device.yang"
+        self.name = name
+
+    def to_gdata(self) -> yang.gdata.Node:
+        res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
+        _name = self.name
+        if _name is not None:
+            res.children['name'] = yang.gdata.Leaf('name', _name, ns=self._ns)
+        for child in res.children.values():
+            child.parent = res
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.Node) -> orchestron_device__devices__device_entry:
+        return orchestron_device__devices__device_entry(name=n.get_str("name"))
+
+    @staticmethod
+    def from_xml(n: xml.Node) -> orchestron_device__devices__device_entry:
+        return orchestron_device__devices__device_entry(name=yang.gdata.from_xml_str(n, "name"))
+
+class orchestron_device__devices__device(yang.adata.MNode):
+    elements: list[orchestron_device__devices__device_entry]
+    def __init__(self, elements=[]):
+        self._ns = "http://orchestron.org/yang/orchestron-device.yang"
+        self._name = 'device'
+        self.elements = elements
+
+    def create(self, name):
+        res = orchestron_device__devices__device_entry(name)
+        self.elements.append(res)
+        return res
+
+    def to_gdata(self):
+        res = yang.gdata.List('device', ['name'], ns=self._ns)
+        for e in self.elements:
+            e_gdata = e.to_gdata()
+            if isinstance(e_gdata, yang.gdata.ListElement):
+                res.elements.append(e_gdata)
+        return res
+
+    @staticmethod
+    def from_gdata(n: yang.gdata.List) -> list[orchestron_device__devices__device_entry]:
+        res = []
+        for e in n.elements:
+            res.append(orchestron_device__devices__device_entry.from_gdata(e))
+        return res
+
+    @staticmethod
+    def from_xml(nodes: list[xml.Node]) -> list[orchestron_device__devices__device_entry]:
+        res = []
+        for node in nodes:
+            res.append(orchestron_device__devices__device_entry.from_xml(node))
+        return res
+
+
+class orchestron_device__devices(yang.adata.MNode):
+    device: orchestron_device__devices__device
+
+    def __init__(self, device: list[orchestron_device__devices__device_entry]=[]):
+        self._ns = "http://orchestron.org/yang/orchestron-device.yang"
+        self.device = orchestron_device__devices__device(elements=device)
+        self.device._parent = self
+
+    def to_gdata(self) -> yang.gdata.Node:
+        res = yang.gdata.Container('devices', ns=self._ns)
+        _device = self.device
+        if _device is not None:
+            res.children['device'] = _device.to_gdata()
+        for child in res.children.values():
+            child.parent = res
+        return res
+
+    @staticmethod
+    def from_gdata(n: ?yang.gdata.Node) -> orchestron_device__devices:
+        if n != None:
+            return orchestron_device__devices(device=orchestron_device__devices__device.from_gdata(n.get_list("device")))
+        return orchestron_device__devices()
+
+    @staticmethod
+    def from_xml(n: ?xml.Node) -> orchestron_device__devices:
+        if n != None:
+            return orchestron_device__devices(device=orchestron_device__devices__device.from_xml(yang.gdata.get_xml_children(n, "device")))
+        return orchestron_device__devices()
+
+
+class root(yang.adata.MNode):
+    devices: orchestron_device__devices
+
+    def __init__(self, devices: ?orchestron_device__devices=None):
+        self._ns = ""
+        if devices is not None:
+            self.devices = devices
+        else:
+            self.devices = orchestron_device__devices()
+        self_devices = self.devices
+        if self_devices is not None:
+            self_devices._parent = self
+
+    def to_gdata(self) -> yang.gdata.Node:
+        res = yang.gdata.Root()
+        _devices = self.devices
+        if _devices is not None:
+            res.children['devices'] = _devices.to_gdata()
+        for child in res.children.values():
+            child.parent = res
+        return res
+
+    @staticmethod
+    def from_gdata(n: ?yang.gdata.Node) -> root:
+        if n != None:
+            return root(devices=orchestron_device__devices.from_gdata(n.get_opt_container("devices")))
+        return root()
+
+    @staticmethod
+    def from_xml(n: ?xml.Node) -> root:
+        if n != None:
+            return root(devices=orchestron_device__devices.from_xml(yang.gdata.get_xml_opt_child(n, "devices")))
+        return root()
+

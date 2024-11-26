@@ -7,16 +7,9 @@ class Router(base.Router):
     def transform(self, i):
         o = base.o_root()
         print("CFS router transform running", i.name, i.id)
-        dev = o.device.create(i.name)
-        oob_addr = dev.address.create("oob")
-        oob_addr.address = i.name
-        dev.credentials.username = "clab"
-        dev.credentials.password = "clab@123"
-        sid = i.id
-        rfs = o.rfs.create(i.name)
-        bc = rfs.base_config.create(i.name) # TODO: should be P-container
-        bc.ipv4_address = "10.0.0.%s" % sid if sid is not None else ""
-        bc.ipv6_address = "2001:db8:0:0::%s" % sid if sid is not None else ""
+        o_router = o.netinfra.routers.create(i.name)
+        o_router.id = i.id
+        o_router.role = i.role
         return o
 
 
@@ -24,15 +17,22 @@ class BBLink(base.BBLink):
     def transform(self, i):
         print("CFS backbonelink transform running %s [%s] <-> %s [%s]" % (i.left_router, i.left_interface, i.right_router, i.right_interface))
         o = base.o_root()
+        o.netinfra.backbone_link.create(i.left_router, i.left_interface, i.right_router, i.right_interface)
+        return o
 
-        left_rfs = o.rfs.create(i.left_router)
-        li = left_rfs.backbone_interface.create(i.left_interface)
-        li.remote.device = i.right_router
-        li.remote.interface = i.right_interface
 
-        right_rfs = o.rfs.create(i.right_router)
-        ri = right_rfs.backbone_interface.create(i.right_interface)
-        ri.remote.device = i.left_router
-        ri.remote.interface = i.left_interface
+class L3VpnVpnService(base.L3VpnVpnService):
+    def transform(self, i):
+        print("CFS L3VPN VPN Service transform running %s" % (i.vpn_id))
+        customer_name = i.customer_name
+        o = base.o_root()
+        o_vpn = o.l3vpns.l3vpn.create(i.vpn_id)
+        o_vpn.description = "Customer VPN for %s" % customer_name if customer_name is not None else ""
+        return o
 
+
+class L3VpnSite(base.L3VpnSite):
+    def transform(self, i):
+        print("CFS L3VPN Site transform running %s" % (i.site_id))
+        o = base.o_root()
         return o

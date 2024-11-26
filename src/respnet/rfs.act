@@ -1,7 +1,7 @@
 import yang.adata
 import orchestron.ttt
 
-import respnet.layers.base_1 as base
+import respnet.layers.base_2 as base
 
 import respnet.devices.CiscoIosXr_24_1_ncs55a1 as xr24
 
@@ -25,5 +25,29 @@ class BBInterface(base.BBInterface):
         intf = dev.interfaces.interface.create(i.name)
         intf.description = "Link to %s [%s]" % (i.remote.device, i.remote.interface)
         intf.ipv4.addresses.create_address("1.2.3.5", "255.255.255.252")
+
+        return dev
+
+
+class Vrf(base.Vrf):
+    def transform(self, i, di):
+        print("RFS /rfs{%s}/vrf transform running %s" % (di.name, i.name))
+
+        dev = xr24.root()
+        vrf = dev.vrfs.vrf.create(i.name)
+        vrf.description = i.description
+
+        return dev
+
+
+class CustomerInterface(base.CustomerInterface):
+    def transform(self, i, di):
+        print("RFS /rfs{%s}/vrf transform running %s" % (di.name, i.name))
+
+        dev = xr24.root()
+        intf = dev.interfaces.interface.create(i.name)
+        intf.description = i.description
+        intf.ipv4.addresses.create_address("1.2.3.5", "255.255.255.252")
+        intf.vrf = i.vrf
 
         return dev

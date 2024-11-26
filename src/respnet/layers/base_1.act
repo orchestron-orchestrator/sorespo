@@ -6,30 +6,41 @@ import orchestron.ttt as ttt
 import yang.adata
 import yang.gdata
 
-from respnet.layers.y_1 import orchestron_rfs__rfs__base_config_entry
-from respnet.layers.y_1 import orchestron_rfs__rfs__backbone_interface_entry
+from respnet.layers.y_1 import l3vpn_inter__l3vpns__l3vpn_entry
+from respnet.layers.y_1 import netinfra_inter__netinfra__routers_entry
+from respnet.layers.y_1 import netinfra_inter__netinfra__backbone_link_entry
 from respnet.layers.y_2_loose import root as output_root
 
 def o_root():
     return output_root()
 
 
-class BaseConfig(ttt.TTTRFSTransform):
-    transform: mut(orchestron_rfs__rfs__base_config_entry, ttt.DeviceInfo) -> yang.adata.MNode
+class L3Vpn(ttt.TTTTransform):
+    transform: mut(l3vpn_inter__l3vpns__l3vpn_entry) -> yang.adata.MNode
 
-    mut def transform_wrapper(self, i: yang.gdata.Node, device_info: ttt.DeviceInfo) -> yang.gdata.Node:
+    mut def transform_wrapper(self, i: yang.gdata.Node) -> yang.gdata.Node:
         """Wrap the user provided transform method to convert from gdata to
         modeled input and back to gdata
         """
-        modeled_input = orchestron_rfs__rfs__base_config_entry.from_gdata(i)
-        return self.transform(modeled_input, device_info).to_gdata()
+        modeled_input = l3vpn_inter__l3vpns__l3vpn_entry.from_gdata(i)
+        return self.transform(modeled_input).to_gdata()
 
-class BBInterface(ttt.TTTRFSTransform):
-    transform: mut(orchestron_rfs__rfs__backbone_interface_entry, ttt.DeviceInfo) -> yang.adata.MNode
+class Router(ttt.TTTTransform):
+    transform: mut(netinfra_inter__netinfra__routers_entry) -> yang.adata.MNode
 
-    mut def transform_wrapper(self, i: yang.gdata.Node, device_info: ttt.DeviceInfo) -> yang.gdata.Node:
+    mut def transform_wrapper(self, i: yang.gdata.Node) -> yang.gdata.Node:
         """Wrap the user provided transform method to convert from gdata to
         modeled input and back to gdata
         """
-        modeled_input = orchestron_rfs__rfs__backbone_interface_entry.from_gdata(i)
-        return self.transform(modeled_input, device_info).to_gdata()
+        modeled_input = netinfra_inter__netinfra__routers_entry.from_gdata(i)
+        return self.transform(modeled_input).to_gdata()
+
+class BBLink(ttt.TTTTransform):
+    transform: mut(netinfra_inter__netinfra__backbone_link_entry) -> yang.adata.MNode
+
+    mut def transform_wrapper(self, i: yang.gdata.Node) -> yang.gdata.Node:
+        """Wrap the user provided transform method to convert from gdata to
+        modeled input and back to gdata
+        """
+        modeled_input = netinfra_inter__netinfra__backbone_link_entry.from_gdata(i)
+        return self.transform(modeled_input).to_gdata()
