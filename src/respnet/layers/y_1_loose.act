@@ -241,12 +241,16 @@ class orchestron_rfs__device__credentials(yang.adata.MNode):
         return res
 
     @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__device__credentials:
-        return orchestron_rfs__device__credentials(username=n.get_str("username"), password=n.get_opt_str("password"), key=orchestron_rfs__device__credentials__key.from_gdata(n.get_list("key")))
+    def from_gdata(n: ?yang.gdata.Node) -> orchestron_rfs__device__credentials:
+        if n != None:
+            return orchestron_rfs__device__credentials(username=n.get_str("username"), password=n.get_opt_str("password"), key=orchestron_rfs__device__credentials__key.from_gdata(n.get_list("key")))
+        raise ValueError("Missing required subtree orchestron_rfs__device__credentials")
 
     @staticmethod
-    def from_xml(n: xml.Node) -> orchestron_rfs__device__credentials:
-        return orchestron_rfs__device__credentials(username=yang.gdata.from_xml_str(n, "username"), password=yang.gdata.from_xml_opt_str(n, "password"), key=orchestron_rfs__device__credentials__key.from_xml(yang.gdata.get_xml_children(n, "key")))
+    def from_xml(n: ?xml.Node) -> orchestron_rfs__device__credentials:
+        if n != None:
+            return orchestron_rfs__device__credentials(username=yang.gdata.from_xml_str(n, "username"), password=yang.gdata.from_xml_opt_str(n, "password"), key=orchestron_rfs__device__credentials__key.from_xml(yang.gdata.get_xml_children(n, "key")))
+        raise ValueError("Missing required subtree orchestron_rfs__device__credentials")
 
 
 class orchestron_rfs__device__initial_credentials_entry(yang.adata.MNode):
@@ -364,11 +368,11 @@ class orchestron_rfs__device_entry(yang.adata.MNode):
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__device_entry:
-        return orchestron_rfs__device_entry(name=n.get_str("name"), description=n.get_opt_str("description"), address=orchestron_rfs__device__address.from_gdata(n.get_list("address")), credentials=orchestron_rfs__device__credentials.from_gdata(n.get_container("credentials")), initial_credentials=orchestron_rfs__device__initial_credentials.from_gdata(n.get_list("initial-credentials")))
+        return orchestron_rfs__device_entry(name=n.get_str("name"), description=n.get_opt_str("description"), address=orchestron_rfs__device__address.from_gdata(n.get_list("address")), credentials=orchestron_rfs__device__credentials.from_gdata(n.get_opt_container("credentials")), initial_credentials=orchestron_rfs__device__initial_credentials.from_gdata(n.get_list("initial-credentials")))
 
     @staticmethod
     def from_xml(n: xml.Node) -> orchestron_rfs__device_entry:
-        return orchestron_rfs__device_entry(name=yang.gdata.from_xml_str(n, "name"), description=yang.gdata.from_xml_opt_str(n, "description"), address=orchestron_rfs__device__address.from_xml(yang.gdata.get_xml_children(n, "address")), credentials=orchestron_rfs__device__credentials.from_xml(yang.gdata.get_xml_child(n, "credentials")), initial_credentials=orchestron_rfs__device__initial_credentials.from_xml(yang.gdata.get_xml_children(n, "initial-credentials")))
+        return orchestron_rfs__device_entry(name=yang.gdata.from_xml_str(n, "name"), description=yang.gdata.from_xml_opt_str(n, "description"), address=orchestron_rfs__device__address.from_xml(yang.gdata.get_xml_children(n, "address")), credentials=orchestron_rfs__device__credentials.from_xml(yang.gdata.get_xml_opt_child(n, "credentials")), initial_credentials=orchestron_rfs__device__initial_credentials.from_xml(yang.gdata.get_xml_children(n, "initial-credentials")))
 
 class orchestron_rfs__device(yang.adata.MNode):
     elements: list[orchestron_rfs__device_entry]
@@ -496,12 +500,16 @@ class orchestron_rfs__rfs__backbone_interface__remote(yang.adata.MNode):
         return res
 
     @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__backbone_interface__remote:
-        return orchestron_rfs__rfs__backbone_interface__remote(device=n.get_str("device"), interface=n.get_str("interface"))
+    def from_gdata(n: ?yang.gdata.Node) -> orchestron_rfs__rfs__backbone_interface__remote:
+        if n != None:
+            return orchestron_rfs__rfs__backbone_interface__remote(device=n.get_str("device"), interface=n.get_str("interface"))
+        raise ValueError("Missing required subtree orchestron_rfs__rfs__backbone_interface__remote")
 
     @staticmethod
-    def from_xml(n: xml.Node) -> orchestron_rfs__rfs__backbone_interface__remote:
-        return orchestron_rfs__rfs__backbone_interface__remote(device=yang.gdata.from_xml_str(n, "device"), interface=yang.gdata.from_xml_str(n, "interface"))
+    def from_xml(n: ?xml.Node) -> orchestron_rfs__rfs__backbone_interface__remote:
+        if n != None:
+            return orchestron_rfs__rfs__backbone_interface__remote(device=yang.gdata.from_xml_str(n, "device"), interface=yang.gdata.from_xml_str(n, "interface"))
+        raise ValueError("Missing required subtree orchestron_rfs__rfs__backbone_interface__remote")
 
 
 class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
@@ -553,11 +561,11 @@ class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__backbone_interface_entry:
-        return orchestron_rfs__rfs__backbone_interface_entry(name=n.get_str("name"), ipv4_address=n.get_opt_str("ipv4-address"), ipv4_prefix_length=n.get_opt_int("ipv4-prefix-length"), ipv6_address=n.get_opt_str("ipv6-address"), ipv6_prefix_length=n.get_opt_int("ipv6-prefix-length"), remote=orchestron_rfs__rfs__backbone_interface__remote.from_gdata(n.get_container("remote")))
+        return orchestron_rfs__rfs__backbone_interface_entry(name=n.get_str("name"), ipv4_address=n.get_opt_str("ipv4-address"), ipv4_prefix_length=n.get_opt_int("ipv4-prefix-length"), ipv6_address=n.get_opt_str("ipv6-address"), ipv6_prefix_length=n.get_opt_int("ipv6-prefix-length"), remote=orchestron_rfs__rfs__backbone_interface__remote.from_gdata(n.get_opt_container("remote")))
 
     @staticmethod
     def from_xml(n: xml.Node) -> orchestron_rfs__rfs__backbone_interface_entry:
-        return orchestron_rfs__rfs__backbone_interface_entry(name=yang.gdata.from_xml_str(n, "name"), ipv4_address=yang.gdata.from_xml_opt_str(n, "ipv4-address"), ipv4_prefix_length=yang.gdata.from_xml_opt_int(n, "ipv4-prefix-length"), ipv6_address=yang.gdata.from_xml_opt_str(n, "ipv6-address"), ipv6_prefix_length=yang.gdata.from_xml_opt_int(n, "ipv6-prefix-length"), remote=orchestron_rfs__rfs__backbone_interface__remote.from_xml(yang.gdata.get_xml_child(n, "remote")))
+        return orchestron_rfs__rfs__backbone_interface_entry(name=yang.gdata.from_xml_str(n, "name"), ipv4_address=yang.gdata.from_xml_opt_str(n, "ipv4-address"), ipv4_prefix_length=yang.gdata.from_xml_opt_int(n, "ipv4-prefix-length"), ipv6_address=yang.gdata.from_xml_opt_str(n, "ipv6-address"), ipv6_prefix_length=yang.gdata.from_xml_opt_int(n, "ipv6-prefix-length"), remote=orchestron_rfs__rfs__backbone_interface__remote.from_xml(yang.gdata.get_xml_opt_child(n, "remote")))
 
 class orchestron_rfs__rfs__backbone_interface(yang.adata.MNode):
     elements: list[orchestron_rfs__rfs__backbone_interface_entry]
@@ -689,10 +697,14 @@ class root(yang.adata.MNode):
         return res
 
     @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> root:
-        return root(device=orchestron_rfs__device.from_gdata(n.get_list("device")), rfs=orchestron_rfs__rfs.from_gdata(n.get_list("rfs")))
+    def from_gdata(n: ?yang.gdata.Node) -> root:
+        if n != None:
+            return root(device=orchestron_rfs__device.from_gdata(n.get_list("device")), rfs=orchestron_rfs__rfs.from_gdata(n.get_list("rfs")))
+        return root()
 
     @staticmethod
-    def from_xml(n: xml.Node) -> root:
-        return root(device=orchestron_rfs__device.from_xml(yang.gdata.get_xml_children(n, "device")), rfs=orchestron_rfs__rfs.from_xml(yang.gdata.get_xml_children(n, "rfs")))
+    def from_xml(n: ?xml.Node) -> root:
+        if n != None:
+            return root(device=orchestron_rfs__device.from_xml(yang.gdata.get_xml_children(n, "device")), rfs=orchestron_rfs__rfs.from_xml(yang.gdata.get_xml_children(n, "rfs")))
+        return root()
 

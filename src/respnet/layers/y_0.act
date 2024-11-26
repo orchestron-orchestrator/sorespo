@@ -27,12 +27,16 @@ class l3vpn__l3vpn(yang.adata.MNode):
         return res
 
     @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> l3vpn__l3vpn:
-        return l3vpn__l3vpn(this=n.get_opt_str("this"), that=n.get_opt_str("that"))
+    def from_gdata(n: ?yang.gdata.Node) -> l3vpn__l3vpn:
+        if n != None:
+            return l3vpn__l3vpn(this=n.get_opt_str("this"), that=n.get_opt_str("that"))
+        return l3vpn__l3vpn()
 
     @staticmethod
-    def from_xml(n: xml.Node) -> l3vpn__l3vpn:
-        return l3vpn__l3vpn(this=yang.gdata.from_xml_opt_str(n, "this"), that=yang.gdata.from_xml_opt_str(n, "that"))
+    def from_xml(n: ?xml.Node) -> l3vpn__l3vpn:
+        if n != None:
+            return l3vpn__l3vpn(this=yang.gdata.from_xml_opt_str(n, "this"), that=yang.gdata.from_xml_opt_str(n, "that"))
+        return l3vpn__l3vpn()
 
 
 class netinfra__netinfra__routers_entry(yang.adata.MNode):
@@ -202,12 +206,16 @@ class netinfra__netinfra(yang.adata.MNode):
         return res
 
     @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> netinfra__netinfra:
-        return netinfra__netinfra(routers=netinfra__netinfra__routers.from_gdata(n.get_list("routers")), backbone_link=netinfra__netinfra__backbone_link.from_gdata(n.get_list("backbone-link")))
+    def from_gdata(n: ?yang.gdata.Node) -> netinfra__netinfra:
+        if n != None:
+            return netinfra__netinfra(routers=netinfra__netinfra__routers.from_gdata(n.get_list("routers")), backbone_link=netinfra__netinfra__backbone_link.from_gdata(n.get_list("backbone-link")))
+        return netinfra__netinfra()
 
     @staticmethod
-    def from_xml(n: xml.Node) -> netinfra__netinfra:
-        return netinfra__netinfra(routers=netinfra__netinfra__routers.from_xml(yang.gdata.get_xml_children(n, "routers")), backbone_link=netinfra__netinfra__backbone_link.from_xml(yang.gdata.get_xml_children(n, "backbone-link")))
+    def from_xml(n: ?xml.Node) -> netinfra__netinfra:
+        if n != None:
+            return netinfra__netinfra(routers=netinfra__netinfra__routers.from_xml(yang.gdata.get_xml_children(n, "routers")), backbone_link=netinfra__netinfra__backbone_link.from_xml(yang.gdata.get_xml_children(n, "backbone-link")))
+        return netinfra__netinfra()
 
 
 class root(yang.adata.MNode):
@@ -244,10 +252,14 @@ class root(yang.adata.MNode):
         return res
 
     @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> root:
-        return root(l3vpn=l3vpn__l3vpn.from_gdata(n.get_container("l3vpn")), netinfra=netinfra__netinfra.from_gdata(n.get_container("netinfra")))
+    def from_gdata(n: ?yang.gdata.Node) -> root:
+        if n != None:
+            return root(l3vpn=l3vpn__l3vpn.from_gdata(n.get_opt_container("l3vpn")), netinfra=netinfra__netinfra.from_gdata(n.get_opt_container("netinfra")))
+        return root()
 
     @staticmethod
-    def from_xml(n: xml.Node) -> root:
-        return root(l3vpn=l3vpn__l3vpn.from_xml(yang.gdata.get_xml_child(n, "l3vpn")), netinfra=netinfra__netinfra.from_xml(yang.gdata.get_xml_child(n, "netinfra")))
+    def from_xml(n: ?xml.Node) -> root:
+        if n != None:
+            return root(l3vpn=l3vpn__l3vpn.from_xml(yang.gdata.get_xml_opt_child(n, "l3vpn")), netinfra=netinfra__netinfra.from_xml(yang.gdata.get_xml_opt_child(n, "netinfra")))
+        return root()
 

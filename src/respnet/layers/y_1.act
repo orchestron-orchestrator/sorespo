@@ -241,12 +241,16 @@ class orchestron_rfs__device__credentials(yang.adata.MNode):
         return res
 
     @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__device__credentials:
-        return orchestron_rfs__device__credentials(username=n.get_str("username"), password=n.get_opt_str("password"), key=orchestron_rfs__device__credentials__key.from_gdata(n.get_list("key")))
+    def from_gdata(n: ?yang.gdata.Node) -> orchestron_rfs__device__credentials:
+        if n != None:
+            return orchestron_rfs__device__credentials(username=n.get_str("username"), password=n.get_opt_str("password"), key=orchestron_rfs__device__credentials__key.from_gdata(n.get_list("key")))
+        raise ValueError("Missing required subtree orchestron_rfs__device__credentials")
 
     @staticmethod
-    def from_xml(n: xml.Node) -> orchestron_rfs__device__credentials:
-        return orchestron_rfs__device__credentials(username=yang.gdata.from_xml_str(n, "username"), password=yang.gdata.from_xml_opt_str(n, "password"), key=orchestron_rfs__device__credentials__key.from_xml(yang.gdata.get_xml_children(n, "key")))
+    def from_xml(n: ?xml.Node) -> orchestron_rfs__device__credentials:
+        if n != None:
+            return orchestron_rfs__device__credentials(username=yang.gdata.from_xml_str(n, "username"), password=yang.gdata.from_xml_opt_str(n, "password"), key=orchestron_rfs__device__credentials__key.from_xml(yang.gdata.get_xml_children(n, "key")))
+        raise ValueError("Missing required subtree orchestron_rfs__device__credentials")
 
 
 class orchestron_rfs__device__initial_credentials_entry(yang.adata.MNode):
@@ -491,12 +495,16 @@ class orchestron_rfs__rfs__backbone_interface__remote(yang.adata.MNode):
         return res
 
     @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__backbone_interface__remote:
-        return orchestron_rfs__rfs__backbone_interface__remote(device=n.get_str("device"), interface=n.get_str("interface"))
+    def from_gdata(n: ?yang.gdata.Node) -> orchestron_rfs__rfs__backbone_interface__remote:
+        if n != None:
+            return orchestron_rfs__rfs__backbone_interface__remote(device=n.get_str("device"), interface=n.get_str("interface"))
+        raise ValueError("Missing required subtree orchestron_rfs__rfs__backbone_interface__remote")
 
     @staticmethod
-    def from_xml(n: xml.Node) -> orchestron_rfs__rfs__backbone_interface__remote:
-        return orchestron_rfs__rfs__backbone_interface__remote(device=yang.gdata.from_xml_str(n, "device"), interface=yang.gdata.from_xml_str(n, "interface"))
+    def from_xml(n: ?xml.Node) -> orchestron_rfs__rfs__backbone_interface__remote:
+        if n != None:
+            return orchestron_rfs__rfs__backbone_interface__remote(device=yang.gdata.from_xml_str(n, "device"), interface=yang.gdata.from_xml_str(n, "interface"))
+        raise ValueError("Missing required subtree orchestron_rfs__rfs__backbone_interface__remote")
 
 
 class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
@@ -679,10 +687,14 @@ class root(yang.adata.MNode):
         return res
 
     @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> root:
-        return root(device=orchestron_rfs__device.from_gdata(n.get_list("device")), rfs=orchestron_rfs__rfs.from_gdata(n.get_list("rfs")))
+    def from_gdata(n: ?yang.gdata.Node) -> root:
+        if n != None:
+            return root(device=orchestron_rfs__device.from_gdata(n.get_list("device")), rfs=orchestron_rfs__rfs.from_gdata(n.get_list("rfs")))
+        return root()
 
     @staticmethod
-    def from_xml(n: xml.Node) -> root:
-        return root(device=orchestron_rfs__device.from_xml(yang.gdata.get_xml_children(n, "device")), rfs=orchestron_rfs__rfs.from_xml(yang.gdata.get_xml_children(n, "rfs")))
+    def from_xml(n: ?xml.Node) -> root:
+        if n != None:
+            return root(device=orchestron_rfs__device.from_xml(yang.gdata.get_xml_children(n, "device")), rfs=orchestron_rfs__rfs.from_xml(yang.gdata.get_xml_children(n, "rfs")))
+        return root()
 
