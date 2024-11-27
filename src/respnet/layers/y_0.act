@@ -19,9 +19,9 @@ class l3vpn__l3vpn(yang.adata.MNode):
         _this = self.this
         _that = self.that
         if _this is not None:
-            res.children['this'] = yang.gdata.Leaf('this', _this, ns=self._ns)
+            res.children['this'] = yang.gdata.Leaf('this', _this, ns='http://example.com/l3vpn')
         if _that is not None:
-            res.children['that'] = yang.gdata.Leaf('that', _that, ns=self._ns)
+            res.children['that'] = yang.gdata.Leaf('that', _that, ns='http://example.com/l3vpn')
         for child in res.children.values():
             child.parent = res
         return res
@@ -56,11 +56,11 @@ class netinfra__netinfra__routers_entry(yang.adata.MNode):
         _id = self.id
         _role = self.role
         if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', _name, ns=self._ns)
+            res.children['name'] = yang.gdata.Leaf('name', _name, ns='http://example.com/netinfra')
         if _id is not None:
-            res.children['id'] = yang.gdata.Leaf('id', _id, ns=self._ns)
+            res.children['id'] = yang.gdata.Leaf('id', _id, ns='http://example.com/netinfra')
         if _role is not None:
-            res.children['role'] = yang.gdata.Leaf('role', _role, ns=self._ns)
+            res.children['role'] = yang.gdata.Leaf('role', _role, ns='http://example.com/netinfra')
         for child in res.children.values():
             child.parent = res
         return res
@@ -81,6 +81,14 @@ class netinfra__netinfra__routers(yang.adata.MNode):
         self.elements = elements
 
     def create(self, name):
+        for e in self.elements:
+            match = True
+            if e.name != name:
+                match = False
+                break
+            if match:
+                return e
+
         res = netinfra__netinfra__routers_entry(name)
         self.elements.append(res)
         return res
@@ -128,13 +136,13 @@ class netinfra__netinfra__backbone_link_entry(yang.adata.MNode):
         _right_router = self.right_router
         _right_interface = self.right_interface
         if _left_router is not None:
-            res.children['left-router'] = yang.gdata.Leaf('left-router', _left_router, ns=self._ns)
+            res.children['left-router'] = yang.gdata.Leaf('left-router', _left_router, ns='http://example.com/netinfra')
         if _left_interface is not None:
-            res.children['left-interface'] = yang.gdata.Leaf('left-interface', _left_interface, ns=self._ns)
+            res.children['left-interface'] = yang.gdata.Leaf('left-interface', _left_interface, ns='http://example.com/netinfra')
         if _right_router is not None:
-            res.children['right-router'] = yang.gdata.Leaf('right-router', _right_router, ns=self._ns)
+            res.children['right-router'] = yang.gdata.Leaf('right-router', _right_router, ns='http://example.com/netinfra')
         if _right_interface is not None:
-            res.children['right-interface'] = yang.gdata.Leaf('right-interface', _right_interface, ns=self._ns)
+            res.children['right-interface'] = yang.gdata.Leaf('right-interface', _right_interface, ns='http://example.com/netinfra')
         for child in res.children.values():
             child.parent = res
         return res
@@ -155,6 +163,23 @@ class netinfra__netinfra__backbone_link(yang.adata.MNode):
         self.elements = elements
 
     def create(self, left_router, left_interface, right_router, right_interface):
+        for e in self.elements:
+            match = True
+            if e.left_router != left_router:
+                match = False
+                break
+            if e.left_interface != left_interface:
+                match = False
+                break
+            if e.right_router != right_router:
+                match = False
+                break
+            if e.right_interface != right_interface:
+                match = False
+                break
+            if match:
+                return e
+
         res = netinfra__netinfra__backbone_link_entry(left_router, left_interface, right_router, right_interface)
         self.elements.append(res)
         return res
