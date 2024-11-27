@@ -12,4 +12,4 @@ copy:
 	docker cp netinfra1.xml respnet-quicklab-otron:/netinfra1.xml
 
 run:
-	docker exec -it respnet-quicklab-otron /respnet netinfra1.xml
+	docker exec -it respnet-quicklab-otron /respnet netinfra1.xml --rts-bt-dbg
