@@ -42,12 +42,12 @@ class Vrf(base.Vrf):
 
 class CustomerInterface(base.CustomerInterface):
     def transform(self, i, di):
-        print("RFS /rfs{%s}/vrf transform running %s" % (di.name, i.name))
+        print("RFS /rfs{%s}/customer-interface transform running %s" % (di.name, i.name))
 
         dev = xr24.root()
         intf = dev.interfaces.interface.create(i.name)
         intf.description = i.description
         intf.ipv4.addresses.create_address("1.2.3.5", "255.255.255.252")
-        intf.vrf = i.vrf
+        # intf.vrf = i.vrf  # FIXME: https://github.com/orchestron-orchestrator/acton-yang/issues/25
 
         return dev

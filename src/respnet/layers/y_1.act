@@ -8,13 +8,17 @@ import yang.gdata
 class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yang.adata.MNode):
     device: str
     interface: str
+    site: str
+    site_network_access: str
     ipv4_address: ?str
     ipv4_prefix_length: ?int
 
-    def __init__(self, device: str, interface: str, ipv4_address: ?str, ipv4_prefix_length: ?int):
+    def __init__(self, device: str, interface: str, site: str, site_network_access: str, ipv4_address: ?str, ipv4_prefix_length: ?int):
         self._ns = "http://example.com/l3vpn-inter"
         self.device = device
         self.interface = interface
+        self.site = site
+        self.site_network_access = site_network_access
         self.ipv4_address = ipv4_address
         self.ipv4_prefix_length = ipv4_prefix_length
 
@@ -22,12 +26,18 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yang.adata.MNode):
         res = yang.gdata.ListElement([str(self.device), str(self.interface)], ns=self._ns)
         _device = self.device
         _interface = self.interface
+        _site = self.site
+        _site_network_access = self.site_network_access
         _ipv4_address = self.ipv4_address
         _ipv4_prefix_length = self.ipv4_prefix_length
         if _device is not None:
             res.children['device'] = yang.gdata.Leaf('device', _device, ns=self._ns)
         if _interface is not None:
             res.children['interface'] = yang.gdata.Leaf('interface', _interface, ns=self._ns)
+        if _site is not None:
+            res.children['site'] = yang.gdata.Leaf('site', _site, ns=self._ns)
+        if _site_network_access is not None:
+            res.children['site-network-access'] = yang.gdata.Leaf('site-network-access', _site_network_access, ns=self._ns)
         if _ipv4_address is not None:
             res.children['ipv4-address'] = yang.gdata.Leaf('ipv4-address', _ipv4_address, ns=self._ns)
         if _ipv4_prefix_length is not None:
@@ -38,11 +48,11 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yang.adata.MNode):
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> l3vpn_inter__l3vpns__l3vpn__endpoint_entry:
-        return l3vpn_inter__l3vpns__l3vpn__endpoint_entry(device=n.get_str("device"), interface=n.get_str("interface"), ipv4_address=n.get_opt_str("ipv4-address"), ipv4_prefix_length=n.get_opt_int("ipv4-prefix-length"))
+        return l3vpn_inter__l3vpns__l3vpn__endpoint_entry(device=n.get_str("device"), interface=n.get_str("interface"), site=n.get_str("site"), site_network_access=n.get_str("site-network-access"), ipv4_address=n.get_opt_str("ipv4-address"), ipv4_prefix_length=n.get_opt_int("ipv4-prefix-length"))
 
     @staticmethod
     def from_xml(n: xml.Node) -> l3vpn_inter__l3vpns__l3vpn__endpoint_entry:
-        return l3vpn_inter__l3vpns__l3vpn__endpoint_entry(device=yang.gdata.from_xml_str(n, "device"), interface=yang.gdata.from_xml_str(n, "interface"), ipv4_address=yang.gdata.from_xml_opt_str(n, "ipv4-address"), ipv4_prefix_length=yang.gdata.from_xml_opt_int(n, "ipv4-prefix-length"))
+        return l3vpn_inter__l3vpns__l3vpn__endpoint_entry(device=yang.gdata.from_xml_str(n, "device"), interface=yang.gdata.from_xml_str(n, "interface"), site=yang.gdata.from_xml_str(n, "site"), site_network_access=yang.gdata.from_xml_str(n, "site-network-access"), ipv4_address=yang.gdata.from_xml_opt_str(n, "ipv4-address"), ipv4_prefix_length=yang.gdata.from_xml_opt_int(n, "ipv4-prefix-length"))
 
 class l3vpn_inter__l3vpns__l3vpn__endpoint(yang.adata.MNode):
     elements: list[l3vpn_inter__l3vpns__l3vpn__endpoint_entry]
@@ -51,8 +61,8 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint(yang.adata.MNode):
         self._name = 'endpoint'
         self.elements = elements
 
-    def create(self, device, interface):
-        res = l3vpn_inter__l3vpns__l3vpn__endpoint_entry(device, interface)
+    def create(self, device, interface, site, site_network_access):
+        res = l3vpn_inter__l3vpns__l3vpn__endpoint_entry(device, interface, site, site_network_access)
         self.elements.append(res)
         return res
 
