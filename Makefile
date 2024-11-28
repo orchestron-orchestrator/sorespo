@@ -1,7 +1,7 @@
 
 
 build:
-	acton build
+	acton build --dev
 
 .PHONY: gen
 gen:
