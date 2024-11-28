@@ -58,12 +58,11 @@ class CustomerInterface(base.CustomerInterface):
         dev = xr24.root()
         intf = dev.interfaces.interface.create(i.name)
         intf.description = i.description
+        intf.shutdown = False
         ipv4_address = i.ipv4_address
-        # ipv4_len = i.ipv4_prefix_length
-        # if ipv4_address is not None and ipv4_len is not None:
-        #     intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(ipv4_len))
-        if ipv4_address is not None:
-            intf.ipv4.addresses.create_address(ipv4_address, "255.255.255.252")
-        # intf.vrf = i.vrf  # FIXME: https://github.com/orchestron-orchestrator/acton-yang/issues/25
+        ipv4_len = i.ipv4_prefix_length
+        if ipv4_address is not None and ipv4_len is not None:
+            intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(ipv4_len))
+        intf.vrf = i.vrf
 
         return dev
