@@ -5,6 +5,16 @@ import respnet.layers.base_2 as base
 
 import respnet.devices.CiscoIosXr_24_1_ncs55a1 as xr24
 
+
+def prefix_length_to_netmask(prefix_length):
+    binary_netmask = ("1" * prefix_length).ljust(32, "0")
+    octets = []
+    for i in range(0, 32, 8):
+        bit = int(binary_netmask[i:i + 8], 2)
+        octets.append(bit)
+    return ".".join(map(str, octets))
+
+
 class BaseConfig(base.BaseConfig):
     def transform(self, i, di):
         print("RFS /rfs{%s}/base-config transform running" % (di.name))
@@ -47,7 +57,12 @@ class CustomerInterface(base.CustomerInterface):
         dev = xr24.root()
         intf = dev.interfaces.interface.create(i.name)
         intf.description = i.description
-        intf.ipv4.addresses.create_address("1.2.3.5", "255.255.255.252")
+        ipv4_address = i.ipv4_address
+        # ipv4_len = i.ipv4_prefix_length
+        # if ipv4_address is not None and ipv4_len is not None:
+        #     intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(ipv4_len))
+        if ipv4_address is not None:
+            intf.ipv4.addresses.create_address(ipv4_address, "255.255.255.252")
         # intf.vrf = i.vrf  # FIXME: https://github.com/orchestron-orchestrator/acton-yang/issues/25
 
         return dev
