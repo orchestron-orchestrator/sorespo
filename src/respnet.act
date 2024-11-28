@@ -35,10 +35,12 @@ actor main(env):
 
     dev_mgr = odev.DeviceManager(env.cap)
     layers = respnet.layers.get_layers(dev_mgr)
+    layer_configs = {}
 
     def conf(xml_conf: xml.Node):
         # Bootstrap first layer config input
         input_config = cfs_root.from_xml(xml_conf)
+        layer_configs[0] = input_config.to_gdata().to_xmlstr()
         config_in = {"source1": input_config.to_gdata()}
 
         config_out = {}
@@ -46,11 +48,12 @@ actor main(env):
             print("Computing layer %d" % idx)
             config_out = {}
             layer.configure(config_in, config_out)
+            mc = merge_confpsrc(config_out)
 #            print("=== Layer %d config === START ===" % idx)
-#            mc = merge_confpsrc(config_out)
 #            print(mc.to_xmlstr())
 #            print("=== Layer %d config === END =====" % idx)
             config_in = config_out
+            layer_configs[idx + 1] = mc.to_xmlstr()
 
     tcpl_cap = net.TCPListenCap(net.TCPCap(net.NetCap(env.cap)))
 
@@ -58,10 +61,33 @@ actor main(env):
         server.cb_install(_on_http_server_request, _on_http_server_error)
 
     def _on_http_server_request(server, request, respond):
-        xml_in = xml.decode(request.body.decode())
-        log.info("Received XML", {"xml": xml_in})
-        conf(xml_in)
-        respond(200, {}, "Oki doki!")
+        if request.method == "GET":
+            path_elements = request.path.split("/")
+            if len(path_elements) == 3 and path_elements[1] == "layer":
+                try:
+                    layer_idx = int(path_elements[2])
+                    try:
+                        layer_config = layer_configs[layer_idx]
+                        respond(200, {}, layer_config)
+                        return
+                    except KeyError:
+                        respond(404, {}, "Not found")
+                        return
+                except ValueError:
+                    respond(400, {}, "Bad request, layer index must be an integer")
+                    return
+            else:
+                respond(404, {}, "Not found")
+                return
+        elif request.method == "POST":
+            xml_in = xml.decode(request.body.decode())
+            log.info("Received XML", {"xml": xml_in})
+            conf(xml_in)
+            respond(200, {}, "Oki doki!")
+            return
+        else:
+            respond(405, {}, "Method not allowed")
+            return
 
     def _on_http_server_error(server, error):
         print("Error: %s" % error)
