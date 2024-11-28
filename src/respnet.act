@@ -28,13 +28,6 @@ def merge_confpsrc(confpsrc: dict[str, yang.gdata.Node]):
 
 actor main(env):
     rfcap = file.ReadFileCap(file.FileCap(env.cap))
-    if len(env.argv) <= 1:
-        print("Usage: %s <filename>" % env.argv[0])
-        await async env.exit(1)
-    filename = env.argv[1]
-    f = file.ReadFile(rfcap, filename)
-    nb_input = await async f.read()
-    f.close()
 
     logh = logging.Handler("Otron")
     logh.add_sink(logging.StdoutSink())
@@ -75,6 +68,35 @@ actor main(env):
 
     server = http.Listener(tcpl_cap, "0.0.0.0", 80, _on_http_accept)
 
-    #conf(xml.decode(nb_input.decode()))
+    configs = []
+
+    def _conf_file():
+        # Grab te first config
+        print("Applying config file..")
+        try:
+            nb_input = configs.pop(0)
+            conf(nb_input)
+            print("Config file applied, waiting 3 seconds before applying the next..")
+            after 3: _conf_file()
+        except IndexError:
+            print("All config files applied")
+
+    if len(env.argv) > 1:
+        # Read and apply config files, but paced
+        for i in range(1, len(env.argv)):
+            if i > 0:
+                filename = env.argv[i]
+                f = file.ReadFile(rfcap, filename)
+                nb_input = await async f.read()
+                f.close()
+                try:
+                    configs.append(xml.decode(nb_input.decode()))
+                except Exception as e:
+                    print("Error reading config file %s: %s" % (filename, str(e)))
+                    env.exit(1)
+
+        # start to apply..
+        after 0.5: _conf_file()
 
     print("Orchestron/respnet running..")
+
