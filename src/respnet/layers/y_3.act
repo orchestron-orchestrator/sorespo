@@ -16,7 +16,7 @@ class orchestron_device__devices__device_entry(yang.adata.MNode):
         res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
         _name = self.name
         if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', _name, ns=self._ns)
+            res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://orchestron.org/yang/orchestron-device.yang')
         for child in res.children.values():
             child.parent = res
         return res
@@ -37,6 +37,14 @@ class orchestron_device__devices__device(yang.adata.MNode):
         self.elements = elements
 
     def create(self, name):
+        for e in self.elements:
+            match = True
+            if e.name != name:
+                match = False
+                break
+            if match:
+                return e
+
         res = orchestron_device__devices__device_entry(name)
         self.elements.append(res)
         return res

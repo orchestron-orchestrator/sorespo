@@ -12,4 +12,4 @@ copy:
 	docker cp l3vpn-svc.xml respnet-quicklab-otron:/l3vpn-svc.xml
 
 run:
-	docker exec -it respnet-quicklab-otron /respnet l3vpn-svc.xml
+	docker exec -it respnet-quicklab-otron /respnet l3vpn-svc.xml --rts-bt-dbg

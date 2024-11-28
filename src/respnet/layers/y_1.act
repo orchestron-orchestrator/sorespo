@@ -31,17 +31,17 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yang.adata.MNode):
         _ipv4_address = self.ipv4_address
         _ipv4_prefix_length = self.ipv4_prefix_length
         if _device is not None:
-            res.children['device'] = yang.gdata.Leaf('device', _device, ns=self._ns)
+            res.children['device'] = yang.gdata.Leaf('device', 'string', _device, ns='http://example.com/l3vpn-inter')
         if _interface is not None:
-            res.children['interface'] = yang.gdata.Leaf('interface', _interface, ns=self._ns)
+            res.children['interface'] = yang.gdata.Leaf('interface', 'string', _interface, ns='http://example.com/l3vpn-inter')
         if _site is not None:
-            res.children['site'] = yang.gdata.Leaf('site', _site, ns=self._ns)
+            res.children['site'] = yang.gdata.Leaf('site', 'string', _site, ns='http://example.com/l3vpn-inter')
         if _site_network_access is not None:
-            res.children['site-network-access'] = yang.gdata.Leaf('site-network-access', _site_network_access, ns=self._ns)
+            res.children['site-network-access'] = yang.gdata.Leaf('site-network-access', 'string', _site_network_access, ns='http://example.com/l3vpn-inter')
         if _ipv4_address is not None:
-            res.children['ipv4-address'] = yang.gdata.Leaf('ipv4-address', _ipv4_address, ns=self._ns)
+            res.children['ipv4-address'] = yang.gdata.Leaf('ipv4-address', 'string', _ipv4_address, ns='http://example.com/l3vpn-inter')
         if _ipv4_prefix_length is not None:
-            res.children['ipv4-prefix-length'] = yang.gdata.Leaf('ipv4-prefix-length', _ipv4_prefix_length, ns=self._ns)
+            res.children['ipv4-prefix-length'] = yang.gdata.Leaf('ipv4-prefix-length', 'uint8', _ipv4_prefix_length, ns='http://example.com/l3vpn-inter')
         for child in res.children.values():
             child.parent = res
         return res
@@ -62,6 +62,17 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint(yang.adata.MNode):
         self.elements = elements
 
     def create(self, device, interface, site, site_network_access):
+        for e in self.elements:
+            match = True
+            if e.device != device:
+                match = False
+                break
+            if e.interface != interface:
+                match = False
+                break
+            if match:
+                return e
+
         res = l3vpn_inter__l3vpns__l3vpn__endpoint_entry(device, interface, site, site_network_access)
         self.elements.append(res)
         return res
@@ -107,9 +118,9 @@ class l3vpn_inter__l3vpns__l3vpn_entry(yang.adata.MNode):
         _description = self.description
         _endpoint = self.endpoint
         if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', _name, ns=self._ns)
+            res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://example.com/l3vpn-inter')
         if _description is not None:
-            res.children['description'] = yang.gdata.Leaf('description', _description, ns=self._ns)
+            res.children['description'] = yang.gdata.Leaf('description', 'string', _description, ns='http://example.com/l3vpn-inter')
         if _endpoint is not None:
             res.children['endpoint'] = _endpoint.to_gdata()
         for child in res.children.values():
@@ -132,6 +143,14 @@ class l3vpn_inter__l3vpns__l3vpn(yang.adata.MNode):
         self.elements = elements
 
     def create(self, name):
+        for e in self.elements:
+            match = True
+            if e.name != name:
+                match = False
+                break
+            if match:
+                return e
+
         res = l3vpn_inter__l3vpns__l3vpn_entry(name)
         self.elements.append(res)
         return res
@@ -206,11 +225,11 @@ class netinfra_inter__netinfra__routers_entry(yang.adata.MNode):
         _id = self.id
         _role = self.role
         if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', _name, ns=self._ns)
+            res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://example.com/netinfra-inter')
         if _id is not None:
-            res.children['id'] = yang.gdata.Leaf('id', _id, ns=self._ns)
+            res.children['id'] = yang.gdata.Leaf('id', 'string', _id, ns='http://example.com/netinfra-inter')
         if _role is not None:
-            res.children['role'] = yang.gdata.Leaf('role', _role, ns=self._ns)
+            res.children['role'] = yang.gdata.Leaf('role', 'string', _role, ns='http://example.com/netinfra-inter')
         for child in res.children.values():
             child.parent = res
         return res
@@ -231,6 +250,14 @@ class netinfra_inter__netinfra__routers(yang.adata.MNode):
         self.elements = elements
 
     def create(self, name):
+        for e in self.elements:
+            match = True
+            if e.name != name:
+                match = False
+                break
+            if match:
+                return e
+
         res = netinfra_inter__netinfra__routers_entry(name)
         self.elements.append(res)
         return res
@@ -278,13 +305,13 @@ class netinfra_inter__netinfra__backbone_link_entry(yang.adata.MNode):
         _right_router = self.right_router
         _right_interface = self.right_interface
         if _left_router is not None:
-            res.children['left-router'] = yang.gdata.Leaf('left-router', _left_router, ns=self._ns)
+            res.children['left-router'] = yang.gdata.Leaf('left-router', 'string', _left_router, ns='http://example.com/netinfra-inter')
         if _left_interface is not None:
-            res.children['left-interface'] = yang.gdata.Leaf('left-interface', _left_interface, ns=self._ns)
+            res.children['left-interface'] = yang.gdata.Leaf('left-interface', 'string', _left_interface, ns='http://example.com/netinfra-inter')
         if _right_router is not None:
-            res.children['right-router'] = yang.gdata.Leaf('right-router', _right_router, ns=self._ns)
+            res.children['right-router'] = yang.gdata.Leaf('right-router', 'string', _right_router, ns='http://example.com/netinfra-inter')
         if _right_interface is not None:
-            res.children['right-interface'] = yang.gdata.Leaf('right-interface', _right_interface, ns=self._ns)
+            res.children['right-interface'] = yang.gdata.Leaf('right-interface', 'string', _right_interface, ns='http://example.com/netinfra-inter')
         for child in res.children.values():
             child.parent = res
         return res
@@ -305,6 +332,23 @@ class netinfra_inter__netinfra__backbone_link(yang.adata.MNode):
         self.elements = elements
 
     def create(self, left_router, left_interface, right_router, right_interface):
+        for e in self.elements:
+            match = True
+            if e.left_router != left_router:
+                match = False
+                break
+            if e.left_interface != left_interface:
+                match = False
+                break
+            if e.right_router != right_router:
+                match = False
+                break
+            if e.right_interface != right_interface:
+                match = False
+                break
+            if match:
+                return e
+
         res = netinfra_inter__netinfra__backbone_link_entry(left_router, left_interface, right_router, right_interface)
         self.elements.append(res)
         return res
