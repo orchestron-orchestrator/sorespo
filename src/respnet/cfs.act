@@ -36,7 +36,6 @@ class L3VpnSite(base.L3VpnSite):
     def transform(self, i):
         print("CFS L3VPN Site transform running %s" % (i.site_id))
         o = base.o_root()
-        vpns = {}
         for sna in i.site_network_accesses.site_network_access.elements:
             vpn_id = sna.vpn_attachment.vpn_id
             bearer_ref = sna.bearer.bearer_reference
@@ -47,11 +46,9 @@ class L3VpnSite(base.L3VpnSite):
             else:
                 device, interface = None, None
             ipv4_address = sna.ip_connection.ipv4.addresses.provider_address
-            ipv4_len = 30
+            ipv4_len = sna.ip_connection.ipv4.addresses.prefix_length
             if vpn_id is not None and device is not None and interface is not None and ipv4_address is not None and ipv4_len is not None:
-                if vpn_id not in vpns:
-                    vpns[vpn_id] = o.l3vpns.l3vpn.create(vpn_id)
-                o_vpn: respnet.layers.y_1_loose.l3vpn_inter__l3vpns__l3vpn_entry = vpns[vpn_id]
+                o_vpn = o.l3vpns.l3vpn.create(vpn_id)
                 o_ep = o_vpn.endpoint.create(device, interface)
                 o_ep.site = i.site_id
                 o_ep.site_network_access = sna.site_network_access_id
