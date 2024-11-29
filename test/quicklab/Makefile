@@ -9,7 +9,7 @@ stop:
 
 copy:
 	docker cp ../../out/bin/respnet respnet-quicklab-otron:/respnet
-	docker cp netinfra1.xml respnet-quicklab-otron:/netinfra1.xml
+	docker cp l3vpn-svc.xml respnet-quicklab-otron:/l3vpn-svc.xml
 
 run:
-	docker exec -it respnet-quicklab-otron /respnet netinfra1.xml --rts-bt-dbg
+	docker exec -it respnet-quicklab-otron /respnet l3vpn-svc.xml --rts-bt-dbg

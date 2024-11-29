@@ -2,21 +2,15 @@ import yang.adata
 import orchestron.ttt
 
 import respnet.layers.base_0 as base
+import respnet.layers.y_1_loose
 
 class Router(base.Router):
     def transform(self, i):
         o = base.o_root()
         print("CFS router transform running", i.name, i.id)
-        dev = o.device.create(i.name)
-        oob_addr = dev.address.create("oob")
-        oob_addr.address = i.name
-        dev.credentials.username = "clab"
-        dev.credentials.password = "clab@123"
-        sid = i.id
-        rfs = o.rfs.create(i.name)
-        bc = rfs.base_config.create(i.name) # TODO: should be P-container
-        bc.ipv4_address = "10.0.0.%s" % sid if sid is not None else ""
-        bc.ipv6_address = "2001:db8:0:0::%s" % sid if sid is not None else ""
+        o_router = o.netinfra.routers.create(i.name)
+        o_router.id = i.id
+        o_router.role = i.role
         return o
 
 
@@ -24,15 +18,44 @@ class BBLink(base.BBLink):
     def transform(self, i):
         print("CFS backbonelink transform running %s [%s] <-> %s [%s]" % (i.left_router, i.left_interface, i.right_router, i.right_interface))
         o = base.o_root()
+        o.netinfra.backbone_link.create(i.left_router, i.left_interface, i.right_router, i.right_interface)
+        return o
 
-        left_rfs = o.rfs.create(i.left_router)
-        li = left_rfs.backbone_interface.create(i.left_interface)
-        li.remote.device = i.right_router
-        li.remote.interface = i.right_interface
 
-        right_rfs = o.rfs.create(i.right_router)
-        ri = right_rfs.backbone_interface.create(i.right_interface)
-        ri.remote.device = i.left_router
-        ri.remote.interface = i.left_interface
+class L3VpnVpnService(base.L3VpnVpnService):
+    def transform(self, i):
+        print("CFS L3VPN VPN Service transform running %s" % (i.vpn_id))
+        customer_name = i.customer_name
+        o = base.o_root()
+        o_vpn = o.l3vpns.l3vpn.create(i.vpn_id)
+        o_vpn.description = "Customer VPN for %s" % customer_name if customer_name is not None else ""
+        return o
+
+
+class L3VpnSite(base.L3VpnSite):
+    def transform(self, i):
+        print("CFS L3VPN Site transform running %s" % (i.site_id))
+        o = base.o_root()
+        vpns = {}
+        for sna in i.site_network_accesses.site_network_access.elements:
+            vpn_id = sna.vpn_attachment.vpn_id
+            bearer_ref = sna.bearer.bearer_reference
+            if bearer_ref != None:
+                parts = bearer_ref.split(",")
+                device = parts[0]
+                interface = parts[1]
+            else:
+                device, interface = None, None
+            ipv4_address = sna.ip_connection.ipv4.addresses.provider_address
+            ipv4_len = 30
+            if vpn_id is not None and device is not None and interface is not None and ipv4_address is not None and ipv4_len is not None:
+                if vpn_id not in vpns:
+                    vpns[vpn_id] = o.l3vpns.l3vpn.create(vpn_id)
+                o_vpn: respnet.layers.y_1_loose.l3vpn_inter__l3vpns__l3vpn_entry = vpns[vpn_id]
+                o_ep = o_vpn.endpoint.create(device, interface)
+                o_ep.site = i.site_id
+                o_ep.site_network_access = sna.site_network_access_id
+                o_ep.ipv4_address = ipv4_address
+                o_ep.ipv4_prefix_length = ipv4_len
 
         return o

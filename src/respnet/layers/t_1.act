@@ -7,14 +7,14 @@ import orchestron.ttt as ttt
 import yang.adata
 import yang.gdata
 
-from respnet.layers.y_1 import orchestron_rfs__rfs__base_config_entry
-from respnet.layers.y_1 import orchestron_rfs__rfs__backbone_interface_entry
+from respnet.layers.y_1 import l3vpn_inter__l3vpns__l3vpn_entry
+from respnet.layers.y_1 import netinfra_inter__netinfra__routers_entry
+from respnet.layers.y_1 import netinfra_inter__netinfra__backbone_link_entry
 
-import respnet.rfs
+import respnet.inter
 
 def get_ttt(dev_mgr: odev.DeviceManager) -> ttt.TTTNode:
-    def create_list_entry_orchestron_rfs__rfs():
-        return ttt.TTTContainer({"base-config": ttt.TTTList(respnet.rfs.BaseConfig), "backbone-interface": ttt.TTTList(respnet.rfs.BBInterface)})
 
-    r = ttt.TTTContainer({"device": ttt.TTTList(lambda: ttt.TTTDevice(dev_mgr)), "rfs": ttt.TTTList(create_list_entry_orchestron_rfs__rfs)})
+
+    r = ttt.TTTContainer({"l3vpns": ttt.TTTContainer({"l3vpn": ttt.TTTList(respnet.inter.L3Vpn)}), "netinfra": ttt.TTTContainer({"routers": ttt.TTTList(respnet.inter.Router), "backbone-link": ttt.TTTList(respnet.inter.BBLink)})})
     return r
