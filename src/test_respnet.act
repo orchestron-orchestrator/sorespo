@@ -1,0 +1,63 @@
+
+import logging
+import testing
+import xml
+
+import yang.adata
+import yang.gdata
+import orchestron.ttt
+import orchestron.device as odev
+
+import respnet.layers
+from respnet.layers.y_0 import root as cfs_root
+
+
+def merge_confpsrc(confpsrc: dict[str, yang.gdata.Node]):
+    chunks = list(confpsrc.values())
+    if len(chunks) > 0:
+        merged = chunks[0]
+        if len(chunks) > 1:
+            for chunk in chunks[1:]:
+                merged = yang.gdata.merge(merged, chunk)
+        return merged
+    return yang.gdata.Root()
+
+def _test_netinfra1(log_handler: logging.Handler) -> str:
+    xmlin = """<data>
+    <netinfra xmlns="http://example.com/netinfra">
+        <routers>
+            <name>AMS-CORE-1</name>
+            <id>1</id>
+            <role>edge</role>
+        </routers>
+        <routers>
+            <name>FRA-CORE-1</name>
+            <id>2</id>
+            <role>core</role>
+        </routers>
+        <backbone-link>
+            <left-router>AMS-CORE-1</left-router>
+            <left-interface>GigabitEthernet0/0/0/0</left-interface>
+            <right-router>FRA-CORE-1</right-router>
+            <right-interface>GigabitEthernet0/0/0/0</right-interface>
+        </backbone-link>
+    </netinfra>
+</data>"""
+    xml_conf = xml.decode(xmlin)
+    dev_mgr = odev.DeviceManager()
+    layers = respnet.layers.get_layers(dev_mgr)
+
+    input_config = cfs_root.from_xml(xml_conf)
+    config_in = {"source1": input_config.to_gdata()}
+
+    config_out = {}
+    device_configs = {}
+    xml_out = ""
+    for idx, layer in enumerate(layers[:-1]):
+        print("Computing layer %d" % idx)
+        config_out = {}
+        layer.configure(config_in, config_out)
+        config_in = config_out
+
+    mc = merge_confpsrc(config_out)
+    return mc.to_xmlstr()
