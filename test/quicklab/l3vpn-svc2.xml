@@ -26,13 +26,13 @@
             <left-router>AMS-CORE-1</left-router>
             <left-interface>GigabitEthernet0/0/0/1</left-interface>
             <right-router>STO-CORE-1</right-router>
-            <right-interface>GigabitEthernet0/0/0/0</right-interface>
+            <right-interface>eth1</right-interface>
         </backbone-link>
         <backbone-link>
             <left-router>FRA-CORE-1</left-router>
             <left-interface>GigabitEthernet0/0/0/1</left-interface>
             <right-router>STO-CORE-1</right-router>
-            <right-interface>GigabitEthernet0/0/0/1</right-interface>
+            <right-interface>eth2</right-interface>
         </backbone-link>
     </netinfra>
     <l3vpn-svc xmlns="urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc">
@@ -43,10 +43,6 @@
             <vpn-service>
                 <vpn-id>VPN-1</vpn-id>
                 <customer-name>CUSTOMER-1</customer-name>
-            </vpn-service>
-            <vpn-service>
-                <vpn-id>VPN-2</vpn-id>
-                <customer-name>CUSTOMER-2</customer-name>
             </vpn-service>
         </vpn-services>
         <sites>
@@ -85,30 +81,6 @@
                             <bearer-reference>AMS-CORE-1,GigabitEthernet0/0/0/2</bearer-reference>
                         </bearer>
                     </site-network-access>
-                    <site-network-access>
-                        <site-network-access-id>SNA-1-2</site-network-access-id>
-                        <location-reference>MAIN</location-reference>
-                        <service>
-                            <svc-input-bandwidth>1000000000</svc-input-bandwidth>
-                            <svc-output-bandwidth>1000000000</svc-output-bandwidth>
-                            <svc-mtu>9000</svc-mtu>
-                        </service>
-                        <vpn-attachment>
-                            <vpn-id>VPN-1</vpn-id>
-                        </vpn-attachment>
-                        <ip-connection>
-                            <ipv4>
-                                <address-allocation-type>static-address</address-allocation-type>
-                                <addresses>
-                                    <provider-address>10.201.2.1</provider-address>
-                                    <prefix-length>30</prefix-length>
-                                </addresses>
-                            </ipv4>
-                        </ip-connection>
-                        <bearer>
-                            <bearer-reference>FRA-CORE-1,GigabitEthernet0/0/0/2</bearer-reference>
-                        </bearer>
-                    </site-network-access>
                 </site-network-accesses>
             </site>
             <site>
@@ -131,7 +103,7 @@
                             <svc-mtu>9000</svc-mtu>
                         </service>
                         <vpn-attachment>
-                            <vpn-id>VPN-2</vpn-id>
+                            <vpn-id>VPN-1</vpn-id>
                         </vpn-attachment>
                         <ip-connection>
                             <ipv4>
@@ -143,11 +115,24 @@
                             </ipv4>
                         </ip-connection>
                         <bearer>
-                            <bearer-reference>AMS-CORE-1,GigabitEthernet0/0/0/3</bearer-reference>
+                            <bearer-reference>FRA-CORE-1,GigabitEthernet0/0/0/2</bearer-reference>
                         </bearer>
                     </site-network-access>
+                </site-network-accesses>
+            </site>
+            <site>
+                <site-id>SITE-3</site-id>
+                <management>
+                    <type>customer-managed</type>
+                </management>
+                <locations>
+                    <location>
+                        <location-id>MAIN</location-id>
+                    </location>
+                </locations>
+                <site-network-accesses>
                     <site-network-access>
-                        <site-network-access-id>SNA-2-2</site-network-access-id>
+                        <site-network-access-id>SNA-3-1</site-network-access-id>
                         <location-reference>MAIN</location-reference>
                         <service>
                             <svc-input-bandwidth>1000000000</svc-input-bandwidth>
@@ -155,19 +140,19 @@
                             <svc-mtu>9000</svc-mtu>
                         </service>
                         <vpn-attachment>
-                            <vpn-id>VPN-2</vpn-id>
+                            <vpn-id>VPN-1</vpn-id>
                         </vpn-attachment>
                         <ip-connection>
                             <ipv4>
                                 <address-allocation-type>static-address</address-allocation-type>
                                 <addresses>
-                                    <provider-address>10.202.2.1</provider-address>
+                                    <provider-address>10.203.1.1</provider-address>
                                     <prefix-length>30</prefix-length>
                                 </addresses>
                             </ipv4>
                         </ip-connection>
                         <bearer>
-                            <bearer-reference>FRA-CORE-1,GigabitEthernet0/0/0/3</bearer-reference>
+                            <bearer-reference>STO-CORE-1,eth3</bearer-reference>
                         </bearer>
                     </site-network-access>
                 </site-network-accesses>

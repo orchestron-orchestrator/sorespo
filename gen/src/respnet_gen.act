@@ -3485,6 +3485,7 @@ respnet_rfs_yang = """module respnet-rfs {
                 type uint8 {
                     range "0..32";
                 }
+                default "30";
             }
 
             leaf ipv6-address {
@@ -3521,9 +3522,9 @@ respnet_rfs_yang = """module respnet-rfs {
             }
         }
 
-        list customer-interface {
+        list vrf-interface {
             key "name";
-            orchestron:rfs-transform respnet.rfs.CustomerInterface;
+            orchestron:rfs-transform respnet.rfs.VrfInterface;
             leaf name {
                 type string;
             }
@@ -3600,6 +3601,7 @@ actor main(env):
         orchestron.build.Layer([oyang.rfs, oyang.ietf_inet_types, respnet_rfs_yang]),
     ], [
         orchestron.build.DeviceType.from_dir(fc, "CiscoIosXr_24_1_ncs55a1", "yang/CiscoIosXr_24_1_ncs55a1"),
+        orchestron.build.DeviceType.from_dir(fc, "JuniperCRPD_23_4R1_9", "yang/JuniperCRPD_23_4R1_9"),
     ])
     spec.gen_app(wfc, "../src/")
 
