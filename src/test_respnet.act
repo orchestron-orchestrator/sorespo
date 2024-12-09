@@ -61,3 +61,72 @@ def _test_netinfra1(log_handler: logging.Handler) -> str:
 
     mc = merge_confpsrc(config_out)
     return mc.to_xmlstr()
+
+def _test_l3vpn_svc(log_handler: logging.Handler) -> str:
+    xmlin = """<data>
+    <l3vpn-svc xmlns="urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc">
+        <vpn-services>
+            <vpn-service>
+                <vpn-id>VPN-1</vpn-id>
+                <customer-name>CUSTOMER-1</customer-name>
+            </vpn-service>
+        </vpn-services>
+        <sites>
+            <site>
+                <site-id>SITE-1</site-id>
+                <management>
+                    <type>customer-managed</type>
+                </management>
+                <locations>
+                    <location>
+                        <location-id>MAIN</location-id>
+                    </location>
+                </locations>
+                <site-network-accesses>
+                    <site-network-access>
+                        <site-network-access-id>SNA-1-1</site-network-access-id>
+                        <location-reference>MAIN</location-reference>
+                        <service>
+                            <svc-input-bandwidth>1000000000</svc-input-bandwidth>
+                            <svc-output-bandwidth>1000000000</svc-output-bandwidth>
+                            <svc-mtu>9000</svc-mtu>
+                        </service>
+                        <vpn-attachment>
+                            <vpn-id>VPN-1</vpn-id>
+                        </vpn-attachment>
+                        <ip-connection>
+                            <ipv4>
+                                <address-allocation-type>static-address</address-allocation-type>
+                                <addresses>
+                                    <provider-address>10.201.1.1</provider-address>
+                                    <prefix-length>30</prefix-length>
+                                </addresses>
+                            </ipv4>
+                        </ip-connection>
+                        <bearer>
+                            <bearer-reference>AMS-CORE-1,GigabitEthernet0/0/0/2</bearer-reference>
+                        </bearer>
+                    </site-network-access>
+                </site-network-accesses>
+            </site>
+        </sites>
+    </l3vpn-svc>
+</data>"""
+    xml_conf = xml.decode(xmlin)
+    dev_mgr = odev.DeviceManager()
+    layers = respnet.layers.get_layers(dev_mgr)
+
+    input_config = cfs_root.from_xml(xml_conf)
+    config_in = {"source1": input_config.to_gdata()}
+
+    config_out = {}
+    device_configs = {}
+    xml_out = ""
+    for idx, layer in enumerate(layers[:-1]):
+        print("Computing layer %d" % idx)
+        config_out = {}
+        layer.configure(config_in, config_out)
+        config_in = config_out
+
+    mc = merge_confpsrc(config_out)
+    return mc.to_xmlstr()
