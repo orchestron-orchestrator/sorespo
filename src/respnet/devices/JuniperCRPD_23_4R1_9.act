@@ -6,27 +6,15 @@ import yang.gdata
 
 
 class junos_conf_root__configuration__system(yang.adata.MNode):
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     host_name: ?str
 
-    def __init__(self, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, host_name: ?str):
+    def __init__(self, host_name: ?str):
         self._ns = "http://yang.juniper.net/junos/conf/root"
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.host_name = host_name
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.Container('system', ns=self._ns)
         _host_name = self.host_name
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _host_name is not None:
             res.children['host-name'] = yang.gdata.Leaf('host-name', 'string', _host_name, ns='http://yang.juniper.net/junos/conf/root')
         for child in res.children.values():
@@ -36,51 +24,39 @@ class junos_conf_root__configuration__system(yang.adata.MNode):
     @staticmethod
     def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__system:
         if n != None:
-            return junos_conf_root__configuration__system(apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), host_name=n.get_opt_str("host-name"))
+            return junos_conf_root__configuration__system(host_name=n.get_opt_str("host-name"))
         return junos_conf_root__configuration__system()
 
     @staticmethod
     def from_xml(n: ?xml.Node) -> junos_conf_root__configuration__system:
         if n != None:
-            return junos_conf_root__configuration__system(apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), host_name=yang.gdata.from_xml_opt_str(n, "host-name"))
+            return junos_conf_root__configuration__system(host_name=yang.gdata.from_xml_opt_str(n, "host-name"))
         return junos_conf_root__configuration__system()
 
 
 class junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry(yang.adata.MNode):
     name: str
-    apply_groups: list[str]
-    apply_groups_except: list[str]
 
-    def __init__(self, name: str, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None):
+    def __init__(self, name: str):
         self._ns = "http://yang.juniper.net/junos/conf/root"
         self.name = name
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
         _name = self.name
         if _name is not None:
             res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         for child in res.children.values():
             child.parent = res
         return res
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry:
-        return junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry(name=n.get_str("name"), apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"))
+        return junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry(name=n.get_str("name"))
 
     @staticmethod
     def from_xml(n: xml.Node) -> junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry:
-        return junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry(name=yang.gdata.from_xml_str(n, "name"), apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"))
+        return junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry(name=yang.gdata.from_xml_str(n, "name"))
 
 class junos_conf_root__configuration__interfaces__interface__unit__family__inet__address(yang.adata.MNode):
     elements: list[junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry]
@@ -126,28 +102,16 @@ class junos_conf_root__configuration__interfaces__interface__unit__family__inet_
 
 
 class junos_conf_root__configuration__interfaces__interface__unit__family__inet(yang.adata.MNode):
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     address: junos_conf_root__configuration__interfaces__interface__unit__family__inet__address
 
-    def __init__(self, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, address: list[junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry]=[]):
+    def __init__(self, address: list[junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry]=[]):
         self._ns = "http://yang.juniper.net/junos/conf/root"
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.address = junos_conf_root__configuration__interfaces__interface__unit__family__inet__address(elements=address)
         self.address._parent = self
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.Container('inet', ns=self._ns)
         _address = self.address
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _address is not None:
             res.children['address'] = _address.to_gdata()
         for child in res.children.values():
@@ -157,13 +121,13 @@ class junos_conf_root__configuration__interfaces__interface__unit__family__inet(
     @staticmethod
     def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__interfaces__interface__unit__family__inet:
         if n != None:
-            return junos_conf_root__configuration__interfaces__interface__unit__family__inet(apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), address=junos_conf_root__configuration__interfaces__interface__unit__family__inet__address.from_gdata(n.get_list("address")))
+            return junos_conf_root__configuration__interfaces__interface__unit__family__inet(address=junos_conf_root__configuration__interfaces__interface__unit__family__inet__address.from_gdata(n.get_list("address")))
         return junos_conf_root__configuration__interfaces__interface__unit__family__inet()
 
     @staticmethod
     def from_xml(n: ?xml.Node) -> junos_conf_root__configuration__interfaces__interface__unit__family__inet:
         if n != None:
-            return junos_conf_root__configuration__interfaces__interface__unit__family__inet(apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), address=junos_conf_root__configuration__interfaces__interface__unit__family__inet__address.from_xml(yang.gdata.get_xml_children(n, "address")))
+            return junos_conf_root__configuration__interfaces__interface__unit__family__inet(address=junos_conf_root__configuration__interfaces__interface__unit__family__inet__address.from_xml(yang.gdata.get_xml_children(n, "address")))
         return junos_conf_root__configuration__interfaces__interface__unit__family__inet()
 
 
@@ -209,34 +173,19 @@ class junos_conf_root__configuration__interfaces__interface__unit__family(yang.a
 
 class junos_conf_root__configuration__interfaces__interface__unit_entry(yang.adata.MNode):
     name: str
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     alias: ?str
     description: ?str
-    security_group: list[str]
     vlan_id: ?str
     encapsulation: ?str
     family: junos_conf_root__configuration__interfaces__interface__unit__family
     mtu: ?value
     mac: ?str
 
-    def __init__(self, name: str, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, alias: ?str, description: ?str, security_group: ?list[str]=None, vlan_id: ?str, encapsulation: ?str, family: ?junos_conf_root__configuration__interfaces__interface__unit__family=None, mtu: ?value, mac: ?str):
+    def __init__(self, name: str, alias: ?str, description: ?str, vlan_id: ?str, encapsulation: ?str, family: ?junos_conf_root__configuration__interfaces__interface__unit__family=None, mtu: ?value, mac: ?str):
         self._ns = "http://yang.juniper.net/junos/conf/root"
         self.name = name
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.alias = alias
         self.description = description
-        if security_group is not None:
-            self.security_group = security_group
-        else:
-            self.security_group = []
         self.vlan_id = vlan_id
         self.encapsulation = encapsulation
         if family is not None:
@@ -261,13 +210,10 @@ class junos_conf_root__configuration__interfaces__interface__unit_entry(yang.ada
         _mac = self.mac
         if _name is not None:
             res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _alias is not None:
             res.children['alias'] = yang.gdata.Leaf('alias', 'string', _alias, ns='http://yang.juniper.net/junos/conf/root')
         if _description is not None:
             res.children['description'] = yang.gdata.Leaf('description', 'string', _description, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['security-group'] = yang.gdata.LeafList('security-group', self.security_group, ns='http://yang.juniper.net/junos/conf/root')
         if _vlan_id is not None:
             res.children['vlan-id'] = yang.gdata.Leaf('vlan-id', 'string', _vlan_id, ns='http://yang.juniper.net/junos/conf/root')
         if _encapsulation is not None:
@@ -284,11 +230,11 @@ class junos_conf_root__configuration__interfaces__interface__unit_entry(yang.ada
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__interfaces__interface__unit_entry:
-        return junos_conf_root__configuration__interfaces__interface__unit_entry(name=n.get_str("name"), apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), alias=n.get_opt_str("alias"), description=n.get_opt_str("description"), security_group=n.get_opt_strs("security-group"), vlan_id=n.get_opt_str("vlan-id"), encapsulation=n.get_opt_str("encapsulation"), family=junos_conf_root__configuration__interfaces__interface__unit__family.from_gdata(n.get_opt_container("family")), mtu=n.get_opt_value("mtu"), mac=n.get_opt_str("mac"))
+        return junos_conf_root__configuration__interfaces__interface__unit_entry(name=n.get_str("name"), alias=n.get_opt_str("alias"), description=n.get_opt_str("description"), vlan_id=n.get_opt_str("vlan-id"), encapsulation=n.get_opt_str("encapsulation"), family=junos_conf_root__configuration__interfaces__interface__unit__family.from_gdata(n.get_opt_container("family")), mtu=n.get_opt_value("mtu"), mac=n.get_opt_str("mac"))
 
     @staticmethod
     def from_xml(n: xml.Node) -> junos_conf_root__configuration__interfaces__interface__unit_entry:
-        return junos_conf_root__configuration__interfaces__interface__unit_entry(name=yang.gdata.from_xml_str(n, "name"), apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), alias=yang.gdata.from_xml_opt_str(n, "alias"), description=yang.gdata.from_xml_opt_str(n, "description"), security_group=yang.gdata.from_xml_opt_strs(n, "security-group"), vlan_id=yang.gdata.from_xml_opt_str(n, "vlan-id"), encapsulation=yang.gdata.from_xml_opt_str(n, "encapsulation"), family=junos_conf_root__configuration__interfaces__interface__unit__family.from_xml(yang.gdata.get_xml_opt_child(n, "family")), mtu=yang.gdata.from_xml_opt_value(n, "mtu"), mac=yang.gdata.from_xml_opt_str(n, "mac"))
+        return junos_conf_root__configuration__interfaces__interface__unit_entry(name=yang.gdata.from_xml_str(n, "name"), alias=yang.gdata.from_xml_opt_str(n, "alias"), description=yang.gdata.from_xml_opt_str(n, "description"), vlan_id=yang.gdata.from_xml_opt_str(n, "vlan-id"), encapsulation=yang.gdata.from_xml_opt_str(n, "encapsulation"), family=junos_conf_root__configuration__interfaces__interface__unit__family.from_xml(yang.gdata.get_xml_opt_child(n, "family")), mtu=yang.gdata.from_xml_opt_value(n, "mtu"), mac=yang.gdata.from_xml_opt_str(n, "mac"))
 
 class junos_conf_root__configuration__interfaces__interface__unit(yang.adata.MNode):
     elements: list[junos_conf_root__configuration__interfaces__interface__unit_entry]
@@ -335,25 +281,15 @@ class junos_conf_root__configuration__interfaces__interface__unit(yang.adata.MNo
 
 class junos_conf_root__configuration__interfaces__interface_entry(yang.adata.MNode):
     name: str
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     description: ?str
     mtu: ?value
     mac: ?str
     native_vlan_id: ?value
     unit: junos_conf_root__configuration__interfaces__interface__unit
 
-    def __init__(self, name: str, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, description: ?str, mtu: ?value, mac: ?str, native_vlan_id: ?value, unit: list[junos_conf_root__configuration__interfaces__interface__unit_entry]=[]):
+    def __init__(self, name: str, description: ?str, mtu: ?value, mac: ?str, native_vlan_id: ?value, unit: list[junos_conf_root__configuration__interfaces__interface__unit_entry]=[]):
         self._ns = "http://yang.juniper.net/junos/conf/root"
         self.name = name
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.description = description
         self.mtu = mtu
         self.mac = mac
@@ -371,8 +307,6 @@ class junos_conf_root__configuration__interfaces__interface_entry(yang.adata.MNo
         _unit = self.unit
         if _name is not None:
             res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _description is not None:
             res.children['description'] = yang.gdata.Leaf('description', 'string', _description, ns='http://yang.juniper.net/junos/conf/root')
         if _mtu is not None:
@@ -389,11 +323,11 @@ class junos_conf_root__configuration__interfaces__interface_entry(yang.adata.MNo
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__interfaces__interface_entry:
-        return junos_conf_root__configuration__interfaces__interface_entry(name=n.get_str("name"), apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), description=n.get_opt_str("description"), mtu=n.get_opt_value("mtu"), mac=n.get_opt_str("mac"), native_vlan_id=n.get_opt_value("native-vlan-id"), unit=junos_conf_root__configuration__interfaces__interface__unit.from_gdata(n.get_list("unit")))
+        return junos_conf_root__configuration__interfaces__interface_entry(name=n.get_str("name"), description=n.get_opt_str("description"), mtu=n.get_opt_value("mtu"), mac=n.get_opt_str("mac"), native_vlan_id=n.get_opt_value("native-vlan-id"), unit=junos_conf_root__configuration__interfaces__interface__unit.from_gdata(n.get_list("unit")))
 
     @staticmethod
     def from_xml(n: xml.Node) -> junos_conf_root__configuration__interfaces__interface_entry:
-        return junos_conf_root__configuration__interfaces__interface_entry(name=yang.gdata.from_xml_str(n, "name"), apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), description=yang.gdata.from_xml_opt_str(n, "description"), mtu=yang.gdata.from_xml_opt_value(n, "mtu"), mac=yang.gdata.from_xml_opt_str(n, "mac"), native_vlan_id=yang.gdata.from_xml_opt_value(n, "native-vlan-id"), unit=junos_conf_root__configuration__interfaces__interface__unit.from_xml(yang.gdata.get_xml_children(n, "unit")))
+        return junos_conf_root__configuration__interfaces__interface_entry(name=yang.gdata.from_xml_str(n, "name"), description=yang.gdata.from_xml_opt_str(n, "description"), mtu=yang.gdata.from_xml_opt_value(n, "mtu"), mac=yang.gdata.from_xml_opt_str(n, "mac"), native_vlan_id=yang.gdata.from_xml_opt_value(n, "native-vlan-id"), unit=junos_conf_root__configuration__interfaces__interface__unit.from_xml(yang.gdata.get_xml_children(n, "unit")))
 
 class junos_conf_root__configuration__interfaces__interface(yang.adata.MNode):
     elements: list[junos_conf_root__configuration__interfaces__interface_entry]
@@ -439,28 +373,16 @@ class junos_conf_root__configuration__interfaces__interface(yang.adata.MNode):
 
 
 class junos_conf_root__configuration__interfaces(yang.adata.MNode):
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     interface: junos_conf_root__configuration__interfaces__interface
 
-    def __init__(self, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, interface: list[junos_conf_root__configuration__interfaces__interface_entry]=[]):
+    def __init__(self, interface: list[junos_conf_root__configuration__interfaces__interface_entry]=[]):
         self._ns = "http://yang.juniper.net/junos/conf/root"
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.interface = junos_conf_root__configuration__interfaces__interface(elements=interface)
         self.interface._parent = self
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.Container('interfaces', ns=self._ns)
         _interface = self.interface
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _interface is not None:
             res.children['interface'] = _interface.to_gdata()
         for child in res.children.values():
@@ -470,36 +392,26 @@ class junos_conf_root__configuration__interfaces(yang.adata.MNode):
     @staticmethod
     def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__interfaces:
         if n != None:
-            return junos_conf_root__configuration__interfaces(apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), interface=junos_conf_root__configuration__interfaces__interface.from_gdata(n.get_list("interface")))
+            return junos_conf_root__configuration__interfaces(interface=junos_conf_root__configuration__interfaces__interface.from_gdata(n.get_list("interface")))
         return junos_conf_root__configuration__interfaces()
 
     @staticmethod
     def from_xml(n: ?xml.Node) -> junos_conf_root__configuration__interfaces:
         if n != None:
-            return junos_conf_root__configuration__interfaces(apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), interface=junos_conf_root__configuration__interfaces__interface.from_xml(yang.gdata.get_xml_children(n, "interface")))
+            return junos_conf_root__configuration__interfaces(interface=junos_conf_root__configuration__interfaces__interface.from_xml(yang.gdata.get_xml_children(n, "interface")))
         return junos_conf_root__configuration__interfaces()
 
 
 class junos_conf_root__configuration__routing_instances__instance__interface_entry(yang.adata.MNode):
     name: str
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     any: ?bool
     unicast: ?bool
     multicast: ?bool
     primary: ?bool
 
-    def __init__(self, name: str, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, any: ?bool, unicast: ?bool, multicast: ?bool, primary: ?bool):
+    def __init__(self, name: str, any: ?bool, unicast: ?bool, multicast: ?bool, primary: ?bool):
         self._ns = "http://yang.juniper.net/junos/conf/root"
         self.name = name
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.any = any
         self.unicast = unicast
         self.multicast = multicast
@@ -514,8 +426,6 @@ class junos_conf_root__configuration__routing_instances__instance__interface_ent
         _primary = self.primary
         if _name is not None:
             res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _any is not None:
             res.children['any'] = yang.gdata.Leaf('any', 'empty', _any, ns='http://yang.juniper.net/junos/conf/root')
         if _unicast is not None:
@@ -530,11 +440,11 @@ class junos_conf_root__configuration__routing_instances__instance__interface_ent
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__routing_instances__instance__interface_entry:
-        return junos_conf_root__configuration__routing_instances__instance__interface_entry(name=n.get_str("name"), apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), any=n.get_opt_bool("any"), unicast=n.get_opt_bool("unicast"), multicast=n.get_opt_bool("multicast"), primary=n.get_opt_bool("primary"))
+        return junos_conf_root__configuration__routing_instances__instance__interface_entry(name=n.get_str("name"), any=n.get_opt_bool("any"), unicast=n.get_opt_bool("unicast"), multicast=n.get_opt_bool("multicast"), primary=n.get_opt_bool("primary"))
 
     @staticmethod
     def from_xml(n: xml.Node) -> junos_conf_root__configuration__routing_instances__instance__interface_entry:
-        return junos_conf_root__configuration__routing_instances__instance__interface_entry(name=yang.gdata.from_xml_str(n, "name"), apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), any=yang.gdata.from_xml_opt_bool(n, "any"), unicast=yang.gdata.from_xml_opt_bool(n, "unicast"), multicast=yang.gdata.from_xml_opt_bool(n, "multicast"), primary=yang.gdata.from_xml_opt_bool(n, "primary"))
+        return junos_conf_root__configuration__routing_instances__instance__interface_entry(name=yang.gdata.from_xml_str(n, "name"), any=yang.gdata.from_xml_opt_bool(n, "any"), unicast=yang.gdata.from_xml_opt_bool(n, "unicast"), multicast=yang.gdata.from_xml_opt_bool(n, "multicast"), primary=yang.gdata.from_xml_opt_bool(n, "primary"))
 
 class junos_conf_root__configuration__routing_instances__instance__interface(yang.adata.MNode):
     elements: list[junos_conf_root__configuration__routing_instances__instance__interface_entry]
@@ -609,23 +519,13 @@ class junos_conf_root__configuration__routing_instances__instance__route_disting
 
 
 class junos_conf_root__configuration__routing_instances__instance__vrf_target(yang.adata.MNode):
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     community: ?str
     import_: ?str
     export: ?str
     auto: ?bool
 
-    def __init__(self, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, community: ?str, import_: ?str, export: ?str, auto: ?bool):
+    def __init__(self, community: ?str, import_: ?str, export: ?str, auto: ?bool):
         self._ns = "http://yang.juniper.net/junos/conf/root"
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.community = community
         self.import_ = import_
         self.export = export
@@ -637,8 +537,6 @@ class junos_conf_root__configuration__routing_instances__instance__vrf_target(ya
         _import_ = self.import_
         _export = self.export
         _auto = self.auto
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _community is not None:
             res.children['community'] = yang.gdata.Leaf('community', 'string', _community, ns='http://yang.juniper.net/junos/conf/root')
         if _import_ is not None:
@@ -654,41 +552,29 @@ class junos_conf_root__configuration__routing_instances__instance__vrf_target(ya
     @staticmethod
     def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__routing_instances__instance__vrf_target:
         if n != None:
-            return junos_conf_root__configuration__routing_instances__instance__vrf_target(apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), community=n.get_opt_str("community"), import_=n.get_opt_str("import"), export=n.get_opt_str("export"), auto=n.get_opt_bool("auto"))
+            return junos_conf_root__configuration__routing_instances__instance__vrf_target(community=n.get_opt_str("community"), import_=n.get_opt_str("import"), export=n.get_opt_str("export"), auto=n.get_opt_bool("auto"))
         return junos_conf_root__configuration__routing_instances__instance__vrf_target()
 
     @staticmethod
     def from_xml(n: ?xml.Node) -> junos_conf_root__configuration__routing_instances__instance__vrf_target:
         if n != None:
-            return junos_conf_root__configuration__routing_instances__instance__vrf_target(apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), community=yang.gdata.from_xml_opt_str(n, "community"), import_=yang.gdata.from_xml_opt_str(n, "import"), export=yang.gdata.from_xml_opt_str(n, "export"), auto=yang.gdata.from_xml_opt_bool(n, "auto"))
+            return junos_conf_root__configuration__routing_instances__instance__vrf_target(community=yang.gdata.from_xml_opt_str(n, "community"), import_=yang.gdata.from_xml_opt_str(n, "import"), export=yang.gdata.from_xml_opt_str(n, "export"), auto=yang.gdata.from_xml_opt_bool(n, "auto"))
         return junos_conf_root__configuration__routing_instances__instance__vrf_target()
 
 
 class junos_conf_root__configuration__routing_instances__instance_entry(yang.adata.MNode):
     name: str
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     instance_type: ?str
     interface: junos_conf_root__configuration__routing_instances__instance__interface
     route_distinguisher: junos_conf_root__configuration__routing_instances__instance__route_distinguisher
-    vrf_import: list[str]
-    vrf_export: list[str]
     export_default_action: ?str
     import_default_action: ?str
     vrf_target: junos_conf_root__configuration__routing_instances__instance__vrf_target
     no_vrf_advertise: ?bool
 
-    def __init__(self, name: str, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, instance_type: ?str, interface: list[junos_conf_root__configuration__routing_instances__instance__interface_entry]=[], route_distinguisher: ?junos_conf_root__configuration__routing_instances__instance__route_distinguisher=None, vrf_import: ?list[str]=None, vrf_export: ?list[str]=None, export_default_action: ?str, import_default_action: ?str, vrf_target: ?junos_conf_root__configuration__routing_instances__instance__vrf_target=None, no_vrf_advertise: ?bool):
+    def __init__(self, name: str, instance_type: ?str, interface: list[junos_conf_root__configuration__routing_instances__instance__interface_entry]=[], route_distinguisher: ?junos_conf_root__configuration__routing_instances__instance__route_distinguisher=None, export_default_action: ?str, import_default_action: ?str, vrf_target: ?junos_conf_root__configuration__routing_instances__instance__vrf_target=None, no_vrf_advertise: ?bool):
         self._ns = "http://yang.juniper.net/junos/conf/root"
         self.name = name
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.instance_type = instance_type
         self.interface = junos_conf_root__configuration__routing_instances__instance__interface(elements=interface)
         self.interface._parent = self
@@ -699,14 +585,6 @@ class junos_conf_root__configuration__routing_instances__instance_entry(yang.ada
         self_route_distinguisher = self.route_distinguisher
         if self_route_distinguisher is not None:
             self_route_distinguisher._parent = self
-        if vrf_import is not None:
-            self.vrf_import = vrf_import
-        else:
-            self.vrf_import = []
-        if vrf_export is not None:
-            self.vrf_export = vrf_export
-        else:
-            self.vrf_export = []
         self.export_default_action = export_default_action
         self.import_default_action = import_default_action
         if vrf_target is not None:
@@ -730,16 +608,12 @@ class junos_conf_root__configuration__routing_instances__instance_entry(yang.ada
         _no_vrf_advertise = self.no_vrf_advertise
         if _name is not None:
             res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _instance_type is not None:
             res.children['instance-type'] = yang.gdata.Leaf('instance-type', 'enumeration', _instance_type, ns='http://yang.juniper.net/junos/conf/root')
         if _interface is not None:
             res.children['interface'] = _interface.to_gdata()
         if _route_distinguisher is not None:
             res.children['route-distinguisher'] = _route_distinguisher.to_gdata()
-        res.children['vrf-import'] = yang.gdata.LeafList('vrf-import', self.vrf_import, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['vrf-export'] = yang.gdata.LeafList('vrf-export', self.vrf_export, ns='http://yang.juniper.net/junos/conf/root')
         if _export_default_action is not None:
             res.children['export-default-action'] = yang.gdata.Leaf('export-default-action', 'enumeration', _export_default_action, ns='http://yang.juniper.net/junos/conf/root')
         if _import_default_action is not None:
@@ -754,11 +628,11 @@ class junos_conf_root__configuration__routing_instances__instance_entry(yang.ada
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__routing_instances__instance_entry:
-        return junos_conf_root__configuration__routing_instances__instance_entry(name=n.get_str("name"), apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), instance_type=n.get_opt_str("instance-type"), interface=junos_conf_root__configuration__routing_instances__instance__interface.from_gdata(n.get_list("interface")), route_distinguisher=junos_conf_root__configuration__routing_instances__instance__route_distinguisher.from_gdata(n.get_opt_container("route-distinguisher")), vrf_import=n.get_opt_strs("vrf-import"), vrf_export=n.get_opt_strs("vrf-export"), export_default_action=n.get_opt_str("export-default-action"), import_default_action=n.get_opt_str("import-default-action"), vrf_target=junos_conf_root__configuration__routing_instances__instance__vrf_target.from_gdata(n.get_opt_container("vrf-target")), no_vrf_advertise=n.get_opt_bool("no-vrf-advertise"))
+        return junos_conf_root__configuration__routing_instances__instance_entry(name=n.get_str("name"), instance_type=n.get_opt_str("instance-type"), interface=junos_conf_root__configuration__routing_instances__instance__interface.from_gdata(n.get_list("interface")), route_distinguisher=junos_conf_root__configuration__routing_instances__instance__route_distinguisher.from_gdata(n.get_opt_container("route-distinguisher")), export_default_action=n.get_opt_str("export-default-action"), import_default_action=n.get_opt_str("import-default-action"), vrf_target=junos_conf_root__configuration__routing_instances__instance__vrf_target.from_gdata(n.get_opt_container("vrf-target")), no_vrf_advertise=n.get_opt_bool("no-vrf-advertise"))
 
     @staticmethod
     def from_xml(n: xml.Node) -> junos_conf_root__configuration__routing_instances__instance_entry:
-        return junos_conf_root__configuration__routing_instances__instance_entry(name=yang.gdata.from_xml_str(n, "name"), apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), instance_type=yang.gdata.from_xml_opt_str(n, "instance-type"), interface=junos_conf_root__configuration__routing_instances__instance__interface.from_xml(yang.gdata.get_xml_children(n, "interface")), route_distinguisher=junos_conf_root__configuration__routing_instances__instance__route_distinguisher.from_xml(yang.gdata.get_xml_opt_child(n, "route-distinguisher")), vrf_import=yang.gdata.from_xml_opt_strs(n, "vrf-import"), vrf_export=yang.gdata.from_xml_opt_strs(n, "vrf-export"), export_default_action=yang.gdata.from_xml_opt_str(n, "export-default-action"), import_default_action=yang.gdata.from_xml_opt_str(n, "import-default-action"), vrf_target=junos_conf_root__configuration__routing_instances__instance__vrf_target.from_xml(yang.gdata.get_xml_opt_child(n, "vrf-target")), no_vrf_advertise=yang.gdata.from_xml_opt_bool(n, "no-vrf-advertise"))
+        return junos_conf_root__configuration__routing_instances__instance_entry(name=yang.gdata.from_xml_str(n, "name"), instance_type=yang.gdata.from_xml_opt_str(n, "instance-type"), interface=junos_conf_root__configuration__routing_instances__instance__interface.from_xml(yang.gdata.get_xml_children(n, "interface")), route_distinguisher=junos_conf_root__configuration__routing_instances__instance__route_distinguisher.from_xml(yang.gdata.get_xml_opt_child(n, "route-distinguisher")), export_default_action=yang.gdata.from_xml_opt_str(n, "export-default-action"), import_default_action=yang.gdata.from_xml_opt_str(n, "import-default-action"), vrf_target=junos_conf_root__configuration__routing_instances__instance__vrf_target.from_xml(yang.gdata.get_xml_opt_child(n, "vrf-target")), no_vrf_advertise=yang.gdata.from_xml_opt_bool(n, "no-vrf-advertise"))
 
 class junos_conf_root__configuration__routing_instances__instance(yang.adata.MNode):
     elements: list[junos_conf_root__configuration__routing_instances__instance_entry]
@@ -804,28 +678,16 @@ class junos_conf_root__configuration__routing_instances__instance(yang.adata.MNo
 
 
 class junos_conf_root__configuration__routing_instances(yang.adata.MNode):
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     instance: junos_conf_root__configuration__routing_instances__instance
 
-    def __init__(self, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, instance: list[junos_conf_root__configuration__routing_instances__instance_entry]=[]):
+    def __init__(self, instance: list[junos_conf_root__configuration__routing_instances__instance_entry]=[]):
         self._ns = "http://yang.juniper.net/junos/conf/root"
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.instance = junos_conf_root__configuration__routing_instances__instance(elements=instance)
         self.instance._parent = self
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.Container('routing-instances', ns=self._ns)
         _instance = self.instance
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _instance is not None:
             res.children['instance'] = _instance.to_gdata()
         for child in res.children.values():
@@ -835,38 +697,26 @@ class junos_conf_root__configuration__routing_instances(yang.adata.MNode):
     @staticmethod
     def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__routing_instances:
         if n != None:
-            return junos_conf_root__configuration__routing_instances(apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), instance=junos_conf_root__configuration__routing_instances__instance.from_gdata(n.get_list("instance")))
+            return junos_conf_root__configuration__routing_instances(instance=junos_conf_root__configuration__routing_instances__instance.from_gdata(n.get_list("instance")))
         return junos_conf_root__configuration__routing_instances()
 
     @staticmethod
     def from_xml(n: ?xml.Node) -> junos_conf_root__configuration__routing_instances:
         if n != None:
-            return junos_conf_root__configuration__routing_instances(apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), instance=junos_conf_root__configuration__routing_instances__instance.from_xml(yang.gdata.get_xml_children(n, "instance")))
+            return junos_conf_root__configuration__routing_instances(instance=junos_conf_root__configuration__routing_instances__instance.from_xml(yang.gdata.get_xml_children(n, "instance")))
         return junos_conf_root__configuration__routing_instances()
 
 
 class junos_conf_root__configuration__groups__when__time__to(yang.adata.MNode):
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     end_time: ?str
 
-    def __init__(self, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, end_time: ?str):
+    def __init__(self, end_time: ?str):
         self._ns = "http://yang.juniper.net/junos/conf/root"
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.end_time = end_time
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.Container('to', ns=self._ns)
         _end_time = self.end_time
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _end_time is not None:
             res.children['end-time'] = yang.gdata.Leaf('end-time', 'string', _end_time, ns='http://yang.juniper.net/junos/conf/root')
         for child in res.children.values():
@@ -876,13 +726,13 @@ class junos_conf_root__configuration__groups__when__time__to(yang.adata.MNode):
     @staticmethod
     def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__when__time__to:
         if n != None:
-            return junos_conf_root__configuration__groups__when__time__to(apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), end_time=n.get_opt_str("end-time"))
+            return junos_conf_root__configuration__groups__when__time__to(end_time=n.get_opt_str("end-time"))
         return junos_conf_root__configuration__groups__when__time__to()
 
     @staticmethod
     def from_xml(n: ?xml.Node) -> junos_conf_root__configuration__groups__when__time__to:
         if n != None:
-            return junos_conf_root__configuration__groups__when__time__to(apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), end_time=yang.gdata.from_xml_opt_str(n, "end-time"))
+            return junos_conf_root__configuration__groups__when__time__to(end_time=yang.gdata.from_xml_opt_str(n, "end-time"))
         return junos_conf_root__configuration__groups__when__time__to()
 
 
@@ -927,26 +777,15 @@ class junos_conf_root__configuration__groups__when__time(yang.adata.MNode):
 
 
 class junos_conf_root__configuration__groups__when(yang.adata.MNode):
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     time: junos_conf_root__configuration__groups__when__time
-    peers: list[str]
     chassis: ?str
     model: ?str
     routing_engine: ?str
     member: ?str
     node: ?str
 
-    def __init__(self, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, time: ?junos_conf_root__configuration__groups__when__time=None, peers: ?list[str]=None, chassis: ?str, model: ?str, routing_engine: ?str, member: ?str, node: ?str):
+    def __init__(self, time: ?junos_conf_root__configuration__groups__when__time=None, chassis: ?str, model: ?str, routing_engine: ?str, member: ?str, node: ?str):
         self._ns = "http://yang.juniper.net/junos/conf/root"
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         if time is not None:
             self.time = time
         else:
@@ -954,10 +793,6 @@ class junos_conf_root__configuration__groups__when(yang.adata.MNode):
         self_time = self.time
         if self_time is not None:
             self_time._parent = self
-        if peers is not None:
-            self.peers = peers
-        else:
-            self.peers = []
         self.chassis = chassis
         self.model = model
         self.routing_engine = routing_engine
@@ -972,11 +807,8 @@ class junos_conf_root__configuration__groups__when(yang.adata.MNode):
         _routing_engine = self.routing_engine
         _member = self.member
         _node = self.node
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _time is not None:
             res.children['time'] = _time.to_gdata()
-        res.children['peers'] = yang.gdata.LeafList('peers', self.peers, ns='http://yang.juniper.net/junos/conf/root')
         if _chassis is not None:
             res.children['chassis'] = yang.gdata.Leaf('chassis', 'enumeration', _chassis, ns='http://yang.juniper.net/junos/conf/root')
         if _model is not None:
@@ -994,38 +826,26 @@ class junos_conf_root__configuration__groups__when(yang.adata.MNode):
     @staticmethod
     def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__when:
         if n != None:
-            return junos_conf_root__configuration__groups__when(apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), time=junos_conf_root__configuration__groups__when__time.from_gdata(n.get_opt_container("time")), peers=n.get_opt_strs("peers"), chassis=n.get_opt_str("chassis"), model=n.get_opt_str("model"), routing_engine=n.get_opt_str("routing-engine"), member=n.get_opt_str("member"), node=n.get_opt_str("node"))
+            return junos_conf_root__configuration__groups__when(time=junos_conf_root__configuration__groups__when__time.from_gdata(n.get_opt_container("time")), chassis=n.get_opt_str("chassis"), model=n.get_opt_str("model"), routing_engine=n.get_opt_str("routing-engine"), member=n.get_opt_str("member"), node=n.get_opt_str("node"))
         return junos_conf_root__configuration__groups__when()
 
     @staticmethod
     def from_xml(n: ?xml.Node) -> junos_conf_root__configuration__groups__when:
         if n != None:
-            return junos_conf_root__configuration__groups__when(apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), time=junos_conf_root__configuration__groups__when__time.from_xml(yang.gdata.get_xml_opt_child(n, "time")), peers=yang.gdata.from_xml_opt_strs(n, "peers"), chassis=yang.gdata.from_xml_opt_str(n, "chassis"), model=yang.gdata.from_xml_opt_str(n, "model"), routing_engine=yang.gdata.from_xml_opt_str(n, "routing-engine"), member=yang.gdata.from_xml_opt_str(n, "member"), node=yang.gdata.from_xml_opt_str(n, "node"))
+            return junos_conf_root__configuration__groups__when(time=junos_conf_root__configuration__groups__when__time.from_xml(yang.gdata.get_xml_opt_child(n, "time")), chassis=yang.gdata.from_xml_opt_str(n, "chassis"), model=yang.gdata.from_xml_opt_str(n, "model"), routing_engine=yang.gdata.from_xml_opt_str(n, "routing-engine"), member=yang.gdata.from_xml_opt_str(n, "member"), node=yang.gdata.from_xml_opt_str(n, "node"))
         return junos_conf_root__configuration__groups__when()
 
 
 class junos_conf_root__configuration__groups__system(yang.adata.MNode):
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     host_name: ?str
 
-    def __init__(self, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, host_name: ?str):
+    def __init__(self, host_name: ?str):
         self._ns = "http://yang.juniper.net/junos/conf/root"
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.host_name = host_name
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.Container('system', ns=self._ns)
         _host_name = self.host_name
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _host_name is not None:
             res.children['host-name'] = yang.gdata.Leaf('host-name', 'string', _host_name, ns='http://yang.juniper.net/junos/conf/root')
         for child in res.children.values():
@@ -1035,51 +855,39 @@ class junos_conf_root__configuration__groups__system(yang.adata.MNode):
     @staticmethod
     def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__system:
         if n != None:
-            return junos_conf_root__configuration__groups__system(apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), host_name=n.get_opt_str("host-name"))
+            return junos_conf_root__configuration__groups__system(host_name=n.get_opt_str("host-name"))
         return junos_conf_root__configuration__groups__system()
 
     @staticmethod
     def from_xml(n: ?xml.Node) -> junos_conf_root__configuration__groups__system:
         if n != None:
-            return junos_conf_root__configuration__groups__system(apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), host_name=yang.gdata.from_xml_opt_str(n, "host-name"))
+            return junos_conf_root__configuration__groups__system(host_name=yang.gdata.from_xml_opt_str(n, "host-name"))
         return junos_conf_root__configuration__groups__system()
 
 
 class junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry(yang.adata.MNode):
     name: str
-    apply_groups: list[str]
-    apply_groups_except: list[str]
 
-    def __init__(self, name: str, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None):
+    def __init__(self, name: str):
         self._ns = "http://yang.juniper.net/junos/conf/root"
         self.name = name
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
         _name = self.name
         if _name is not None:
             res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         for child in res.children.values():
             child.parent = res
         return res
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry:
-        return junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry(name=n.get_str("name"), apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"))
+        return junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry(name=n.get_str("name"))
 
     @staticmethod
     def from_xml(n: xml.Node) -> junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry:
-        return junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry(name=yang.gdata.from_xml_str(n, "name"), apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"))
+        return junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry(name=yang.gdata.from_xml_str(n, "name"))
 
 class junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address(yang.adata.MNode):
     elements: list[junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry]
@@ -1125,28 +933,16 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit__famil
 
 
 class junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet(yang.adata.MNode):
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     address: junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address
 
-    def __init__(self, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, address: list[junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry]=[]):
+    def __init__(self, address: list[junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry]=[]):
         self._ns = "http://yang.juniper.net/junos/conf/root"
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.address = junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address(elements=address)
         self.address._parent = self
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.Container('inet', ns=self._ns)
         _address = self.address
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _address is not None:
             res.children['address'] = _address.to_gdata()
         for child in res.children.values():
@@ -1156,13 +952,13 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit__famil
     @staticmethod
     def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet:
         if n != None:
-            return junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet(apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), address=junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address.from_gdata(n.get_list("address")))
+            return junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet(address=junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address.from_gdata(n.get_list("address")))
         return junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet()
 
     @staticmethod
     def from_xml(n: ?xml.Node) -> junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet:
         if n != None:
-            return junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet(apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), address=junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address.from_xml(yang.gdata.get_xml_children(n, "address")))
+            return junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet(address=junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address.from_xml(yang.gdata.get_xml_children(n, "address")))
         return junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet()
 
 
@@ -1208,34 +1004,19 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit__famil
 
 class junos_conf_root__configuration__groups__interfaces__interface__unit_entry(yang.adata.MNode):
     name: str
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     alias: ?str
     description: ?str
-    security_group: list[str]
     vlan_id: ?str
     encapsulation: ?str
     family: junos_conf_root__configuration__groups__interfaces__interface__unit__family
     mtu: ?value
     mac: ?str
 
-    def __init__(self, name: str, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, alias: ?str, description: ?str, security_group: ?list[str]=None, vlan_id: ?str, encapsulation: ?str, family: ?junos_conf_root__configuration__groups__interfaces__interface__unit__family=None, mtu: ?value, mac: ?str):
+    def __init__(self, name: str, alias: ?str, description: ?str, vlan_id: ?str, encapsulation: ?str, family: ?junos_conf_root__configuration__groups__interfaces__interface__unit__family=None, mtu: ?value, mac: ?str):
         self._ns = "http://yang.juniper.net/junos/conf/root"
         self.name = name
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.alias = alias
         self.description = description
-        if security_group is not None:
-            self.security_group = security_group
-        else:
-            self.security_group = []
         self.vlan_id = vlan_id
         self.encapsulation = encapsulation
         if family is not None:
@@ -1260,13 +1041,10 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit_entry(
         _mac = self.mac
         if _name is not None:
             res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _alias is not None:
             res.children['alias'] = yang.gdata.Leaf('alias', 'string', _alias, ns='http://yang.juniper.net/junos/conf/root')
         if _description is not None:
             res.children['description'] = yang.gdata.Leaf('description', 'string', _description, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['security-group'] = yang.gdata.LeafList('security-group', self.security_group, ns='http://yang.juniper.net/junos/conf/root')
         if _vlan_id is not None:
             res.children['vlan-id'] = yang.gdata.Leaf('vlan-id', 'string', _vlan_id, ns='http://yang.juniper.net/junos/conf/root')
         if _encapsulation is not None:
@@ -1283,11 +1061,11 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit_entry(
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups__interfaces__interface__unit_entry:
-        return junos_conf_root__configuration__groups__interfaces__interface__unit_entry(name=n.get_str("name"), apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), alias=n.get_opt_str("alias"), description=n.get_opt_str("description"), security_group=n.get_opt_strs("security-group"), vlan_id=n.get_opt_str("vlan-id"), encapsulation=n.get_opt_str("encapsulation"), family=junos_conf_root__configuration__groups__interfaces__interface__unit__family.from_gdata(n.get_opt_container("family")), mtu=n.get_opt_value("mtu"), mac=n.get_opt_str("mac"))
+        return junos_conf_root__configuration__groups__interfaces__interface__unit_entry(name=n.get_str("name"), alias=n.get_opt_str("alias"), description=n.get_opt_str("description"), vlan_id=n.get_opt_str("vlan-id"), encapsulation=n.get_opt_str("encapsulation"), family=junos_conf_root__configuration__groups__interfaces__interface__unit__family.from_gdata(n.get_opt_container("family")), mtu=n.get_opt_value("mtu"), mac=n.get_opt_str("mac"))
 
     @staticmethod
     def from_xml(n: xml.Node) -> junos_conf_root__configuration__groups__interfaces__interface__unit_entry:
-        return junos_conf_root__configuration__groups__interfaces__interface__unit_entry(name=yang.gdata.from_xml_str(n, "name"), apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), alias=yang.gdata.from_xml_opt_str(n, "alias"), description=yang.gdata.from_xml_opt_str(n, "description"), security_group=yang.gdata.from_xml_opt_strs(n, "security-group"), vlan_id=yang.gdata.from_xml_opt_str(n, "vlan-id"), encapsulation=yang.gdata.from_xml_opt_str(n, "encapsulation"), family=junos_conf_root__configuration__groups__interfaces__interface__unit__family.from_xml(yang.gdata.get_xml_opt_child(n, "family")), mtu=yang.gdata.from_xml_opt_value(n, "mtu"), mac=yang.gdata.from_xml_opt_str(n, "mac"))
+        return junos_conf_root__configuration__groups__interfaces__interface__unit_entry(name=yang.gdata.from_xml_str(n, "name"), alias=yang.gdata.from_xml_opt_str(n, "alias"), description=yang.gdata.from_xml_opt_str(n, "description"), vlan_id=yang.gdata.from_xml_opt_str(n, "vlan-id"), encapsulation=yang.gdata.from_xml_opt_str(n, "encapsulation"), family=junos_conf_root__configuration__groups__interfaces__interface__unit__family.from_xml(yang.gdata.get_xml_opt_child(n, "family")), mtu=yang.gdata.from_xml_opt_value(n, "mtu"), mac=yang.gdata.from_xml_opt_str(n, "mac"))
 
 class junos_conf_root__configuration__groups__interfaces__interface__unit(yang.adata.MNode):
     elements: list[junos_conf_root__configuration__groups__interfaces__interface__unit_entry]
@@ -1334,25 +1112,15 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit(yang.a
 
 class junos_conf_root__configuration__groups__interfaces__interface_entry(yang.adata.MNode):
     name: str
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     description: ?str
     mtu: ?value
     mac: ?str
     native_vlan_id: ?value
     unit: junos_conf_root__configuration__groups__interfaces__interface__unit
 
-    def __init__(self, name: str, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, description: ?str, mtu: ?value, mac: ?str, native_vlan_id: ?value, unit: list[junos_conf_root__configuration__groups__interfaces__interface__unit_entry]=[]):
+    def __init__(self, name: str, description: ?str, mtu: ?value, mac: ?str, native_vlan_id: ?value, unit: list[junos_conf_root__configuration__groups__interfaces__interface__unit_entry]=[]):
         self._ns = "http://yang.juniper.net/junos/conf/root"
         self.name = name
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.description = description
         self.mtu = mtu
         self.mac = mac
@@ -1370,8 +1138,6 @@ class junos_conf_root__configuration__groups__interfaces__interface_entry(yang.a
         _unit = self.unit
         if _name is not None:
             res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _description is not None:
             res.children['description'] = yang.gdata.Leaf('description', 'string', _description, ns='http://yang.juniper.net/junos/conf/root')
         if _mtu is not None:
@@ -1388,11 +1154,11 @@ class junos_conf_root__configuration__groups__interfaces__interface_entry(yang.a
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups__interfaces__interface_entry:
-        return junos_conf_root__configuration__groups__interfaces__interface_entry(name=n.get_str("name"), apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), description=n.get_opt_str("description"), mtu=n.get_opt_value("mtu"), mac=n.get_opt_str("mac"), native_vlan_id=n.get_opt_value("native-vlan-id"), unit=junos_conf_root__configuration__groups__interfaces__interface__unit.from_gdata(n.get_list("unit")))
+        return junos_conf_root__configuration__groups__interfaces__interface_entry(name=n.get_str("name"), description=n.get_opt_str("description"), mtu=n.get_opt_value("mtu"), mac=n.get_opt_str("mac"), native_vlan_id=n.get_opt_value("native-vlan-id"), unit=junos_conf_root__configuration__groups__interfaces__interface__unit.from_gdata(n.get_list("unit")))
 
     @staticmethod
     def from_xml(n: xml.Node) -> junos_conf_root__configuration__groups__interfaces__interface_entry:
-        return junos_conf_root__configuration__groups__interfaces__interface_entry(name=yang.gdata.from_xml_str(n, "name"), apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), description=yang.gdata.from_xml_opt_str(n, "description"), mtu=yang.gdata.from_xml_opt_value(n, "mtu"), mac=yang.gdata.from_xml_opt_str(n, "mac"), native_vlan_id=yang.gdata.from_xml_opt_value(n, "native-vlan-id"), unit=junos_conf_root__configuration__groups__interfaces__interface__unit.from_xml(yang.gdata.get_xml_children(n, "unit")))
+        return junos_conf_root__configuration__groups__interfaces__interface_entry(name=yang.gdata.from_xml_str(n, "name"), description=yang.gdata.from_xml_opt_str(n, "description"), mtu=yang.gdata.from_xml_opt_value(n, "mtu"), mac=yang.gdata.from_xml_opt_str(n, "mac"), native_vlan_id=yang.gdata.from_xml_opt_value(n, "native-vlan-id"), unit=junos_conf_root__configuration__groups__interfaces__interface__unit.from_xml(yang.gdata.get_xml_children(n, "unit")))
 
 class junos_conf_root__configuration__groups__interfaces__interface(yang.adata.MNode):
     elements: list[junos_conf_root__configuration__groups__interfaces__interface_entry]
@@ -1438,28 +1204,16 @@ class junos_conf_root__configuration__groups__interfaces__interface(yang.adata.M
 
 
 class junos_conf_root__configuration__groups__interfaces(yang.adata.MNode):
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     interface: junos_conf_root__configuration__groups__interfaces__interface
 
-    def __init__(self, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, interface: list[junos_conf_root__configuration__groups__interfaces__interface_entry]=[]):
+    def __init__(self, interface: list[junos_conf_root__configuration__groups__interfaces__interface_entry]=[]):
         self._ns = "http://yang.juniper.net/junos/conf/root"
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.interface = junos_conf_root__configuration__groups__interfaces__interface(elements=interface)
         self.interface._parent = self
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.Container('interfaces', ns=self._ns)
         _interface = self.interface
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _interface is not None:
             res.children['interface'] = _interface.to_gdata()
         for child in res.children.values():
@@ -1469,36 +1223,26 @@ class junos_conf_root__configuration__groups__interfaces(yang.adata.MNode):
     @staticmethod
     def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__interfaces:
         if n != None:
-            return junos_conf_root__configuration__groups__interfaces(apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), interface=junos_conf_root__configuration__groups__interfaces__interface.from_gdata(n.get_list("interface")))
+            return junos_conf_root__configuration__groups__interfaces(interface=junos_conf_root__configuration__groups__interfaces__interface.from_gdata(n.get_list("interface")))
         return junos_conf_root__configuration__groups__interfaces()
 
     @staticmethod
     def from_xml(n: ?xml.Node) -> junos_conf_root__configuration__groups__interfaces:
         if n != None:
-            return junos_conf_root__configuration__groups__interfaces(apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), interface=junos_conf_root__configuration__groups__interfaces__interface.from_xml(yang.gdata.get_xml_children(n, "interface")))
+            return junos_conf_root__configuration__groups__interfaces(interface=junos_conf_root__configuration__groups__interfaces__interface.from_xml(yang.gdata.get_xml_children(n, "interface")))
         return junos_conf_root__configuration__groups__interfaces()
 
 
 class junos_conf_root__configuration__groups__routing_instances__instance__interface_entry(yang.adata.MNode):
     name: str
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     any: ?bool
     unicast: ?bool
     multicast: ?bool
     primary: ?bool
 
-    def __init__(self, name: str, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, any: ?bool, unicast: ?bool, multicast: ?bool, primary: ?bool):
+    def __init__(self, name: str, any: ?bool, unicast: ?bool, multicast: ?bool, primary: ?bool):
         self._ns = "http://yang.juniper.net/junos/conf/root"
         self.name = name
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.any = any
         self.unicast = unicast
         self.multicast = multicast
@@ -1513,8 +1257,6 @@ class junos_conf_root__configuration__groups__routing_instances__instance__inter
         _primary = self.primary
         if _name is not None:
             res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _any is not None:
             res.children['any'] = yang.gdata.Leaf('any', 'empty', _any, ns='http://yang.juniper.net/junos/conf/root')
         if _unicast is not None:
@@ -1529,11 +1271,11 @@ class junos_conf_root__configuration__groups__routing_instances__instance__inter
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups__routing_instances__instance__interface_entry:
-        return junos_conf_root__configuration__groups__routing_instances__instance__interface_entry(name=n.get_str("name"), apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), any=n.get_opt_bool("any"), unicast=n.get_opt_bool("unicast"), multicast=n.get_opt_bool("multicast"), primary=n.get_opt_bool("primary"))
+        return junos_conf_root__configuration__groups__routing_instances__instance__interface_entry(name=n.get_str("name"), any=n.get_opt_bool("any"), unicast=n.get_opt_bool("unicast"), multicast=n.get_opt_bool("multicast"), primary=n.get_opt_bool("primary"))
 
     @staticmethod
     def from_xml(n: xml.Node) -> junos_conf_root__configuration__groups__routing_instances__instance__interface_entry:
-        return junos_conf_root__configuration__groups__routing_instances__instance__interface_entry(name=yang.gdata.from_xml_str(n, "name"), apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), any=yang.gdata.from_xml_opt_bool(n, "any"), unicast=yang.gdata.from_xml_opt_bool(n, "unicast"), multicast=yang.gdata.from_xml_opt_bool(n, "multicast"), primary=yang.gdata.from_xml_opt_bool(n, "primary"))
+        return junos_conf_root__configuration__groups__routing_instances__instance__interface_entry(name=yang.gdata.from_xml_str(n, "name"), any=yang.gdata.from_xml_opt_bool(n, "any"), unicast=yang.gdata.from_xml_opt_bool(n, "unicast"), multicast=yang.gdata.from_xml_opt_bool(n, "multicast"), primary=yang.gdata.from_xml_opt_bool(n, "primary"))
 
 class junos_conf_root__configuration__groups__routing_instances__instance__interface(yang.adata.MNode):
     elements: list[junos_conf_root__configuration__groups__routing_instances__instance__interface_entry]
@@ -1608,23 +1350,13 @@ class junos_conf_root__configuration__groups__routing_instances__instance__route
 
 
 class junos_conf_root__configuration__groups__routing_instances__instance__vrf_target(yang.adata.MNode):
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     community: ?str
     import_: ?str
     export: ?str
     auto: ?bool
 
-    def __init__(self, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, community: ?str, import_: ?str, export: ?str, auto: ?bool):
+    def __init__(self, community: ?str, import_: ?str, export: ?str, auto: ?bool):
         self._ns = "http://yang.juniper.net/junos/conf/root"
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.community = community
         self.import_ = import_
         self.export = export
@@ -1636,8 +1368,6 @@ class junos_conf_root__configuration__groups__routing_instances__instance__vrf_t
         _import_ = self.import_
         _export = self.export
         _auto = self.auto
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _community is not None:
             res.children['community'] = yang.gdata.Leaf('community', 'string', _community, ns='http://yang.juniper.net/junos/conf/root')
         if _import_ is not None:
@@ -1653,41 +1383,29 @@ class junos_conf_root__configuration__groups__routing_instances__instance__vrf_t
     @staticmethod
     def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__routing_instances__instance__vrf_target:
         if n != None:
-            return junos_conf_root__configuration__groups__routing_instances__instance__vrf_target(apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), community=n.get_opt_str("community"), import_=n.get_opt_str("import"), export=n.get_opt_str("export"), auto=n.get_opt_bool("auto"))
+            return junos_conf_root__configuration__groups__routing_instances__instance__vrf_target(community=n.get_opt_str("community"), import_=n.get_opt_str("import"), export=n.get_opt_str("export"), auto=n.get_opt_bool("auto"))
         return junos_conf_root__configuration__groups__routing_instances__instance__vrf_target()
 
     @staticmethod
     def from_xml(n: ?xml.Node) -> junos_conf_root__configuration__groups__routing_instances__instance__vrf_target:
         if n != None:
-            return junos_conf_root__configuration__groups__routing_instances__instance__vrf_target(apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), community=yang.gdata.from_xml_opt_str(n, "community"), import_=yang.gdata.from_xml_opt_str(n, "import"), export=yang.gdata.from_xml_opt_str(n, "export"), auto=yang.gdata.from_xml_opt_bool(n, "auto"))
+            return junos_conf_root__configuration__groups__routing_instances__instance__vrf_target(community=yang.gdata.from_xml_opt_str(n, "community"), import_=yang.gdata.from_xml_opt_str(n, "import"), export=yang.gdata.from_xml_opt_str(n, "export"), auto=yang.gdata.from_xml_opt_bool(n, "auto"))
         return junos_conf_root__configuration__groups__routing_instances__instance__vrf_target()
 
 
 class junos_conf_root__configuration__groups__routing_instances__instance_entry(yang.adata.MNode):
     name: str
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     instance_type: ?str
     interface: junos_conf_root__configuration__groups__routing_instances__instance__interface
     route_distinguisher: junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher
-    vrf_import: list[str]
-    vrf_export: list[str]
     export_default_action: ?str
     import_default_action: ?str
     vrf_target: junos_conf_root__configuration__groups__routing_instances__instance__vrf_target
     no_vrf_advertise: ?bool
 
-    def __init__(self, name: str, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, instance_type: ?str, interface: list[junos_conf_root__configuration__groups__routing_instances__instance__interface_entry]=[], route_distinguisher: ?junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher=None, vrf_import: ?list[str]=None, vrf_export: ?list[str]=None, export_default_action: ?str, import_default_action: ?str, vrf_target: ?junos_conf_root__configuration__groups__routing_instances__instance__vrf_target=None, no_vrf_advertise: ?bool):
+    def __init__(self, name: str, instance_type: ?str, interface: list[junos_conf_root__configuration__groups__routing_instances__instance__interface_entry]=[], route_distinguisher: ?junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher=None, export_default_action: ?str, import_default_action: ?str, vrf_target: ?junos_conf_root__configuration__groups__routing_instances__instance__vrf_target=None, no_vrf_advertise: ?bool):
         self._ns = "http://yang.juniper.net/junos/conf/root"
         self.name = name
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.instance_type = instance_type
         self.interface = junos_conf_root__configuration__groups__routing_instances__instance__interface(elements=interface)
         self.interface._parent = self
@@ -1698,14 +1416,6 @@ class junos_conf_root__configuration__groups__routing_instances__instance_entry(
         self_route_distinguisher = self.route_distinguisher
         if self_route_distinguisher is not None:
             self_route_distinguisher._parent = self
-        if vrf_import is not None:
-            self.vrf_import = vrf_import
-        else:
-            self.vrf_import = []
-        if vrf_export is not None:
-            self.vrf_export = vrf_export
-        else:
-            self.vrf_export = []
         self.export_default_action = export_default_action
         self.import_default_action = import_default_action
         if vrf_target is not None:
@@ -1729,16 +1439,12 @@ class junos_conf_root__configuration__groups__routing_instances__instance_entry(
         _no_vrf_advertise = self.no_vrf_advertise
         if _name is not None:
             res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _instance_type is not None:
             res.children['instance-type'] = yang.gdata.Leaf('instance-type', 'enumeration', _instance_type, ns='http://yang.juniper.net/junos/conf/root')
         if _interface is not None:
             res.children['interface'] = _interface.to_gdata()
         if _route_distinguisher is not None:
             res.children['route-distinguisher'] = _route_distinguisher.to_gdata()
-        res.children['vrf-import'] = yang.gdata.LeafList('vrf-import', self.vrf_import, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['vrf-export'] = yang.gdata.LeafList('vrf-export', self.vrf_export, ns='http://yang.juniper.net/junos/conf/root')
         if _export_default_action is not None:
             res.children['export-default-action'] = yang.gdata.Leaf('export-default-action', 'enumeration', _export_default_action, ns='http://yang.juniper.net/junos/conf/root')
         if _import_default_action is not None:
@@ -1753,11 +1459,11 @@ class junos_conf_root__configuration__groups__routing_instances__instance_entry(
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups__routing_instances__instance_entry:
-        return junos_conf_root__configuration__groups__routing_instances__instance_entry(name=n.get_str("name"), apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), instance_type=n.get_opt_str("instance-type"), interface=junos_conf_root__configuration__groups__routing_instances__instance__interface.from_gdata(n.get_list("interface")), route_distinguisher=junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher.from_gdata(n.get_opt_container("route-distinguisher")), vrf_import=n.get_opt_strs("vrf-import"), vrf_export=n.get_opt_strs("vrf-export"), export_default_action=n.get_opt_str("export-default-action"), import_default_action=n.get_opt_str("import-default-action"), vrf_target=junos_conf_root__configuration__groups__routing_instances__instance__vrf_target.from_gdata(n.get_opt_container("vrf-target")), no_vrf_advertise=n.get_opt_bool("no-vrf-advertise"))
+        return junos_conf_root__configuration__groups__routing_instances__instance_entry(name=n.get_str("name"), instance_type=n.get_opt_str("instance-type"), interface=junos_conf_root__configuration__groups__routing_instances__instance__interface.from_gdata(n.get_list("interface")), route_distinguisher=junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher.from_gdata(n.get_opt_container("route-distinguisher")), export_default_action=n.get_opt_str("export-default-action"), import_default_action=n.get_opt_str("import-default-action"), vrf_target=junos_conf_root__configuration__groups__routing_instances__instance__vrf_target.from_gdata(n.get_opt_container("vrf-target")), no_vrf_advertise=n.get_opt_bool("no-vrf-advertise"))
 
     @staticmethod
     def from_xml(n: xml.Node) -> junos_conf_root__configuration__groups__routing_instances__instance_entry:
-        return junos_conf_root__configuration__groups__routing_instances__instance_entry(name=yang.gdata.from_xml_str(n, "name"), apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), instance_type=yang.gdata.from_xml_opt_str(n, "instance-type"), interface=junos_conf_root__configuration__groups__routing_instances__instance__interface.from_xml(yang.gdata.get_xml_children(n, "interface")), route_distinguisher=junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher.from_xml(yang.gdata.get_xml_opt_child(n, "route-distinguisher")), vrf_import=yang.gdata.from_xml_opt_strs(n, "vrf-import"), vrf_export=yang.gdata.from_xml_opt_strs(n, "vrf-export"), export_default_action=yang.gdata.from_xml_opt_str(n, "export-default-action"), import_default_action=yang.gdata.from_xml_opt_str(n, "import-default-action"), vrf_target=junos_conf_root__configuration__groups__routing_instances__instance__vrf_target.from_xml(yang.gdata.get_xml_opt_child(n, "vrf-target")), no_vrf_advertise=yang.gdata.from_xml_opt_bool(n, "no-vrf-advertise"))
+        return junos_conf_root__configuration__groups__routing_instances__instance_entry(name=yang.gdata.from_xml_str(n, "name"), instance_type=yang.gdata.from_xml_opt_str(n, "instance-type"), interface=junos_conf_root__configuration__groups__routing_instances__instance__interface.from_xml(yang.gdata.get_xml_children(n, "interface")), route_distinguisher=junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher.from_xml(yang.gdata.get_xml_opt_child(n, "route-distinguisher")), export_default_action=yang.gdata.from_xml_opt_str(n, "export-default-action"), import_default_action=yang.gdata.from_xml_opt_str(n, "import-default-action"), vrf_target=junos_conf_root__configuration__groups__routing_instances__instance__vrf_target.from_xml(yang.gdata.get_xml_opt_child(n, "vrf-target")), no_vrf_advertise=yang.gdata.from_xml_opt_bool(n, "no-vrf-advertise"))
 
 class junos_conf_root__configuration__groups__routing_instances__instance(yang.adata.MNode):
     elements: list[junos_conf_root__configuration__groups__routing_instances__instance_entry]
@@ -1803,28 +1509,16 @@ class junos_conf_root__configuration__groups__routing_instances__instance(yang.a
 
 
 class junos_conf_root__configuration__groups__routing_instances(yang.adata.MNode):
-    apply_groups: list[str]
-    apply_groups_except: list[str]
     instance: junos_conf_root__configuration__groups__routing_instances__instance
 
-    def __init__(self, apply_groups: ?list[str]=None, apply_groups_except: ?list[str]=None, instance: list[junos_conf_root__configuration__groups__routing_instances__instance_entry]=[]):
+    def __init__(self, instance: list[junos_conf_root__configuration__groups__routing_instances__instance_entry]=[]):
         self._ns = "http://yang.juniper.net/junos/conf/root"
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
-        if apply_groups_except is not None:
-            self.apply_groups_except = apply_groups_except
-        else:
-            self.apply_groups_except = []
         self.instance = junos_conf_root__configuration__groups__routing_instances__instance(elements=instance)
         self.instance._parent = self
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.Container('routing-instances', ns=self._ns)
         _instance = self.instance
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups-except'] = yang.gdata.LeafList('apply-groups-except', self.apply_groups_except, ns='http://yang.juniper.net/junos/conf/root')
         if _instance is not None:
             res.children['instance'] = _instance.to_gdata()
         for child in res.children.values():
@@ -1834,13 +1528,13 @@ class junos_conf_root__configuration__groups__routing_instances(yang.adata.MNode
     @staticmethod
     def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__routing_instances:
         if n != None:
-            return junos_conf_root__configuration__groups__routing_instances(apply_groups=n.get_opt_strs("apply-groups"), apply_groups_except=n.get_opt_strs("apply-groups-except"), instance=junos_conf_root__configuration__groups__routing_instances__instance.from_gdata(n.get_list("instance")))
+            return junos_conf_root__configuration__groups__routing_instances(instance=junos_conf_root__configuration__groups__routing_instances__instance.from_gdata(n.get_list("instance")))
         return junos_conf_root__configuration__groups__routing_instances()
 
     @staticmethod
     def from_xml(n: ?xml.Node) -> junos_conf_root__configuration__groups__routing_instances:
         if n != None:
-            return junos_conf_root__configuration__groups__routing_instances(apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), apply_groups_except=yang.gdata.from_xml_opt_strs(n, "apply-groups-except"), instance=junos_conf_root__configuration__groups__routing_instances__instance.from_xml(yang.gdata.get_xml_children(n, "instance")))
+            return junos_conf_root__configuration__groups__routing_instances(instance=junos_conf_root__configuration__groups__routing_instances__instance.from_xml(yang.gdata.get_xml_children(n, "instance")))
         return junos_conf_root__configuration__groups__routing_instances()
 
 
@@ -1849,12 +1543,11 @@ class junos_conf_root__configuration__groups_entry(yang.adata.MNode):
     when: junos_conf_root__configuration__groups__when
     rcsid: ?str
     version: ?str
-    apply_groups: list[str]
     system: junos_conf_root__configuration__groups__system
     interfaces: junos_conf_root__configuration__groups__interfaces
     routing_instances: junos_conf_root__configuration__groups__routing_instances
 
-    def __init__(self, name: str, when: ?junos_conf_root__configuration__groups__when=None, rcsid: ?str, version: ?str, apply_groups: ?list[str]=None, system: ?junos_conf_root__configuration__groups__system=None, interfaces: ?junos_conf_root__configuration__groups__interfaces=None, routing_instances: ?junos_conf_root__configuration__groups__routing_instances=None):
+    def __init__(self, name: str, when: ?junos_conf_root__configuration__groups__when=None, rcsid: ?str, version: ?str, system: ?junos_conf_root__configuration__groups__system=None, interfaces: ?junos_conf_root__configuration__groups__interfaces=None, routing_instances: ?junos_conf_root__configuration__groups__routing_instances=None):
         self._ns = "http://yang.juniper.net/junos/conf/root"
         self.name = name
         if when is not None:
@@ -1866,10 +1559,6 @@ class junos_conf_root__configuration__groups_entry(yang.adata.MNode):
             self_when._parent = self
         self.rcsid = rcsid
         self.version = version
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
         if system is not None:
             self.system = system
         else:
@@ -1909,7 +1598,6 @@ class junos_conf_root__configuration__groups_entry(yang.adata.MNode):
             res.children['rcsid'] = yang.gdata.Leaf('rcsid', 'string', _rcsid, ns='http://yang.juniper.net/junos/conf/root')
         if _version is not None:
             res.children['version'] = yang.gdata.Leaf('version', 'string', _version, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
         if _system is not None:
             res.children['system'] = _system.to_gdata()
         if _interfaces is not None:
@@ -1922,11 +1610,11 @@ class junos_conf_root__configuration__groups_entry(yang.adata.MNode):
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups_entry:
-        return junos_conf_root__configuration__groups_entry(name=n.get_str("name"), when=junos_conf_root__configuration__groups__when.from_gdata(n.get_opt_container("when")), rcsid=n.get_opt_str("rcsid"), version=n.get_opt_str("version"), apply_groups=n.get_opt_strs("apply-groups"), system=junos_conf_root__configuration__groups__system.from_gdata(n.get_opt_container("system")), interfaces=junos_conf_root__configuration__groups__interfaces.from_gdata(n.get_opt_container("interfaces")), routing_instances=junos_conf_root__configuration__groups__routing_instances.from_gdata(n.get_opt_container("routing-instances")))
+        return junos_conf_root__configuration__groups_entry(name=n.get_str("name"), when=junos_conf_root__configuration__groups__when.from_gdata(n.get_opt_container("when")), rcsid=n.get_opt_str("rcsid"), version=n.get_opt_str("version"), system=junos_conf_root__configuration__groups__system.from_gdata(n.get_opt_container("system")), interfaces=junos_conf_root__configuration__groups__interfaces.from_gdata(n.get_opt_container("interfaces")), routing_instances=junos_conf_root__configuration__groups__routing_instances.from_gdata(n.get_opt_container("routing-instances")))
 
     @staticmethod
     def from_xml(n: xml.Node) -> junos_conf_root__configuration__groups_entry:
-        return junos_conf_root__configuration__groups_entry(name=yang.gdata.from_xml_str(n, "name"), when=junos_conf_root__configuration__groups__when.from_xml(yang.gdata.get_xml_opt_child(n, "when")), rcsid=yang.gdata.from_xml_opt_str(n, "rcsid"), version=yang.gdata.from_xml_opt_str(n, "version"), apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), system=junos_conf_root__configuration__groups__system.from_xml(yang.gdata.get_xml_opt_child(n, "system")), interfaces=junos_conf_root__configuration__groups__interfaces.from_xml(yang.gdata.get_xml_opt_child(n, "interfaces")), routing_instances=junos_conf_root__configuration__groups__routing_instances.from_xml(yang.gdata.get_xml_opt_child(n, "routing-instances")))
+        return junos_conf_root__configuration__groups_entry(name=yang.gdata.from_xml_str(n, "name"), when=junos_conf_root__configuration__groups__when.from_xml(yang.gdata.get_xml_opt_child(n, "when")), rcsid=yang.gdata.from_xml_opt_str(n, "rcsid"), version=yang.gdata.from_xml_opt_str(n, "version"), system=junos_conf_root__configuration__groups__system.from_xml(yang.gdata.get_xml_opt_child(n, "system")), interfaces=junos_conf_root__configuration__groups__interfaces.from_xml(yang.gdata.get_xml_opt_child(n, "interfaces")), routing_instances=junos_conf_root__configuration__groups__routing_instances.from_xml(yang.gdata.get_xml_opt_child(n, "routing-instances")))
 
 class junos_conf_root__configuration__groups(yang.adata.MNode):
     elements: list[junos_conf_root__configuration__groups_entry]
@@ -1974,20 +1662,15 @@ class junos_conf_root__configuration__groups(yang.adata.MNode):
 class junos_conf_root__configuration(yang.adata.MNode):
     rcsid: ?str
     version: ?str
-    apply_groups: list[str]
     system: junos_conf_root__configuration__system
     interfaces: junos_conf_root__configuration__interfaces
     routing_instances: junos_conf_root__configuration__routing_instances
     groups: junos_conf_root__configuration__groups
 
-    def __init__(self, rcsid: ?str, version: ?str, apply_groups: ?list[str]=None, system: ?junos_conf_root__configuration__system=None, interfaces: ?junos_conf_root__configuration__interfaces=None, routing_instances: ?junos_conf_root__configuration__routing_instances=None, groups: list[junos_conf_root__configuration__groups_entry]=[]):
+    def __init__(self, rcsid: ?str, version: ?str, system: ?junos_conf_root__configuration__system=None, interfaces: ?junos_conf_root__configuration__interfaces=None, routing_instances: ?junos_conf_root__configuration__routing_instances=None, groups: list[junos_conf_root__configuration__groups_entry]=[]):
         self._ns = "http://yang.juniper.net/junos/conf/root"
         self.rcsid = rcsid
         self.version = version
-        if apply_groups is not None:
-            self.apply_groups = apply_groups
-        else:
-            self.apply_groups = []
         if system is not None:
             self.system = system
         else:
@@ -2024,7 +1707,6 @@ class junos_conf_root__configuration(yang.adata.MNode):
             res.children['rcsid'] = yang.gdata.Leaf('rcsid', 'string', _rcsid, ns='http://yang.juniper.net/junos/conf/root')
         if _version is not None:
             res.children['version'] = yang.gdata.Leaf('version', 'string', _version, ns='http://yang.juniper.net/junos/conf/root')
-        res.children['apply-groups'] = yang.gdata.LeafList('apply-groups', self.apply_groups, ns='http://yang.juniper.net/junos/conf/root')
         if _system is not None:
             res.children['system'] = _system.to_gdata()
         if _interfaces is not None:
@@ -2040,13 +1722,13 @@ class junos_conf_root__configuration(yang.adata.MNode):
     @staticmethod
     def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration:
         if n != None:
-            return junos_conf_root__configuration(rcsid=n.get_opt_str("rcsid"), version=n.get_opt_str("version"), apply_groups=n.get_opt_strs("apply-groups"), system=junos_conf_root__configuration__system.from_gdata(n.get_opt_container("system")), interfaces=junos_conf_root__configuration__interfaces.from_gdata(n.get_opt_container("interfaces")), routing_instances=junos_conf_root__configuration__routing_instances.from_gdata(n.get_opt_container("routing-instances")), groups=junos_conf_root__configuration__groups.from_gdata(n.get_list("groups")))
+            return junos_conf_root__configuration(rcsid=n.get_opt_str("rcsid"), version=n.get_opt_str("version"), system=junos_conf_root__configuration__system.from_gdata(n.get_opt_container("system")), interfaces=junos_conf_root__configuration__interfaces.from_gdata(n.get_opt_container("interfaces")), routing_instances=junos_conf_root__configuration__routing_instances.from_gdata(n.get_opt_container("routing-instances")), groups=junos_conf_root__configuration__groups.from_gdata(n.get_list("groups")))
         return junos_conf_root__configuration()
 
     @staticmethod
     def from_xml(n: ?xml.Node) -> junos_conf_root__configuration:
         if n != None:
-            return junos_conf_root__configuration(rcsid=yang.gdata.from_xml_opt_str(n, "rcsid"), version=yang.gdata.from_xml_opt_str(n, "version"), apply_groups=yang.gdata.from_xml_opt_strs(n, "apply-groups"), system=junos_conf_root__configuration__system.from_xml(yang.gdata.get_xml_opt_child(n, "system")), interfaces=junos_conf_root__configuration__interfaces.from_xml(yang.gdata.get_xml_opt_child(n, "interfaces")), routing_instances=junos_conf_root__configuration__routing_instances.from_xml(yang.gdata.get_xml_opt_child(n, "routing-instances")), groups=junos_conf_root__configuration__groups.from_xml(yang.gdata.get_xml_children(n, "groups")))
+            return junos_conf_root__configuration(rcsid=yang.gdata.from_xml_opt_str(n, "rcsid"), version=yang.gdata.from_xml_opt_str(n, "version"), system=junos_conf_root__configuration__system.from_xml(yang.gdata.get_xml_opt_child(n, "system")), interfaces=junos_conf_root__configuration__interfaces.from_xml(yang.gdata.get_xml_opt_child(n, "interfaces")), routing_instances=junos_conf_root__configuration__routing_instances.from_xml(yang.gdata.get_xml_opt_child(n, "routing-instances")), groups=junos_conf_root__configuration__groups.from_xml(yang.gdata.get_xml_children(n, "groups")))
         return junos_conf_root__configuration()
 
 

@@ -42,18 +42,12 @@
        description "Software version information";
        type string;
      }
-     leaf-list apply-groups {
-       ordered-by user;
-       description "Groups from which to inherit configuration data";
-       type string;
-     }
      container system {
        description "System parameters";
        uses juniper-system;
      }
      container interfaces {
        description "Interface configuration";
-       uses apply-advanced;
        list interface {
          key name;
          uses interfaces_type;
@@ -61,24 +55,10 @@
      }
      container routing-instances {
        description "Routing instance configuration";
-       uses apply-advanced;
        list instance {
          key name;
          uses juniper-routing-instance;
        }
-     }
-   }
-   grouping apply-advanced {
-     description "Apply advanced configuration logic";
-     leaf-list apply-groups {
-       ordered-by user;
-       description "Groups from which to inherit configuration data";
-       type string;
-     }
-     leaf-list apply-groups-except {
-       ordered-by user;
-       description "Don't inherit configuration data from these groups";
-       type string;
      }
    }
    grouping interface_type {
@@ -86,7 +66,6 @@
      leaf name {
        type string;
      }
-     uses apply-advanced;
      choice queue-statistics-choice {
        leaf queue-statistics {
          description "Enable queue statistics collection";
@@ -123,7 +102,6 @@
      leaf name {
        type string;
      }
-     uses apply-advanced;
      leaf description {
        description "Text description of interface";
        type string;
@@ -160,18 +138,12 @@
        leaf name {
          type string;
        }
-       uses apply-advanced;
        leaf alias {
          description "Interface alias";
          type string;
        }
        leaf description {
          description "Text description of interface";
-         type string;
-       }
-       leaf-list security-group {
-         ordered-by user;
-         description "Security-group for the interface";
          type string;
        }
        choice vlan_choice {
@@ -204,7 +176,6 @@
          container inet {
            presence "enable inet";
            description "IPv4 parameters";
-           uses apply-advanced;
            list address {
              key name;
              ordered-by user;
@@ -213,7 +184,6 @@
                description "Interface address/destination prefix";
                type jt:ipv4prefix;
              }
-             uses apply-advanced;
            }
          }
        }
@@ -244,7 +214,6 @@
      }
      container when {
        description "Specify additional conditions for groups";
-       uses apply-advanced;
        container time {
          description "Time at which group should be effective";
          leaf start-time {
@@ -253,18 +222,10 @@
          }
          container to {
            description "End time";
-           uses apply-advanced;
            leaf end-time {
              description "End time([yyyy-mm-dd.]hh:mm)";
              type string;
            }
-         }
-       }
-       leaf-list peers {
-         ordered-by user;
-         description "Hosts on which this group should be effective";
-         type string {
-           length "1 .. 255";
          }
        }
        leaf chassis {
@@ -342,7 +303,6 @@
        type string {
        }
      }
-     uses apply-advanced;
      leaf instance-type {
        description "Type of routing instance";
        type enumeration {
@@ -393,7 +353,6 @@
        leaf name {
          type string;
        }
-       uses apply-advanced;
        choice mode {
          case case_1 {
            leaf any {
@@ -427,16 +386,6 @@
          }
        }
      }
-     leaf-list vrf-import {
-       ordered-by user;
-       description "Import policy for VRF instance RIBs";
-       type jt:policy-algebra;
-     }
-     leaf-list vrf-export {
-       ordered-by user;
-       description "Export policy for VRF instance RIBs";
-       type jt:policy-algebra;
-     }
      leaf export-default-action {
        description "Default action for export in routing-instance";
        type enumeration {
@@ -461,7 +410,6 @@
      }
      container vrf-target {
        description "VRF target community configuration";
-       uses apply-advanced;
        leaf community {
          description "Target community to use in import and export";
          type string {
@@ -488,7 +436,6 @@
      }
    }
    grouping juniper-system {
-     uses apply-advanced;
      leaf host-name {
        description "Hostname for this router";
        type string {
