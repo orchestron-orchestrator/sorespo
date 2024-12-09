@@ -1,5 +1,6 @@
 import yang.adata
 import orchestron.ttt
+from orchestron.device import UnsupportedDevice
 
 import respnet.layers.base_2 as base
 
@@ -26,12 +27,13 @@ class BaseConfig(base.BaseConfig):
     def transform(self, i, di):
         print("RFS /rfs{%s}/base-config transform running" % (di.name))
 
-        if device_type(di.name) == "ios-xr":
+        if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
             dev = xr24.root()
             dev.hostname.system_network_name = di.name
             intf = dev.interfaces.interface.create("Loopback0")
             intf.ipv4.addresses.create_address(i.ipv4_address, "255.255.255.255")
             return dev
+
         # junos is the default
         dev = crpd23.root()
         dev.configuration.system.host_name = di.name
@@ -39,12 +41,14 @@ class BaseConfig(base.BaseConfig):
         unit.family.create_inet().address.create("%s/32" % (i.ipv4_address))
         return dev
 
+        raise UnsupportedDevice()
+
 
 class BBInterface(base.BBInterface):
     def transform(self, i, di):
         print("RFS /rfs{%s}/backbone-interface transform running [%s] <-> %s [%s]" % (di.name, i.name, i.remote.device, i.remote.interface))
 
-        if device_type(di.name) == "ios-xr":
+        if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
             dev = xr24.root()
             intf = dev.interfaces.interface.create(i.name)
             intf.description = "Link to %s [%s]" % (i.remote.device, i.remote.interface)
@@ -53,6 +57,7 @@ class BBInterface(base.BBInterface):
             if ipv4_address != None:
                 intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(i.ipv4_prefix_length))
             return dev
+
         # junos is the default
         dev = crpd23.root()
         unit = dev.configuration.interfaces.interface.create(i.name).unit.create("0")
@@ -62,30 +67,33 @@ class BBInterface(base.BBInterface):
             unit.family.create_inet().address.create("%s/%s" % (ipv4_address, str(i.ipv4_prefix_length)))
         return dev
 
+        raise UnsupportedDevice()
+
 
 class Vrf(base.Vrf):
     def transform(self, i, di):
         print("RFS /rfs{%s}/vrf transform running %s" % (di.name, i.name))
 
-
-        if device_type(di.name) == "ios-xr":
+        if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
             dev = xr24.root()
             vrf = dev.vrfs.vrf.create(i.name)
             vrf.description = i.description
             return dev
+
         # junos is the default
         dev = crpd23.root()
         ri = dev.configuration.routing_instances.instance.create(i.name)
         ri.instance_type = "virtual-router"
         return dev
 
+        raise UnsupportedDevice()
+
 
 class VrfInterface(base.VrfInterface):
     def transform(self, i, di):
         print("RFS /rfs{%s}/vrf-interface transform running %s" % (di.name, i.name))
 
-
-        if device_type(di.name) == "ios-xr":
+        if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
             dev = xr24.root()
             intf = dev.interfaces.interface.create(i.name)
             intf.description = i.description
@@ -95,6 +103,7 @@ class VrfInterface(base.VrfInterface):
                 intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(i.ipv4_prefix_length))
             intf.vrf = i.vrf
             return dev
+
         # junos is the default
         dev = crpd23.root()
         unit = dev.configuration.interfaces.interface.create(i.name).unit.create("0")
@@ -105,3 +114,5 @@ class VrfInterface(base.VrfInterface):
         ri = dev.configuration.routing_instances.instance.create(i.vrf)
         ri.interface.create(i.name)
         return dev
+
+        raise UnsupportedDevice()
