@@ -1,0 +1,446 @@
+
+/*
+ * Copyright (c) 2024 Juniper Networks, Inc.
+ * All rights reserved.
+ */
+ module junos-conf-root {
+   namespace "http://yang.juniper.net/junos/conf/root";
+
+   prefix jc;
+
+   import junos-common-types {
+     prefix jt;
+     revision-date 2023-01-01;
+   }
+
+   organization "Juniper Networks, Inc.";
+
+   contact "yang-support@juniper.net";
+
+   description "Junos YANG module for configuration hierarchies.";
+
+   revision 2023-01-01 {
+     description "Junos: 20231214.153508_builder.r1390688";
+   }
+
+   container configuration {
+     config true;
+     uses juniper-config;
+     list groups {
+       key name;
+       ordered-by user;
+       description "Configuration groups";
+       uses juniper-group;
+     }
+   }
+   grouping juniper-config {
+     leaf rcsid {
+       description "Revision control system identifier";
+       type string;
+     }
+     leaf version {
+       description "Software version information";
+       type string;
+     }
+     container system {
+       description "System parameters";
+       uses juniper-system;
+     }
+     container interfaces {
+       description "Interface configuration";
+       list interface {
+         key name;
+         uses interfaces_type;
+       }
+     }
+     container routing-instances {
+       description "Routing instance configuration";
+       list instance {
+         key name;
+         uses juniper-routing-instance;
+       }
+     }
+   }
+   grouping interface_type {
+     description "Physical interface";
+     leaf name {
+       type string;
+     }
+     choice queue-statistics-choice {
+       leaf queue-statistics {
+         description "Enable queue statistics collection";
+         status deprecated;
+         type empty;
+       }
+       leaf no-queue-statistics {
+         description "Don't enable queue statistics collection";
+         status deprecated;
+         type empty;
+       }
+     }
+     choice traffic-statistics-choice {
+       leaf traffic-statistics {
+         description "Enable traffic statistics collection";
+         status deprecated;
+         type empty;
+       }
+       leaf no-traffic-statistics {
+         description "Don't enable traffic statistics collection";
+         status deprecated;
+         type empty;
+       }
+     }
+     leaf resource-profile {
+       description "Resouce profile name";
+       type string {
+         length "1 .. 64";
+       }
+     }
+   }
+   grouping interfaces_type {
+     description "Physical interface";
+     leaf name {
+       type string;
+     }
+     leaf description {
+       description "Text description of interface";
+       type string;
+     }
+     leaf mtu {
+       description "Maximum transmit packet size";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "1 .. 16000";
+         }
+       }
+     }
+     leaf mac {
+       description "Hardware MAC address";
+       type jt:mac-unicast;
+     }
+     leaf native-vlan-id {
+       description "Virtual LAN identifier for untagged frames";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "0 .. 4094";
+         }
+       }
+     }
+     list unit {
+       key name;
+       description "Logical interface";
+       leaf name {
+         type string;
+       }
+       leaf alias {
+         description "Interface alias";
+         type string;
+       }
+       leaf description {
+         description "Text description of interface";
+         type string;
+       }
+       choice vlan_choice {
+         case case_1 {
+           leaf vlan-id {
+             description "Virtual LAN identifier value for 802.1q VLAN tags";
+             type string;
+           }
+         }
+       }
+       leaf encapsulation {
+         description "Logical link-layer encapsulation";
+         type enumeration {
+           enum "ethernet-ccc" {
+             description "Ethernet for a cross-connect";
+           }
+           enum "ethernet-bridge" {
+             description "Ethernet II bridging";
+           }
+           enum "vlan-ccc" {
+             description "802.1q tagging for a cross-connect";
+           }
+           enum "vlan-bridge" {
+             description "VLAN layer-2 bridging";
+           }
+         }
+       }
+       container family {
+         description "Protocol family";
+         container inet {
+           presence "enable inet";
+           description "IPv4 parameters";
+           list address {
+             key name;
+             ordered-by user;
+             description "Interface address/destination prefix";
+             leaf name {
+               description "Interface address/destination prefix";
+               type jt:ipv4prefix;
+             }
+           }
+         }
+       }
+       leaf mtu {
+         description "Maximum transmission unit packet size";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "1 .. 16000";
+           }
+         }
+       }
+       leaf mac {
+         description "Configure logical interface MAC address";
+         type jt:mac-unicast;
+       }
+     }
+   }
+   grouping juniper-group {
+     description "Configuration groups";
+     leaf name {
+       description "Group name";
+       type string {
+         length "1 .. 254";
+       }
+     }
+     container when {
+       description "Specify additional conditions for groups";
+       container time {
+         description "Time at which group should be effective";
+         leaf start-time {
+           description "Start time([yyyy-mm-dd.]hh:mm)";
+           type string;
+         }
+         container to {
+           description "End time";
+           leaf end-time {
+             description "End time([yyyy-mm-dd.]hh:mm)";
+             type string;
+           }
+         }
+       }
+       leaf chassis {
+         description "Chassis id";
+         type enumeration {
+           enum "lcc0" {
+             description "Chassis lcc0";
+           }
+           enum "lcc1" {
+             description "Chassis lcc1";
+           }
+           enum "lcc2" {
+             description "Chassis lcc2";
+           }
+           enum "lcc3" {
+             description "Chassis lcc3";
+           }
+           enum "lcc4" {
+             description "Chassis lcc4";
+           }
+           enum "lcc5" {
+             description "Chassis lcc5";
+           }
+           enum "lcc6" {
+             description "Chassis lcc6";
+           }
+           enum "lcc7" {
+             description "Chassis lcc7";
+           }
+           enum "scc" {
+             description "Chassis scc";
+           }
+           enum "sfc0" {
+             description "Chassis sfc0";
+           }
+         }
+       }
+       leaf model {
+         description "Model name";
+         type string;
+       }
+       leaf routing-engine {
+         description "Routing Engine";
+         type enumeration {
+           enum "re0" {
+             description "RE0";
+           }
+           enum "re1" {
+             description "RE1";
+           }
+         }
+       }
+       leaf member {
+         description "Member of virtual chassis";
+         type string;
+       }
+       leaf node {
+         description "Node of cluster";
+         type enumeration {
+           enum "node0" {
+             description "Node0";
+           }
+           enum "node1" {
+             description "Node1";
+           }
+         }
+       }
+     }
+     uses juniper-config;
+   }
+   grouping juniper-routing-instance {
+     description "Routing instance";
+     leaf name {
+       description "Routing instance name";
+       type string {
+       }
+     }
+     leaf instance-type {
+       description "Type of routing instance";
+       type enumeration {
+         enum "mac-vrf" {
+           description "MAC-VRF routing instance";
+         }
+         enum "virtual-switch" {
+           description "Virtual switch routing instance";
+         }
+         enum "forwarding" {
+           description "Forwarding instance";
+         }
+         enum "no-forwarding" {
+           description "Nonforwarding instance";
+         }
+         enum "l2vpn" {
+           description "Layer 2 VPN routing instance";
+         }
+         enum "vpls" {
+           description "VPLS routing instance";
+         }
+         enum "virtual-router" {
+           description "Virtual routing instance";
+         }
+         enum "l2backhaul-vpn" {
+           description "L2Backhaul/L2Wholesale routing instance";
+         }
+         enum "mpls-internet-multicast" {
+           description "Internet Multicast over MPLS routing instance";
+         }
+         enum "evpn" {
+           description "EVPN routing instance";
+         }
+         enum "mpls-forwarding" {
+           description "Routing instance provides a MPLS forwarding-context";
+         }
+         enum "evpn-vpws" {
+           description "EVPN VPWS routing instance";
+         }
+         enum "vrf" {
+           description "Virtual routing forwarding instance";
+         }
+       }
+     }
+     list interface {
+       key name;
+       description "Interface name for this routing instance";
+       leaf name {
+         type string;
+       }
+       choice mode {
+         case case_1 {
+           leaf any {
+             description "Interface used for both unicast and multicast traffic";
+             type empty;
+           }
+         }
+         case case_2 {
+           leaf unicast {
+             description "Interface used for unicast traffic only";
+             type empty;
+           }
+         }
+         case case_3 {
+           leaf multicast {
+             description "Interface used for multicast traffic only";
+             type empty;
+           }
+         }
+       }
+       leaf primary {
+         description "Preferred multicast vt interface for the routing-instance";
+         type empty;
+       }
+     }
+     container route-distinguisher {
+       description "Route distinguisher for this instance";
+       leaf rd-type {
+         description "Number in (16 bit:32 bit) or (32 bit 'L':16 bit) or (IP address:16 bit) format";
+         type string {
+         }
+       }
+     }
+     leaf export-default-action {
+       description "Default action for export in routing-instance";
+       type enumeration {
+         enum "accept" {
+           description "Default action is accept";
+         }
+         enum "reject" {
+           description "Default action is reject";
+         }
+       }
+     }
+     leaf import-default-action {
+       description "Default action for import in routing-instance";
+       type enumeration {
+         enum "accept" {
+           description "Default action is accept";
+         }
+         enum "reject" {
+           description "Default action is reject";
+         }
+       }
+     }
+     container vrf-target {
+       description "VRF target community configuration";
+       leaf community {
+         description "Target community to use in import and export";
+         type string {
+         }
+       }
+       leaf import {
+         description "Target community to use when filtering on import";
+         type string {
+         }
+       }
+       leaf export {
+         description "Target community to use when marking routes on export";
+         type string {
+         }
+       }
+       leaf auto {
+         description "Auto derive import and export target community from BGP AS & L2";
+         type empty;
+       }
+     }
+     leaf no-vrf-advertise {
+       description "Don't advertise this instance to remote PEs";
+       type empty;
+     }
+   }
+   grouping juniper-system {
+     leaf host-name {
+       description "Hostname for this router";
+       type string {
+         length "1 .. 255";
+       }
+     }
+   }
+ }

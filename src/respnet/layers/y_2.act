@@ -570,16 +570,19 @@ class orchestron_rfs__rfs__backbone_interface__remote(yang.adata.MNode):
 class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
     name: str
     ipv4_address: ?str
-    ipv4_prefix_length: ?int
+    ipv4_prefix_length: int
     ipv6_address: ?str
     ipv6_prefix_length: ?int
     remote: orchestron_rfs__rfs__backbone_interface__remote
 
-    def __init__(self, name: str, remote: orchestron_rfs__rfs__backbone_interface__remote, ipv4_address: ?str, ipv4_prefix_length: ?int, ipv6_address: ?str, ipv6_prefix_length: ?int):
+    def __init__(self, name: str, remote: orchestron_rfs__rfs__backbone_interface__remote, ipv4_address: ?str, ipv4_prefix_length: ?int=None, ipv6_address: ?str, ipv6_prefix_length: ?int):
         self._ns = "http://example.com/respnet-rfs"
         self.name = name
         self.ipv4_address = ipv4_address
-        self.ipv4_prefix_length = ipv4_prefix_length
+        if ipv4_prefix_length != None:
+            self.ipv4_prefix_length = ipv4_prefix_length
+        else:
+            self.ipv4_prefix_length = 30
         self.ipv6_address = ipv6_address
         self.ipv6_prefix_length = ipv6_prefix_length
         self.remote = remote
@@ -732,7 +735,7 @@ class orchestron_rfs__rfs__vrf(yang.adata.MNode):
         return res
 
 
-class orchestron_rfs__rfs__customer_interface_entry(yang.adata.MNode):
+class orchestron_rfs__rfs__vrf_interface_entry(yang.adata.MNode):
     name: str
     description: ?str
     vrf: str
@@ -772,18 +775,18 @@ class orchestron_rfs__rfs__customer_interface_entry(yang.adata.MNode):
         return res
 
     @staticmethod
-    def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__customer_interface_entry:
-        return orchestron_rfs__rfs__customer_interface_entry(name=n.get_str("name"), description=n.get_opt_str("description"), vrf=n.get_str("vrf"), ipv4_address=n.get_opt_str("ipv4-address"), ipv4_prefix_length=n.get_opt_int("ipv4-prefix-length"))
+    def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__vrf_interface_entry:
+        return orchestron_rfs__rfs__vrf_interface_entry(name=n.get_str("name"), description=n.get_opt_str("description"), vrf=n.get_str("vrf"), ipv4_address=n.get_opt_str("ipv4-address"), ipv4_prefix_length=n.get_opt_int("ipv4-prefix-length"))
 
     @staticmethod
-    def from_xml(n: xml.Node) -> orchestron_rfs__rfs__customer_interface_entry:
-        return orchestron_rfs__rfs__customer_interface_entry(name=yang.gdata.from_xml_str(n, "name"), description=yang.gdata.from_xml_opt_str(n, "description"), vrf=yang.gdata.from_xml_str(n, "vrf"), ipv4_address=yang.gdata.from_xml_opt_str(n, "ipv4-address"), ipv4_prefix_length=yang.gdata.from_xml_opt_int(n, "ipv4-prefix-length"))
+    def from_xml(n: xml.Node) -> orchestron_rfs__rfs__vrf_interface_entry:
+        return orchestron_rfs__rfs__vrf_interface_entry(name=yang.gdata.from_xml_str(n, "name"), description=yang.gdata.from_xml_opt_str(n, "description"), vrf=yang.gdata.from_xml_str(n, "vrf"), ipv4_address=yang.gdata.from_xml_opt_str(n, "ipv4-address"), ipv4_prefix_length=yang.gdata.from_xml_opt_int(n, "ipv4-prefix-length"))
 
-class orchestron_rfs__rfs__customer_interface(yang.adata.MNode):
-    elements: list[orchestron_rfs__rfs__customer_interface_entry]
+class orchestron_rfs__rfs__vrf_interface(yang.adata.MNode):
+    elements: list[orchestron_rfs__rfs__vrf_interface_entry]
     def __init__(self, elements=[]):
         self._ns = "http://example.com/respnet-rfs"
-        self._name = 'customer-interface'
+        self._name = 'vrf-interface'
         self.elements = elements
 
     def create(self, name, vrf):
@@ -795,12 +798,12 @@ class orchestron_rfs__rfs__customer_interface(yang.adata.MNode):
             if match:
                 return e
 
-        res = orchestron_rfs__rfs__customer_interface_entry(name, vrf)
+        res = orchestron_rfs__rfs__vrf_interface_entry(name, vrf)
         self.elements.append(res)
         return res
 
     def to_gdata(self):
-        res = yang.gdata.List('customer-interface', ['name'], ns=self._ns)
+        res = yang.gdata.List('vrf-interface', ['name'], ns=self._ns)
         for e in self.elements:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.ListElement):
@@ -808,17 +811,17 @@ class orchestron_rfs__rfs__customer_interface(yang.adata.MNode):
         return res
 
     @staticmethod
-    def from_gdata(n: yang.gdata.List) -> list[orchestron_rfs__rfs__customer_interface_entry]:
+    def from_gdata(n: yang.gdata.List) -> list[orchestron_rfs__rfs__vrf_interface_entry]:
         res = []
         for e in n.elements:
-            res.append(orchestron_rfs__rfs__customer_interface_entry.from_gdata(e))
+            res.append(orchestron_rfs__rfs__vrf_interface_entry.from_gdata(e))
         return res
 
     @staticmethod
-    def from_xml(nodes: list[xml.Node]) -> list[orchestron_rfs__rfs__customer_interface_entry]:
+    def from_xml(nodes: list[xml.Node]) -> list[orchestron_rfs__rfs__vrf_interface_entry]:
         res = []
         for node in nodes:
-            res.append(orchestron_rfs__rfs__customer_interface_entry.from_xml(node))
+            res.append(orchestron_rfs__rfs__vrf_interface_entry.from_xml(node))
         return res
 
 
@@ -827,9 +830,9 @@ class orchestron_rfs__rfs_entry(yang.adata.MNode):
     base_config: orchestron_rfs__rfs__base_config
     backbone_interface: orchestron_rfs__rfs__backbone_interface
     vrf: orchestron_rfs__rfs__vrf
-    customer_interface: orchestron_rfs__rfs__customer_interface
+    vrf_interface: orchestron_rfs__rfs__vrf_interface
 
-    def __init__(self, name: str, base_config: list[orchestron_rfs__rfs__base_config_entry]=[], backbone_interface: list[orchestron_rfs__rfs__backbone_interface_entry]=[], vrf: list[orchestron_rfs__rfs__vrf_entry]=[], customer_interface: list[orchestron_rfs__rfs__customer_interface_entry]=[]):
+    def __init__(self, name: str, base_config: list[orchestron_rfs__rfs__base_config_entry]=[], backbone_interface: list[orchestron_rfs__rfs__backbone_interface_entry]=[], vrf: list[orchestron_rfs__rfs__vrf_entry]=[], vrf_interface: list[orchestron_rfs__rfs__vrf_interface_entry]=[]):
         self._ns = "http://orchestron.org/yang/orchestron-rfs.yang"
         self.name = name
         self.base_config = orchestron_rfs__rfs__base_config(elements=base_config)
@@ -838,8 +841,8 @@ class orchestron_rfs__rfs_entry(yang.adata.MNode):
         self.backbone_interface._parent = self
         self.vrf = orchestron_rfs__rfs__vrf(elements=vrf)
         self.vrf._parent = self
-        self.customer_interface = orchestron_rfs__rfs__customer_interface(elements=customer_interface)
-        self.customer_interface._parent = self
+        self.vrf_interface = orchestron_rfs__rfs__vrf_interface(elements=vrf_interface)
+        self.vrf_interface._parent = self
 
     def to_gdata(self) -> yang.gdata.Node:
         res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
@@ -847,7 +850,7 @@ class orchestron_rfs__rfs_entry(yang.adata.MNode):
         _base_config = self.base_config
         _backbone_interface = self.backbone_interface
         _vrf = self.vrf
-        _customer_interface = self.customer_interface
+        _vrf_interface = self.vrf_interface
         if _name is not None:
             res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://orchestron.org/yang/orchestron-rfs.yang')
         if _base_config is not None:
@@ -856,19 +859,19 @@ class orchestron_rfs__rfs_entry(yang.adata.MNode):
             res.children['backbone-interface'] = _backbone_interface.to_gdata()
         if _vrf is not None:
             res.children['vrf'] = _vrf.to_gdata()
-        if _customer_interface is not None:
-            res.children['customer-interface'] = _customer_interface.to_gdata()
+        if _vrf_interface is not None:
+            res.children['vrf-interface'] = _vrf_interface.to_gdata()
         for child in res.children.values():
             child.parent = res
         return res
 
     @staticmethod
     def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs_entry:
-        return orchestron_rfs__rfs_entry(name=n.get_str("name"), base_config=orchestron_rfs__rfs__base_config.from_gdata(n.get_list("base-config")), backbone_interface=orchestron_rfs__rfs__backbone_interface.from_gdata(n.get_list("backbone-interface")), vrf=orchestron_rfs__rfs__vrf.from_gdata(n.get_list("vrf")), customer_interface=orchestron_rfs__rfs__customer_interface.from_gdata(n.get_list("customer-interface")))
+        return orchestron_rfs__rfs_entry(name=n.get_str("name"), base_config=orchestron_rfs__rfs__base_config.from_gdata(n.get_list("base-config")), backbone_interface=orchestron_rfs__rfs__backbone_interface.from_gdata(n.get_list("backbone-interface")), vrf=orchestron_rfs__rfs__vrf.from_gdata(n.get_list("vrf")), vrf_interface=orchestron_rfs__rfs__vrf_interface.from_gdata(n.get_list("vrf-interface")))
 
     @staticmethod
     def from_xml(n: xml.Node) -> orchestron_rfs__rfs_entry:
-        return orchestron_rfs__rfs_entry(name=yang.gdata.from_xml_str(n, "name"), base_config=orchestron_rfs__rfs__base_config.from_xml(yang.gdata.get_xml_children(n, "base-config")), backbone_interface=orchestron_rfs__rfs__backbone_interface.from_xml(yang.gdata.get_xml_children(n, "backbone-interface")), vrf=orchestron_rfs__rfs__vrf.from_xml(yang.gdata.get_xml_children(n, "vrf")), customer_interface=orchestron_rfs__rfs__customer_interface.from_xml(yang.gdata.get_xml_children(n, "customer-interface")))
+        return orchestron_rfs__rfs_entry(name=yang.gdata.from_xml_str(n, "name"), base_config=orchestron_rfs__rfs__base_config.from_xml(yang.gdata.get_xml_children(n, "base-config")), backbone_interface=orchestron_rfs__rfs__backbone_interface.from_xml(yang.gdata.get_xml_children(n, "backbone-interface")), vrf=orchestron_rfs__rfs__vrf.from_xml(yang.gdata.get_xml_children(n, "vrf")), vrf_interface=orchestron_rfs__rfs__vrf_interface.from_xml(yang.gdata.get_xml_children(n, "vrf-interface")))
 
 class orchestron_rfs__rfs(yang.adata.MNode):
     elements: list[orchestron_rfs__rfs_entry]

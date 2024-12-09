@@ -3,6 +3,19 @@ import orchestron.ttt
 
 import respnet.layers.base_1 as base
 
+
+def letter_position(letter):
+    """
+    Returns the position of the given letter in the English alphabet (1-26).
+    """
+    if len(letter) != 1 or not letter.isalpha():
+        raise ValueError("Input must be a single alphabetic character.")
+    
+    # Convert to lowercase to handle case-insensitivity
+    letter = letter.lower()
+    return ord(letter) - ord('a') + 1
+
+
 class Router(base.Router):
     def transform(self, i):
         o = base.o_root()
@@ -24,13 +37,16 @@ class BBLink(base.BBLink):
     def transform(self, i):
         print("Intermediate backbonelink transform running %s [%s] <-> %s [%s]" % (i.left_router, i.left_interface, i.right_router, i.right_interface))
         o = base.o_root()
+        link_id = letter_position(i.left_router[0]) + letter_position(i.right_router[0])
         left_rfs = o.rfs.create(i.left_router)
         li = left_rfs.backbone_interface.create(i.left_interface)
+        li.ipv4_address = "10.0.%s.1" % (str(link_id))
         li.remote.device = i.right_router
         li.remote.interface = i.right_interface
 
         right_rfs = o.rfs.create(i.right_router)
         ri = right_rfs.backbone_interface.create(i.right_interface)
+        ri.ipv4_address = "10.0.%s.2" % (str(link_id))
         ri.remote.device = i.left_router
         ri.remote.interface = i.left_interface
 
@@ -48,10 +64,10 @@ class L3Vpn(base.L3Vpn):
             vrf = rfs.vrf.create(i.name)
             vrf.description = i.description
 
-            ci = rfs.customer_interface.create(ep.interface)
-            ci.description = "Customer VPN access %s [%s] in VPN %s" % (ep.site, ep.site_network_access, i.name)
-            ci.ipv4_address = ep.ipv4_address
-            ci.ipv4_prefix_length = ep.ipv4_prefix_length
-            ci.vrf = i.name
+            vi = rfs.vrf_interface.create(ep.interface)
+            vi.description = "Customer VPN access %s [%s] in VPN %s" % (ep.site, ep.site_network_access, i.name)
+            vi.ipv4_address = ep.ipv4_address
+            vi.ipv4_prefix_length = ep.ipv4_prefix_length
+            vi.vrf = i.name
 
         return o

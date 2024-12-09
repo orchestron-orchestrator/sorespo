@@ -15,16 +15,23 @@ topology:
   kinds:
     xrd:
       image: gitlab.dev.terastrm.net:4567/terastream/vrnetlab/vr-xrd/xrd-control-plane:24.1.1
+    crpd:
+      image: registry.devops.telekom.de/containerlab/containerlab/crpd:23.4R1.9
+      image-pull-policy: always
+      startup-config: crpd-startup.conf
+      license: crpd-trial.lic
   nodes:
     ams-core-1:
       kind: xrd
     fra-core-1:
       kind: xrd
     sto-core-1:
-      kind: xrd
+      kind: crpd
     cust-1:
       kind: xrd
     cust-2:
+      kind: xrd
+    cust-3:
       kind: xrd
     otron:
       kind: linux
@@ -36,9 +43,8 @@ topology:
 
   links:
     - endpoints: ["ams-core-1:Gi0-0-0-0", "fra-core-1:Gi0-0-0-0"]
-    - endpoints: ["ams-core-1:Gi0-0-0-1", "sto-core-1:Gi0-0-0-0"]
-    - endpoints: ["fra-core-1:Gi0-0-0-1", "sto-core-1:Gi0-0-0-1"]
+    - endpoints: ["ams-core-1:Gi0-0-0-1", "sto-core-1:eth1"]
+    - endpoints: ["fra-core-1:Gi0-0-0-1", "sto-core-1:eth2"]
     - endpoints: ["ams-core-1:Gi0-0-0-2", "cust-1:Gi0-0-0-0"]
-    - endpoints: ["ams-core-1:Gi0-0-0-3", "cust-2:Gi0-0-0-0"]
-    - endpoints: ["fra-core-1:Gi0-0-0-2", "cust-1:Gi0-0-0-1"]
-    - endpoints: ["fra-core-1:Gi0-0-0-3", "cust-2:Gi0-0-0-1"]
+    - endpoints: ["fra-core-1:Gi0-0-0-2", "cust-2:Gi0-0-0-0"]
+    - endpoints: ["sto-core-1:eth3", "cust-3:Gi0-0-0-0"]
