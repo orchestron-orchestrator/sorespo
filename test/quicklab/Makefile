@@ -17,3 +17,15 @@ run-xr-only:
 
 run:
 	docker exec -it respnet-quicklab-otron /respnet l3vpn-svc2.xml --rts-bt-dbg
+
+.PHONY: shell
+shell:
+	docker exec -it respnet-quicklab-otron bash -l
+
+.PHONY: send-config
+send-config:
+	curl -X POST -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' respnet-quicklab-otron)
+
+.PHONY: get-config0 get-config1 get-config2 get-config3
+get-config0 get-config1 get-config2 get-config3:
+	curl http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' respnet-quicklab-otron)/layer/$(subst get-config,,$@)
