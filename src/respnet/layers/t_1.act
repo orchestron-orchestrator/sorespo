@@ -2,6 +2,8 @@
 # DO NOT MODIFY THIS FILE!! This file is generated!
 # WARNING WARNING WARNING WARNING WARNING
 
+import logging
+
 import orchestron.device as odev
 import orchestron.ttt as ttt
 import yang.adata
@@ -13,8 +15,8 @@ from respnet.layers.y_1 import netinfra_inter__netinfra__backbone_link_entry
 
 import respnet.inter
 
-def get_ttt(dev_mgr: odev.DeviceManager) -> ttt.TTTNode:
+def get_ttt(dev_mgr: odev.DeviceManager, log_handler: logging.Handler) -> ttt.TTTNode:
 
 
-    r = ttt.TTTContainer({"l3vpns": ttt.TTTContainer({"l3vpn": ttt.TTTList(respnet.inter.L3Vpn)}), "netinfra": ttt.TTTContainer({"routers": ttt.TTTList(respnet.inter.Router), "backbone-link": ttt.TTTList(respnet.inter.BBLink)})})
+    r = ttt.TTTContainer({"l3vpns": ttt.TTTContainer({"l3vpn": ttt.TTTList(lambda: respnet.inter.L3Vpn(log_handler), log_handler)}, log_handler), "netinfra": ttt.TTTContainer({"routers": ttt.TTTList(lambda: respnet.inter.Router(log_handler), log_handler), "backbone-link": ttt.TTTList(lambda: respnet.inter.BBLink(log_handler), log_handler)}, log_handler)}, log_handler)
     return r

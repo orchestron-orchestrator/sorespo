@@ -2,6 +2,8 @@
 # DO NOT MODIFY THIS FILE!! This file is generated!
 # WARNING WARNING WARNING WARNING WARNING
 
+import logging
+
 import orchestron.device as odev
 import orchestron.ttt as ttt
 import yang.adata
@@ -14,9 +16,9 @@ from respnet.layers.y_2 import orchestron_rfs__rfs__vrf_interface_entry
 
 import respnet.rfs
 
-def get_ttt(dev_mgr: odev.DeviceManager) -> ttt.TTTNode:
+def get_ttt(dev_mgr: odev.DeviceManager, log_handler: logging.Handler) -> ttt.TTTNode:
     def create_list_entry_orchestron_rfs__rfs():
-        return ttt.TTTContainer({"base-config": ttt.TTTList(lambda: respnet.rfs.BaseConfig(dev_mgr)), "backbone-interface": ttt.TTTList(lambda: respnet.rfs.BBInterface(dev_mgr)), "vrf": ttt.TTTList(lambda: respnet.rfs.Vrf(dev_mgr)), "vrf-interface": ttt.TTTList(lambda: respnet.rfs.VrfInterface(dev_mgr))})
+        return ttt.TTTContainer({"base-config": ttt.TTTList(lambda: respnet.rfs.BaseConfig(dev_mgr, log_handler), log_handler), "backbone-interface": ttt.TTTList(lambda: respnet.rfs.BBInterface(dev_mgr, log_handler), log_handler), "vrf": ttt.TTTList(lambda: respnet.rfs.Vrf(dev_mgr, log_handler), log_handler), "vrf-interface": ttt.TTTList(lambda: respnet.rfs.VrfInterface(dev_mgr, log_handler), log_handler)}, log_handler)
 
-    r = ttt.TTTContainer({"device": ttt.TTTList(lambda: ttt.TTTDevice(dev_mgr)), "rfs": ttt.TTTList(create_list_entry_orchestron_rfs__rfs)})
+    r = ttt.TTTContainer({"device": ttt.TTTList(lambda: ttt.TTTDevice(dev_mgr, log_handler), log_handler), "rfs": ttt.TTTList(create_list_entry_orchestron_rfs__rfs, log_handler)}, log_handler)
     return r
