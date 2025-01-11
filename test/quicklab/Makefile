@@ -2,7 +2,7 @@ include clab.mk
 
 start:
 	$(CLAB_BIN) deploy --topo quicklab.clab.yml --log-level trace --reconfigure
-	docker exec -it respnet-quicklab-otron bash -lc "apt-get update && apt-get install -qy ssh sshpass"
+	docker exec -it respnet-quicklab-otron bash -lc "apt-get update && apt-get install -qy ssh sshpass gdb"
 
 stop:
 	$(CLAB_BIN) destroy --topo quicklab.clab.yml --log-level trace
