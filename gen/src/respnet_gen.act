@@ -1,4 +1,5 @@
 import file
+import process
 
 import orchestron.build
 import orchestron.yang as oyang
@@ -3606,6 +3607,7 @@ dev_xr_yang = """module xr {
 actor main(env):
     fc = file.FileCap(env.cap)
     wfc = file.WriteFileCap(fc)
+    pc = process.ProcessCap(env.cap)
 
     spec = orchestron.build.SysSpec("respnet", [
         orchestron.build.Layer([netinfra_yang, l3vpn_yang, oyang.ietf_inet_types, yang_types_yang]),
@@ -3613,7 +3615,9 @@ actor main(env):
         orchestron.build.Layer([oyang.rfs, oyang.ietf_inet_types, respnet_rfs_yang]),
     ], [
         orchestron.build.DeviceType.from_dir(fc, "CiscoIosXr_24_1_ncs55a1", "yang/CiscoIosXr_24_1_ncs55a1"),
-        orchestron.build.DeviceType.from_dir(fc, "JuniperCRPD_23_4R1_9", "yang/JuniperCRPD_23_4R1_9"),
+        orchestron.build.DeviceType.from_dir(fc, "JuniperCRPD_23_4R1_9", "yang/JuniperCRPD_23_4R1_9", [
+             orchestron.build.SchemaTransformChain(".*yang.orig", [orchestron.build.SchemaTransformUnions()])
+        ], pc),
     ])
     spec.gen_app(wfc, "../src/")
 
