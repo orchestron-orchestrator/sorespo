@@ -13318,27 +13318,6 @@ module: junos-conf-protocols
        |  +--rw net* [name]
        |     +--rw name    jt:isoaddr
        +--rw ldp
-       |  +--rw traceoptions
-       |  |  +--rw file
-       |  |  |  +--rw filename?                  string
-       |  |  |  x--rw replace?                   empty
-       |  |  |  +--rw size?                      string
-       |  |  |  +--rw files?                     uint32
-       |  |  |  x--rw no-stamp?                  empty
-       |  |  |  +--rw (world-readable-choice)?
-       |  |  |     +--:(world-readable)
-       |  |  |     |  +--rw world-readable?      empty
-       |  |  |     +--:(no-world-readable)
-       |  |  |        +--rw no-world-readable?   empty
-       |  |  +--rw flag* [name]
-       |  |     +--rw name       enumeration
-       |  |     +--rw send?      empty
-       |  |     +--rw receive?   empty
-       |  |     +--rw detail?    empty
-       |  |     +--rw disable?   empty
-       |  |     +--rw filter!
-       |  |        +--rw match-on?   enumeration
-       |  |        +--rw policy*     jt:policy-algebra
        |  +--rw traffic-statistics
        |  |  +--rw file
        |  |  |  +--rw filename?                  string
@@ -13354,54 +13333,6 @@ module: junos-conf-protocols
        |  |  +--rw interval?             int32
        |  |  +--rw sensor-based-stats?   empty
        |  |  +--rw no-penultimate-hop?   empty
-       |  +--rw graceful-restart
-       |  |  +--rw (enable-disable)?
-       |  |  |  +--:(case_1)
-       |  |  |     +--rw disable?                     empty
-       |  |  +--rw helper-disable?                    empty
-       |  |  +--rw recovery-time?                     uint32
-       |  |  +--rw maximum-neighbor-recovery-time?    uint32
-       |  |  +--rw reconnect-time?                    uint32
-       |  |  +--rw maximum-neighbor-reconnect-time?   uint32
-       |  +--rw auto-targeted-session!
-       |  |  +--rw teardown-delay?       uint32
-       |  |  +--rw maximum-sessions?     uint32
-       |  |  +--rw no-rlfa?              empty
-       |  |  +--rw no-dynamic-tunnels?   empty
-       |  +--rw preference?                  uint32
-       |  +--rw no-forwarding?               empty
-       |  +--rw rib-group?                   string
-       |  +--rw rib-group6?                  string
-       |  +--rw l2-smart-policy?             empty
-       |  +--rw track-igp-metric?            empty
-       |  +--rw strict-targeted-hellos?      empty
-       |  +--rw longest-match!
-       |  |  +--rw policy*   jt:policy-algebra
-       |  +--rw color-import-policy*         jt:policy-algebra
-       |  +--rw import*                      jt:policy-algebra
-       |  +--rw export*                      jt:policy-algebra
-       |  +--rw egress-policy*               jt:policy-algebra
-       |  +--rw dod-request-policy*          jt:policy-algebra
-       |  +--rw next-hop
-       |  |  +--rw merged
-       |  |  |  +--rw policy*   jt:policy-algebra
-       |  |  +--rw no-rsvp-tunneling
-       |  |     +--rw policy*   jt:policy-algebra
-       |  +--rw (mtu-discovery-choice)?
-       |  |  +--:(mtu-discovery)
-       |  |  |  +--rw mtu-discovery?         empty
-       |  |  +--:(no-mtu-discovery)
-       |  |     +--rw no-mtu-discovery?      empty
-       |  +--rw (deaggregate-choice)?
-       |  |  +--:(deaggregate)
-       |  |  |  +--rw deaggregate?           empty
-       |  |  +--:(no-deaggregate)
-       |  |     +--rw no-deaggregate?        empty
-       |  +--rw explicit-null?               empty
-       |  +--rw label-withdrawal-delay?      uint32
-       |  +--rw make-before-break!
-       |  |  +--rw timeout?            uint32
-       |  |  +--rw switchover-delay?   uint32
        |  +--rw transport-address
        |  |  +--rw (address-choice)?
        |  |     +--:(case_1)
@@ -13410,185 +13341,31 @@ module: junos-conf-protocols
        |  |     |  +--rw interface?   empty
        |  |     +--:(case_3)
        |  |        +--rw address?     jt:ipaddr
-       |  +--rw keepalive-interval?          uint32
-       |  +--rw keepalive-timeout?           uint32
        |  +--rw interface* [name]
-       |  |  +--rw name                              jt:interface-name
-       |  |  +--rw (enable-disable)?
-       |  |  |  +--:(case_1)
-       |  |  |     +--rw disable?                    empty
-       |  |  +--rw hello-interval?                   uint32
-       |  |  +--rw hold-time?                        uint32
-       |  |  +--rw link-protection!
-       |  |  |  +--rw (enable-disable)?
-       |  |  |  |  +--:(case_1)
-       |  |  |  |     +--rw disable?      empty
-       |  |  |  +--rw dynamic-rsvp-lsp?   empty
-       |  |  +--rw transport-address
-       |  |  |  +--rw (address-choice)?
-       |  |  |     +--:(case_1)
-       |  |  |     |  +--rw router-id?   empty
-       |  |  |     +--:(case_2)
-       |  |  |     |  +--rw interface?   empty
-       |  |  |     +--:(case_3)
-       |  |  |        +--rw address?     jt:ipaddr
-       |  |  +--rw (allow-subnet-mismatch-choice)?
-       |  |     +--:(allow-subnet-mismatch)
-       |  |     |  +--rw allow-subnet-mismatch?      empty
-       |  |     +--:(no-allow-subnet-mismatch)
-       |  |        +--rw no-allow-subnet-mismatch?   empty
-       |  +--rw neighbor* [name]
-       |  |  +--rw name    jt:ipaddr
-       |  +--rw session* [name]
-       |  |  +--rw name                        jt:ipaddr
-       |  |  +--rw authentication-key?         string
-       |  |  +--rw authentication-algorithm?   enumeration
-       |  |  +--rw tcpao-auth-mismatch?        enumeration
-       |  |  +--rw authentication-key-chain?   string
-       |  |  +--rw downstream-on-demand?       empty
-       |  |  +--rw transport-address?          jt:ipaddr
-       |  |  +--rw (mtu-discovery-choice)?
-       |  |     +--:(mtu-discovery)
-       |  |     |  +--rw mtu-discovery?        empty
-       |  |     +--:(no-mtu-discovery)
-       |  |        +--rw no-mtu-discovery?     empty
-       |  +--rw session-group* [name]
-       |  |  +--rw name                        jt:ipprefix
-       |  |  +--rw authentication-key?         string
-       |  |  +--rw authentication-algorithm?   enumeration
-       |  |  +--rw tcpao-auth-mismatch?        enumeration
-       |  |  +--rw authentication-key-chain?   string
-       |  |  +--rw downstream-on-demand?       empty
-       |  |  +--rw transport-address?          jt:ipaddr
-       |  |  +--rw (mtu-discovery-choice)?
-       |  |     +--:(mtu-discovery)
-       |  |     |  +--rw mtu-discovery?        empty
-       |  |     +--:(no-mtu-discovery)
-       |  |        +--rw no-mtu-discovery?     empty
-       |  +--rw session-protection!
-       |  |  +--rw timeout?   uint16
-       |  +--rw igp-synchronization
-       |  |  +--rw holddown-interval?   uint32
-       |  +--rw log-updown
-       |  |  +--rw trap
-       |  |     +--rw (enable-disable)?
-       |  |        +--:(case_1)
-       |  |           +--rw disable?   empty
-       |  +--rw policing
-       |  |  +--rw fec* [name]
-       |  |     +--rw name               jt:ipv4prefix
-       |  |     +--rw ingress-traffic?   string
-       |  |     +--rw transit-traffic?   string
-       |  +--rw entropy-label
-       |  |  +--rw ingress-policy*   jt:policy-algebra
-       |  +--rw oam
-       |  |  +--rw ingress-policy*           jt:policy-algebra
-       |  |  +--rw bfd-port-egress-policy*   jt:policy-algebra
-       |  |  +--rw fec* [name]
-       |  |  |  +--rw name                               jt:ipv4prefix
-       |  |  |  +--rw (bfd_liveness_detection_type)?
-       |  |  |  |  +--:(case_1)
-       |  |  |  |  |  +--rw bfd-liveness-detection
-       |  |  |  |  |     +--rw version?                     enumeration
-       |  |  |  |  |     +--rw minimum-interval?            uint32
-       |  |  |  |  |     x--rw minimum-transmit-interval?   uint32
-       |  |  |  |  |     +--rw minimum-receive-interval?    uint32
-       |  |  |  |  |     +--rw multiplier?                  uint32
-       |  |  |  |  |     +--rw inline-disable?              empty
-       |  |  |  |  |     +--rw pdu-size?                    uint32
-       |  |  |  |  |     +--rw (adaptation-choice)?
-       |  |  |  |  |     |  +--:(case_1)
-       |  |  |  |  |     |     +--rw no-adaptation?         empty
-       |  |  |  |  |     +--rw transmit-interval
-       |  |  |  |  |     |  +--rw minimum-interval?   uint32
-       |  |  |  |  |     |  +--rw threshold?          uint32
-       |  |  |  |  |     +--rw detection-time
-       |  |  |  |  |     |  +--rw threshold?   uint32
-       |  |  |  |  |     +--rw ecmp?                        empty
-       |  |  |  |  |     +--rw failure-action
-       |  |  |  |  |     |  +--rw (action-choice)?
-       |  |  |  |  |     |     +--:(case_1)
-       |  |  |  |  |     |     |  +--rw remove-route?     empty
-       |  |  |  |  |     |     +--:(case_2)
-       |  |  |  |  |     |        +--rw remove-nexthop?   empty
-       |  |  |  |  |     +--rw holddown-interval?           uint32
-       |  |  |  |  |     +--rw no-router-alert-option?      empty
-       |  |  |  |  |     +--rw use-ip-ttl-1?                empty
-       |  |  |  |  +--:(case_2)
-       |  |  |  |     +--rw no-bfd-liveness-detection?   empty
-       |  |  |  +--rw periodic-traceroute!
-       |  |  |     +--rw frequency?   uint16
-       |  |  |     +--rw ttl?         uint16
-       |  |  |     +--rw retries?     uint16
-       |  |  |     +--rw wait?        uint16
-       |  |  |     +--rw paths?       uint16
-       |  |  |     +--rw source?      jt:ipv4addr
-       |  |  |     +--rw exp?         uint16
-       |  |  |     +--rw fanout?      uint16
-       |  |  |     +--rw disable?     empty
-       |  |  +--rw bfd-liveness-detection
-       |  |  |  +--rw version?                     enumeration
-       |  |  |  +--rw minimum-interval?            uint32
-       |  |  |  x--rw minimum-transmit-interval?   uint32
-       |  |  |  +--rw minimum-receive-interval?    uint32
-       |  |  |  +--rw multiplier?                  uint32
-       |  |  |  +--rw inline-disable?              empty
-       |  |  |  +--rw pdu-size?                    uint32
-       |  |  |  +--rw (adaptation-choice)?
-       |  |  |  |  +--:(case_1)
-       |  |  |  |     +--rw no-adaptation?         empty
-       |  |  |  +--rw transmit-interval
-       |  |  |  |  +--rw minimum-interval?   uint32
-       |  |  |  |  +--rw threshold?          uint32
-       |  |  |  +--rw detection-time
-       |  |  |  |  +--rw threshold?   uint32
-       |  |  |  +--rw ecmp?                        empty
-       |  |  |  +--rw failure-action
-       |  |  |  |  +--rw (action-choice)?
-       |  |  |  |     +--:(case_1)
-       |  |  |  |     |  +--rw remove-route?     empty
-       |  |  |  |     +--:(case_2)
-       |  |  |  |        +--rw remove-nexthop?   empty
-       |  |  |  +--rw holddown-interval?           uint32
-       |  |  |  +--rw no-router-alert-option?      empty
-       |  |  |  +--rw use-ip-ttl-1?                empty
-       |  |  +--rw periodic-traceroute!
-       |  |  |  +--rw frequency?   uint16
-       |  |  |  +--rw ttl?         uint16
-       |  |  |  +--rw retries?     uint16
-       |  |  |  +--rw wait?        uint16
-       |  |  |  +--rw paths?       uint16
-       |  |  |  +--rw source?      jt:ipv4addr
-       |  |  |  +--rw exp?         uint16
-       |  |  |  +--rw fanout?      uint16
-       |  |  +--rw lsp-ping-interval?        uint16
-       |  |  +--rw lsp-ping-multiplier?      uint8
-       |  +--rw targeted-hello
-       |  |  +--rw hello-interval?   uint32
-       |  |  +--rw hold-time?        uint32
-       |  +--rw p2mp!
-       |  |  +--rw recursive
-       |  |  |  +--rw route?   empty
-       |  |  |  +--rw fec?     empty
-       |  |  +--rw root-address* [name]
-       |  |  |  +--rw name             jt:ipaddr
-       |  |  |  +--rw lsp-id* [name]
-       |  |  |  |  +--rw name    uint32
-       |  |  |  +--rw group-address* [name]
-       |  |  |     +--rw name              jt:ipaddr
-       |  |  |     +--rw source-address* [name]
-       |  |  |        +--rw name    jt:ipaddr
-       |  |  +--rw no-rsvp-tunneling?   empty
-       |  +--rw sr-mapping-client!
-       |  |  +--rw policy*   jt:policy-algebra
-       |  +--rw upstream-label-assignment?   empty
-       |  +--rw family* [name]
-       |  |  +--rw name    enumeration
-       |  +--rw transport-preference?        enumeration
-       |  +--rw dual-transport!
-       |  |  +--rw inet-lsr-id?    jt:ipv4addr
-       |  |  +--rw inet6-lsr-id?   jt:ipv4addr
-       |  +--rw no-propagate-ttl?            empty
+       |     +--rw name                              jt:interface-name
+       |     +--rw (enable-disable)?
+       |     |  +--:(case_1)
+       |     |     +--rw disable?                    empty
+       |     +--rw hello-interval?                   uint32
+       |     +--rw hold-time?                        uint32
+       |     +--rw link-protection!
+       |     |  +--rw (enable-disable)?
+       |     |  |  +--:(case_1)
+       |     |  |     +--rw disable?      empty
+       |     |  +--rw dynamic-rsvp-lsp?   empty
+       |     +--rw transport-address
+       |     |  +--rw (address-choice)?
+       |     |     +--:(case_1)
+       |     |     |  +--rw router-id?   empty
+       |     |     +--:(case_2)
+       |     |     |  +--rw interface?   empty
+       |     |     +--:(case_3)
+       |     |        +--rw address?     jt:ipaddr
+       |     +--rw (allow-subnet-mismatch-choice)?
+       |        +--:(allow-subnet-mismatch)
+       |        |  +--rw allow-subnet-mismatch?      empty
+       |        +--:(no-allow-subnet-mismatch)
+       |           +--rw no-allow-subnet-mismatch?   empty
        +--rw mpls
           +--rw no-propagate-ttl?   empty
           +--rw ipv6-tunneling?     empty
@@ -26922,27 +26699,6 @@ module: junos-conf-protocols
        |  +--rw net* [name]
        |     +--rw name    jt:isoaddr
        +--rw ldp
-       |  +--rw traceoptions
-       |  |  +--rw file
-       |  |  |  +--rw filename?                  string
-       |  |  |  x--rw replace?                   empty
-       |  |  |  +--rw size?                      string
-       |  |  |  +--rw files?                     uint32
-       |  |  |  x--rw no-stamp?                  empty
-       |  |  |  +--rw (world-readable-choice)?
-       |  |  |     +--:(world-readable)
-       |  |  |     |  +--rw world-readable?      empty
-       |  |  |     +--:(no-world-readable)
-       |  |  |        +--rw no-world-readable?   empty
-       |  |  +--rw flag* [name]
-       |  |     +--rw name       enumeration
-       |  |     +--rw send?      empty
-       |  |     +--rw receive?   empty
-       |  |     +--rw detail?    empty
-       |  |     +--rw disable?   empty
-       |  |     +--rw filter!
-       |  |        +--rw match-on?   enumeration
-       |  |        +--rw policy*     jt:policy-algebra
        |  +--rw traffic-statistics
        |  |  +--rw file
        |  |  |  +--rw filename?                  string
@@ -26958,54 +26714,6 @@ module: junos-conf-protocols
        |  |  +--rw interval?             int32
        |  |  +--rw sensor-based-stats?   empty
        |  |  +--rw no-penultimate-hop?   empty
-       |  +--rw graceful-restart
-       |  |  +--rw (enable-disable)?
-       |  |  |  +--:(case_1)
-       |  |  |     +--rw disable?                     empty
-       |  |  +--rw helper-disable?                    empty
-       |  |  +--rw recovery-time?                     uint32
-       |  |  +--rw maximum-neighbor-recovery-time?    uint32
-       |  |  +--rw reconnect-time?                    uint32
-       |  |  +--rw maximum-neighbor-reconnect-time?   uint32
-       |  +--rw auto-targeted-session!
-       |  |  +--rw teardown-delay?       uint32
-       |  |  +--rw maximum-sessions?     uint32
-       |  |  +--rw no-rlfa?              empty
-       |  |  +--rw no-dynamic-tunnels?   empty
-       |  +--rw preference?                  uint32
-       |  +--rw no-forwarding?               empty
-       |  +--rw rib-group?                   string
-       |  +--rw rib-group6?                  string
-       |  +--rw l2-smart-policy?             empty
-       |  +--rw track-igp-metric?            empty
-       |  +--rw strict-targeted-hellos?      empty
-       |  +--rw longest-match!
-       |  |  +--rw policy*   jt:policy-algebra
-       |  +--rw color-import-policy*         jt:policy-algebra
-       |  +--rw import*                      jt:policy-algebra
-       |  +--rw export*                      jt:policy-algebra
-       |  +--rw egress-policy*               jt:policy-algebra
-       |  +--rw dod-request-policy*          jt:policy-algebra
-       |  +--rw next-hop
-       |  |  +--rw merged
-       |  |  |  +--rw policy*   jt:policy-algebra
-       |  |  +--rw no-rsvp-tunneling
-       |  |     +--rw policy*   jt:policy-algebra
-       |  +--rw (mtu-discovery-choice)?
-       |  |  +--:(mtu-discovery)
-       |  |  |  +--rw mtu-discovery?         empty
-       |  |  +--:(no-mtu-discovery)
-       |  |     +--rw no-mtu-discovery?      empty
-       |  +--rw (deaggregate-choice)?
-       |  |  +--:(deaggregate)
-       |  |  |  +--rw deaggregate?           empty
-       |  |  +--:(no-deaggregate)
-       |  |     +--rw no-deaggregate?        empty
-       |  +--rw explicit-null?               empty
-       |  +--rw label-withdrawal-delay?      uint32
-       |  +--rw make-before-break!
-       |  |  +--rw timeout?            uint32
-       |  |  +--rw switchover-delay?   uint32
        |  +--rw transport-address
        |  |  +--rw (address-choice)?
        |  |     +--:(case_1)
@@ -27014,185 +26722,31 @@ module: junos-conf-protocols
        |  |     |  +--rw interface?   empty
        |  |     +--:(case_3)
        |  |        +--rw address?     jt:ipaddr
-       |  +--rw keepalive-interval?          uint32
-       |  +--rw keepalive-timeout?           uint32
        |  +--rw interface* [name]
-       |  |  +--rw name                              jt:interface-name
-       |  |  +--rw (enable-disable)?
-       |  |  |  +--:(case_1)
-       |  |  |     +--rw disable?                    empty
-       |  |  +--rw hello-interval?                   uint32
-       |  |  +--rw hold-time?                        uint32
-       |  |  +--rw link-protection!
-       |  |  |  +--rw (enable-disable)?
-       |  |  |  |  +--:(case_1)
-       |  |  |  |     +--rw disable?      empty
-       |  |  |  +--rw dynamic-rsvp-lsp?   empty
-       |  |  +--rw transport-address
-       |  |  |  +--rw (address-choice)?
-       |  |  |     +--:(case_1)
-       |  |  |     |  +--rw router-id?   empty
-       |  |  |     +--:(case_2)
-       |  |  |     |  +--rw interface?   empty
-       |  |  |     +--:(case_3)
-       |  |  |        +--rw address?     jt:ipaddr
-       |  |  +--rw (allow-subnet-mismatch-choice)?
-       |  |     +--:(allow-subnet-mismatch)
-       |  |     |  +--rw allow-subnet-mismatch?      empty
-       |  |     +--:(no-allow-subnet-mismatch)
-       |  |        +--rw no-allow-subnet-mismatch?   empty
-       |  +--rw neighbor* [name]
-       |  |  +--rw name    jt:ipaddr
-       |  +--rw session* [name]
-       |  |  +--rw name                        jt:ipaddr
-       |  |  +--rw authentication-key?         string
-       |  |  +--rw authentication-algorithm?   enumeration
-       |  |  +--rw tcpao-auth-mismatch?        enumeration
-       |  |  +--rw authentication-key-chain?   string
-       |  |  +--rw downstream-on-demand?       empty
-       |  |  +--rw transport-address?          jt:ipaddr
-       |  |  +--rw (mtu-discovery-choice)?
-       |  |     +--:(mtu-discovery)
-       |  |     |  +--rw mtu-discovery?        empty
-       |  |     +--:(no-mtu-discovery)
-       |  |        +--rw no-mtu-discovery?     empty
-       |  +--rw session-group* [name]
-       |  |  +--rw name                        jt:ipprefix
-       |  |  +--rw authentication-key?         string
-       |  |  +--rw authentication-algorithm?   enumeration
-       |  |  +--rw tcpao-auth-mismatch?        enumeration
-       |  |  +--rw authentication-key-chain?   string
-       |  |  +--rw downstream-on-demand?       empty
-       |  |  +--rw transport-address?          jt:ipaddr
-       |  |  +--rw (mtu-discovery-choice)?
-       |  |     +--:(mtu-discovery)
-       |  |     |  +--rw mtu-discovery?        empty
-       |  |     +--:(no-mtu-discovery)
-       |  |        +--rw no-mtu-discovery?     empty
-       |  +--rw session-protection!
-       |  |  +--rw timeout?   uint16
-       |  +--rw igp-synchronization
-       |  |  +--rw holddown-interval?   uint32
-       |  +--rw log-updown
-       |  |  +--rw trap
-       |  |     +--rw (enable-disable)?
-       |  |        +--:(case_1)
-       |  |           +--rw disable?   empty
-       |  +--rw policing
-       |  |  +--rw fec* [name]
-       |  |     +--rw name               jt:ipv4prefix
-       |  |     +--rw ingress-traffic?   string
-       |  |     +--rw transit-traffic?   string
-       |  +--rw entropy-label
-       |  |  +--rw ingress-policy*   jt:policy-algebra
-       |  +--rw oam
-       |  |  +--rw ingress-policy*           jt:policy-algebra
-       |  |  +--rw bfd-port-egress-policy*   jt:policy-algebra
-       |  |  +--rw fec* [name]
-       |  |  |  +--rw name                               jt:ipv4prefix
-       |  |  |  +--rw (bfd_liveness_detection_type)?
-       |  |  |  |  +--:(case_1)
-       |  |  |  |  |  +--rw bfd-liveness-detection
-       |  |  |  |  |     +--rw version?                     enumeration
-       |  |  |  |  |     +--rw minimum-interval?            uint32
-       |  |  |  |  |     x--rw minimum-transmit-interval?   uint32
-       |  |  |  |  |     +--rw minimum-receive-interval?    uint32
-       |  |  |  |  |     +--rw multiplier?                  uint32
-       |  |  |  |  |     +--rw inline-disable?              empty
-       |  |  |  |  |     +--rw pdu-size?                    uint32
-       |  |  |  |  |     +--rw (adaptation-choice)?
-       |  |  |  |  |     |  +--:(case_1)
-       |  |  |  |  |     |     +--rw no-adaptation?         empty
-       |  |  |  |  |     +--rw transmit-interval
-       |  |  |  |  |     |  +--rw minimum-interval?   uint32
-       |  |  |  |  |     |  +--rw threshold?          uint32
-       |  |  |  |  |     +--rw detection-time
-       |  |  |  |  |     |  +--rw threshold?   uint32
-       |  |  |  |  |     +--rw ecmp?                        empty
-       |  |  |  |  |     +--rw failure-action
-       |  |  |  |  |     |  +--rw (action-choice)?
-       |  |  |  |  |     |     +--:(case_1)
-       |  |  |  |  |     |     |  +--rw remove-route?     empty
-       |  |  |  |  |     |     +--:(case_2)
-       |  |  |  |  |     |        +--rw remove-nexthop?   empty
-       |  |  |  |  |     +--rw holddown-interval?           uint32
-       |  |  |  |  |     +--rw no-router-alert-option?      empty
-       |  |  |  |  |     +--rw use-ip-ttl-1?                empty
-       |  |  |  |  +--:(case_2)
-       |  |  |  |     +--rw no-bfd-liveness-detection?   empty
-       |  |  |  +--rw periodic-traceroute!
-       |  |  |     +--rw frequency?   uint16
-       |  |  |     +--rw ttl?         uint16
-       |  |  |     +--rw retries?     uint16
-       |  |  |     +--rw wait?        uint16
-       |  |  |     +--rw paths?       uint16
-       |  |  |     +--rw source?      jt:ipv4addr
-       |  |  |     +--rw exp?         uint16
-       |  |  |     +--rw fanout?      uint16
-       |  |  |     +--rw disable?     empty
-       |  |  +--rw bfd-liveness-detection
-       |  |  |  +--rw version?                     enumeration
-       |  |  |  +--rw minimum-interval?            uint32
-       |  |  |  x--rw minimum-transmit-interval?   uint32
-       |  |  |  +--rw minimum-receive-interval?    uint32
-       |  |  |  +--rw multiplier?                  uint32
-       |  |  |  +--rw inline-disable?              empty
-       |  |  |  +--rw pdu-size?                    uint32
-       |  |  |  +--rw (adaptation-choice)?
-       |  |  |  |  +--:(case_1)
-       |  |  |  |     +--rw no-adaptation?         empty
-       |  |  |  +--rw transmit-interval
-       |  |  |  |  +--rw minimum-interval?   uint32
-       |  |  |  |  +--rw threshold?          uint32
-       |  |  |  +--rw detection-time
-       |  |  |  |  +--rw threshold?   uint32
-       |  |  |  +--rw ecmp?                        empty
-       |  |  |  +--rw failure-action
-       |  |  |  |  +--rw (action-choice)?
-       |  |  |  |     +--:(case_1)
-       |  |  |  |     |  +--rw remove-route?     empty
-       |  |  |  |     +--:(case_2)
-       |  |  |  |        +--rw remove-nexthop?   empty
-       |  |  |  +--rw holddown-interval?           uint32
-       |  |  |  +--rw no-router-alert-option?      empty
-       |  |  |  +--rw use-ip-ttl-1?                empty
-       |  |  +--rw periodic-traceroute!
-       |  |  |  +--rw frequency?   uint16
-       |  |  |  +--rw ttl?         uint16
-       |  |  |  +--rw retries?     uint16
-       |  |  |  +--rw wait?        uint16
-       |  |  |  +--rw paths?       uint16
-       |  |  |  +--rw source?      jt:ipv4addr
-       |  |  |  +--rw exp?         uint16
-       |  |  |  +--rw fanout?      uint16
-       |  |  +--rw lsp-ping-interval?        uint16
-       |  |  +--rw lsp-ping-multiplier?      uint8
-       |  +--rw targeted-hello
-       |  |  +--rw hello-interval?   uint32
-       |  |  +--rw hold-time?        uint32
-       |  +--rw p2mp!
-       |  |  +--rw recursive
-       |  |  |  +--rw route?   empty
-       |  |  |  +--rw fec?     empty
-       |  |  +--rw root-address* [name]
-       |  |  |  +--rw name             jt:ipaddr
-       |  |  |  +--rw lsp-id* [name]
-       |  |  |  |  +--rw name    uint32
-       |  |  |  +--rw group-address* [name]
-       |  |  |     +--rw name              jt:ipaddr
-       |  |  |     +--rw source-address* [name]
-       |  |  |        +--rw name    jt:ipaddr
-       |  |  +--rw no-rsvp-tunneling?   empty
-       |  +--rw sr-mapping-client!
-       |  |  +--rw policy*   jt:policy-algebra
-       |  +--rw upstream-label-assignment?   empty
-       |  +--rw family* [name]
-       |  |  +--rw name    enumeration
-       |  +--rw transport-preference?        enumeration
-       |  +--rw dual-transport!
-       |  |  +--rw inet-lsr-id?    jt:ipv4addr
-       |  |  +--rw inet6-lsr-id?   jt:ipv4addr
-       |  +--rw no-propagate-ttl?            empty
+       |     +--rw name                              jt:interface-name
+       |     +--rw (enable-disable)?
+       |     |  +--:(case_1)
+       |     |     +--rw disable?                    empty
+       |     +--rw hello-interval?                   uint32
+       |     +--rw hold-time?                        uint32
+       |     +--rw link-protection!
+       |     |  +--rw (enable-disable)?
+       |     |  |  +--:(case_1)
+       |     |  |     +--rw disable?      empty
+       |     |  +--rw dynamic-rsvp-lsp?   empty
+       |     +--rw transport-address
+       |     |  +--rw (address-choice)?
+       |     |     +--:(case_1)
+       |     |     |  +--rw router-id?   empty
+       |     |     +--:(case_2)
+       |     |     |  +--rw interface?   empty
+       |     |     +--:(case_3)
+       |     |        +--rw address?     jt:ipaddr
+       |     +--rw (allow-subnet-mismatch-choice)?
+       |        +--:(allow-subnet-mismatch)
+       |        |  +--rw allow-subnet-mismatch?      empty
+       |        +--:(no-allow-subnet-mismatch)
+       |           +--rw no-allow-subnet-mismatch?   empty
        +--rw mpls
           +--rw no-propagate-ttl?   empty
           +--rw ipv6-tunneling?     empty
