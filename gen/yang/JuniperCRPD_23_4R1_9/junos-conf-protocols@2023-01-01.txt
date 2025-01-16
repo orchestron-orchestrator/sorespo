@@ -424,7 +424,7 @@ module: junos-conf-protocols
        |  +--rw log-updown?       empty
        +--rw isis
        |  +--rw interface* [name]
-       |  |  +--rw name                              jt:interface-name
+       |  |  +--rw name                   jt:interface-name
        |  |  +--rw ldp-synchronization!
        |  |  |  +--rw (enable-disable)?
        |  |  |  |  +--:(case_1)
@@ -436,124 +436,35 @@ module: junos-conf-protocols
        |  |  |  |  +--:(case_1)
        |  |  |  |     +--rw disable?   empty
        |  |  |  +--rw metric?          uint32
-       |  |  +--rw delay-metric?                     uint32
-       |  |  +--rw delay-measurement!
-       |  |  |  +--rw probe-interval?   uint32
-       |  |  |  +--rw probe-count?      uint32
-       |  |  |  +--rw advertisement
-       |  |  |     +--rw periodic
-       |  |  |     |  +--rw threshold?   uint32
-       |  |  |     |  +--rw interval?    uint32
-       |  |  |     +--rw accelerated!
-       |  |  |        +--rw threshold?   uint32
-       |  |  +--rw no-advertise-adjacency-segment?   empty
-       |  |  +--rw auto-bandwidth
-       |  |  |  +--rw template-name?   string
-       |  |  |  +--rw (enable-disable)?
-       |  |  |     +--:(case_1)
-       |  |  |        +--rw disable?   empty
-       |  |  +--rw (protection-type)?
-       |  |  |  +--:(case_1)
-       |  |  |  |  +--rw link-protection?            empty
-       |  |  |  +--:(case_2)
-       |  |  |     +--rw node-link-protection?       empty
-       |  |  +--rw no-eligible-backup?               empty
-       |  |  +--rw no-eligible-remote-backup?        empty
-       |  |  +--rw link-degradation-threshold!
-       |  |  |  +--rw link-down?   uint32
-       |  |  |  +--rw link-up?     uint32
-       |  |  +--rw (enable-disable)?
-       |  |  |  +--:(case_1)
-       |  |  |     +--rw disable?                    empty
-       |  |  x--rw authentication-key?               jt:unreadable
-       |  |  x--rw authentication-type?              enumeration
-       |  |  +--rw flood-group?                      string
-       |  |  x--rw hello-authentication-key?         jt:unreadable
-       |  |  x--rw hello-authentication-type?        enumeration
-       |  |  +--rw hello-padding-type?               enumeration
-       |  |  +--rw interface-group-holddown-delay?   uint32
-       |  |  +--rw (layer2-map-choice)?
-       |  |  |  +--:(layer2-map)
-       |  |  |  |  +--rw layer2-map?                 empty
-       |  |  |  +--:(no-layer2-map)
-       |  |  |     +--rw no-layer2-map?              empty
-       |  |  +--rw max-hello-size?                   uint32
-       |  |  +--rw lsp-interval?                     uint32
-       |  |  +--rw csnp-interval
-       |  |  |  +--rw (csnp_interval_option)?
-       |  |  |     +--:(case_1)
-       |  |  |     |  +--rw csnp-interval-number?   uint32
-       |  |  |     +--:(case_2)
-       |  |  |        +--rw disable?                empty
-       |  |  +--rw strict-dual-isis!
-       |  |  |  x--rw holdown?    uint32
-       |  |  |  +--rw holddown?   uint32
-       |  |  +--rw mesh-group
-       |  |  |  +--rw (mesh_group_option)?
-       |  |  |     +--:(case_1)
-       |  |  |     |  +--rw mesh-group-number?   uint32
-       |  |  |     +--:(case_2)
-       |  |  |        +--rw blocked?             empty
-       |  |  +--rw point-to-point?                   empty
-       |  |  +--rw passive!
-       |  |  |  +--rw remote-node-iso?   jt:sysid
-       |  |  |  +--rw remote-node-id?    jt:ipv4addr
-       |  |  +--rw checksum?                         empty
-       |  |  +--rw no-unicast-topology?              empty
-       |  |  +--rw no-ipv4-multicast?                empty
-       |  |  +--rw no-ipv6-unicast?                  empty
-       |  |  +--rw no-ipv6-multicast?                empty
-       |  |  +--rw no-adjacency-down-notification?   empty
-       |  |  x--rw bfd-liveness-detection
-       |  |  |  +--rw version?                     enumeration
-       |  |  |  +--rw minimum-interval?            uint32
-       |  |  |  x--rw minimum-transmit-interval?   uint32
-       |  |  |  +--rw minimum-receive-interval?    uint32
-       |  |  |  +--rw multiplier?                  uint32
-       |  |  |  +--rw inline-disable?              empty
-       |  |  |  +--rw pdu-size?                    uint32
-       |  |  |  +--rw (adaptation-choice)?
-       |  |  |  |  +--:(case_1)
-       |  |  |  |     +--rw no-adaptation?         empty
-       |  |  |  +--rw transmit-interval
-       |  |  |  |  +--rw minimum-interval?   uint32
-       |  |  |  |  +--rw threshold?          uint32
-       |  |  |  +--rw detection-time
-       |  |  |  |  +--rw threshold?   uint32
-       |  |  |  +--rw authentication
-       |  |  |     +--rw key-chain?     string
-       |  |  |     +--rw algorithm?     enumeration
-       |  |  |     +--rw loose-check?   empty
+       |  |  +--rw lsp-interval?          uint32
+       |  |  +--rw point-to-point?        empty
        |  |  +--rw family* [name]
-       |  |  |  +--rw name                      enumeration
-       |  |  |  +--rw bfd-liveness-detection
-       |  |  |     +--rw version?                     enumeration
-       |  |  |     +--rw minimum-interval?            uint32
-       |  |  |     x--rw minimum-transmit-interval?   uint32
-       |  |  |     +--rw minimum-receive-interval?    uint32
-       |  |  |     +--rw multiplier?                  uint32
-       |  |  |     +--rw inline-disable?              empty
-       |  |  |     +--rw pdu-size?                    uint32
-       |  |  |     +--rw (adaptation-choice)?
-       |  |  |     |  +--:(case_1)
-       |  |  |     |     +--rw no-adaptation?         empty
-       |  |  |     +--rw transmit-interval
-       |  |  |     |  +--rw minimum-interval?   uint32
-       |  |  |     |  +--rw threshold?          uint32
-       |  |  |     +--rw detection-time
-       |  |  |     |  +--rw threshold?   uint32
-       |  |  |     +--rw authentication
-       |  |  |     |  +--rw key-chain?     string
-       |  |  |     |  +--rw algorithm?     enumeration
-       |  |  |     |  +--rw loose-check?   empty
-       |  |  |     +--rw echo
-       |  |  |     |  +--rw minimum-interval?   uint32
-       |  |  |     +--rw echo-lite
-       |  |  |     |  +--rw minimum-interval?   uint32
-       |  |  |     +--rw holddown-interval?           uint32
-       |  |  +--rw strict-bfd?                       empty
-       |  +--rw bier-sub-domain* [name]
-       |  |  +--rw name    uint8
+       |  |     +--rw name                      enumeration
+       |  |     +--rw bfd-liveness-detection
+       |  |        +--rw version?                     enumeration
+       |  |        +--rw minimum-interval?            uint32
+       |  |        x--rw minimum-transmit-interval?   uint32
+       |  |        +--rw minimum-receive-interval?    uint32
+       |  |        +--rw multiplier?                  uint32
+       |  |        +--rw inline-disable?              empty
+       |  |        +--rw pdu-size?                    uint32
+       |  |        +--rw (adaptation-choice)?
+       |  |        |  +--:(case_1)
+       |  |        |     +--rw no-adaptation?         empty
+       |  |        +--rw transmit-interval
+       |  |        |  +--rw minimum-interval?   uint32
+       |  |        |  +--rw threshold?          uint32
+       |  |        +--rw detection-time
+       |  |        |  +--rw threshold?   uint32
+       |  |        +--rw authentication
+       |  |        |  +--rw key-chain?     string
+       |  |        |  +--rw algorithm?     enumeration
+       |  |        |  +--rw loose-check?   empty
+       |  |        +--rw echo
+       |  |        |  +--rw minimum-interval?   uint32
+       |  |        +--rw echo-lite
+       |  |        |  +--rw minimum-interval?   uint32
+       |  |        +--rw holddown-interval?           uint32
        |  +--rw source-packet-routing!
        |  |  +--rw adjacency-segment
        |  |  |  +--rw hold-time?   uint32
@@ -606,43 +517,12 @@ module: junos-conf-protocols
        |  |     |  +--rw per-interface?   empty
        |  |     +--rw congestion-protection?    empty
        |  |     +--rw auto-bandwidth?           string
-       |  +--rw srm6!
-       |  |  +--rw sid
-       |  |     +--rw node-sid?   uint32
-       |  |     +--rw address?    jt:ipv6addr
        |  +--rw level* [name]
-       |  |  +--rw name                         uint32
-       |  |  +--rw labeled-preference?          uint32
-       |  |  +--rw srv6-preference?             uint32
-       |  |  +--rw flex-algorithm-preference?   uint32
-       |  |  +--rw source-packet-routing!
-       |  |  |  +--rw (enable-disable)?
-       |  |  |  |  +--:(case_1)
-       |  |  |  |     +--rw disable?     empty
-       |  |  |  +--rw srms-preference?   uint32
+       |  |  +--rw name                 uint32
        |  |  +--rw (enable-disable)?
        |  |  |  +--:(case_1)
-       |  |  |     +--rw disable?               empty
-       |  |  +--rw authentication-key?          jt:unreadable
-       |  |  +--rw authentication-type?         enumeration
-       |  |  +--rw purge-originator?            enumeration
-       |  |  +--rw no-hello-authentication?     empty
-       |  |  +--rw no-csnp-authentication?      empty
-       |  |  +--rw no-psnp-authentication?      empty
-       |  |  +--rw no-lsp-authentication?       empty
-       |  |  +--rw authentication-key-chain?    string
-       |  |  +--rw wide-metrics-only?           empty
-       |  |  +--rw preference?                  uint32
-       |  |  +--rw external-preference?         uint32
-       |  |  +--rw prefix-export-limit?         uint32
-       |  |  +--rw max-lsp-size?                uint32
-       |  |  +--rw flood-reflector
-       |  |     +--rw (flood-reflector-choice)?
-       |  |        +--:(case_1)
-       |  |        |  +--rw reflector
-       |  |        |     +--rw cluster-id?   uint32
-       |  |        +--:(case_2)
-       |  |           +--rw client?      empty
+       |  |  |     +--rw disable?       empty
+       |  |  +--rw wide-metrics-only?   empty
        |  +--rw interface-group* [name]
        |  |  +--rw name                     string
        |  |  +--rw level* [name]
@@ -1333,7 +1213,7 @@ module: junos-conf-protocols
        |  +--rw log-updown?       empty
        +--rw isis
        |  +--rw interface* [name]
-       |  |  +--rw name                              jt:interface-name
+       |  |  +--rw name                   jt:interface-name
        |  |  +--rw ldp-synchronization!
        |  |  |  +--rw (enable-disable)?
        |  |  |  |  +--:(case_1)
@@ -1345,124 +1225,35 @@ module: junos-conf-protocols
        |  |  |  |  +--:(case_1)
        |  |  |  |     +--rw disable?   empty
        |  |  |  +--rw metric?          uint32
-       |  |  +--rw delay-metric?                     uint32
-       |  |  +--rw delay-measurement!
-       |  |  |  +--rw probe-interval?   uint32
-       |  |  |  +--rw probe-count?      uint32
-       |  |  |  +--rw advertisement
-       |  |  |     +--rw periodic
-       |  |  |     |  +--rw threshold?   uint32
-       |  |  |     |  +--rw interval?    uint32
-       |  |  |     +--rw accelerated!
-       |  |  |        +--rw threshold?   uint32
-       |  |  +--rw no-advertise-adjacency-segment?   empty
-       |  |  +--rw auto-bandwidth
-       |  |  |  +--rw template-name?   string
-       |  |  |  +--rw (enable-disable)?
-       |  |  |     +--:(case_1)
-       |  |  |        +--rw disable?   empty
-       |  |  +--rw (protection-type)?
-       |  |  |  +--:(case_1)
-       |  |  |  |  +--rw link-protection?            empty
-       |  |  |  +--:(case_2)
-       |  |  |     +--rw node-link-protection?       empty
-       |  |  +--rw no-eligible-backup?               empty
-       |  |  +--rw no-eligible-remote-backup?        empty
-       |  |  +--rw link-degradation-threshold!
-       |  |  |  +--rw link-down?   uint32
-       |  |  |  +--rw link-up?     uint32
-       |  |  +--rw (enable-disable)?
-       |  |  |  +--:(case_1)
-       |  |  |     +--rw disable?                    empty
-       |  |  x--rw authentication-key?               jt:unreadable
-       |  |  x--rw authentication-type?              enumeration
-       |  |  +--rw flood-group?                      string
-       |  |  x--rw hello-authentication-key?         jt:unreadable
-       |  |  x--rw hello-authentication-type?        enumeration
-       |  |  +--rw hello-padding-type?               enumeration
-       |  |  +--rw interface-group-holddown-delay?   uint32
-       |  |  +--rw (layer2-map-choice)?
-       |  |  |  +--:(layer2-map)
-       |  |  |  |  +--rw layer2-map?                 empty
-       |  |  |  +--:(no-layer2-map)
-       |  |  |     +--rw no-layer2-map?              empty
-       |  |  +--rw max-hello-size?                   uint32
-       |  |  +--rw lsp-interval?                     uint32
-       |  |  +--rw csnp-interval
-       |  |  |  +--rw (csnp_interval_option)?
-       |  |  |     +--:(case_1)
-       |  |  |     |  +--rw csnp-interval-number?   uint32
-       |  |  |     +--:(case_2)
-       |  |  |        +--rw disable?                empty
-       |  |  +--rw strict-dual-isis!
-       |  |  |  x--rw holdown?    uint32
-       |  |  |  +--rw holddown?   uint32
-       |  |  +--rw mesh-group
-       |  |  |  +--rw (mesh_group_option)?
-       |  |  |     +--:(case_1)
-       |  |  |     |  +--rw mesh-group-number?   uint32
-       |  |  |     +--:(case_2)
-       |  |  |        +--rw blocked?             empty
-       |  |  +--rw point-to-point?                   empty
-       |  |  +--rw passive!
-       |  |  |  +--rw remote-node-iso?   jt:sysid
-       |  |  |  +--rw remote-node-id?    jt:ipv4addr
-       |  |  +--rw checksum?                         empty
-       |  |  +--rw no-unicast-topology?              empty
-       |  |  +--rw no-ipv4-multicast?                empty
-       |  |  +--rw no-ipv6-unicast?                  empty
-       |  |  +--rw no-ipv6-multicast?                empty
-       |  |  +--rw no-adjacency-down-notification?   empty
-       |  |  x--rw bfd-liveness-detection
-       |  |  |  +--rw version?                     enumeration
-       |  |  |  +--rw minimum-interval?            uint32
-       |  |  |  x--rw minimum-transmit-interval?   uint32
-       |  |  |  +--rw minimum-receive-interval?    uint32
-       |  |  |  +--rw multiplier?                  uint32
-       |  |  |  +--rw inline-disable?              empty
-       |  |  |  +--rw pdu-size?                    uint32
-       |  |  |  +--rw (adaptation-choice)?
-       |  |  |  |  +--:(case_1)
-       |  |  |  |     +--rw no-adaptation?         empty
-       |  |  |  +--rw transmit-interval
-       |  |  |  |  +--rw minimum-interval?   uint32
-       |  |  |  |  +--rw threshold?          uint32
-       |  |  |  +--rw detection-time
-       |  |  |  |  +--rw threshold?   uint32
-       |  |  |  +--rw authentication
-       |  |  |     +--rw key-chain?     string
-       |  |  |     +--rw algorithm?     enumeration
-       |  |  |     +--rw loose-check?   empty
+       |  |  +--rw lsp-interval?          uint32
+       |  |  +--rw point-to-point?        empty
        |  |  +--rw family* [name]
-       |  |  |  +--rw name                      enumeration
-       |  |  |  +--rw bfd-liveness-detection
-       |  |  |     +--rw version?                     enumeration
-       |  |  |     +--rw minimum-interval?            uint32
-       |  |  |     x--rw minimum-transmit-interval?   uint32
-       |  |  |     +--rw minimum-receive-interval?    uint32
-       |  |  |     +--rw multiplier?                  uint32
-       |  |  |     +--rw inline-disable?              empty
-       |  |  |     +--rw pdu-size?                    uint32
-       |  |  |     +--rw (adaptation-choice)?
-       |  |  |     |  +--:(case_1)
-       |  |  |     |     +--rw no-adaptation?         empty
-       |  |  |     +--rw transmit-interval
-       |  |  |     |  +--rw minimum-interval?   uint32
-       |  |  |     |  +--rw threshold?          uint32
-       |  |  |     +--rw detection-time
-       |  |  |     |  +--rw threshold?   uint32
-       |  |  |     +--rw authentication
-       |  |  |     |  +--rw key-chain?     string
-       |  |  |     |  +--rw algorithm?     enumeration
-       |  |  |     |  +--rw loose-check?   empty
-       |  |  |     +--rw echo
-       |  |  |     |  +--rw minimum-interval?   uint32
-       |  |  |     +--rw echo-lite
-       |  |  |     |  +--rw minimum-interval?   uint32
-       |  |  |     +--rw holddown-interval?           uint32
-       |  |  +--rw strict-bfd?                       empty
-       |  +--rw bier-sub-domain* [name]
-       |  |  +--rw name    uint8
+       |  |     +--rw name                      enumeration
+       |  |     +--rw bfd-liveness-detection
+       |  |        +--rw version?                     enumeration
+       |  |        +--rw minimum-interval?            uint32
+       |  |        x--rw minimum-transmit-interval?   uint32
+       |  |        +--rw minimum-receive-interval?    uint32
+       |  |        +--rw multiplier?                  uint32
+       |  |        +--rw inline-disable?              empty
+       |  |        +--rw pdu-size?                    uint32
+       |  |        +--rw (adaptation-choice)?
+       |  |        |  +--:(case_1)
+       |  |        |     +--rw no-adaptation?         empty
+       |  |        +--rw transmit-interval
+       |  |        |  +--rw minimum-interval?   uint32
+       |  |        |  +--rw threshold?          uint32
+       |  |        +--rw detection-time
+       |  |        |  +--rw threshold?   uint32
+       |  |        +--rw authentication
+       |  |        |  +--rw key-chain?     string
+       |  |        |  +--rw algorithm?     enumeration
+       |  |        |  +--rw loose-check?   empty
+       |  |        +--rw echo
+       |  |        |  +--rw minimum-interval?   uint32
+       |  |        +--rw echo-lite
+       |  |        |  +--rw minimum-interval?   uint32
+       |  |        +--rw holddown-interval?           uint32
        |  +--rw source-packet-routing!
        |  |  +--rw adjacency-segment
        |  |  |  +--rw hold-time?   uint32
@@ -1515,43 +1306,12 @@ module: junos-conf-protocols
        |  |     |  +--rw per-interface?   empty
        |  |     +--rw congestion-protection?    empty
        |  |     +--rw auto-bandwidth?           string
-       |  +--rw srm6!
-       |  |  +--rw sid
-       |  |     +--rw node-sid?   uint32
-       |  |     +--rw address?    jt:ipv6addr
        |  +--rw level* [name]
-       |  |  +--rw name                         uint32
-       |  |  +--rw labeled-preference?          uint32
-       |  |  +--rw srv6-preference?             uint32
-       |  |  +--rw flex-algorithm-preference?   uint32
-       |  |  +--rw source-packet-routing!
-       |  |  |  +--rw (enable-disable)?
-       |  |  |  |  +--:(case_1)
-       |  |  |  |     +--rw disable?     empty
-       |  |  |  +--rw srms-preference?   uint32
+       |  |  +--rw name                 uint32
        |  |  +--rw (enable-disable)?
        |  |  |  +--:(case_1)
-       |  |  |     +--rw disable?               empty
-       |  |  +--rw authentication-key?          jt:unreadable
-       |  |  +--rw authentication-type?         enumeration
-       |  |  +--rw purge-originator?            enumeration
-       |  |  +--rw no-hello-authentication?     empty
-       |  |  +--rw no-csnp-authentication?      empty
-       |  |  +--rw no-psnp-authentication?      empty
-       |  |  +--rw no-lsp-authentication?       empty
-       |  |  +--rw authentication-key-chain?    string
-       |  |  +--rw wide-metrics-only?           empty
-       |  |  +--rw preference?                  uint32
-       |  |  +--rw external-preference?         uint32
-       |  |  +--rw prefix-export-limit?         uint32
-       |  |  +--rw max-lsp-size?                uint32
-       |  |  +--rw flood-reflector
-       |  |     +--rw (flood-reflector-choice)?
-       |  |        +--:(case_1)
-       |  |        |  +--rw reflector
-       |  |        |     +--rw cluster-id?   uint32
-       |  |        +--:(case_2)
-       |  |           +--rw client?      empty
+       |  |  |     +--rw disable?       empty
+       |  |  +--rw wide-metrics-only?   empty
        |  +--rw interface-group* [name]
        |  |  +--rw name                     string
        |  |  +--rw level* [name]
