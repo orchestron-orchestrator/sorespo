@@ -2148,64 +2148,6 @@ module junos-conf-protocols {
         container route-target {
           description "Route target NLRI used for VPN route filtering";
           presence "enable route-target";
-          container prefix-limit {
-            description "Limit maximum number of prefixes from a peer";
-            uses bgpaf-prefix-limit;
-          }
-          container accepted-prefix-limit {
-            description "Limit maximum number of prefixes accepted from a peer";
-            uses bgpaf-accepted-prefix-limit;
-          }
-          container proxy-generate {
-            description "Generate route target NLRI for peers that don't support it";
-            presence "enable proxy-generate";
-            leaf-list route-target-policy {
-              type "jt:policy-algebra";
-              description "Limit VPN routes that are used to generate proxy route-target filters";
-              ordered-by user;
-            }
-          }
-          leaf external-paths {
-            type uint32 {
-              range "1 .. 256";
-            }
-            description "Number of external paths accepted for route filtering";
-          }
-          leaf advertise-default {
-            type empty;
-            description "Advertise default and suppress more specific routes";
-          }
-          leaf damping {
-            type empty;
-            description "Enable route flap damping";
-          }
-          container graceful-restart {
-            description "BGP graceful restart options";
-            uses bgp-af-gr;
-          }
-          leaf local-ipv4-address {
-            type "jt:ipv4addr";
-            description "Local IPv4 address";
-          }
-          container nexthop-resolution {
-            description "Configure nexthop resolution properties";
-            leaf no-resolution {
-              type empty;
-              description "Consider nexthop good without resolution attempt";
-            }
-          }
-          container output-queue-priority {
-            description "Default output-queue to assign updates to";
-            uses bgp-output-queue-priority-class;
-          }
-          container route-refresh-priority {
-            description "Default output-queue to assign route refreshes to";
-            uses bgp-output-queue-priority-class;
-          }
-          container withdraw-priority {
-            description "Default output-queue to assign withdrawn routes to";
-            uses bgp-output-queue-priority-class;
-          }
         }
       }
       leaf authentication-key {
