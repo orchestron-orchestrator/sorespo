@@ -34,7 +34,11 @@ actor main(env):
 
     logh = logging.Handler("Otron")
     logh.add_sink(logging.StdoutSink())
-    #logh.set_output_level(logging.DEBUG)
+    logh.set_output_level(logging.DEBUG)
+
+    logh_http = logging.Handler("HTTP")
+    logh_http.set_handler(logh)
+    logh_http.set_output_level(logging.DEBUG)
 
     logh_ttt = logging.Handler("TTT")
     logh_ttt.set_handler(logh)
@@ -132,7 +136,7 @@ actor main(env):
     def _on_http_server_error(server, error):
         print("Error: %s" % error)
 
-    server = http.Listener(tcpl_cap, "0.0.0.0", 80, _on_http_accept)
+    server = http.Listener(tcpl_cap, "0.0.0.0", 80, _on_http_accept, log_handler=logh_http)
 
     configs = []
 
