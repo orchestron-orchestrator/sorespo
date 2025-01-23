@@ -56,7 +56,18 @@ actor main(env):
         # Bootstrap first layer config input
         if xml_conf != None:
             input_config = cfs_root.from_xml(xml_conf)
-            layer_configs[0] = input_config.to_gdata()
+            current_config = layer_configs.get(0)
+            new_config = None
+            if current_config != None:
+                new_config = yang.gdata.patch(current_config, input_config.to_gdata())
+            else:
+                new_config = input_config.to_gdata()
+
+            if new_config != None:
+                layer_configs[0] = new_config
+            else:
+                log.error("No new config (empty patch) to apply")
+                return
 
         if 0 not in layer_configs:
             return
