@@ -1,6 +1,11 @@
 
+.PHONY: build
 build:
-	acton build --dev
+	acton build --dev $(DEP_OVERRIDES)
+
+.PHONY: build-ldep
+build-ldep:
+	$(MAKE) build DEP_OVERRIDES="--dep netconf=../netconf --dep orchestron=../orchestron --dep yang=../acton-yang"
 
 .PHONY: gen
 gen:
@@ -8,4 +13,4 @@ gen:
 
 .PHONY: gen-ldep
 gen-ldep:
-	$(MAKE) gen DEP_OVERRIDES="--dep netconf=../netconf --dep orchestron=../orchestron --dep yang=../acton-yang"
+	$(MAKE) gen DEP_OVERRIDES="--dep netconf=../../netconf --dep orchestron=../../orchestron --dep yang=../../acton-yang"
