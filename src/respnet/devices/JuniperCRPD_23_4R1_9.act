@@ -13,13 +13,11 @@ class junos_conf_root__configuration__system(yang.adata.MNode):
         self.host_name = host_name
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('system', ns=self._ns)
+        children = {}
         _host_name = self.host_name
         if _host_name is not None:
-            res.children['host-name'] = yang.gdata.Leaf('host-name', 'string', _host_name, ns='http://yang.juniper.net/junos/conf/root')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['host-name'] = yang.gdata.Leaf('string', _host_name)
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__system:
@@ -42,13 +40,11 @@ class junos_conf_root__configuration__interfaces__interface__unit__family__inet_
         self.name = name
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
+        children = {}
         _name = self.name
         if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['name'] = yang.gdata.Leaf('string', _name)
+        return yang.gdata.ListElement([str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry:
@@ -79,13 +75,12 @@ class junos_conf_root__configuration__interfaces__interface__unit__family__inet_
         return res
 
     mut def to_gdata(self):
-        res = yang.gdata.List('address', ['name'], ns=self._ns)
+        elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            e_gdata.parent = res
             if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
+                elements.append(e_gdata)
+        return yang.gdata.List(['name'], elements)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry]:
@@ -111,13 +106,11 @@ class junos_conf_root__configuration__interfaces__interface__unit__family__inet(
         self.address._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('inet', ns=self._ns)
+        children = {}
         _address = self.address
         if _address is not None:
-            res.children['address'] = _address.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['address'] = _address.to_gdata()
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__interfaces__interface__unit__family__inet:
@@ -151,13 +144,11 @@ class junos_conf_root__configuration__interfaces__interface__unit__family(yang.a
         return res
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('family', ns=self._ns)
+        children = {}
         _inet = self.inet
         if _inet is not None:
-            res.children['inet'] = _inet.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['inet'] = _inet.to_gdata()
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__interfaces__interface__unit__family:
@@ -200,7 +191,7 @@ class junos_conf_root__configuration__interfaces__interface__unit_entry(yang.ada
         self.mac = mac
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
+        children = {}
         _name = self.name
         _alias = self.alias
         _description = self.description
@@ -210,24 +201,22 @@ class junos_conf_root__configuration__interfaces__interface__unit_entry(yang.ada
         _mtu = self.mtu
         _mac = self.mac
         if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
+            children['name'] = yang.gdata.Leaf('string', _name)
         if _alias is not None:
-            res.children['alias'] = yang.gdata.Leaf('alias', 'string', _alias, ns='http://yang.juniper.net/junos/conf/root')
+            children['alias'] = yang.gdata.Leaf('string', _alias)
         if _description is not None:
-            res.children['description'] = yang.gdata.Leaf('description', 'string', _description, ns='http://yang.juniper.net/junos/conf/root')
+            children['description'] = yang.gdata.Leaf('string', _description)
         if _vlan_id is not None:
-            res.children['vlan-id'] = yang.gdata.Leaf('vlan-id', 'string', _vlan_id, ns='http://yang.juniper.net/junos/conf/root')
+            children['vlan-id'] = yang.gdata.Leaf('string', _vlan_id)
         if _encapsulation is not None:
-            res.children['encapsulation'] = yang.gdata.Leaf('encapsulation', 'enumeration', _encapsulation, ns='http://yang.juniper.net/junos/conf/root')
+            children['encapsulation'] = yang.gdata.Leaf('enumeration', _encapsulation)
         if _family is not None:
-            res.children['family'] = _family.to_gdata()
+            children['family'] = _family.to_gdata()
         if _mtu is not None:
-            res.children['mtu'] = yang.gdata.Leaf('mtu', 'union', _mtu, ns='http://yang.juniper.net/junos/conf/root')
+            children['mtu'] = yang.gdata.Leaf('union', _mtu)
         if _mac is not None:
-            res.children['mac'] = yang.gdata.Leaf('mac', 'string', _mac, ns='http://yang.juniper.net/junos/conf/root')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['mac'] = yang.gdata.Leaf('string', _mac)
+        return yang.gdata.ListElement([str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__interfaces__interface__unit_entry:
@@ -258,13 +247,12 @@ class junos_conf_root__configuration__interfaces__interface__unit(yang.adata.MNo
         return res
 
     mut def to_gdata(self):
-        res = yang.gdata.List('unit', ['name'], ns=self._ns)
+        elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            e_gdata.parent = res
             if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
+                elements.append(e_gdata)
+        return yang.gdata.List(['name'], elements)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__interfaces__interface__unit_entry]:
@@ -300,7 +288,7 @@ class junos_conf_root__configuration__interfaces__interface_entry(yang.adata.MNo
         self.unit._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
+        children = {}
         _name = self.name
         _description = self.description
         _mtu = self.mtu
@@ -308,20 +296,18 @@ class junos_conf_root__configuration__interfaces__interface_entry(yang.adata.MNo
         _native_vlan_id = self.native_vlan_id
         _unit = self.unit
         if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
+            children['name'] = yang.gdata.Leaf('string', _name)
         if _description is not None:
-            res.children['description'] = yang.gdata.Leaf('description', 'string', _description, ns='http://yang.juniper.net/junos/conf/root')
+            children['description'] = yang.gdata.Leaf('string', _description)
         if _mtu is not None:
-            res.children['mtu'] = yang.gdata.Leaf('mtu', 'union', _mtu, ns='http://yang.juniper.net/junos/conf/root')
+            children['mtu'] = yang.gdata.Leaf('union', _mtu)
         if _mac is not None:
-            res.children['mac'] = yang.gdata.Leaf('mac', 'string', _mac, ns='http://yang.juniper.net/junos/conf/root')
+            children['mac'] = yang.gdata.Leaf('string', _mac)
         if _native_vlan_id is not None:
-            res.children['native-vlan-id'] = yang.gdata.Leaf('native-vlan-id', 'union', _native_vlan_id, ns='http://yang.juniper.net/junos/conf/root')
+            children['native-vlan-id'] = yang.gdata.Leaf('union', _native_vlan_id)
         if _unit is not None:
-            res.children['unit'] = _unit.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['unit'] = _unit.to_gdata()
+        return yang.gdata.ListElement([str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__interfaces__interface_entry:
@@ -352,13 +338,12 @@ class junos_conf_root__configuration__interfaces__interface(yang.adata.MNode):
         return res
 
     mut def to_gdata(self):
-        res = yang.gdata.List('interface', ['name'], ns=self._ns)
+        elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            e_gdata.parent = res
             if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
+                elements.append(e_gdata)
+        return yang.gdata.List(['name'], elements)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__interfaces__interface_entry]:
@@ -384,13 +369,11 @@ class junos_conf_root__configuration__interfaces(yang.adata.MNode):
         self.interface._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('interfaces', ns=self._ns)
+        children = {}
         _interface = self.interface
         if _interface is not None:
-            res.children['interface'] = _interface.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['interface'] = _interface.to_gdata()
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__interfaces:
@@ -421,25 +404,23 @@ class junos_conf_root__configuration__routing_instances__instance__interface_ent
         self.primary = primary
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
+        children = {}
         _name = self.name
         _any = self.any
         _unicast = self.unicast
         _multicast = self.multicast
         _primary = self.primary
         if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
+            children['name'] = yang.gdata.Leaf('string', _name)
         if _any is not None:
-            res.children['any'] = yang.gdata.Leaf('any', 'empty', _any, ns='http://yang.juniper.net/junos/conf/root')
+            children['any'] = yang.gdata.Leaf('empty', _any)
         if _unicast is not None:
-            res.children['unicast'] = yang.gdata.Leaf('unicast', 'empty', _unicast, ns='http://yang.juniper.net/junos/conf/root')
+            children['unicast'] = yang.gdata.Leaf('empty', _unicast)
         if _multicast is not None:
-            res.children['multicast'] = yang.gdata.Leaf('multicast', 'empty', _multicast, ns='http://yang.juniper.net/junos/conf/root')
+            children['multicast'] = yang.gdata.Leaf('empty', _multicast)
         if _primary is not None:
-            res.children['primary'] = yang.gdata.Leaf('primary', 'empty', _primary, ns='http://yang.juniper.net/junos/conf/root')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['primary'] = yang.gdata.Leaf('empty', _primary)
+        return yang.gdata.ListElement([str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__routing_instances__instance__interface_entry:
@@ -470,13 +451,12 @@ class junos_conf_root__configuration__routing_instances__instance__interface(yan
         return res
 
     mut def to_gdata(self):
-        res = yang.gdata.List('interface', ['name'], ns=self._ns)
+        elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            e_gdata.parent = res
             if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
+                elements.append(e_gdata)
+        return yang.gdata.List(['name'], elements)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__routing_instances__instance__interface_entry]:
@@ -501,13 +481,11 @@ class junos_conf_root__configuration__routing_instances__instance__route_disting
         self.rd_type = rd_type
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('route-distinguisher', ns=self._ns)
+        children = {}
         _rd_type = self.rd_type
         if _rd_type is not None:
-            res.children['rd-type'] = yang.gdata.Leaf('rd-type', 'string', _rd_type, ns='http://yang.juniper.net/junos/conf/root')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['rd-type'] = yang.gdata.Leaf('string', _rd_type)
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__routing_instances__instance__route_distinguisher:
@@ -536,22 +514,20 @@ class junos_conf_root__configuration__routing_instances__instance__vrf_target(ya
         self.auto = auto
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('vrf-target', ns=self._ns)
+        children = {}
         _community = self.community
         _import_ = self.import_
         _export = self.export
         _auto = self.auto
         if _community is not None:
-            res.children['community'] = yang.gdata.Leaf('community', 'string', _community, ns='http://yang.juniper.net/junos/conf/root')
+            children['community'] = yang.gdata.Leaf('string', _community)
         if _import_ is not None:
-            res.children['import'] = yang.gdata.Leaf('import', 'string', _import_, ns='http://yang.juniper.net/junos/conf/root')
+            children['import'] = yang.gdata.Leaf('string', _import_)
         if _export is not None:
-            res.children['export'] = yang.gdata.Leaf('export', 'string', _export, ns='http://yang.juniper.net/junos/conf/root')
+            children['export'] = yang.gdata.Leaf('string', _export)
         if _auto is not None:
-            res.children['auto'] = yang.gdata.Leaf('auto', 'empty', _auto, ns='http://yang.juniper.net/junos/conf/root')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['auto'] = yang.gdata.Leaf('empty', _auto)
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__routing_instances__instance__vrf_target:
@@ -601,7 +577,7 @@ class junos_conf_root__configuration__routing_instances__instance_entry(yang.ada
         self.no_vrf_advertise = no_vrf_advertise
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
+        children = {}
         _name = self.name
         _instance_type = self.instance_type
         _interface = self.interface
@@ -611,24 +587,22 @@ class junos_conf_root__configuration__routing_instances__instance_entry(yang.ada
         _vrf_target = self.vrf_target
         _no_vrf_advertise = self.no_vrf_advertise
         if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
+            children['name'] = yang.gdata.Leaf('string', _name)
         if _instance_type is not None:
-            res.children['instance-type'] = yang.gdata.Leaf('instance-type', 'enumeration', _instance_type, ns='http://yang.juniper.net/junos/conf/root')
+            children['instance-type'] = yang.gdata.Leaf('enumeration', _instance_type)
         if _interface is not None:
-            res.children['interface'] = _interface.to_gdata()
+            children['interface'] = _interface.to_gdata()
         if _route_distinguisher is not None:
-            res.children['route-distinguisher'] = _route_distinguisher.to_gdata()
+            children['route-distinguisher'] = _route_distinguisher.to_gdata()
         if _export_default_action is not None:
-            res.children['export-default-action'] = yang.gdata.Leaf('export-default-action', 'enumeration', _export_default_action, ns='http://yang.juniper.net/junos/conf/root')
+            children['export-default-action'] = yang.gdata.Leaf('enumeration', _export_default_action)
         if _import_default_action is not None:
-            res.children['import-default-action'] = yang.gdata.Leaf('import-default-action', 'enumeration', _import_default_action, ns='http://yang.juniper.net/junos/conf/root')
+            children['import-default-action'] = yang.gdata.Leaf('enumeration', _import_default_action)
         if _vrf_target is not None:
-            res.children['vrf-target'] = _vrf_target.to_gdata()
+            children['vrf-target'] = _vrf_target.to_gdata()
         if _no_vrf_advertise is not None:
-            res.children['no-vrf-advertise'] = yang.gdata.Leaf('no-vrf-advertise', 'empty', _no_vrf_advertise, ns='http://yang.juniper.net/junos/conf/root')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['no-vrf-advertise'] = yang.gdata.Leaf('empty', _no_vrf_advertise)
+        return yang.gdata.ListElement([str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__routing_instances__instance_entry:
@@ -659,13 +633,12 @@ class junos_conf_root__configuration__routing_instances__instance(yang.adata.MNo
         return res
 
     mut def to_gdata(self):
-        res = yang.gdata.List('instance', ['name'], ns=self._ns)
+        elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            e_gdata.parent = res
             if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
+                elements.append(e_gdata)
+        return yang.gdata.List(['name'], elements)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__routing_instances__instance_entry]:
@@ -691,13 +664,11 @@ class junos_conf_root__configuration__routing_instances(yang.adata.MNode):
         self.instance._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('routing-instances', ns=self._ns)
+        children = {}
         _instance = self.instance
         if _instance is not None:
-            res.children['instance'] = _instance.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['instance'] = _instance.to_gdata()
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__routing_instances:
@@ -720,13 +691,11 @@ class junos_conf_root__configuration__groups__when__time__to(yang.adata.MNode):
         self.end_time = end_time
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('to', ns=self._ns)
+        children = {}
         _end_time = self.end_time
         if _end_time is not None:
-            res.children['end-time'] = yang.gdata.Leaf('end-time', 'string', _end_time, ns='http://yang.juniper.net/junos/conf/root')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['end-time'] = yang.gdata.Leaf('string', _end_time)
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__when__time__to:
@@ -757,16 +726,14 @@ class junos_conf_root__configuration__groups__when__time(yang.adata.MNode):
             self_to._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('time', ns=self._ns)
+        children = {}
         _start_time = self.start_time
         _to = self.to
         if _start_time is not None:
-            res.children['start-time'] = yang.gdata.Leaf('start-time', 'string', _start_time, ns='http://yang.juniper.net/junos/conf/root')
+            children['start-time'] = yang.gdata.Leaf('string', _start_time)
         if _to is not None:
-            res.children['to'] = _to.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['to'] = _to.to_gdata()
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__when__time:
@@ -805,7 +772,7 @@ class junos_conf_root__configuration__groups__when(yang.adata.MNode):
         self.node = node
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('when', ns=self._ns)
+        children = {}
         _time = self.time
         _chassis = self.chassis
         _model = self.model
@@ -813,20 +780,18 @@ class junos_conf_root__configuration__groups__when(yang.adata.MNode):
         _member = self.member
         _node = self.node
         if _time is not None:
-            res.children['time'] = _time.to_gdata()
+            children['time'] = _time.to_gdata()
         if _chassis is not None:
-            res.children['chassis'] = yang.gdata.Leaf('chassis', 'enumeration', _chassis, ns='http://yang.juniper.net/junos/conf/root')
+            children['chassis'] = yang.gdata.Leaf('enumeration', _chassis)
         if _model is not None:
-            res.children['model'] = yang.gdata.Leaf('model', 'string', _model, ns='http://yang.juniper.net/junos/conf/root')
+            children['model'] = yang.gdata.Leaf('string', _model)
         if _routing_engine is not None:
-            res.children['routing-engine'] = yang.gdata.Leaf('routing-engine', 'enumeration', _routing_engine, ns='http://yang.juniper.net/junos/conf/root')
+            children['routing-engine'] = yang.gdata.Leaf('enumeration', _routing_engine)
         if _member is not None:
-            res.children['member'] = yang.gdata.Leaf('member', 'string', _member, ns='http://yang.juniper.net/junos/conf/root')
+            children['member'] = yang.gdata.Leaf('string', _member)
         if _node is not None:
-            res.children['node'] = yang.gdata.Leaf('node', 'enumeration', _node, ns='http://yang.juniper.net/junos/conf/root')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['node'] = yang.gdata.Leaf('enumeration', _node)
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__when:
@@ -849,13 +814,11 @@ class junos_conf_root__configuration__groups__system(yang.adata.MNode):
         self.host_name = host_name
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('system', ns=self._ns)
+        children = {}
         _host_name = self.host_name
         if _host_name is not None:
-            res.children['host-name'] = yang.gdata.Leaf('host-name', 'string', _host_name, ns='http://yang.juniper.net/junos/conf/root')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['host-name'] = yang.gdata.Leaf('string', _host_name)
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__system:
@@ -878,13 +841,11 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit__famil
         self.name = name
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
+        children = {}
         _name = self.name
         if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['name'] = yang.gdata.Leaf('string', _name)
+        return yang.gdata.ListElement([str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry:
@@ -915,13 +876,12 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit__famil
         return res
 
     mut def to_gdata(self):
-        res = yang.gdata.List('address', ['name'], ns=self._ns)
+        elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            e_gdata.parent = res
             if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
+                elements.append(e_gdata)
+        return yang.gdata.List(['name'], elements)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry]:
@@ -947,13 +907,11 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit__famil
         self.address._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('inet', ns=self._ns)
+        children = {}
         _address = self.address
         if _address is not None:
-            res.children['address'] = _address.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['address'] = _address.to_gdata()
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet:
@@ -987,13 +945,11 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit__famil
         return res
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('family', ns=self._ns)
+        children = {}
         _inet = self.inet
         if _inet is not None:
-            res.children['inet'] = _inet.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['inet'] = _inet.to_gdata()
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__interfaces__interface__unit__family:
@@ -1036,7 +992,7 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit_entry(
         self.mac = mac
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
+        children = {}
         _name = self.name
         _alias = self.alias
         _description = self.description
@@ -1046,24 +1002,22 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit_entry(
         _mtu = self.mtu
         _mac = self.mac
         if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
+            children['name'] = yang.gdata.Leaf('string', _name)
         if _alias is not None:
-            res.children['alias'] = yang.gdata.Leaf('alias', 'string', _alias, ns='http://yang.juniper.net/junos/conf/root')
+            children['alias'] = yang.gdata.Leaf('string', _alias)
         if _description is not None:
-            res.children['description'] = yang.gdata.Leaf('description', 'string', _description, ns='http://yang.juniper.net/junos/conf/root')
+            children['description'] = yang.gdata.Leaf('string', _description)
         if _vlan_id is not None:
-            res.children['vlan-id'] = yang.gdata.Leaf('vlan-id', 'string', _vlan_id, ns='http://yang.juniper.net/junos/conf/root')
+            children['vlan-id'] = yang.gdata.Leaf('string', _vlan_id)
         if _encapsulation is not None:
-            res.children['encapsulation'] = yang.gdata.Leaf('encapsulation', 'enumeration', _encapsulation, ns='http://yang.juniper.net/junos/conf/root')
+            children['encapsulation'] = yang.gdata.Leaf('enumeration', _encapsulation)
         if _family is not None:
-            res.children['family'] = _family.to_gdata()
+            children['family'] = _family.to_gdata()
         if _mtu is not None:
-            res.children['mtu'] = yang.gdata.Leaf('mtu', 'union', _mtu, ns='http://yang.juniper.net/junos/conf/root')
+            children['mtu'] = yang.gdata.Leaf('union', _mtu)
         if _mac is not None:
-            res.children['mac'] = yang.gdata.Leaf('mac', 'string', _mac, ns='http://yang.juniper.net/junos/conf/root')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['mac'] = yang.gdata.Leaf('string', _mac)
+        return yang.gdata.ListElement([str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups__interfaces__interface__unit_entry:
@@ -1094,13 +1048,12 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit(yang.a
         return res
 
     mut def to_gdata(self):
-        res = yang.gdata.List('unit', ['name'], ns=self._ns)
+        elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            e_gdata.parent = res
             if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
+                elements.append(e_gdata)
+        return yang.gdata.List(['name'], elements)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__groups__interfaces__interface__unit_entry]:
@@ -1136,7 +1089,7 @@ class junos_conf_root__configuration__groups__interfaces__interface_entry(yang.a
         self.unit._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
+        children = {}
         _name = self.name
         _description = self.description
         _mtu = self.mtu
@@ -1144,20 +1097,18 @@ class junos_conf_root__configuration__groups__interfaces__interface_entry(yang.a
         _native_vlan_id = self.native_vlan_id
         _unit = self.unit
         if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
+            children['name'] = yang.gdata.Leaf('string', _name)
         if _description is not None:
-            res.children['description'] = yang.gdata.Leaf('description', 'string', _description, ns='http://yang.juniper.net/junos/conf/root')
+            children['description'] = yang.gdata.Leaf('string', _description)
         if _mtu is not None:
-            res.children['mtu'] = yang.gdata.Leaf('mtu', 'union', _mtu, ns='http://yang.juniper.net/junos/conf/root')
+            children['mtu'] = yang.gdata.Leaf('union', _mtu)
         if _mac is not None:
-            res.children['mac'] = yang.gdata.Leaf('mac', 'string', _mac, ns='http://yang.juniper.net/junos/conf/root')
+            children['mac'] = yang.gdata.Leaf('string', _mac)
         if _native_vlan_id is not None:
-            res.children['native-vlan-id'] = yang.gdata.Leaf('native-vlan-id', 'union', _native_vlan_id, ns='http://yang.juniper.net/junos/conf/root')
+            children['native-vlan-id'] = yang.gdata.Leaf('union', _native_vlan_id)
         if _unit is not None:
-            res.children['unit'] = _unit.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['unit'] = _unit.to_gdata()
+        return yang.gdata.ListElement([str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups__interfaces__interface_entry:
@@ -1188,13 +1139,12 @@ class junos_conf_root__configuration__groups__interfaces__interface(yang.adata.M
         return res
 
     mut def to_gdata(self):
-        res = yang.gdata.List('interface', ['name'], ns=self._ns)
+        elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            e_gdata.parent = res
             if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
+                elements.append(e_gdata)
+        return yang.gdata.List(['name'], elements)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__groups__interfaces__interface_entry]:
@@ -1220,13 +1170,11 @@ class junos_conf_root__configuration__groups__interfaces(yang.adata.MNode):
         self.interface._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('interfaces', ns=self._ns)
+        children = {}
         _interface = self.interface
         if _interface is not None:
-            res.children['interface'] = _interface.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['interface'] = _interface.to_gdata()
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__interfaces:
@@ -1257,25 +1205,23 @@ class junos_conf_root__configuration__groups__routing_instances__instance__inter
         self.primary = primary
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
+        children = {}
         _name = self.name
         _any = self.any
         _unicast = self.unicast
         _multicast = self.multicast
         _primary = self.primary
         if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
+            children['name'] = yang.gdata.Leaf('string', _name)
         if _any is not None:
-            res.children['any'] = yang.gdata.Leaf('any', 'empty', _any, ns='http://yang.juniper.net/junos/conf/root')
+            children['any'] = yang.gdata.Leaf('empty', _any)
         if _unicast is not None:
-            res.children['unicast'] = yang.gdata.Leaf('unicast', 'empty', _unicast, ns='http://yang.juniper.net/junos/conf/root')
+            children['unicast'] = yang.gdata.Leaf('empty', _unicast)
         if _multicast is not None:
-            res.children['multicast'] = yang.gdata.Leaf('multicast', 'empty', _multicast, ns='http://yang.juniper.net/junos/conf/root')
+            children['multicast'] = yang.gdata.Leaf('empty', _multicast)
         if _primary is not None:
-            res.children['primary'] = yang.gdata.Leaf('primary', 'empty', _primary, ns='http://yang.juniper.net/junos/conf/root')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['primary'] = yang.gdata.Leaf('empty', _primary)
+        return yang.gdata.ListElement([str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups__routing_instances__instance__interface_entry:
@@ -1306,13 +1252,12 @@ class junos_conf_root__configuration__groups__routing_instances__instance__inter
         return res
 
     mut def to_gdata(self):
-        res = yang.gdata.List('interface', ['name'], ns=self._ns)
+        elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            e_gdata.parent = res
             if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
+                elements.append(e_gdata)
+        return yang.gdata.List(['name'], elements)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__groups__routing_instances__instance__interface_entry]:
@@ -1337,13 +1282,11 @@ class junos_conf_root__configuration__groups__routing_instances__instance__route
         self.rd_type = rd_type
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('route-distinguisher', ns=self._ns)
+        children = {}
         _rd_type = self.rd_type
         if _rd_type is not None:
-            res.children['rd-type'] = yang.gdata.Leaf('rd-type', 'string', _rd_type, ns='http://yang.juniper.net/junos/conf/root')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['rd-type'] = yang.gdata.Leaf('string', _rd_type)
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher:
@@ -1372,22 +1315,20 @@ class junos_conf_root__configuration__groups__routing_instances__instance__vrf_t
         self.auto = auto
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('vrf-target', ns=self._ns)
+        children = {}
         _community = self.community
         _import_ = self.import_
         _export = self.export
         _auto = self.auto
         if _community is not None:
-            res.children['community'] = yang.gdata.Leaf('community', 'string', _community, ns='http://yang.juniper.net/junos/conf/root')
+            children['community'] = yang.gdata.Leaf('string', _community)
         if _import_ is not None:
-            res.children['import'] = yang.gdata.Leaf('import', 'string', _import_, ns='http://yang.juniper.net/junos/conf/root')
+            children['import'] = yang.gdata.Leaf('string', _import_)
         if _export is not None:
-            res.children['export'] = yang.gdata.Leaf('export', 'string', _export, ns='http://yang.juniper.net/junos/conf/root')
+            children['export'] = yang.gdata.Leaf('string', _export)
         if _auto is not None:
-            res.children['auto'] = yang.gdata.Leaf('auto', 'empty', _auto, ns='http://yang.juniper.net/junos/conf/root')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['auto'] = yang.gdata.Leaf('empty', _auto)
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__routing_instances__instance__vrf_target:
@@ -1437,7 +1378,7 @@ class junos_conf_root__configuration__groups__routing_instances__instance_entry(
         self.no_vrf_advertise = no_vrf_advertise
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
+        children = {}
         _name = self.name
         _instance_type = self.instance_type
         _interface = self.interface
@@ -1447,24 +1388,22 @@ class junos_conf_root__configuration__groups__routing_instances__instance_entry(
         _vrf_target = self.vrf_target
         _no_vrf_advertise = self.no_vrf_advertise
         if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
+            children['name'] = yang.gdata.Leaf('string', _name)
         if _instance_type is not None:
-            res.children['instance-type'] = yang.gdata.Leaf('instance-type', 'enumeration', _instance_type, ns='http://yang.juniper.net/junos/conf/root')
+            children['instance-type'] = yang.gdata.Leaf('enumeration', _instance_type)
         if _interface is not None:
-            res.children['interface'] = _interface.to_gdata()
+            children['interface'] = _interface.to_gdata()
         if _route_distinguisher is not None:
-            res.children['route-distinguisher'] = _route_distinguisher.to_gdata()
+            children['route-distinguisher'] = _route_distinguisher.to_gdata()
         if _export_default_action is not None:
-            res.children['export-default-action'] = yang.gdata.Leaf('export-default-action', 'enumeration', _export_default_action, ns='http://yang.juniper.net/junos/conf/root')
+            children['export-default-action'] = yang.gdata.Leaf('enumeration', _export_default_action)
         if _import_default_action is not None:
-            res.children['import-default-action'] = yang.gdata.Leaf('import-default-action', 'enumeration', _import_default_action, ns='http://yang.juniper.net/junos/conf/root')
+            children['import-default-action'] = yang.gdata.Leaf('enumeration', _import_default_action)
         if _vrf_target is not None:
-            res.children['vrf-target'] = _vrf_target.to_gdata()
+            children['vrf-target'] = _vrf_target.to_gdata()
         if _no_vrf_advertise is not None:
-            res.children['no-vrf-advertise'] = yang.gdata.Leaf('no-vrf-advertise', 'empty', _no_vrf_advertise, ns='http://yang.juniper.net/junos/conf/root')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['no-vrf-advertise'] = yang.gdata.Leaf('empty', _no_vrf_advertise)
+        return yang.gdata.ListElement([str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups__routing_instances__instance_entry:
@@ -1495,13 +1434,12 @@ class junos_conf_root__configuration__groups__routing_instances__instance(yang.a
         return res
 
     mut def to_gdata(self):
-        res = yang.gdata.List('instance', ['name'], ns=self._ns)
+        elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            e_gdata.parent = res
             if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
+                elements.append(e_gdata)
+        return yang.gdata.List(['name'], elements)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__groups__routing_instances__instance_entry]:
@@ -1527,13 +1465,11 @@ class junos_conf_root__configuration__groups__routing_instances(yang.adata.MNode
         self.instance._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('routing-instances', ns=self._ns)
+        children = {}
         _instance = self.instance
         if _instance is not None:
-            res.children['instance'] = _instance.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['instance'] = _instance.to_gdata()
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__routing_instances:
@@ -1592,7 +1528,7 @@ class junos_conf_root__configuration__groups_entry(yang.adata.MNode):
             self_routing_instances._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
+        children = {}
         _name = self.name
         _when = self.when
         _rcsid = self.rcsid
@@ -1601,22 +1537,20 @@ class junos_conf_root__configuration__groups_entry(yang.adata.MNode):
         _interfaces = self.interfaces
         _routing_instances = self.routing_instances
         if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://yang.juniper.net/junos/conf/root')
+            children['name'] = yang.gdata.Leaf('string', _name)
         if _when is not None:
-            res.children['when'] = _when.to_gdata()
+            children['when'] = _when.to_gdata()
         if _rcsid is not None:
-            res.children['rcsid'] = yang.gdata.Leaf('rcsid', 'string', _rcsid, ns='http://yang.juniper.net/junos/conf/root')
+            children['rcsid'] = yang.gdata.Leaf('string', _rcsid)
         if _version is not None:
-            res.children['version'] = yang.gdata.Leaf('version', 'string', _version, ns='http://yang.juniper.net/junos/conf/root')
+            children['version'] = yang.gdata.Leaf('string', _version)
         if _system is not None:
-            res.children['system'] = _system.to_gdata()
+            children['system'] = _system.to_gdata()
         if _interfaces is not None:
-            res.children['interfaces'] = _interfaces.to_gdata()
+            children['interfaces'] = _interfaces.to_gdata()
         if _routing_instances is not None:
-            res.children['routing-instances'] = _routing_instances.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['routing-instances'] = _routing_instances.to_gdata()
+        return yang.gdata.ListElement([str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups_entry:
@@ -1647,13 +1581,12 @@ class junos_conf_root__configuration__groups(yang.adata.MNode):
         return res
 
     mut def to_gdata(self):
-        res = yang.gdata.List('groups', ['name'], ns=self._ns)
+        elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            e_gdata.parent = res
             if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
+                elements.append(e_gdata)
+        return yang.gdata.List(['name'], elements)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__groups_entry]:
@@ -1707,7 +1640,7 @@ class junos_conf_root__configuration(yang.adata.MNode):
         self.groups._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('configuration', ns=self._ns)
+        children = {}
         _rcsid = self.rcsid
         _version = self.version
         _system = self.system
@@ -1715,20 +1648,18 @@ class junos_conf_root__configuration(yang.adata.MNode):
         _routing_instances = self.routing_instances
         _groups = self.groups
         if _rcsid is not None:
-            res.children['rcsid'] = yang.gdata.Leaf('rcsid', 'string', _rcsid, ns='http://yang.juniper.net/junos/conf/root')
+            children['rcsid'] = yang.gdata.Leaf('string', _rcsid)
         if _version is not None:
-            res.children['version'] = yang.gdata.Leaf('version', 'string', _version, ns='http://yang.juniper.net/junos/conf/root')
+            children['version'] = yang.gdata.Leaf('string', _version)
         if _system is not None:
-            res.children['system'] = _system.to_gdata()
+            children['system'] = _system.to_gdata()
         if _interfaces is not None:
-            res.children['interfaces'] = _interfaces.to_gdata()
+            children['interfaces'] = _interfaces.to_gdata()
         if _routing_instances is not None:
-            res.children['routing-instances'] = _routing_instances.to_gdata()
+            children['routing-instances'] = _routing_instances.to_gdata()
         if _groups is not None:
-            res.children['groups'] = _groups.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['groups'] = _groups.to_gdata()
+        return yang.gdata.Container(children, ns='http://yang.juniper.net/junos/conf/root')
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration:
@@ -1757,13 +1688,11 @@ class root(yang.adata.MNode):
             self_configuration._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Root()
+        children = {}
         _configuration = self.configuration
         if _configuration is not None:
-            res.children['configuration'] = _configuration.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['configuration'] = _configuration.to_gdata()
+        return yang.gdata.Root(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> root:
