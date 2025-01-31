@@ -13,13 +13,11 @@ class orchestron_device__devices__device_entry(yang.adata.MNode):
         self.name = name
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.ListElement([str(self.name)], ns=self._ns)
+        children = {}
         _name = self.name
         if _name is not None:
-            res.children['name'] = yang.gdata.Leaf('name', 'string', _name, ns='http://orchestron.org/yang/orchestron-device.yang')
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['name'] = yang.gdata.Leaf('string', _name)
+        return yang.gdata.ListElement([str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_device__devices__device_entry:
@@ -50,13 +48,12 @@ class orchestron_device__devices__device(yang.adata.MNode):
         return res
 
     mut def to_gdata(self):
-        res = yang.gdata.List('device', ['name'], ns=self._ns)
+        elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            e_gdata.parent = res
             if isinstance(e_gdata, yang.gdata.ListElement):
-                res.elements.append(e_gdata)
-        return res
+                elements.append(e_gdata)
+        return yang.gdata.List(['name'], elements)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.List) -> list[orchestron_device__devices__device_entry]:
@@ -82,13 +79,11 @@ class orchestron_device__devices(yang.adata.MNode):
         self.device._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Container('devices', ns=self._ns)
+        children = {}
         _device = self.device
         if _device is not None:
-            res.children['device'] = _device.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['device'] = _device.to_gdata()
+        return yang.gdata.Container(children, ns='http://orchestron.org/yang/orchestron-device.yang')
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> orchestron_device__devices:
@@ -117,13 +112,11 @@ class root(yang.adata.MNode):
             self_devices._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
-        res = yang.gdata.Root()
+        children = {}
         _devices = self.devices
         if _devices is not None:
-            res.children['devices'] = _devices.to_gdata()
-        for child in res.children.values():
-            child.parent = res
-        return res
+            children['devices'] = _devices.to_gdata()
+        return yang.gdata.Root(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> root:
