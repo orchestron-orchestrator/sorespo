@@ -206,33 +206,38 @@ class netinfra_inter__netinfra__routers_entry(yang.adata.MNode):
     name: str
     id: ?str
     role: ?str
+    mock: ?str
 
-    mut def __init__(self, name: str, id: ?str, role: ?str):
+    mut def __init__(self, name: str, id: ?str, role: ?str, mock: ?str):
         self._ns = "http://example.com/netinfra-inter"
         self.name = name
         self.id = id
         self.role = role
+        self.mock = mock
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
         _name = self.name
         _id = self.id
         _role = self.role
+        _mock = self.mock
         if _name is not None:
             children['name'] = yang.gdata.Leaf('string', _name)
         if _id is not None:
             children['id'] = yang.gdata.Leaf('string', _id)
         if _role is not None:
             children['role'] = yang.gdata.Leaf('string', _role)
+        if _mock is not None:
+            children['mock'] = yang.gdata.Leaf('enumeration', _mock)
         return yang.gdata.ListElement([str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra_inter__netinfra__routers_entry:
-        return netinfra_inter__netinfra__routers_entry(name=n.get_str("name"), id=n.get_opt_str("id"), role=n.get_opt_str("role"))
+        return netinfra_inter__netinfra__routers_entry(name=n.get_str("name"), id=n.get_opt_str("id"), role=n.get_opt_str("role"), mock=n.get_opt_str("mock"))
 
     @staticmethod
     mut def from_xml(n: xml.Node) -> netinfra_inter__netinfra__routers_entry:
-        return netinfra_inter__netinfra__routers_entry(name=yang.gdata.from_xml_str(n, "name"), id=yang.gdata.from_xml_opt_str(n, "id"), role=yang.gdata.from_xml_opt_str(n, "role"))
+        return netinfra_inter__netinfra__routers_entry(name=yang.gdata.from_xml_str(n, "name"), id=yang.gdata.from_xml_opt_str(n, "id"), role=yang.gdata.from_xml_opt_str(n, "role"), mock=yang.gdata.from_xml_opt_str(n, "mock"))
 
 class netinfra_inter__netinfra__routers(yang.adata.MNode):
     elements: list[netinfra_inter__netinfra__routers_entry]
