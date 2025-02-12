@@ -44,7 +44,7 @@ class junos_conf_root__configuration__interfaces__interface__unit__family__inet_
         _name = self.name
         if _name is not None:
             children['name'] = yang.gdata.Leaf('string', _name)
-        return yang.gdata.ListElement([str(self.name)], children)
+        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry:
@@ -83,10 +83,11 @@ class junos_conf_root__configuration__interfaces__interface__unit__family__inet_
         return yang.gdata.List(['name'], elements)
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry]:
+    mut def from_gdata(n: ?yang.gdata.List) -> list[junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry]:
         res = []
-        for e in n.elements:
-            res.append(junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry.from_gdata(e))
+        if n is not None:
+            for e in n.elements:
+                res.append(junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry.from_gdata(e))
         return res
 
     @staticmethod
@@ -115,7 +116,7 @@ class junos_conf_root__configuration__interfaces__interface__unit__family__inet(
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ?junos_conf_root__configuration__interfaces__interface__unit__family__inet:
         if n != None:
-            return junos_conf_root__configuration__interfaces__interface__unit__family__inet(address=junos_conf_root__configuration__interfaces__interface__unit__family__inet__address.from_gdata(n.get_list("address")))
+            return junos_conf_root__configuration__interfaces__interface__unit__family__inet(address=junos_conf_root__configuration__interfaces__interface__unit__family__inet__address.from_gdata(n.get_opt_list("address")))
         return None
 
     @staticmethod
@@ -213,7 +214,7 @@ class junos_conf_root__configuration__interfaces__interface__unit_entry(yang.ada
             children['mtu'] = yang.gdata.Leaf('union', _mtu)
         if _mac is not None:
             children['mac'] = yang.gdata.Leaf('string', _mac)
-        return yang.gdata.ListElement([str(self.name)], children)
+        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__interfaces__interface__unit_entry:
@@ -252,10 +253,11 @@ class junos_conf_root__configuration__interfaces__interface__unit(yang.adata.MNo
         return yang.gdata.List(['name'], elements)
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__interfaces__interface__unit_entry]:
+    mut def from_gdata(n: ?yang.gdata.List) -> list[junos_conf_root__configuration__interfaces__interface__unit_entry]:
         res = []
-        for e in n.elements:
-            res.append(junos_conf_root__configuration__interfaces__interface__unit_entry.from_gdata(e))
+        if n is not None:
+            for e in n.elements:
+                res.append(junos_conf_root__configuration__interfaces__interface__unit_entry.from_gdata(e))
         return res
 
     @staticmethod
@@ -304,11 +306,11 @@ class junos_conf_root__configuration__interfaces__interface_entry(yang.adata.MNo
             children['native-vlan-id'] = yang.gdata.Leaf('union', _native_vlan_id)
         if _unit is not None:
             children['unit'] = _unit.to_gdata()
-        return yang.gdata.ListElement([str(self.name)], children)
+        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__interfaces__interface_entry:
-        return junos_conf_root__configuration__interfaces__interface_entry(name=n.get_str("name"), description=n.get_opt_str("description"), mtu=n.get_opt_value("mtu"), mac=n.get_opt_str("mac"), native_vlan_id=n.get_opt_value("native-vlan-id"), unit=junos_conf_root__configuration__interfaces__interface__unit.from_gdata(n.get_list("unit")))
+        return junos_conf_root__configuration__interfaces__interface_entry(name=n.get_str("name"), description=n.get_opt_str("description"), mtu=n.get_opt_value("mtu"), mac=n.get_opt_str("mac"), native_vlan_id=n.get_opt_value("native-vlan-id"), unit=junos_conf_root__configuration__interfaces__interface__unit.from_gdata(n.get_opt_list("unit")))
 
     @staticmethod
     mut def from_xml(n: xml.Node) -> junos_conf_root__configuration__interfaces__interface_entry:
@@ -343,10 +345,11 @@ class junos_conf_root__configuration__interfaces__interface(yang.adata.MNode):
         return yang.gdata.List(['name'], elements)
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__interfaces__interface_entry]:
+    mut def from_gdata(n: ?yang.gdata.List) -> list[junos_conf_root__configuration__interfaces__interface_entry]:
         res = []
-        for e in n.elements:
-            res.append(junos_conf_root__configuration__interfaces__interface_entry.from_gdata(e))
+        if n is not None:
+            for e in n.elements:
+                res.append(junos_conf_root__configuration__interfaces__interface_entry.from_gdata(e))
         return res
 
     @staticmethod
@@ -375,7 +378,7 @@ class junos_conf_root__configuration__interfaces(yang.adata.MNode):
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__interfaces:
         if n != None:
-            return junos_conf_root__configuration__interfaces(interface=junos_conf_root__configuration__interfaces__interface.from_gdata(n.get_list("interface")))
+            return junos_conf_root__configuration__interfaces(interface=junos_conf_root__configuration__interfaces__interface.from_gdata(n.get_opt_list("interface")))
         return junos_conf_root__configuration__interfaces()
 
     @staticmethod
@@ -417,7 +420,7 @@ class junos_conf_root__configuration__routing_instances__instance__interface_ent
             children['multicast'] = yang.gdata.Leaf('empty', _multicast)
         if _primary is not None:
             children['primary'] = yang.gdata.Leaf('empty', _primary)
-        return yang.gdata.ListElement([str(self.name)], children)
+        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__routing_instances__instance__interface_entry:
@@ -456,10 +459,11 @@ class junos_conf_root__configuration__routing_instances__instance__interface(yan
         return yang.gdata.List(['name'], elements)
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__routing_instances__instance__interface_entry]:
+    mut def from_gdata(n: ?yang.gdata.List) -> list[junos_conf_root__configuration__routing_instances__instance__interface_entry]:
         res = []
-        for e in n.elements:
-            res.append(junos_conf_root__configuration__routing_instances__instance__interface_entry.from_gdata(e))
+        if n is not None:
+            for e in n.elements:
+                res.append(junos_conf_root__configuration__routing_instances__instance__interface_entry.from_gdata(e))
         return res
 
     @staticmethod
@@ -599,11 +603,11 @@ class junos_conf_root__configuration__routing_instances__instance_entry(yang.ada
             children['vrf-target'] = _vrf_target.to_gdata()
         if _no_vrf_advertise is not None:
             children['no-vrf-advertise'] = yang.gdata.Leaf('empty', _no_vrf_advertise)
-        return yang.gdata.ListElement([str(self.name)], children)
+        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__routing_instances__instance_entry:
-        return junos_conf_root__configuration__routing_instances__instance_entry(name=n.get_str("name"), instance_type=n.get_opt_str("instance-type"), interface=junos_conf_root__configuration__routing_instances__instance__interface.from_gdata(n.get_list("interface")), route_distinguisher=junos_conf_root__configuration__routing_instances__instance__route_distinguisher.from_gdata(n.get_opt_container("route-distinguisher")), export_default_action=n.get_opt_str("export-default-action"), import_default_action=n.get_opt_str("import-default-action"), vrf_target=junos_conf_root__configuration__routing_instances__instance__vrf_target.from_gdata(n.get_opt_container("vrf-target")), no_vrf_advertise=n.get_opt_bool("no-vrf-advertise"))
+        return junos_conf_root__configuration__routing_instances__instance_entry(name=n.get_str("name"), instance_type=n.get_opt_str("instance-type"), interface=junos_conf_root__configuration__routing_instances__instance__interface.from_gdata(n.get_opt_list("interface")), route_distinguisher=junos_conf_root__configuration__routing_instances__instance__route_distinguisher.from_gdata(n.get_opt_container("route-distinguisher")), export_default_action=n.get_opt_str("export-default-action"), import_default_action=n.get_opt_str("import-default-action"), vrf_target=junos_conf_root__configuration__routing_instances__instance__vrf_target.from_gdata(n.get_opt_container("vrf-target")), no_vrf_advertise=n.get_opt_bool("no-vrf-advertise"))
 
     @staticmethod
     mut def from_xml(n: xml.Node) -> junos_conf_root__configuration__routing_instances__instance_entry:
@@ -638,10 +642,11 @@ class junos_conf_root__configuration__routing_instances__instance(yang.adata.MNo
         return yang.gdata.List(['name'], elements)
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__routing_instances__instance_entry]:
+    mut def from_gdata(n: ?yang.gdata.List) -> list[junos_conf_root__configuration__routing_instances__instance_entry]:
         res = []
-        for e in n.elements:
-            res.append(junos_conf_root__configuration__routing_instances__instance_entry.from_gdata(e))
+        if n is not None:
+            for e in n.elements:
+                res.append(junos_conf_root__configuration__routing_instances__instance_entry.from_gdata(e))
         return res
 
     @staticmethod
@@ -670,7 +675,7 @@ class junos_conf_root__configuration__routing_instances(yang.adata.MNode):
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__routing_instances:
         if n != None:
-            return junos_conf_root__configuration__routing_instances(instance=junos_conf_root__configuration__routing_instances__instance.from_gdata(n.get_list("instance")))
+            return junos_conf_root__configuration__routing_instances(instance=junos_conf_root__configuration__routing_instances__instance.from_gdata(n.get_opt_list("instance")))
         return junos_conf_root__configuration__routing_instances()
 
     @staticmethod
@@ -842,7 +847,7 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit__famil
         _name = self.name
         if _name is not None:
             children['name'] = yang.gdata.Leaf('string', _name)
-        return yang.gdata.ListElement([str(self.name)], children)
+        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry:
@@ -881,10 +886,11 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit__famil
         return yang.gdata.List(['name'], elements)
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry]:
+    mut def from_gdata(n: ?yang.gdata.List) -> list[junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry]:
         res = []
-        for e in n.elements:
-            res.append(junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry.from_gdata(e))
+        if n is not None:
+            for e in n.elements:
+                res.append(junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry.from_gdata(e))
         return res
 
     @staticmethod
@@ -913,7 +919,7 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit__famil
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ?junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet:
         if n != None:
-            return junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet(address=junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address.from_gdata(n.get_list("address")))
+            return junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet(address=junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address.from_gdata(n.get_opt_list("address")))
         return None
 
     @staticmethod
@@ -1011,7 +1017,7 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit_entry(
             children['mtu'] = yang.gdata.Leaf('union', _mtu)
         if _mac is not None:
             children['mac'] = yang.gdata.Leaf('string', _mac)
-        return yang.gdata.ListElement([str(self.name)], children)
+        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups__interfaces__interface__unit_entry:
@@ -1050,10 +1056,11 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit(yang.a
         return yang.gdata.List(['name'], elements)
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__groups__interfaces__interface__unit_entry]:
+    mut def from_gdata(n: ?yang.gdata.List) -> list[junos_conf_root__configuration__groups__interfaces__interface__unit_entry]:
         res = []
-        for e in n.elements:
-            res.append(junos_conf_root__configuration__groups__interfaces__interface__unit_entry.from_gdata(e))
+        if n is not None:
+            for e in n.elements:
+                res.append(junos_conf_root__configuration__groups__interfaces__interface__unit_entry.from_gdata(e))
         return res
 
     @staticmethod
@@ -1102,11 +1109,11 @@ class junos_conf_root__configuration__groups__interfaces__interface_entry(yang.a
             children['native-vlan-id'] = yang.gdata.Leaf('union', _native_vlan_id)
         if _unit is not None:
             children['unit'] = _unit.to_gdata()
-        return yang.gdata.ListElement([str(self.name)], children)
+        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups__interfaces__interface_entry:
-        return junos_conf_root__configuration__groups__interfaces__interface_entry(name=n.get_str("name"), description=n.get_opt_str("description"), mtu=n.get_opt_value("mtu"), mac=n.get_opt_str("mac"), native_vlan_id=n.get_opt_value("native-vlan-id"), unit=junos_conf_root__configuration__groups__interfaces__interface__unit.from_gdata(n.get_list("unit")))
+        return junos_conf_root__configuration__groups__interfaces__interface_entry(name=n.get_str("name"), description=n.get_opt_str("description"), mtu=n.get_opt_value("mtu"), mac=n.get_opt_str("mac"), native_vlan_id=n.get_opt_value("native-vlan-id"), unit=junos_conf_root__configuration__groups__interfaces__interface__unit.from_gdata(n.get_opt_list("unit")))
 
     @staticmethod
     mut def from_xml(n: xml.Node) -> junos_conf_root__configuration__groups__interfaces__interface_entry:
@@ -1141,10 +1148,11 @@ class junos_conf_root__configuration__groups__interfaces__interface(yang.adata.M
         return yang.gdata.List(['name'], elements)
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__groups__interfaces__interface_entry]:
+    mut def from_gdata(n: ?yang.gdata.List) -> list[junos_conf_root__configuration__groups__interfaces__interface_entry]:
         res = []
-        for e in n.elements:
-            res.append(junos_conf_root__configuration__groups__interfaces__interface_entry.from_gdata(e))
+        if n is not None:
+            for e in n.elements:
+                res.append(junos_conf_root__configuration__groups__interfaces__interface_entry.from_gdata(e))
         return res
 
     @staticmethod
@@ -1173,7 +1181,7 @@ class junos_conf_root__configuration__groups__interfaces(yang.adata.MNode):
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__interfaces:
         if n != None:
-            return junos_conf_root__configuration__groups__interfaces(interface=junos_conf_root__configuration__groups__interfaces__interface.from_gdata(n.get_list("interface")))
+            return junos_conf_root__configuration__groups__interfaces(interface=junos_conf_root__configuration__groups__interfaces__interface.from_gdata(n.get_opt_list("interface")))
         return junos_conf_root__configuration__groups__interfaces()
 
     @staticmethod
@@ -1215,7 +1223,7 @@ class junos_conf_root__configuration__groups__routing_instances__instance__inter
             children['multicast'] = yang.gdata.Leaf('empty', _multicast)
         if _primary is not None:
             children['primary'] = yang.gdata.Leaf('empty', _primary)
-        return yang.gdata.ListElement([str(self.name)], children)
+        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups__routing_instances__instance__interface_entry:
@@ -1254,10 +1262,11 @@ class junos_conf_root__configuration__groups__routing_instances__instance__inter
         return yang.gdata.List(['name'], elements)
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__groups__routing_instances__instance__interface_entry]:
+    mut def from_gdata(n: ?yang.gdata.List) -> list[junos_conf_root__configuration__groups__routing_instances__instance__interface_entry]:
         res = []
-        for e in n.elements:
-            res.append(junos_conf_root__configuration__groups__routing_instances__instance__interface_entry.from_gdata(e))
+        if n is not None:
+            for e in n.elements:
+                res.append(junos_conf_root__configuration__groups__routing_instances__instance__interface_entry.from_gdata(e))
         return res
 
     @staticmethod
@@ -1397,11 +1406,11 @@ class junos_conf_root__configuration__groups__routing_instances__instance_entry(
             children['vrf-target'] = _vrf_target.to_gdata()
         if _no_vrf_advertise is not None:
             children['no-vrf-advertise'] = yang.gdata.Leaf('empty', _no_vrf_advertise)
-        return yang.gdata.ListElement([str(self.name)], children)
+        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups__routing_instances__instance_entry:
-        return junos_conf_root__configuration__groups__routing_instances__instance_entry(name=n.get_str("name"), instance_type=n.get_opt_str("instance-type"), interface=junos_conf_root__configuration__groups__routing_instances__instance__interface.from_gdata(n.get_list("interface")), route_distinguisher=junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher.from_gdata(n.get_opt_container("route-distinguisher")), export_default_action=n.get_opt_str("export-default-action"), import_default_action=n.get_opt_str("import-default-action"), vrf_target=junos_conf_root__configuration__groups__routing_instances__instance__vrf_target.from_gdata(n.get_opt_container("vrf-target")), no_vrf_advertise=n.get_opt_bool("no-vrf-advertise"))
+        return junos_conf_root__configuration__groups__routing_instances__instance_entry(name=n.get_str("name"), instance_type=n.get_opt_str("instance-type"), interface=junos_conf_root__configuration__groups__routing_instances__instance__interface.from_gdata(n.get_opt_list("interface")), route_distinguisher=junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher.from_gdata(n.get_opt_container("route-distinguisher")), export_default_action=n.get_opt_str("export-default-action"), import_default_action=n.get_opt_str("import-default-action"), vrf_target=junos_conf_root__configuration__groups__routing_instances__instance__vrf_target.from_gdata(n.get_opt_container("vrf-target")), no_vrf_advertise=n.get_opt_bool("no-vrf-advertise"))
 
     @staticmethod
     mut def from_xml(n: xml.Node) -> junos_conf_root__configuration__groups__routing_instances__instance_entry:
@@ -1436,10 +1445,11 @@ class junos_conf_root__configuration__groups__routing_instances__instance(yang.a
         return yang.gdata.List(['name'], elements)
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__groups__routing_instances__instance_entry]:
+    mut def from_gdata(n: ?yang.gdata.List) -> list[junos_conf_root__configuration__groups__routing_instances__instance_entry]:
         res = []
-        for e in n.elements:
-            res.append(junos_conf_root__configuration__groups__routing_instances__instance_entry.from_gdata(e))
+        if n is not None:
+            for e in n.elements:
+                res.append(junos_conf_root__configuration__groups__routing_instances__instance_entry.from_gdata(e))
         return res
 
     @staticmethod
@@ -1468,7 +1478,7 @@ class junos_conf_root__configuration__groups__routing_instances(yang.adata.MNode
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__routing_instances:
         if n != None:
-            return junos_conf_root__configuration__groups__routing_instances(instance=junos_conf_root__configuration__groups__routing_instances__instance.from_gdata(n.get_list("instance")))
+            return junos_conf_root__configuration__groups__routing_instances(instance=junos_conf_root__configuration__groups__routing_instances__instance.from_gdata(n.get_opt_list("instance")))
         return junos_conf_root__configuration__groups__routing_instances()
 
     @staticmethod
@@ -1544,7 +1554,7 @@ class junos_conf_root__configuration__groups_entry(yang.adata.MNode):
             children['interfaces'] = _interfaces.to_gdata()
         if _routing_instances is not None:
             children['routing-instances'] = _routing_instances.to_gdata()
-        return yang.gdata.ListElement([str(self.name)], children)
+        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> junos_conf_root__configuration__groups_entry:
@@ -1583,10 +1593,11 @@ class junos_conf_root__configuration__groups(yang.adata.MNode):
         return yang.gdata.List(['name'], elements)
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.List) -> list[junos_conf_root__configuration__groups_entry]:
+    mut def from_gdata(n: ?yang.gdata.List) -> list[junos_conf_root__configuration__groups_entry]:
         res = []
-        for e in n.elements:
-            res.append(junos_conf_root__configuration__groups_entry.from_gdata(e))
+        if n is not None:
+            for e in n.elements:
+                res.append(junos_conf_root__configuration__groups_entry.from_gdata(e))
         return res
 
     @staticmethod
@@ -1658,7 +1669,7 @@ class junos_conf_root__configuration(yang.adata.MNode):
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration:
         if n != None:
-            return junos_conf_root__configuration(rcsid=n.get_opt_str("rcsid"), version=n.get_opt_str("version"), system=junos_conf_root__configuration__system.from_gdata(n.get_opt_container("system")), interfaces=junos_conf_root__configuration__interfaces.from_gdata(n.get_opt_container("interfaces")), routing_instances=junos_conf_root__configuration__routing_instances.from_gdata(n.get_opt_container("routing-instances")), groups=junos_conf_root__configuration__groups.from_gdata(n.get_list("groups")))
+            return junos_conf_root__configuration(rcsid=n.get_opt_str("rcsid"), version=n.get_opt_str("version"), system=junos_conf_root__configuration__system.from_gdata(n.get_opt_container("system")), interfaces=junos_conf_root__configuration__interfaces.from_gdata(n.get_opt_container("interfaces")), routing_instances=junos_conf_root__configuration__routing_instances.from_gdata(n.get_opt_container("routing-instances")), groups=junos_conf_root__configuration__groups.from_gdata(n.get_opt_list("groups")))
         return junos_conf_root__configuration()
 
     @staticmethod

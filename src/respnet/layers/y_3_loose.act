@@ -17,7 +17,7 @@ class orchestron_device__devices__device_entry(yang.adata.MNode):
         _name = self.name
         if _name is not None:
             children['name'] = yang.gdata.Leaf('string', _name)
-        return yang.gdata.ListElement([str(self.name)], children)
+        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_device__devices__device_entry:
@@ -56,10 +56,11 @@ class orchestron_device__devices__device(yang.adata.MNode):
         return yang.gdata.List(['name'], elements)
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.List) -> list[orchestron_device__devices__device_entry]:
+    mut def from_gdata(n: ?yang.gdata.List) -> list[orchestron_device__devices__device_entry]:
         res = []
-        for e in n.elements:
-            res.append(orchestron_device__devices__device_entry.from_gdata(e))
+        if n is not None:
+            for e in n.elements:
+                res.append(orchestron_device__devices__device_entry.from_gdata(e))
         return res
 
     @staticmethod
@@ -88,7 +89,7 @@ class orchestron_device__devices(yang.adata.MNode):
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> orchestron_device__devices:
         if n != None:
-            return orchestron_device__devices(device=orchestron_device__devices__device.from_gdata(n.get_list("device")))
+            return orchestron_device__devices(device=orchestron_device__devices__device.from_gdata(n.get_opt_list("device")))
         return orchestron_device__devices()
 
     @staticmethod
