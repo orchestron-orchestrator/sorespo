@@ -1,5 +1,6 @@
 import argparse
 import file
+import json
 import logging
 import http
 import net
@@ -12,6 +13,10 @@ import yang.gdata
 
 import respnet.layers
 from respnet.layers.y_0 import root as cfs_root
+import respnet.layers.y_0
+import respnet.layers.y_1
+import respnet.layers.y_2
+import respnet.layers.y_3
 
 import testing
 
@@ -52,16 +57,22 @@ actor main(env):
 
     log = logging.Logger(logh)
 
-    action def conf(xml_conf: ?xml.Node=None):
+    def conf_xml(xml_in: xml.Node):
+        try:
+            input_config = cfs_root.from_xml(xml_in).to_gdata()
+            conf(input_config)
+        except Exception as e:
+            log.error("Error applying config: %s" % str(e))
+
+    action def conf(in_conf: ?yang.gdata.Node=None):
         # Bootstrap first layer config input
-        if xml_conf != None:
-            input_config = cfs_root.from_xml(xml_conf)
+        if in_conf != None:
             current_config = layer_configs.get(0)
             new_config = None
             if current_config != None:
-                new_config = yang.gdata.patch(current_config, input_config.to_gdata())
+                new_config = yang.gdata.patch(current_config, in_conf)
             else:
-                new_config = input_config.to_gdata()
+                new_config = in_conf
 
             if new_config != None:
                 layer_configs[0] = new_config
@@ -119,11 +130,27 @@ actor main(env):
                     respond(404, {}, "Not found")
                     return
             elif len(path_elements) == 3 and path_elements[1] == "layer":
+                ys = [respnet.layers.y_0.to_json]
                 try:
                     layer_idx = int(path_elements[2])
                     try:
-                        layer_config = layer_configs[layer_idx]
-                        respond(200, {}, layer_config.to_xmlstr())
+                        layer_config: yang.gdata.Node = layer_configs[layer_idx]
+                        content = ""
+                        if request.headers.get("accept") == "application/yang-data+json":
+                            if isinstance(layer_config, yang.gdata.Root):
+                                # TODO: bah, why can't we pick function from ys list?
+                                if layer_idx == 0:
+                                    content = json.encode(respnet.layers.y_0.to_json(layer_config))
+                                elif layer_idx == 1:
+                                    content = json.encode(respnet.layers.y_1.to_json(layer_config))
+                                elif layer_idx == 2:
+                                    content = json.encode(respnet.layers.y_2.to_json(layer_config))
+                                else:
+                                    respond(404, {}, "Unknown layer")
+                                    return
+                        if request.headers.get("accept") == "application/yang-data+xml":
+                            content = layer_config.to_xmlstr()
+                        respond(200, {}, content)
                         return
                     except KeyError:
                         respond(404, {}, "Not found")
@@ -134,11 +161,35 @@ actor main(env):
             else:
                 respond(404, {}, "Not found")
                 return
-        elif request.method == "POST":
-            xml_in = xml.decode(request.body.decode())
-            log.info("Received XML", {"xml": xml_in})
-            conf(xml_in)
-            respond(200, {}, "Oki doki!")
+        elif request.method == "DELETE":
+            p = split_restconf_path(request.path)
+            if p[0] == "restconf":
+                input_config = respnet.layers.y_0.from_json_path({}, p[1:], "remove")
+                conf(input_config)
+                respond(200, {}, "OK")
+                return
+            respond(404, {}, "")
+            return
+        elif request.method in {"POST", "PUT"}:
+            path_segments = request.path.split("/")
+            if len(path_segments) >= 1 and path_segments[1] == "restconf":
+                if request.headers.get("content-type") == "application/yang-data+json":
+                    json_in = json.decode(request.body.decode())
+                    p = split_restconf_path(request.path)[1:]
+                    input_config = respnet.layers.y_0.from_json_path(json_in, p)
+                    conf(input_config)
+                    respond(200, {}, "OK")
+                    return
+                elif request.headers.get("content-type") == "application/yang-data+xml":
+                    xml_in = xml.decode(request.body.decode())
+                    input_config = cfs_root.from_xml(xml_in).to_gdata()
+                    conf(input_config)
+                    respond(200, {}, "OK")
+                    return
+                else:
+                    respond(415, {}, "Unsupported media type")
+                    return
+            respond(404, {}, "")
             return
         else:
             respond(405, {}, "Method not allowed")
@@ -156,7 +207,7 @@ actor main(env):
         print("Applying config file..")
         try:
             nb_input = configs.pop(0)
-            conf(nb_input)
+            conf_xml(nb_input)
             print("Config file applied, waiting 3 seconds before applying the next..")
             after 3: _conf_file()
         except IndexError:
@@ -181,3 +232,17 @@ actor main(env):
 
     print("Orchestron/respnet running..")
 
+
+
+def split_restconf_path(text: str) -> list[str]:
+    # First split by slash
+    parts = text.split('/')
+    # Create a new list to store all elements
+    result = []
+    # For each part, split by equals if it exists
+    for part in parts:
+        if '=' in part:
+            result.extend(part.split('=', 1))
+        elif part != '':
+            result.append(part)
+    return result
