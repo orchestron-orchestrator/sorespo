@@ -42,7 +42,7 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yang.adata.MNode):
             children['ipv4-address'] = yang.gdata.Leaf('string', _ipv4_address)
         if _ipv4_prefix_length is not None:
             children['ipv4-prefix-length'] = yang.gdata.Leaf('uint8', _ipv4_prefix_length)
-        return yang.gdata.ListElement([str(self.device), str(self.interface)], children)
+        return yang.gdata.ListElement([yang.gdata.yang_str(self.device), yang.gdata.yang_str(self.interface)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> l3vpn_inter__l3vpns__l3vpn__endpoint_entry:
@@ -84,10 +84,11 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint(yang.adata.MNode):
         return yang.gdata.List(['device', 'interface'], elements)
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.List) -> list[l3vpn_inter__l3vpns__l3vpn__endpoint_entry]:
+    mut def from_gdata(n: ?yang.gdata.List) -> list[l3vpn_inter__l3vpns__l3vpn__endpoint_entry]:
         res = []
-        for e in n.elements:
-            res.append(l3vpn_inter__l3vpns__l3vpn__endpoint_entry.from_gdata(e))
+        if n is not None:
+            for e in n.elements:
+                res.append(l3vpn_inter__l3vpns__l3vpn__endpoint_entry.from_gdata(e))
         return res
 
     @staticmethod
@@ -121,11 +122,11 @@ class l3vpn_inter__l3vpns__l3vpn_entry(yang.adata.MNode):
             children['description'] = yang.gdata.Leaf('string', _description)
         if _endpoint is not None:
             children['endpoint'] = _endpoint.to_gdata()
-        return yang.gdata.ListElement([str(self.name)], children)
+        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> l3vpn_inter__l3vpns__l3vpn_entry:
-        return l3vpn_inter__l3vpns__l3vpn_entry(name=n.get_str("name"), description=n.get_opt_str("description"), endpoint=l3vpn_inter__l3vpns__l3vpn__endpoint.from_gdata(n.get_list("endpoint")))
+        return l3vpn_inter__l3vpns__l3vpn_entry(name=n.get_str("name"), description=n.get_opt_str("description"), endpoint=l3vpn_inter__l3vpns__l3vpn__endpoint.from_gdata(n.get_opt_list("endpoint")))
 
     @staticmethod
     mut def from_xml(n: xml.Node) -> l3vpn_inter__l3vpns__l3vpn_entry:
@@ -160,10 +161,11 @@ class l3vpn_inter__l3vpns__l3vpn(yang.adata.MNode):
         return yang.gdata.List(['name'], elements)
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.List) -> list[l3vpn_inter__l3vpns__l3vpn_entry]:
+    mut def from_gdata(n: ?yang.gdata.List) -> list[l3vpn_inter__l3vpns__l3vpn_entry]:
         res = []
-        for e in n.elements:
-            res.append(l3vpn_inter__l3vpns__l3vpn_entry.from_gdata(e))
+        if n is not None:
+            for e in n.elements:
+                res.append(l3vpn_inter__l3vpns__l3vpn_entry.from_gdata(e))
         return res
 
     @staticmethod
@@ -192,7 +194,7 @@ class l3vpn_inter__l3vpns(yang.adata.MNode):
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> l3vpn_inter__l3vpns:
         if n != None:
-            return l3vpn_inter__l3vpns(l3vpn=l3vpn_inter__l3vpns__l3vpn.from_gdata(n.get_list("l3vpn")))
+            return l3vpn_inter__l3vpns(l3vpn=l3vpn_inter__l3vpns__l3vpn.from_gdata(n.get_opt_list("l3vpn")))
         return l3vpn_inter__l3vpns()
 
     @staticmethod
@@ -229,7 +231,7 @@ class netinfra_inter__netinfra__routers_entry(yang.adata.MNode):
             children['role'] = yang.gdata.Leaf('string', _role)
         if _mock is not None:
             children['mock'] = yang.gdata.Leaf('enumeration', _mock)
-        return yang.gdata.ListElement([str(self.name)], children)
+        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra_inter__netinfra__routers_entry:
@@ -268,10 +270,11 @@ class netinfra_inter__netinfra__routers(yang.adata.MNode):
         return yang.gdata.List(['name'], elements)
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.List) -> list[netinfra_inter__netinfra__routers_entry]:
+    mut def from_gdata(n: ?yang.gdata.List) -> list[netinfra_inter__netinfra__routers_entry]:
         res = []
-        for e in n.elements:
-            res.append(netinfra_inter__netinfra__routers_entry.from_gdata(e))
+        if n is not None:
+            for e in n.elements:
+                res.append(netinfra_inter__netinfra__routers_entry.from_gdata(e))
         return res
 
     @staticmethod
@@ -309,7 +312,7 @@ class netinfra_inter__netinfra__backbone_link_entry(yang.adata.MNode):
             children['right-router'] = yang.gdata.Leaf('string', _right_router)
         if _right_interface is not None:
             children['right-interface'] = yang.gdata.Leaf('string', _right_interface)
-        return yang.gdata.ListElement([str(self.left_router), str(self.left_interface), str(self.right_router), str(self.right_interface)], children)
+        return yang.gdata.ListElement([yang.gdata.yang_str(self.left_router), yang.gdata.yang_str(self.left_interface), yang.gdata.yang_str(self.right_router), yang.gdata.yang_str(self.right_interface)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra_inter__netinfra__backbone_link_entry:
@@ -357,10 +360,11 @@ class netinfra_inter__netinfra__backbone_link(yang.adata.MNode):
         return yang.gdata.List(['left-router', 'left-interface', 'right-router', 'right-interface'], elements)
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.List) -> list[netinfra_inter__netinfra__backbone_link_entry]:
+    mut def from_gdata(n: ?yang.gdata.List) -> list[netinfra_inter__netinfra__backbone_link_entry]:
         res = []
-        for e in n.elements:
-            res.append(netinfra_inter__netinfra__backbone_link_entry.from_gdata(e))
+        if n is not None:
+            for e in n.elements:
+                res.append(netinfra_inter__netinfra__backbone_link_entry.from_gdata(e))
         return res
 
     @staticmethod
@@ -395,7 +399,7 @@ class netinfra_inter__netinfra(yang.adata.MNode):
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> netinfra_inter__netinfra:
         if n != None:
-            return netinfra_inter__netinfra(routers=netinfra_inter__netinfra__routers.from_gdata(n.get_list("routers")), backbone_link=netinfra_inter__netinfra__backbone_link.from_gdata(n.get_list("backbone-link")))
+            return netinfra_inter__netinfra(routers=netinfra_inter__netinfra__routers.from_gdata(n.get_opt_list("routers")), backbone_link=netinfra_inter__netinfra__backbone_link.from_gdata(n.get_opt_list("backbone-link")))
         return netinfra_inter__netinfra()
 
     @staticmethod
