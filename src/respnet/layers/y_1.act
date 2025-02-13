@@ -1,9 +1,34 @@
+import json
 import xml
 import yang.adata
 import yang.gdata
 
 # == This file is generated ==
 
+
+mut def from_json_l3vpn_inter__l3vpns__l3vpn__name(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_l3vpn_inter__l3vpns__l3vpn__description(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_l3vpn_inter__l3vpns__l3vpn__endpoint__device(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_l3vpn_inter__l3vpns__l3vpn__endpoint__interface(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_l3vpn_inter__l3vpns__l3vpn__endpoint__site(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_l3vpn_inter__l3vpns__l3vpn__endpoint__site_network_access(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_l3vpn_inter__l3vpns__l3vpn__endpoint__ipv4_address(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_l3vpn_inter__l3vpns__l3vpn__endpoint__ipv4_prefix_length(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("uint8", val)
 
 class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yang.adata.MNode):
     device: str
@@ -99,6 +124,130 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint(yang.adata.MNode):
         return res
 
 
+mut def from_json_path_l3vpn_inter__l3vpns__l3vpn__endpoint_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        val = from_json_l3vpn_inter__l3vpns__l3vpn__endpoint_element(jd_dict)
+        if op == "merge":
+            return val
+        elif op == "remove":
+            return yang.gdata.AbsentListElement(val.key_vals)
+        raise ValueError("Invalid operation")
+    elif len(path) > 1:
+        keys = path[0].split(",")
+        point = path[1]
+        rest_path = path[2:]
+        children: dict[str, yang.gdata.Node] = {}
+        for idx, key in enumerate(['device', 'interface']):
+            children[key] = yang.gdata.Leaf("str", keys[idx])
+        if point == 'site':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'site-network-access':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'ipv4-address':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'ipv4-prefix-length':
+            raise ValueError("Invalid json path to non-inner node")
+        return yang.gdata.ListElement(keys, children)
+    raise ValueError("unreachable - no keys to list element")
+
+mut def from_json_path_l3vpn_inter__l3vpns__l3vpn__endpoint(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        # Check that all keys are present in payload.
+        # If present, they must equal the keys in the path
+        # If not present, fill in from path
+        for key in ['device', 'interface']:
+            if key not in jd_dict:
+                jd_dict[key] = keys.pop(0)
+            else:
+                if str(jd_dict[key]) != keys.pop(0):
+                    raise ValueError("Key value mismatch between path and payload")
+        element = from_json_l3vpn_inter__l3vpns__l3vpn__endpoint_element(jd_dict)
+        elements = []
+        if op == "merge":
+            elements.append(element)
+        elif op == "remove":
+            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+        return yang.gdata.List(['device', 'interface'], elements)
+    elif len(path) > 1:
+        return yang.gdata.List(['device', 'interface'], [from_json_path_l3vpn_inter__l3vpns__l3vpn__endpoint_element(jd, path, op)])
+    raise ValueError("Unable to resolve path, no keys provided")
+
+mut def from_json_l3vpn_inter__l3vpns__l3vpn__endpoint_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+    children = {}
+    child_device_full = jd.get('l3vpn-inter:device')
+    child_device = child_device_full if child_device_full is not None else jd.get('device')
+    if child_device is not None:
+        children['device'] = from_json_l3vpn_inter__l3vpns__l3vpn__endpoint__device(child_device)
+    child_interface_full = jd.get('l3vpn-inter:interface')
+    child_interface = child_interface_full if child_interface_full is not None else jd.get('interface')
+    if child_interface is not None:
+        children['interface'] = from_json_l3vpn_inter__l3vpns__l3vpn__endpoint__interface(child_interface)
+    child_site_full = jd.get('l3vpn-inter:site')
+    child_site = child_site_full if child_site_full is not None else jd.get('site')
+    if child_site is not None:
+        children['site'] = from_json_l3vpn_inter__l3vpns__l3vpn__endpoint__site(child_site)
+    child_site_network_access_full = jd.get('l3vpn-inter:site-network-access')
+    child_site_network_access = child_site_network_access_full if child_site_network_access_full is not None else jd.get('site-network-access')
+    if child_site_network_access is not None:
+        children['site-network-access'] = from_json_l3vpn_inter__l3vpns__l3vpn__endpoint__site_network_access(child_site_network_access)
+    child_ipv4_address_full = jd.get('l3vpn-inter:ipv4-address')
+    child_ipv4_address = child_ipv4_address_full if child_ipv4_address_full is not None else jd.get('ipv4-address')
+    if child_ipv4_address is not None:
+        children['ipv4-address'] = from_json_l3vpn_inter__l3vpns__l3vpn__endpoint__ipv4_address(child_ipv4_address)
+    child_ipv4_prefix_length_full = jd.get('l3vpn-inter:ipv4-prefix-length')
+    child_ipv4_prefix_length = child_ipv4_prefix_length_full if child_ipv4_prefix_length_full is not None else jd.get('ipv4-prefix-length')
+    if child_ipv4_prefix_length is not None:
+        children['ipv4-prefix-length'] = from_json_l3vpn_inter__l3vpns__l3vpn__endpoint__ipv4_prefix_length(child_ipv4_prefix_length)
+    return yang.gdata.ListElement([str(child_device if child_device is not None else ""), str(child_interface if child_interface is not None else "")], children)
+
+mut def from_json_l3vpn_inter__l3vpns__l3vpn__endpoint(jd: list[dict[str, ?value]]) -> yang.gdata.List:
+    elements = []
+    for e in jd:
+        if isinstance(e, dict):
+            elements.append(from_json_l3vpn_inter__l3vpns__l3vpn__endpoint_element(e))
+    return yang.gdata.List(keys=['device', 'interface'], elements=elements, user_order=False, ns=None, prefix=None)
+
+mut def to_json_l3vpn_inter__l3vpns__l3vpn__endpoint_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+    children = {}
+    child_device = n.children.get('device')
+    if child_device is not None:
+        if isinstance(child_device, yang.gdata.Leaf):
+            children['device'] = child_device.val
+    child_interface = n.children.get('interface')
+    if child_interface is not None:
+        if isinstance(child_interface, yang.gdata.Leaf):
+            children['interface'] = child_interface.val
+    child_site = n.children.get('site')
+    if child_site is not None:
+        if isinstance(child_site, yang.gdata.Leaf):
+            children['site'] = child_site.val
+    child_site_network_access = n.children.get('site-network-access')
+    if child_site_network_access is not None:
+        if isinstance(child_site_network_access, yang.gdata.Leaf):
+            children['site-network-access'] = child_site_network_access.val
+    child_ipv4_address = n.children.get('ipv4-address')
+    if child_ipv4_address is not None:
+        if isinstance(child_ipv4_address, yang.gdata.Leaf):
+            children['ipv4-address'] = child_ipv4_address.val
+    child_ipv4_prefix_length = n.children.get('ipv4-prefix-length')
+    if child_ipv4_prefix_length is not None:
+        if isinstance(child_ipv4_prefix_length, yang.gdata.Leaf):
+            children['ipv4-prefix-length'] = child_ipv4_prefix_length.val
+    return children
+
+mut def to_json_l3vpn_inter__l3vpns__l3vpn__endpoint(n: yang.gdata.List) -> list[dict[str, ?value]]:
+    elements = []
+    for e in n.elements:
+        elements.append(to_json_l3vpn_inter__l3vpns__l3vpn__endpoint_element(e))
+    return elements
+
+
 class l3vpn_inter__l3vpns__l3vpn_entry(yang.adata.MNode):
     name: str
     description: ?str
@@ -176,6 +325,102 @@ class l3vpn_inter__l3vpns__l3vpn(yang.adata.MNode):
         return res
 
 
+mut def from_json_path_l3vpn_inter__l3vpns__l3vpn_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        val = from_json_l3vpn_inter__l3vpns__l3vpn_element(jd_dict)
+        if op == "merge":
+            return val
+        elif op == "remove":
+            return yang.gdata.AbsentListElement(val.key_vals)
+        raise ValueError("Invalid operation")
+    elif len(path) > 1:
+        keys = path[0].split(",")
+        point = path[1]
+        rest_path = path[2:]
+        children: dict[str, yang.gdata.Node] = {}
+        for idx, key in enumerate(['name']):
+            children[key] = yang.gdata.Leaf("str", keys[idx])
+        if point == 'description':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'endpoint':
+            children['endpoint'] = from_json_path_l3vpn_inter__l3vpns__l3vpn__endpoint(jd, rest_path, op)
+        return yang.gdata.ListElement(keys, children)
+    raise ValueError("unreachable - no keys to list element")
+
+mut def from_json_path_l3vpn_inter__l3vpns__l3vpn(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        # Check that all keys are present in payload.
+        # If present, they must equal the keys in the path
+        # If not present, fill in from path
+        for key in ['name']:
+            if key not in jd_dict:
+                jd_dict[key] = keys.pop(0)
+            else:
+                if str(jd_dict[key]) != keys.pop(0):
+                    raise ValueError("Key value mismatch between path and payload")
+        element = from_json_l3vpn_inter__l3vpns__l3vpn_element(jd_dict)
+        elements = []
+        if op == "merge":
+            elements.append(element)
+        elif op == "remove":
+            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+        return yang.gdata.List(['name'], elements)
+    elif len(path) > 1:
+        return yang.gdata.List(['name'], [from_json_path_l3vpn_inter__l3vpns__l3vpn_element(jd, path, op)])
+    raise ValueError("Unable to resolve path, no keys provided")
+
+mut def from_json_l3vpn_inter__l3vpns__l3vpn_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+    children = {}
+    child_name_full = jd.get('l3vpn-inter:name')
+    child_name = child_name_full if child_name_full is not None else jd.get('name')
+    if child_name is not None:
+        children['name'] = from_json_l3vpn_inter__l3vpns__l3vpn__name(child_name)
+    child_description_full = jd.get('l3vpn-inter:description')
+    child_description = child_description_full if child_description_full is not None else jd.get('description')
+    if child_description is not None:
+        children['description'] = from_json_l3vpn_inter__l3vpns__l3vpn__description(child_description)
+    child_endpoint_full = jd.get('l3vpn-inter:endpoint')
+    child_endpoint = child_endpoint_full if child_endpoint_full is not None else jd.get('endpoint')
+    if child_endpoint is not None and isinstance(child_endpoint, list):
+        children['endpoint'] = from_json_l3vpn_inter__l3vpns__l3vpn__endpoint(child_endpoint)
+    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+
+mut def from_json_l3vpn_inter__l3vpns__l3vpn(jd: list[dict[str, ?value]]) -> yang.gdata.List:
+    elements = []
+    for e in jd:
+        if isinstance(e, dict):
+            elements.append(from_json_l3vpn_inter__l3vpns__l3vpn_element(e))
+    return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
+
+mut def to_json_l3vpn_inter__l3vpns__l3vpn_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+    children = {}
+    child_name = n.children.get('name')
+    if child_name is not None:
+        if isinstance(child_name, yang.gdata.Leaf):
+            children['name'] = child_name.val
+    child_description = n.children.get('description')
+    if child_description is not None:
+        if isinstance(child_description, yang.gdata.Leaf):
+            children['description'] = child_description.val
+    child_endpoint = n.children.get('endpoint')
+    if child_endpoint is not None:
+        if isinstance(child_endpoint, yang.gdata.List):
+            children['endpoint'] = to_json_l3vpn_inter__l3vpns__l3vpn__endpoint(child_endpoint)
+    return children
+
+mut def to_json_l3vpn_inter__l3vpns__l3vpn(n: yang.gdata.List) -> list[dict[str, ?value]]:
+    elements = []
+    for e in n.elements:
+        elements.append(to_json_l3vpn_inter__l3vpns__l3vpn_element(e))
+    return elements
+
+
 class l3vpn_inter__l3vpns(yang.adata.MNode):
     l3vpn: l3vpn_inter__l3vpns__l3vpn
 
@@ -203,6 +448,52 @@ class l3vpn_inter__l3vpns(yang.adata.MNode):
             return l3vpn_inter__l3vpns(l3vpn=l3vpn_inter__l3vpns__l3vpn.from_xml(yang.gdata.get_xml_children(n, "l3vpn")))
         return l3vpn_inter__l3vpns()
 
+
+mut def from_json_path_l3vpn_inter__l3vpns(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'l3vpn-inter:l3vpn' or point == 'l3vpn':
+            child = {'l3vpn': from_json_path_l3vpn_inter__l3vpns__l3vpn(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_l3vpn_inter__l3vpns(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_l3vpn_inter__l3vpns(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_l3vpn_full = jd.get('l3vpn-inter:l3vpn')
+    child_l3vpn = child_l3vpn_full if child_l3vpn_full is not None else jd.get('l3vpn')
+    if child_l3vpn is not None and isinstance(child_l3vpn, list):
+        children['l3vpn'] = from_json_l3vpn_inter__l3vpns__l3vpn(child_l3vpn)
+    return yang.gdata.Container(children)
+
+mut def to_json_l3vpn_inter__l3vpns(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_l3vpn = n.children.get('l3vpn')
+    if child_l3vpn is not None:
+        if isinstance(child_l3vpn, yang.gdata.List):
+            children['l3vpn'] = to_json_l3vpn_inter__l3vpns__l3vpn(child_l3vpn)
+    return children
+
+
+mut def from_json_netinfra_inter__netinfra__routers__name(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_netinfra_inter__netinfra__routers__id(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_netinfra_inter__netinfra__routers__role(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_netinfra_inter__netinfra__routers__mock(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("enumeration", val)
 
 class netinfra_inter__netinfra__routers_entry(yang.adata.MNode):
     name: str
@@ -284,6 +575,124 @@ class netinfra_inter__netinfra__routers(yang.adata.MNode):
             res.append(netinfra_inter__netinfra__routers_entry.from_xml(node))
         return res
 
+
+mut def from_json_path_netinfra_inter__netinfra__routers_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        val = from_json_netinfra_inter__netinfra__routers_element(jd_dict)
+        if op == "merge":
+            return val
+        elif op == "remove":
+            return yang.gdata.AbsentListElement(val.key_vals)
+        raise ValueError("Invalid operation")
+    elif len(path) > 1:
+        keys = path[0].split(",")
+        point = path[1]
+        rest_path = path[2:]
+        children: dict[str, yang.gdata.Node] = {}
+        for idx, key in enumerate(['name']):
+            children[key] = yang.gdata.Leaf("str", keys[idx])
+        if point == 'id':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'role':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'mock':
+            raise ValueError("Invalid json path to non-inner node")
+        return yang.gdata.ListElement(keys, children)
+    raise ValueError("unreachable - no keys to list element")
+
+mut def from_json_path_netinfra_inter__netinfra__routers(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        # Check that all keys are present in payload.
+        # If present, they must equal the keys in the path
+        # If not present, fill in from path
+        for key in ['name']:
+            if key not in jd_dict:
+                jd_dict[key] = keys.pop(0)
+            else:
+                if str(jd_dict[key]) != keys.pop(0):
+                    raise ValueError("Key value mismatch between path and payload")
+        element = from_json_netinfra_inter__netinfra__routers_element(jd_dict)
+        elements = []
+        if op == "merge":
+            elements.append(element)
+        elif op == "remove":
+            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+        return yang.gdata.List(['name'], elements)
+    elif len(path) > 1:
+        return yang.gdata.List(['name'], [from_json_path_netinfra_inter__netinfra__routers_element(jd, path, op)])
+    raise ValueError("Unable to resolve path, no keys provided")
+
+mut def from_json_netinfra_inter__netinfra__routers_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+    children = {}
+    child_name_full = jd.get('netinfra-inter:name')
+    child_name = child_name_full if child_name_full is not None else jd.get('name')
+    if child_name is not None:
+        children['name'] = from_json_netinfra_inter__netinfra__routers__name(child_name)
+    child_id_full = jd.get('netinfra-inter:id')
+    child_id = child_id_full if child_id_full is not None else jd.get('id')
+    if child_id is not None:
+        children['id'] = from_json_netinfra_inter__netinfra__routers__id(child_id)
+    child_role_full = jd.get('netinfra-inter:role')
+    child_role = child_role_full if child_role_full is not None else jd.get('role')
+    if child_role is not None:
+        children['role'] = from_json_netinfra_inter__netinfra__routers__role(child_role)
+    child_mock_full = jd.get('netinfra-inter:mock')
+    child_mock = child_mock_full if child_mock_full is not None else jd.get('mock')
+    if child_mock is not None:
+        children['mock'] = from_json_netinfra_inter__netinfra__routers__mock(child_mock)
+    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+
+mut def from_json_netinfra_inter__netinfra__routers(jd: list[dict[str, ?value]]) -> yang.gdata.List:
+    elements = []
+    for e in jd:
+        if isinstance(e, dict):
+            elements.append(from_json_netinfra_inter__netinfra__routers_element(e))
+    return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
+
+mut def to_json_netinfra_inter__netinfra__routers_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+    children = {}
+    child_name = n.children.get('name')
+    if child_name is not None:
+        if isinstance(child_name, yang.gdata.Leaf):
+            children['name'] = child_name.val
+    child_id = n.children.get('id')
+    if child_id is not None:
+        if isinstance(child_id, yang.gdata.Leaf):
+            children['id'] = child_id.val
+    child_role = n.children.get('role')
+    if child_role is not None:
+        if isinstance(child_role, yang.gdata.Leaf):
+            children['role'] = child_role.val
+    child_mock = n.children.get('mock')
+    if child_mock is not None:
+        if isinstance(child_mock, yang.gdata.Leaf):
+            children['mock'] = child_mock.val
+    return children
+
+mut def to_json_netinfra_inter__netinfra__routers(n: yang.gdata.List) -> list[dict[str, ?value]]:
+    elements = []
+    for e in n.elements:
+        elements.append(to_json_netinfra_inter__netinfra__routers_element(e))
+    return elements
+
+
+mut def from_json_netinfra_inter__netinfra__backbone_link__left_router(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_netinfra_inter__netinfra__backbone_link__left_interface(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_netinfra_inter__netinfra__backbone_link__right_router(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_netinfra_inter__netinfra__backbone_link__right_interface(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
 
 class netinfra_inter__netinfra__backbone_link_entry(yang.adata.MNode):
     left_router: str
@@ -375,6 +784,106 @@ class netinfra_inter__netinfra__backbone_link(yang.adata.MNode):
         return res
 
 
+mut def from_json_path_netinfra_inter__netinfra__backbone_link_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        val = from_json_netinfra_inter__netinfra__backbone_link_element(jd_dict)
+        if op == "merge":
+            return val
+        elif op == "remove":
+            return yang.gdata.AbsentListElement(val.key_vals)
+        raise ValueError("Invalid operation")
+    elif len(path) > 1:
+        keys = path[0].split(",")
+        point = path[1]
+        rest_path = path[2:]
+        children: dict[str, yang.gdata.Node] = {}
+        for idx, key in enumerate(['left-router', 'left-interface', 'right-router', 'right-interface']):
+            children[key] = yang.gdata.Leaf("str", keys[idx])
+        return yang.gdata.ListElement(keys, children)
+    raise ValueError("unreachable - no keys to list element")
+
+mut def from_json_path_netinfra_inter__netinfra__backbone_link(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        # Check that all keys are present in payload.
+        # If present, they must equal the keys in the path
+        # If not present, fill in from path
+        for key in ['left-router', 'left-interface', 'right-router', 'right-interface']:
+            if key not in jd_dict:
+                jd_dict[key] = keys.pop(0)
+            else:
+                if str(jd_dict[key]) != keys.pop(0):
+                    raise ValueError("Key value mismatch between path and payload")
+        element = from_json_netinfra_inter__netinfra__backbone_link_element(jd_dict)
+        elements = []
+        if op == "merge":
+            elements.append(element)
+        elif op == "remove":
+            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+        return yang.gdata.List(['left-router', 'left-interface', 'right-router', 'right-interface'], elements)
+    elif len(path) > 1:
+        return yang.gdata.List(['left-router', 'left-interface', 'right-router', 'right-interface'], [from_json_path_netinfra_inter__netinfra__backbone_link_element(jd, path, op)])
+    raise ValueError("Unable to resolve path, no keys provided")
+
+mut def from_json_netinfra_inter__netinfra__backbone_link_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+    children = {}
+    child_left_router_full = jd.get('netinfra-inter:left-router')
+    child_left_router = child_left_router_full if child_left_router_full is not None else jd.get('left-router')
+    if child_left_router is not None:
+        children['left-router'] = from_json_netinfra_inter__netinfra__backbone_link__left_router(child_left_router)
+    child_left_interface_full = jd.get('netinfra-inter:left-interface')
+    child_left_interface = child_left_interface_full if child_left_interface_full is not None else jd.get('left-interface')
+    if child_left_interface is not None:
+        children['left-interface'] = from_json_netinfra_inter__netinfra__backbone_link__left_interface(child_left_interface)
+    child_right_router_full = jd.get('netinfra-inter:right-router')
+    child_right_router = child_right_router_full if child_right_router_full is not None else jd.get('right-router')
+    if child_right_router is not None:
+        children['right-router'] = from_json_netinfra_inter__netinfra__backbone_link__right_router(child_right_router)
+    child_right_interface_full = jd.get('netinfra-inter:right-interface')
+    child_right_interface = child_right_interface_full if child_right_interface_full is not None else jd.get('right-interface')
+    if child_right_interface is not None:
+        children['right-interface'] = from_json_netinfra_inter__netinfra__backbone_link__right_interface(child_right_interface)
+    return yang.gdata.ListElement([str(child_left_router if child_left_router is not None else ""), str(child_left_interface if child_left_interface is not None else ""), str(child_right_router if child_right_router is not None else ""), str(child_right_interface if child_right_interface is not None else "")], children)
+
+mut def from_json_netinfra_inter__netinfra__backbone_link(jd: list[dict[str, ?value]]) -> yang.gdata.List:
+    elements = []
+    for e in jd:
+        if isinstance(e, dict):
+            elements.append(from_json_netinfra_inter__netinfra__backbone_link_element(e))
+    return yang.gdata.List(keys=['left-router', 'left-interface', 'right-router', 'right-interface'], elements=elements, user_order=False, ns=None, prefix=None)
+
+mut def to_json_netinfra_inter__netinfra__backbone_link_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+    children = {}
+    child_left_router = n.children.get('left-router')
+    if child_left_router is not None:
+        if isinstance(child_left_router, yang.gdata.Leaf):
+            children['left-router'] = child_left_router.val
+    child_left_interface = n.children.get('left-interface')
+    if child_left_interface is not None:
+        if isinstance(child_left_interface, yang.gdata.Leaf):
+            children['left-interface'] = child_left_interface.val
+    child_right_router = n.children.get('right-router')
+    if child_right_router is not None:
+        if isinstance(child_right_router, yang.gdata.Leaf):
+            children['right-router'] = child_right_router.val
+    child_right_interface = n.children.get('right-interface')
+    if child_right_interface is not None:
+        if isinstance(child_right_interface, yang.gdata.Leaf):
+            children['right-interface'] = child_right_interface.val
+    return children
+
+mut def to_json_netinfra_inter__netinfra__backbone_link(n: yang.gdata.List) -> list[dict[str, ?value]]:
+    elements = []
+    for e in n.elements:
+        elements.append(to_json_netinfra_inter__netinfra__backbone_link_element(e))
+    return elements
+
+
 class netinfra_inter__netinfra(yang.adata.MNode):
     routers: netinfra_inter__netinfra__routers
     backbone_link: netinfra_inter__netinfra__backbone_link
@@ -407,6 +916,51 @@ class netinfra_inter__netinfra(yang.adata.MNode):
         if n != None:
             return netinfra_inter__netinfra(routers=netinfra_inter__netinfra__routers.from_xml(yang.gdata.get_xml_children(n, "routers")), backbone_link=netinfra_inter__netinfra__backbone_link.from_xml(yang.gdata.get_xml_children(n, "backbone-link")))
         return netinfra_inter__netinfra()
+
+
+mut def from_json_path_netinfra_inter__netinfra(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'netinfra-inter:routers' or point == 'routers':
+            child = {'routers': from_json_path_netinfra_inter__netinfra__routers(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        if point == 'netinfra-inter:backbone-link' or point == 'backbone-link':
+            child = {'backbone-link': from_json_path_netinfra_inter__netinfra__backbone_link(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_netinfra_inter__netinfra(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_netinfra_inter__netinfra(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_routers_full = jd.get('netinfra-inter:routers')
+    child_routers = child_routers_full if child_routers_full is not None else jd.get('routers')
+    if child_routers is not None and isinstance(child_routers, list):
+        children['routers'] = from_json_netinfra_inter__netinfra__routers(child_routers)
+    child_backbone_link_full = jd.get('netinfra-inter:backbone-link')
+    child_backbone_link = child_backbone_link_full if child_backbone_link_full is not None else jd.get('backbone-link')
+    if child_backbone_link is not None and isinstance(child_backbone_link, list):
+        children['backbone-link'] = from_json_netinfra_inter__netinfra__backbone_link(child_backbone_link)
+    return yang.gdata.Container(children)
+
+mut def to_json_netinfra_inter__netinfra(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_routers = n.children.get('routers')
+    if child_routers is not None:
+        if isinstance(child_routers, yang.gdata.List):
+            children['routers'] = to_json_netinfra_inter__netinfra__routers(child_routers)
+    child_backbone_link = n.children.get('backbone-link')
+    if child_backbone_link is not None:
+        if isinstance(child_backbone_link, yang.gdata.List):
+            children['backbone-link'] = to_json_netinfra_inter__netinfra__backbone_link(child_backbone_link)
+    return children
 
 
 class root(yang.adata.MNode):
@@ -451,4 +1005,47 @@ class root(yang.adata.MNode):
         if n != None:
             return root(l3vpns=l3vpn_inter__l3vpns.from_xml(yang.gdata.get_xml_opt_child(n, "l3vpns", "http://example.com/l3vpn-inter")), netinfra=netinfra_inter__netinfra.from_xml(yang.gdata.get_xml_opt_child(n, "netinfra", "http://example.com/netinfra-inter")))
         return root()
+
+
+mut def from_json_path(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'l3vpn-inter:l3vpns':
+            child = {'l3vpns': from_json_path_l3vpn_inter__l3vpns(jd, rest_path, op) }
+            return yang.gdata.Root(child)
+        if point == 'netinfra-inter:netinfra':
+            child = {'netinfra': from_json_path_netinfra_inter__netinfra(jd, rest_path, op) }
+            return yang.gdata.Root(child)
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json(jd: dict[str, ?value]) -> yang.gdata.Root:
+    children = {}
+    child_l3vpns = jd.get('l3vpn-inter:l3vpns')
+    if child_l3vpns is not None and isinstance(child_l3vpns, dict):
+        children['l3vpns'] = from_json_l3vpn_inter__l3vpns(child_l3vpns)
+    child_netinfra = jd.get('netinfra-inter:netinfra')
+    if child_netinfra is not None and isinstance(child_netinfra, dict):
+        children['netinfra'] = from_json_netinfra_inter__netinfra(child_netinfra)
+    return yang.gdata.Root(children)
+
+mut def to_json(n: yang.gdata.Root) -> dict[str, ?value]:
+    children = {}
+    child_l3vpns = n.children.get('l3vpns')
+    if child_l3vpns is not None:
+        if isinstance(child_l3vpns, yang.gdata.Container):
+            children['l3vpn-inter:l3vpns'] = to_json_l3vpn_inter__l3vpns(child_l3vpns)
+    child_netinfra = n.children.get('netinfra')
+    if child_netinfra is not None:
+        if isinstance(child_netinfra, yang.gdata.Container):
+            children['netinfra-inter:netinfra'] = to_json_netinfra_inter__netinfra(child_netinfra)
+    return children
 

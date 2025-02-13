@@ -1,9 +1,19 @@
+import json
 import xml
 import yang.adata
 import yang.gdata
 
 # == This file is generated ==
 
+
+mut def from_json_junos_conf_root__configuration__rcsid(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__version(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__system__host_name(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
 
 class junos_conf_root__configuration__system(yang.adata.MNode):
     host_name: ?str
@@ -31,6 +41,72 @@ class junos_conf_root__configuration__system(yang.adata.MNode):
             return junos_conf_root__configuration__system(host_name=yang.gdata.from_xml_opt_str(n, "host-name"))
         return junos_conf_root__configuration__system()
 
+
+mut def from_json_path_junos_conf_root__configuration__system(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:host-name' or point == 'host-name':
+            raise ValueError("Invalid json path to non-inner node")
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__system(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__system(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_host_name_full = jd.get('jc:host-name')
+    child_host_name = child_host_name_full if child_host_name_full is not None else jd.get('host-name')
+    if child_host_name is not None:
+        children['host-name'] = from_json_junos_conf_root__configuration__system__host_name(child_host_name)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__system(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_host_name = n.children.get('host-name')
+    if child_host_name is not None:
+        if isinstance(child_host_name, yang.gdata.Leaf):
+            children['host-name'] = child_host_name.val
+    return children
+
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__name(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__description(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__mtu(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("union", val)
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__mac(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__native_vlan_id(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("union", val)
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__unit__name(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__unit__alias(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__unit__description(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__unit__vlan_id(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__unit__encapsulation(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("enumeration", val)
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet__address__name(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
 
 class junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_entry(yang.adata.MNode):
     name: str
@@ -98,6 +174,82 @@ class junos_conf_root__configuration__interfaces__interface__unit__family__inet_
         return res
 
 
+mut def from_json_path_junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        val = from_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_element(jd_dict)
+        if op == "merge":
+            return val
+        elif op == "remove":
+            return yang.gdata.AbsentListElement(val.key_vals)
+        raise ValueError("Invalid operation")
+    elif len(path) > 1:
+        keys = path[0].split(",")
+        point = path[1]
+        rest_path = path[2:]
+        children: dict[str, yang.gdata.Node] = {}
+        for idx, key in enumerate(['name']):
+            children[key] = yang.gdata.Leaf("str", keys[idx])
+        return yang.gdata.ListElement(keys, children)
+    raise ValueError("unreachable - no keys to list element")
+
+mut def from_json_path_junos_conf_root__configuration__interfaces__interface__unit__family__inet__address(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        # Check that all keys are present in payload.
+        # If present, they must equal the keys in the path
+        # If not present, fill in from path
+        for key in ['name']:
+            if key not in jd_dict:
+                jd_dict[key] = keys.pop(0)
+            else:
+                if str(jd_dict[key]) != keys.pop(0):
+                    raise ValueError("Key value mismatch between path and payload")
+        element = from_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_element(jd_dict)
+        elements = []
+        if op == "merge":
+            elements.append(element)
+        elif op == "remove":
+            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+        return yang.gdata.List(['name'], elements)
+    elif len(path) > 1:
+        return yang.gdata.List(['name'], [from_json_path_junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_element(jd, path, op)])
+    raise ValueError("Unable to resolve path, no keys provided")
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+    children = {}
+    child_name_full = jd.get('jc:name')
+    child_name = child_name_full if child_name_full is not None else jd.get('name')
+    if child_name is not None:
+        children['name'] = from_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet__address__name(child_name)
+    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet__address(jd: list[dict[str, ?value]]) -> yang.gdata.List:
+    elements = []
+    for e in jd:
+        if isinstance(e, dict):
+            elements.append(from_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_element(e))
+    return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
+
+mut def to_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+    children = {}
+    child_name = n.children.get('name')
+    if child_name is not None:
+        if isinstance(child_name, yang.gdata.Leaf):
+            children['name'] = child_name.val
+    return children
+
+mut def to_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet__address(n: yang.gdata.List) -> list[dict[str, ?value]]:
+    elements = []
+    for e in n.elements:
+        elements.append(to_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet__address_element(e))
+    return elements
+
+
 class junos_conf_root__configuration__interfaces__interface__unit__family__inet(yang.adata.MNode):
     address: junos_conf_root__configuration__interfaces__interface__unit__family__inet__address
 
@@ -124,6 +276,40 @@ class junos_conf_root__configuration__interfaces__interface__unit__family__inet(
         if n != None:
             return junos_conf_root__configuration__interfaces__interface__unit__family__inet(address=junos_conf_root__configuration__interfaces__interface__unit__family__inet__address.from_xml(yang.gdata.get_xml_children(n, "address")))
         return None
+
+
+mut def from_json_path_junos_conf_root__configuration__interfaces__interface__unit__family__inet(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:address' or point == 'address':
+            child = {'address': from_json_path_junos_conf_root__configuration__interfaces__interface__unit__family__inet__address(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_address_full = jd.get('jc:address')
+    child_address = child_address_full if child_address_full is not None else jd.get('address')
+    if child_address is not None and isinstance(child_address, list):
+        children['address'] = from_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet__address(child_address)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_address = n.children.get('address')
+    if child_address is not None:
+        if isinstance(child_address, yang.gdata.List):
+            children['address'] = to_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet__address(child_address)
+    return children
 
 
 class junos_conf_root__configuration__interfaces__interface__unit__family(yang.adata.MNode):
@@ -160,6 +346,46 @@ class junos_conf_root__configuration__interfaces__interface__unit__family(yang.a
             return junos_conf_root__configuration__interfaces__interface__unit__family(inet=junos_conf_root__configuration__interfaces__interface__unit__family__inet.from_xml(yang.gdata.get_xml_opt_child(n, "inet")))
         return junos_conf_root__configuration__interfaces__interface__unit__family()
 
+
+mut def from_json_path_junos_conf_root__configuration__interfaces__interface__unit__family(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:inet' or point == 'inet':
+            child = {'inet': from_json_path_junos_conf_root__configuration__interfaces__interface__unit__family__inet(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__interfaces__interface__unit__family(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__unit__family(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_inet_full = jd.get('jc:inet')
+    child_inet = child_inet_full if child_inet_full is not None else jd.get('inet')
+    if child_inet is not None and isinstance(child_inet, dict):
+        children['inet'] = from_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet(child_inet)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__interfaces__interface__unit__family(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_inet = n.children.get('inet')
+    if child_inet is not None:
+        if isinstance(child_inet, yang.gdata.Container):
+            children['inet'] = to_json_junos_conf_root__configuration__interfaces__interface__unit__family__inet(child_inet)
+    return children
+
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__unit__mtu(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("union", val)
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__unit__mac(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
 
 class junos_conf_root__configuration__interfaces__interface__unit_entry(yang.adata.MNode):
     name: str
@@ -268,6 +494,152 @@ class junos_conf_root__configuration__interfaces__interface__unit(yang.adata.MNo
         return res
 
 
+mut def from_json_path_junos_conf_root__configuration__interfaces__interface__unit_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        val = from_json_junos_conf_root__configuration__interfaces__interface__unit_element(jd_dict)
+        if op == "merge":
+            return val
+        elif op == "remove":
+            return yang.gdata.AbsentListElement(val.key_vals)
+        raise ValueError("Invalid operation")
+    elif len(path) > 1:
+        keys = path[0].split(",")
+        point = path[1]
+        rest_path = path[2:]
+        children: dict[str, yang.gdata.Node] = {}
+        for idx, key in enumerate(['name']):
+            children[key] = yang.gdata.Leaf("str", keys[idx])
+        if point == 'alias':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'description':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'vlan-id':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'encapsulation':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'family':
+            children['family'] = from_json_path_junos_conf_root__configuration__interfaces__interface__unit__family(jd, rest_path, op)
+        if point == 'mtu':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'mac':
+            raise ValueError("Invalid json path to non-inner node")
+        return yang.gdata.ListElement(keys, children)
+    raise ValueError("unreachable - no keys to list element")
+
+mut def from_json_path_junos_conf_root__configuration__interfaces__interface__unit(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        # Check that all keys are present in payload.
+        # If present, they must equal the keys in the path
+        # If not present, fill in from path
+        for key in ['name']:
+            if key not in jd_dict:
+                jd_dict[key] = keys.pop(0)
+            else:
+                if str(jd_dict[key]) != keys.pop(0):
+                    raise ValueError("Key value mismatch between path and payload")
+        element = from_json_junos_conf_root__configuration__interfaces__interface__unit_element(jd_dict)
+        elements = []
+        if op == "merge":
+            elements.append(element)
+        elif op == "remove":
+            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+        return yang.gdata.List(['name'], elements)
+    elif len(path) > 1:
+        return yang.gdata.List(['name'], [from_json_path_junos_conf_root__configuration__interfaces__interface__unit_element(jd, path, op)])
+    raise ValueError("Unable to resolve path, no keys provided")
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__unit_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+    children = {}
+    child_name_full = jd.get('jc:name')
+    child_name = child_name_full if child_name_full is not None else jd.get('name')
+    if child_name is not None:
+        children['name'] = from_json_junos_conf_root__configuration__interfaces__interface__unit__name(child_name)
+    child_alias_full = jd.get('jc:alias')
+    child_alias = child_alias_full if child_alias_full is not None else jd.get('alias')
+    if child_alias is not None:
+        children['alias'] = from_json_junos_conf_root__configuration__interfaces__interface__unit__alias(child_alias)
+    child_description_full = jd.get('jc:description')
+    child_description = child_description_full if child_description_full is not None else jd.get('description')
+    if child_description is not None:
+        children['description'] = from_json_junos_conf_root__configuration__interfaces__interface__unit__description(child_description)
+    child_vlan_id_full = jd.get('jc:vlan-id')
+    child_vlan_id = child_vlan_id_full if child_vlan_id_full is not None else jd.get('vlan-id')
+    if child_vlan_id is not None:
+        children['vlan-id'] = from_json_junos_conf_root__configuration__interfaces__interface__unit__vlan_id(child_vlan_id)
+    child_encapsulation_full = jd.get('jc:encapsulation')
+    child_encapsulation = child_encapsulation_full if child_encapsulation_full is not None else jd.get('encapsulation')
+    if child_encapsulation is not None:
+        children['encapsulation'] = from_json_junos_conf_root__configuration__interfaces__interface__unit__encapsulation(child_encapsulation)
+    child_family_full = jd.get('jc:family')
+    child_family = child_family_full if child_family_full is not None else jd.get('family')
+    if child_family is not None and isinstance(child_family, dict):
+        children['family'] = from_json_junos_conf_root__configuration__interfaces__interface__unit__family(child_family)
+    child_mtu_full = jd.get('jc:mtu')
+    child_mtu = child_mtu_full if child_mtu_full is not None else jd.get('mtu')
+    if child_mtu is not None:
+        children['mtu'] = from_json_junos_conf_root__configuration__interfaces__interface__unit__mtu(child_mtu)
+    child_mac_full = jd.get('jc:mac')
+    child_mac = child_mac_full if child_mac_full is not None else jd.get('mac')
+    if child_mac is not None:
+        children['mac'] = from_json_junos_conf_root__configuration__interfaces__interface__unit__mac(child_mac)
+    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface__unit(jd: list[dict[str, ?value]]) -> yang.gdata.List:
+    elements = []
+    for e in jd:
+        if isinstance(e, dict):
+            elements.append(from_json_junos_conf_root__configuration__interfaces__interface__unit_element(e))
+    return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
+
+mut def to_json_junos_conf_root__configuration__interfaces__interface__unit_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+    children = {}
+    child_name = n.children.get('name')
+    if child_name is not None:
+        if isinstance(child_name, yang.gdata.Leaf):
+            children['name'] = child_name.val
+    child_alias = n.children.get('alias')
+    if child_alias is not None:
+        if isinstance(child_alias, yang.gdata.Leaf):
+            children['alias'] = child_alias.val
+    child_description = n.children.get('description')
+    if child_description is not None:
+        if isinstance(child_description, yang.gdata.Leaf):
+            children['description'] = child_description.val
+    child_vlan_id = n.children.get('vlan-id')
+    if child_vlan_id is not None:
+        if isinstance(child_vlan_id, yang.gdata.Leaf):
+            children['vlan-id'] = child_vlan_id.val
+    child_encapsulation = n.children.get('encapsulation')
+    if child_encapsulation is not None:
+        if isinstance(child_encapsulation, yang.gdata.Leaf):
+            children['encapsulation'] = child_encapsulation.val
+    child_family = n.children.get('family')
+    if child_family is not None:
+        if isinstance(child_family, yang.gdata.Container):
+            children['family'] = to_json_junos_conf_root__configuration__interfaces__interface__unit__family(child_family)
+    child_mtu = n.children.get('mtu')
+    if child_mtu is not None:
+        if isinstance(child_mtu, yang.gdata.Leaf):
+            children['mtu'] = child_mtu.val
+    child_mac = n.children.get('mac')
+    if child_mac is not None:
+        if isinstance(child_mac, yang.gdata.Leaf):
+            children['mac'] = child_mac.val
+    return children
+
+mut def to_json_junos_conf_root__configuration__interfaces__interface__unit(n: yang.gdata.List) -> list[dict[str, ?value]]:
+    elements = []
+    for e in n.elements:
+        elements.append(to_json_junos_conf_root__configuration__interfaces__interface__unit_element(e))
+    return elements
+
+
 class junos_conf_root__configuration__interfaces__interface_entry(yang.adata.MNode):
     name: str
     description: ?str
@@ -360,6 +732,132 @@ class junos_conf_root__configuration__interfaces__interface(yang.adata.MNode):
         return res
 
 
+mut def from_json_path_junos_conf_root__configuration__interfaces__interface_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        val = from_json_junos_conf_root__configuration__interfaces__interface_element(jd_dict)
+        if op == "merge":
+            return val
+        elif op == "remove":
+            return yang.gdata.AbsentListElement(val.key_vals)
+        raise ValueError("Invalid operation")
+    elif len(path) > 1:
+        keys = path[0].split(",")
+        point = path[1]
+        rest_path = path[2:]
+        children: dict[str, yang.gdata.Node] = {}
+        for idx, key in enumerate(['name']):
+            children[key] = yang.gdata.Leaf("str", keys[idx])
+        if point == 'description':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'mtu':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'mac':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'native-vlan-id':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'unit':
+            children['unit'] = from_json_path_junos_conf_root__configuration__interfaces__interface__unit(jd, rest_path, op)
+        return yang.gdata.ListElement(keys, children)
+    raise ValueError("unreachable - no keys to list element")
+
+mut def from_json_path_junos_conf_root__configuration__interfaces__interface(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        # Check that all keys are present in payload.
+        # If present, they must equal the keys in the path
+        # If not present, fill in from path
+        for key in ['name']:
+            if key not in jd_dict:
+                jd_dict[key] = keys.pop(0)
+            else:
+                if str(jd_dict[key]) != keys.pop(0):
+                    raise ValueError("Key value mismatch between path and payload")
+        element = from_json_junos_conf_root__configuration__interfaces__interface_element(jd_dict)
+        elements = []
+        if op == "merge":
+            elements.append(element)
+        elif op == "remove":
+            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+        return yang.gdata.List(['name'], elements)
+    elif len(path) > 1:
+        return yang.gdata.List(['name'], [from_json_path_junos_conf_root__configuration__interfaces__interface_element(jd, path, op)])
+    raise ValueError("Unable to resolve path, no keys provided")
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+    children = {}
+    child_name_full = jd.get('jc:name')
+    child_name = child_name_full if child_name_full is not None else jd.get('name')
+    if child_name is not None:
+        children['name'] = from_json_junos_conf_root__configuration__interfaces__interface__name(child_name)
+    child_description_full = jd.get('jc:description')
+    child_description = child_description_full if child_description_full is not None else jd.get('description')
+    if child_description is not None:
+        children['description'] = from_json_junos_conf_root__configuration__interfaces__interface__description(child_description)
+    child_mtu_full = jd.get('jc:mtu')
+    child_mtu = child_mtu_full if child_mtu_full is not None else jd.get('mtu')
+    if child_mtu is not None:
+        children['mtu'] = from_json_junos_conf_root__configuration__interfaces__interface__mtu(child_mtu)
+    child_mac_full = jd.get('jc:mac')
+    child_mac = child_mac_full if child_mac_full is not None else jd.get('mac')
+    if child_mac is not None:
+        children['mac'] = from_json_junos_conf_root__configuration__interfaces__interface__mac(child_mac)
+    child_native_vlan_id_full = jd.get('jc:native-vlan-id')
+    child_native_vlan_id = child_native_vlan_id_full if child_native_vlan_id_full is not None else jd.get('native-vlan-id')
+    if child_native_vlan_id is not None:
+        children['native-vlan-id'] = from_json_junos_conf_root__configuration__interfaces__interface__native_vlan_id(child_native_vlan_id)
+    child_unit_full = jd.get('jc:unit')
+    child_unit = child_unit_full if child_unit_full is not None else jd.get('unit')
+    if child_unit is not None and isinstance(child_unit, list):
+        children['unit'] = from_json_junos_conf_root__configuration__interfaces__interface__unit(child_unit)
+    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+
+mut def from_json_junos_conf_root__configuration__interfaces__interface(jd: list[dict[str, ?value]]) -> yang.gdata.List:
+    elements = []
+    for e in jd:
+        if isinstance(e, dict):
+            elements.append(from_json_junos_conf_root__configuration__interfaces__interface_element(e))
+    return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
+
+mut def to_json_junos_conf_root__configuration__interfaces__interface_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+    children = {}
+    child_name = n.children.get('name')
+    if child_name is not None:
+        if isinstance(child_name, yang.gdata.Leaf):
+            children['name'] = child_name.val
+    child_description = n.children.get('description')
+    if child_description is not None:
+        if isinstance(child_description, yang.gdata.Leaf):
+            children['description'] = child_description.val
+    child_mtu = n.children.get('mtu')
+    if child_mtu is not None:
+        if isinstance(child_mtu, yang.gdata.Leaf):
+            children['mtu'] = child_mtu.val
+    child_mac = n.children.get('mac')
+    if child_mac is not None:
+        if isinstance(child_mac, yang.gdata.Leaf):
+            children['mac'] = child_mac.val
+    child_native_vlan_id = n.children.get('native-vlan-id')
+    if child_native_vlan_id is not None:
+        if isinstance(child_native_vlan_id, yang.gdata.Leaf):
+            children['native-vlan-id'] = child_native_vlan_id.val
+    child_unit = n.children.get('unit')
+    if child_unit is not None:
+        if isinstance(child_unit, yang.gdata.List):
+            children['unit'] = to_json_junos_conf_root__configuration__interfaces__interface__unit(child_unit)
+    return children
+
+mut def to_json_junos_conf_root__configuration__interfaces__interface(n: yang.gdata.List) -> list[dict[str, ?value]]:
+    elements = []
+    for e in n.elements:
+        elements.append(to_json_junos_conf_root__configuration__interfaces__interface_element(e))
+    return elements
+
+
 class junos_conf_root__configuration__interfaces(yang.adata.MNode):
     interface: junos_conf_root__configuration__interfaces__interface
 
@@ -387,6 +885,61 @@ class junos_conf_root__configuration__interfaces(yang.adata.MNode):
             return junos_conf_root__configuration__interfaces(interface=junos_conf_root__configuration__interfaces__interface.from_xml(yang.gdata.get_xml_children(n, "interface")))
         return junos_conf_root__configuration__interfaces()
 
+
+mut def from_json_path_junos_conf_root__configuration__interfaces(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:interface' or point == 'interface':
+            child = {'interface': from_json_path_junos_conf_root__configuration__interfaces__interface(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__interfaces(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__interfaces(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_interface_full = jd.get('jc:interface')
+    child_interface = child_interface_full if child_interface_full is not None else jd.get('interface')
+    if child_interface is not None and isinstance(child_interface, list):
+        children['interface'] = from_json_junos_conf_root__configuration__interfaces__interface(child_interface)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__interfaces(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_interface = n.children.get('interface')
+    if child_interface is not None:
+        if isinstance(child_interface, yang.gdata.List):
+            children['interface'] = to_json_junos_conf_root__configuration__interfaces__interface(child_interface)
+    return children
+
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__name(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__instance_type(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("enumeration", val)
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__interface__name(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__interface__any(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("empty", val)
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__interface__unicast(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("empty", val)
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__interface__multicast(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("empty", val)
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__interface__primary(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("empty", val)
 
 class junos_conf_root__configuration__routing_instances__instance__interface_entry(yang.adata.MNode):
     name: str
@@ -474,6 +1027,125 @@ class junos_conf_root__configuration__routing_instances__instance__interface(yan
         return res
 
 
+mut def from_json_path_junos_conf_root__configuration__routing_instances__instance__interface_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        val = from_json_junos_conf_root__configuration__routing_instances__instance__interface_element(jd_dict)
+        if op == "merge":
+            return val
+        elif op == "remove":
+            return yang.gdata.AbsentListElement(val.key_vals)
+        raise ValueError("Invalid operation")
+    elif len(path) > 1:
+        keys = path[0].split(",")
+        point = path[1]
+        rest_path = path[2:]
+        children: dict[str, yang.gdata.Node] = {}
+        for idx, key in enumerate(['name']):
+            children[key] = yang.gdata.Leaf("str", keys[idx])
+        if point == 'any':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'unicast':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'multicast':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'primary':
+            raise ValueError("Invalid json path to non-inner node")
+        return yang.gdata.ListElement(keys, children)
+    raise ValueError("unreachable - no keys to list element")
+
+mut def from_json_path_junos_conf_root__configuration__routing_instances__instance__interface(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        # Check that all keys are present in payload.
+        # If present, they must equal the keys in the path
+        # If not present, fill in from path
+        for key in ['name']:
+            if key not in jd_dict:
+                jd_dict[key] = keys.pop(0)
+            else:
+                if str(jd_dict[key]) != keys.pop(0):
+                    raise ValueError("Key value mismatch between path and payload")
+        element = from_json_junos_conf_root__configuration__routing_instances__instance__interface_element(jd_dict)
+        elements = []
+        if op == "merge":
+            elements.append(element)
+        elif op == "remove":
+            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+        return yang.gdata.List(['name'], elements)
+    elif len(path) > 1:
+        return yang.gdata.List(['name'], [from_json_path_junos_conf_root__configuration__routing_instances__instance__interface_element(jd, path, op)])
+    raise ValueError("Unable to resolve path, no keys provided")
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__interface_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+    children = {}
+    child_name_full = jd.get('jc:name')
+    child_name = child_name_full if child_name_full is not None else jd.get('name')
+    if child_name is not None:
+        children['name'] = from_json_junos_conf_root__configuration__routing_instances__instance__interface__name(child_name)
+    child_any_full = jd.get('jc:any')
+    child_any = child_any_full if child_any_full is not None else jd.get('any')
+    if child_any is not None:
+        children['any'] = from_json_junos_conf_root__configuration__routing_instances__instance__interface__any(child_any)
+    child_unicast_full = jd.get('jc:unicast')
+    child_unicast = child_unicast_full if child_unicast_full is not None else jd.get('unicast')
+    if child_unicast is not None:
+        children['unicast'] = from_json_junos_conf_root__configuration__routing_instances__instance__interface__unicast(child_unicast)
+    child_multicast_full = jd.get('jc:multicast')
+    child_multicast = child_multicast_full if child_multicast_full is not None else jd.get('multicast')
+    if child_multicast is not None:
+        children['multicast'] = from_json_junos_conf_root__configuration__routing_instances__instance__interface__multicast(child_multicast)
+    child_primary_full = jd.get('jc:primary')
+    child_primary = child_primary_full if child_primary_full is not None else jd.get('primary')
+    if child_primary is not None:
+        children['primary'] = from_json_junos_conf_root__configuration__routing_instances__instance__interface__primary(child_primary)
+    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__interface(jd: list[dict[str, ?value]]) -> yang.gdata.List:
+    elements = []
+    for e in jd:
+        if isinstance(e, dict):
+            elements.append(from_json_junos_conf_root__configuration__routing_instances__instance__interface_element(e))
+    return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
+
+mut def to_json_junos_conf_root__configuration__routing_instances__instance__interface_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+    children = {}
+    child_name = n.children.get('name')
+    if child_name is not None:
+        if isinstance(child_name, yang.gdata.Leaf):
+            children['name'] = child_name.val
+    child_any = n.children.get('any')
+    if child_any is not None:
+        if isinstance(child_any, yang.gdata.Leaf):
+            children['any'] = child_any.val
+    child_unicast = n.children.get('unicast')
+    if child_unicast is not None:
+        if isinstance(child_unicast, yang.gdata.Leaf):
+            children['unicast'] = child_unicast.val
+    child_multicast = n.children.get('multicast')
+    if child_multicast is not None:
+        if isinstance(child_multicast, yang.gdata.Leaf):
+            children['multicast'] = child_multicast.val
+    child_primary = n.children.get('primary')
+    if child_primary is not None:
+        if isinstance(child_primary, yang.gdata.Leaf):
+            children['primary'] = child_primary.val
+    return children
+
+mut def to_json_junos_conf_root__configuration__routing_instances__instance__interface(n: yang.gdata.List) -> list[dict[str, ?value]]:
+    elements = []
+    for e in n.elements:
+        elements.append(to_json_junos_conf_root__configuration__routing_instances__instance__interface_element(e))
+    return elements
+
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__route_distinguisher__rd_type(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
 class junos_conf_root__configuration__routing_instances__instance__route_distinguisher(yang.adata.MNode):
     rd_type: ?str
 
@@ -500,6 +1172,57 @@ class junos_conf_root__configuration__routing_instances__instance__route_disting
             return junos_conf_root__configuration__routing_instances__instance__route_distinguisher(rd_type=yang.gdata.from_xml_opt_str(n, "rd-type"))
         return junos_conf_root__configuration__routing_instances__instance__route_distinguisher()
 
+
+mut def from_json_path_junos_conf_root__configuration__routing_instances__instance__route_distinguisher(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:rd-type' or point == 'rd-type':
+            raise ValueError("Invalid json path to non-inner node")
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__routing_instances__instance__route_distinguisher(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__route_distinguisher(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_rd_type_full = jd.get('jc:rd-type')
+    child_rd_type = child_rd_type_full if child_rd_type_full is not None else jd.get('rd-type')
+    if child_rd_type is not None:
+        children['rd-type'] = from_json_junos_conf_root__configuration__routing_instances__instance__route_distinguisher__rd_type(child_rd_type)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__routing_instances__instance__route_distinguisher(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_rd_type = n.children.get('rd-type')
+    if child_rd_type is not None:
+        if isinstance(child_rd_type, yang.gdata.Leaf):
+            children['rd-type'] = child_rd_type.val
+    return children
+
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__export_default_action(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("enumeration", val)
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__import_default_action(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("enumeration", val)
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__vrf_target__community(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__vrf_target__import(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__vrf_target__export(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__vrf_target__auto(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("empty", val)
 
 class junos_conf_root__configuration__routing_instances__instance__vrf_target(yang.adata.MNode):
     community: ?str
@@ -542,6 +1265,72 @@ class junos_conf_root__configuration__routing_instances__instance__vrf_target(ya
             return junos_conf_root__configuration__routing_instances__instance__vrf_target(community=yang.gdata.from_xml_opt_str(n, "community"), import_=yang.gdata.from_xml_opt_str(n, "import"), export=yang.gdata.from_xml_opt_str(n, "export"), auto=yang.gdata.from_xml_opt_bool(n, "auto"))
         return junos_conf_root__configuration__routing_instances__instance__vrf_target()
 
+
+mut def from_json_path_junos_conf_root__configuration__routing_instances__instance__vrf_target(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:community' or point == 'community':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'jc:import' or point == 'import':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'jc:export' or point == 'export':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'jc:auto' or point == 'auto':
+            raise ValueError("Invalid json path to non-inner node")
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__routing_instances__instance__vrf_target(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__vrf_target(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_community_full = jd.get('jc:community')
+    child_community = child_community_full if child_community_full is not None else jd.get('community')
+    if child_community is not None:
+        children['community'] = from_json_junos_conf_root__configuration__routing_instances__instance__vrf_target__community(child_community)
+    child_import__full = jd.get('jc:import')
+    child_import_ = child_import__full if child_import__full is not None else jd.get('import')
+    if child_import_ is not None:
+        children['import'] = from_json_junos_conf_root__configuration__routing_instances__instance__vrf_target__import(child_import_)
+    child_export_full = jd.get('jc:export')
+    child_export = child_export_full if child_export_full is not None else jd.get('export')
+    if child_export is not None:
+        children['export'] = from_json_junos_conf_root__configuration__routing_instances__instance__vrf_target__export(child_export)
+    child_auto_full = jd.get('jc:auto')
+    child_auto = child_auto_full if child_auto_full is not None else jd.get('auto')
+    if child_auto is not None:
+        children['auto'] = from_json_junos_conf_root__configuration__routing_instances__instance__vrf_target__auto(child_auto)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__routing_instances__instance__vrf_target(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_community = n.children.get('community')
+    if child_community is not None:
+        if isinstance(child_community, yang.gdata.Leaf):
+            children['community'] = child_community.val
+    child_import_ = n.children.get('import')
+    if child_import_ is not None:
+        if isinstance(child_import_, yang.gdata.Leaf):
+            children['import'] = child_import_.val
+    child_export = n.children.get('export')
+    if child_export is not None:
+        if isinstance(child_export, yang.gdata.Leaf):
+            children['export'] = child_export.val
+    child_auto = n.children.get('auto')
+    if child_auto is not None:
+        if isinstance(child_auto, yang.gdata.Leaf):
+            children['auto'] = child_auto.val
+    return children
+
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance__no_vrf_advertise(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("empty", val)
 
 class junos_conf_root__configuration__routing_instances__instance_entry(yang.adata.MNode):
     name: str
@@ -657,6 +1446,152 @@ class junos_conf_root__configuration__routing_instances__instance(yang.adata.MNo
         return res
 
 
+mut def from_json_path_junos_conf_root__configuration__routing_instances__instance_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        val = from_json_junos_conf_root__configuration__routing_instances__instance_element(jd_dict)
+        if op == "merge":
+            return val
+        elif op == "remove":
+            return yang.gdata.AbsentListElement(val.key_vals)
+        raise ValueError("Invalid operation")
+    elif len(path) > 1:
+        keys = path[0].split(",")
+        point = path[1]
+        rest_path = path[2:]
+        children: dict[str, yang.gdata.Node] = {}
+        for idx, key in enumerate(['name']):
+            children[key] = yang.gdata.Leaf("str", keys[idx])
+        if point == 'instance-type':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'interface':
+            children['interface'] = from_json_path_junos_conf_root__configuration__routing_instances__instance__interface(jd, rest_path, op)
+        if point == 'route-distinguisher':
+            children['route-distinguisher'] = from_json_path_junos_conf_root__configuration__routing_instances__instance__route_distinguisher(jd, rest_path, op)
+        if point == 'export-default-action':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'import-default-action':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'vrf-target':
+            children['vrf-target'] = from_json_path_junos_conf_root__configuration__routing_instances__instance__vrf_target(jd, rest_path, op)
+        if point == 'no-vrf-advertise':
+            raise ValueError("Invalid json path to non-inner node")
+        return yang.gdata.ListElement(keys, children)
+    raise ValueError("unreachable - no keys to list element")
+
+mut def from_json_path_junos_conf_root__configuration__routing_instances__instance(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        # Check that all keys are present in payload.
+        # If present, they must equal the keys in the path
+        # If not present, fill in from path
+        for key in ['name']:
+            if key not in jd_dict:
+                jd_dict[key] = keys.pop(0)
+            else:
+                if str(jd_dict[key]) != keys.pop(0):
+                    raise ValueError("Key value mismatch between path and payload")
+        element = from_json_junos_conf_root__configuration__routing_instances__instance_element(jd_dict)
+        elements = []
+        if op == "merge":
+            elements.append(element)
+        elif op == "remove":
+            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+        return yang.gdata.List(['name'], elements)
+    elif len(path) > 1:
+        return yang.gdata.List(['name'], [from_json_path_junos_conf_root__configuration__routing_instances__instance_element(jd, path, op)])
+    raise ValueError("Unable to resolve path, no keys provided")
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+    children = {}
+    child_name_full = jd.get('jc:name')
+    child_name = child_name_full if child_name_full is not None else jd.get('name')
+    if child_name is not None:
+        children['name'] = from_json_junos_conf_root__configuration__routing_instances__instance__name(child_name)
+    child_instance_type_full = jd.get('jc:instance-type')
+    child_instance_type = child_instance_type_full if child_instance_type_full is not None else jd.get('instance-type')
+    if child_instance_type is not None:
+        children['instance-type'] = from_json_junos_conf_root__configuration__routing_instances__instance__instance_type(child_instance_type)
+    child_interface_full = jd.get('jc:interface')
+    child_interface = child_interface_full if child_interface_full is not None else jd.get('interface')
+    if child_interface is not None and isinstance(child_interface, list):
+        children['interface'] = from_json_junos_conf_root__configuration__routing_instances__instance__interface(child_interface)
+    child_route_distinguisher_full = jd.get('jc:route-distinguisher')
+    child_route_distinguisher = child_route_distinguisher_full if child_route_distinguisher_full is not None else jd.get('route-distinguisher')
+    if child_route_distinguisher is not None and isinstance(child_route_distinguisher, dict):
+        children['route-distinguisher'] = from_json_junos_conf_root__configuration__routing_instances__instance__route_distinguisher(child_route_distinguisher)
+    child_export_default_action_full = jd.get('jc:export-default-action')
+    child_export_default_action = child_export_default_action_full if child_export_default_action_full is not None else jd.get('export-default-action')
+    if child_export_default_action is not None:
+        children['export-default-action'] = from_json_junos_conf_root__configuration__routing_instances__instance__export_default_action(child_export_default_action)
+    child_import_default_action_full = jd.get('jc:import-default-action')
+    child_import_default_action = child_import_default_action_full if child_import_default_action_full is not None else jd.get('import-default-action')
+    if child_import_default_action is not None:
+        children['import-default-action'] = from_json_junos_conf_root__configuration__routing_instances__instance__import_default_action(child_import_default_action)
+    child_vrf_target_full = jd.get('jc:vrf-target')
+    child_vrf_target = child_vrf_target_full if child_vrf_target_full is not None else jd.get('vrf-target')
+    if child_vrf_target is not None and isinstance(child_vrf_target, dict):
+        children['vrf-target'] = from_json_junos_conf_root__configuration__routing_instances__instance__vrf_target(child_vrf_target)
+    child_no_vrf_advertise_full = jd.get('jc:no-vrf-advertise')
+    child_no_vrf_advertise = child_no_vrf_advertise_full if child_no_vrf_advertise_full is not None else jd.get('no-vrf-advertise')
+    if child_no_vrf_advertise is not None:
+        children['no-vrf-advertise'] = from_json_junos_conf_root__configuration__routing_instances__instance__no_vrf_advertise(child_no_vrf_advertise)
+    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+
+mut def from_json_junos_conf_root__configuration__routing_instances__instance(jd: list[dict[str, ?value]]) -> yang.gdata.List:
+    elements = []
+    for e in jd:
+        if isinstance(e, dict):
+            elements.append(from_json_junos_conf_root__configuration__routing_instances__instance_element(e))
+    return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
+
+mut def to_json_junos_conf_root__configuration__routing_instances__instance_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+    children = {}
+    child_name = n.children.get('name')
+    if child_name is not None:
+        if isinstance(child_name, yang.gdata.Leaf):
+            children['name'] = child_name.val
+    child_instance_type = n.children.get('instance-type')
+    if child_instance_type is not None:
+        if isinstance(child_instance_type, yang.gdata.Leaf):
+            children['instance-type'] = child_instance_type.val
+    child_interface = n.children.get('interface')
+    if child_interface is not None:
+        if isinstance(child_interface, yang.gdata.List):
+            children['interface'] = to_json_junos_conf_root__configuration__routing_instances__instance__interface(child_interface)
+    child_route_distinguisher = n.children.get('route-distinguisher')
+    if child_route_distinguisher is not None:
+        if isinstance(child_route_distinguisher, yang.gdata.Container):
+            children['route-distinguisher'] = to_json_junos_conf_root__configuration__routing_instances__instance__route_distinguisher(child_route_distinguisher)
+    child_export_default_action = n.children.get('export-default-action')
+    if child_export_default_action is not None:
+        if isinstance(child_export_default_action, yang.gdata.Leaf):
+            children['export-default-action'] = child_export_default_action.val
+    child_import_default_action = n.children.get('import-default-action')
+    if child_import_default_action is not None:
+        if isinstance(child_import_default_action, yang.gdata.Leaf):
+            children['import-default-action'] = child_import_default_action.val
+    child_vrf_target = n.children.get('vrf-target')
+    if child_vrf_target is not None:
+        if isinstance(child_vrf_target, yang.gdata.Container):
+            children['vrf-target'] = to_json_junos_conf_root__configuration__routing_instances__instance__vrf_target(child_vrf_target)
+    child_no_vrf_advertise = n.children.get('no-vrf-advertise')
+    if child_no_vrf_advertise is not None:
+        if isinstance(child_no_vrf_advertise, yang.gdata.Leaf):
+            children['no-vrf-advertise'] = child_no_vrf_advertise.val
+    return children
+
+mut def to_json_junos_conf_root__configuration__routing_instances__instance(n: yang.gdata.List) -> list[dict[str, ?value]]:
+    elements = []
+    for e in n.elements:
+        elements.append(to_json_junos_conf_root__configuration__routing_instances__instance_element(e))
+    return elements
+
+
 class junos_conf_root__configuration__routing_instances(yang.adata.MNode):
     instance: junos_conf_root__configuration__routing_instances__instance
 
@@ -685,6 +1620,49 @@ class junos_conf_root__configuration__routing_instances(yang.adata.MNode):
         return junos_conf_root__configuration__routing_instances()
 
 
+mut def from_json_path_junos_conf_root__configuration__routing_instances(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:instance' or point == 'instance':
+            child = {'instance': from_json_path_junos_conf_root__configuration__routing_instances__instance(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__routing_instances(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__routing_instances(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_instance_full = jd.get('jc:instance')
+    child_instance = child_instance_full if child_instance_full is not None else jd.get('instance')
+    if child_instance is not None and isinstance(child_instance, list):
+        children['instance'] = from_json_junos_conf_root__configuration__routing_instances__instance(child_instance)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__routing_instances(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_instance = n.children.get('instance')
+    if child_instance is not None:
+        if isinstance(child_instance, yang.gdata.List):
+            children['instance'] = to_json_junos_conf_root__configuration__routing_instances__instance(child_instance)
+    return children
+
+
+mut def from_json_junos_conf_root__configuration__groups__name(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__when__time__start_time(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__when__time__to__end_time(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
 class junos_conf_root__configuration__groups__when__time__to(yang.adata.MNode):
     end_time: ?str
 
@@ -710,6 +1688,39 @@ class junos_conf_root__configuration__groups__when__time__to(yang.adata.MNode):
         if n != None:
             return junos_conf_root__configuration__groups__when__time__to(end_time=yang.gdata.from_xml_opt_str(n, "end-time"))
         return junos_conf_root__configuration__groups__when__time__to()
+
+
+mut def from_json_path_junos_conf_root__configuration__groups__when__time__to(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:end-time' or point == 'end-time':
+            raise ValueError("Invalid json path to non-inner node")
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__groups__when__time__to(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__groups__when__time__to(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_end_time_full = jd.get('jc:end-time')
+    child_end_time = child_end_time_full if child_end_time_full is not None else jd.get('end-time')
+    if child_end_time is not None:
+        children['end-time'] = from_json_junos_conf_root__configuration__groups__when__time__to__end_time(child_end_time)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__groups__when__time__to(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_end_time = n.children.get('end-time')
+    if child_end_time is not None:
+        if isinstance(child_end_time, yang.gdata.Leaf):
+            children['end-time'] = child_end_time.val
+    return children
 
 
 class junos_conf_root__configuration__groups__when__time(yang.adata.MNode):
@@ -749,6 +1760,65 @@ class junos_conf_root__configuration__groups__when__time(yang.adata.MNode):
             return junos_conf_root__configuration__groups__when__time(start_time=yang.gdata.from_xml_opt_str(n, "start-time"), to=junos_conf_root__configuration__groups__when__time__to.from_xml(yang.gdata.get_xml_opt_child(n, "to")))
         return junos_conf_root__configuration__groups__when__time()
 
+
+mut def from_json_path_junos_conf_root__configuration__groups__when__time(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:start-time' or point == 'start-time':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'jc:to' or point == 'to':
+            child = {'to': from_json_path_junos_conf_root__configuration__groups__when__time__to(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__groups__when__time(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__groups__when__time(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_start_time_full = jd.get('jc:start-time')
+    child_start_time = child_start_time_full if child_start_time_full is not None else jd.get('start-time')
+    if child_start_time is not None:
+        children['start-time'] = from_json_junos_conf_root__configuration__groups__when__time__start_time(child_start_time)
+    child_to_full = jd.get('jc:to')
+    child_to = child_to_full if child_to_full is not None else jd.get('to')
+    if child_to is not None and isinstance(child_to, dict):
+        children['to'] = from_json_junos_conf_root__configuration__groups__when__time__to(child_to)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__groups__when__time(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_start_time = n.children.get('start-time')
+    if child_start_time is not None:
+        if isinstance(child_start_time, yang.gdata.Leaf):
+            children['start-time'] = child_start_time.val
+    child_to = n.children.get('to')
+    if child_to is not None:
+        if isinstance(child_to, yang.gdata.Container):
+            children['to'] = to_json_junos_conf_root__configuration__groups__when__time__to(child_to)
+    return children
+
+
+mut def from_json_junos_conf_root__configuration__groups__when__chassis(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("enumeration", val)
+
+mut def from_json_junos_conf_root__configuration__groups__when__model(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__when__routing_engine(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("enumeration", val)
+
+mut def from_json_junos_conf_root__configuration__groups__when__member(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__when__node(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("enumeration", val)
 
 class junos_conf_root__configuration__groups__when(yang.adata.MNode):
     time: junos_conf_root__configuration__groups__when__time
@@ -808,6 +1878,99 @@ class junos_conf_root__configuration__groups__when(yang.adata.MNode):
         return junos_conf_root__configuration__groups__when()
 
 
+mut def from_json_path_junos_conf_root__configuration__groups__when(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:time' or point == 'time':
+            child = {'time': from_json_path_junos_conf_root__configuration__groups__when__time(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        if point == 'jc:chassis' or point == 'chassis':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'jc:model' or point == 'model':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'jc:routing-engine' or point == 'routing-engine':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'jc:member' or point == 'member':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'jc:node' or point == 'node':
+            raise ValueError("Invalid json path to non-inner node")
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__groups__when(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__groups__when(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_time_full = jd.get('jc:time')
+    child_time = child_time_full if child_time_full is not None else jd.get('time')
+    if child_time is not None and isinstance(child_time, dict):
+        children['time'] = from_json_junos_conf_root__configuration__groups__when__time(child_time)
+    child_chassis_full = jd.get('jc:chassis')
+    child_chassis = child_chassis_full if child_chassis_full is not None else jd.get('chassis')
+    if child_chassis is not None:
+        children['chassis'] = from_json_junos_conf_root__configuration__groups__when__chassis(child_chassis)
+    child_model_full = jd.get('jc:model')
+    child_model = child_model_full if child_model_full is not None else jd.get('model')
+    if child_model is not None:
+        children['model'] = from_json_junos_conf_root__configuration__groups__when__model(child_model)
+    child_routing_engine_full = jd.get('jc:routing-engine')
+    child_routing_engine = child_routing_engine_full if child_routing_engine_full is not None else jd.get('routing-engine')
+    if child_routing_engine is not None:
+        children['routing-engine'] = from_json_junos_conf_root__configuration__groups__when__routing_engine(child_routing_engine)
+    child_member_full = jd.get('jc:member')
+    child_member = child_member_full if child_member_full is not None else jd.get('member')
+    if child_member is not None:
+        children['member'] = from_json_junos_conf_root__configuration__groups__when__member(child_member)
+    child_node_full = jd.get('jc:node')
+    child_node = child_node_full if child_node_full is not None else jd.get('node')
+    if child_node is not None:
+        children['node'] = from_json_junos_conf_root__configuration__groups__when__node(child_node)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__groups__when(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_time = n.children.get('time')
+    if child_time is not None:
+        if isinstance(child_time, yang.gdata.Container):
+            children['time'] = to_json_junos_conf_root__configuration__groups__when__time(child_time)
+    child_chassis = n.children.get('chassis')
+    if child_chassis is not None:
+        if isinstance(child_chassis, yang.gdata.Leaf):
+            children['chassis'] = child_chassis.val
+    child_model = n.children.get('model')
+    if child_model is not None:
+        if isinstance(child_model, yang.gdata.Leaf):
+            children['model'] = child_model.val
+    child_routing_engine = n.children.get('routing-engine')
+    if child_routing_engine is not None:
+        if isinstance(child_routing_engine, yang.gdata.Leaf):
+            children['routing-engine'] = child_routing_engine.val
+    child_member = n.children.get('member')
+    if child_member is not None:
+        if isinstance(child_member, yang.gdata.Leaf):
+            children['member'] = child_member.val
+    child_node = n.children.get('node')
+    if child_node is not None:
+        if isinstance(child_node, yang.gdata.Leaf):
+            children['node'] = child_node.val
+    return children
+
+
+mut def from_json_junos_conf_root__configuration__groups__rcsid(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__version(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__system__host_name(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
 class junos_conf_root__configuration__groups__system(yang.adata.MNode):
     host_name: ?str
 
@@ -834,6 +1997,72 @@ class junos_conf_root__configuration__groups__system(yang.adata.MNode):
             return junos_conf_root__configuration__groups__system(host_name=yang.gdata.from_xml_opt_str(n, "host-name"))
         return junos_conf_root__configuration__groups__system()
 
+
+mut def from_json_path_junos_conf_root__configuration__groups__system(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:host-name' or point == 'host-name':
+            raise ValueError("Invalid json path to non-inner node")
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__groups__system(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__groups__system(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_host_name_full = jd.get('jc:host-name')
+    child_host_name = child_host_name_full if child_host_name_full is not None else jd.get('host-name')
+    if child_host_name is not None:
+        children['host-name'] = from_json_junos_conf_root__configuration__groups__system__host_name(child_host_name)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__groups__system(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_host_name = n.children.get('host-name')
+    if child_host_name is not None:
+        if isinstance(child_host_name, yang.gdata.Leaf):
+            children['host-name'] = child_host_name.val
+    return children
+
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__name(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__description(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__mtu(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("union", val)
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__mac(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__native_vlan_id(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("union", val)
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__name(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__alias(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__description(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__vlan_id(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__encapsulation(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("enumeration", val)
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address__name(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
 
 class junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_entry(yang.adata.MNode):
     name: str
@@ -901,6 +2130,82 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit__famil
         return res
 
 
+mut def from_json_path_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        val = from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_element(jd_dict)
+        if op == "merge":
+            return val
+        elif op == "remove":
+            return yang.gdata.AbsentListElement(val.key_vals)
+        raise ValueError("Invalid operation")
+    elif len(path) > 1:
+        keys = path[0].split(",")
+        point = path[1]
+        rest_path = path[2:]
+        children: dict[str, yang.gdata.Node] = {}
+        for idx, key in enumerate(['name']):
+            children[key] = yang.gdata.Leaf("str", keys[idx])
+        return yang.gdata.ListElement(keys, children)
+    raise ValueError("unreachable - no keys to list element")
+
+mut def from_json_path_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        # Check that all keys are present in payload.
+        # If present, they must equal the keys in the path
+        # If not present, fill in from path
+        for key in ['name']:
+            if key not in jd_dict:
+                jd_dict[key] = keys.pop(0)
+            else:
+                if str(jd_dict[key]) != keys.pop(0):
+                    raise ValueError("Key value mismatch between path and payload")
+        element = from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_element(jd_dict)
+        elements = []
+        if op == "merge":
+            elements.append(element)
+        elif op == "remove":
+            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+        return yang.gdata.List(['name'], elements)
+    elif len(path) > 1:
+        return yang.gdata.List(['name'], [from_json_path_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_element(jd, path, op)])
+    raise ValueError("Unable to resolve path, no keys provided")
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+    children = {}
+    child_name_full = jd.get('jc:name')
+    child_name = child_name_full if child_name_full is not None else jd.get('name')
+    if child_name is not None:
+        children['name'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address__name(child_name)
+    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address(jd: list[dict[str, ?value]]) -> yang.gdata.List:
+    elements = []
+    for e in jd:
+        if isinstance(e, dict):
+            elements.append(from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_element(e))
+    return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
+
+mut def to_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+    children = {}
+    child_name = n.children.get('name')
+    if child_name is not None:
+        if isinstance(child_name, yang.gdata.Leaf):
+            children['name'] = child_name.val
+    return children
+
+mut def to_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address(n: yang.gdata.List) -> list[dict[str, ?value]]:
+    elements = []
+    for e in n.elements:
+        elements.append(to_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address_element(e))
+    return elements
+
+
 class junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet(yang.adata.MNode):
     address: junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address
 
@@ -927,6 +2232,40 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit__famil
         if n != None:
             return junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet(address=junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address.from_xml(yang.gdata.get_xml_children(n, "address")))
         return None
+
+
+mut def from_json_path_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:address' or point == 'address':
+            child = {'address': from_json_path_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_address_full = jd.get('jc:address')
+    child_address = child_address_full if child_address_full is not None else jd.get('address')
+    if child_address is not None and isinstance(child_address, list):
+        children['address'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address(child_address)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_address = n.children.get('address')
+    if child_address is not None:
+        if isinstance(child_address, yang.gdata.List):
+            children['address'] = to_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet__address(child_address)
+    return children
 
 
 class junos_conf_root__configuration__groups__interfaces__interface__unit__family(yang.adata.MNode):
@@ -963,6 +2302,46 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit__famil
             return junos_conf_root__configuration__groups__interfaces__interface__unit__family(inet=junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet.from_xml(yang.gdata.get_xml_opt_child(n, "inet")))
         return junos_conf_root__configuration__groups__interfaces__interface__unit__family()
 
+
+mut def from_json_path_junos_conf_root__configuration__groups__interfaces__interface__unit__family(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:inet' or point == 'inet':
+            child = {'inet': from_json_path_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_inet_full = jd.get('jc:inet')
+    child_inet = child_inet_full if child_inet_full is not None else jd.get('inet')
+    if child_inet is not None and isinstance(child_inet, dict):
+        children['inet'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet(child_inet)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_inet = n.children.get('inet')
+    if child_inet is not None:
+        if isinstance(child_inet, yang.gdata.Container):
+            children['inet'] = to_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family__inet(child_inet)
+    return children
+
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__mtu(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("union", val)
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__mac(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
 
 class junos_conf_root__configuration__groups__interfaces__interface__unit_entry(yang.adata.MNode):
     name: str
@@ -1071,6 +2450,152 @@ class junos_conf_root__configuration__groups__interfaces__interface__unit(yang.a
         return res
 
 
+mut def from_json_path_junos_conf_root__configuration__groups__interfaces__interface__unit_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        val = from_json_junos_conf_root__configuration__groups__interfaces__interface__unit_element(jd_dict)
+        if op == "merge":
+            return val
+        elif op == "remove":
+            return yang.gdata.AbsentListElement(val.key_vals)
+        raise ValueError("Invalid operation")
+    elif len(path) > 1:
+        keys = path[0].split(",")
+        point = path[1]
+        rest_path = path[2:]
+        children: dict[str, yang.gdata.Node] = {}
+        for idx, key in enumerate(['name']):
+            children[key] = yang.gdata.Leaf("str", keys[idx])
+        if point == 'alias':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'description':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'vlan-id':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'encapsulation':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'family':
+            children['family'] = from_json_path_junos_conf_root__configuration__groups__interfaces__interface__unit__family(jd, rest_path, op)
+        if point == 'mtu':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'mac':
+            raise ValueError("Invalid json path to non-inner node")
+        return yang.gdata.ListElement(keys, children)
+    raise ValueError("unreachable - no keys to list element")
+
+mut def from_json_path_junos_conf_root__configuration__groups__interfaces__interface__unit(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        # Check that all keys are present in payload.
+        # If present, they must equal the keys in the path
+        # If not present, fill in from path
+        for key in ['name']:
+            if key not in jd_dict:
+                jd_dict[key] = keys.pop(0)
+            else:
+                if str(jd_dict[key]) != keys.pop(0):
+                    raise ValueError("Key value mismatch between path and payload")
+        element = from_json_junos_conf_root__configuration__groups__interfaces__interface__unit_element(jd_dict)
+        elements = []
+        if op == "merge":
+            elements.append(element)
+        elif op == "remove":
+            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+        return yang.gdata.List(['name'], elements)
+    elif len(path) > 1:
+        return yang.gdata.List(['name'], [from_json_path_junos_conf_root__configuration__groups__interfaces__interface__unit_element(jd, path, op)])
+    raise ValueError("Unable to resolve path, no keys provided")
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__unit_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+    children = {}
+    child_name_full = jd.get('jc:name')
+    child_name = child_name_full if child_name_full is not None else jd.get('name')
+    if child_name is not None:
+        children['name'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__name(child_name)
+    child_alias_full = jd.get('jc:alias')
+    child_alias = child_alias_full if child_alias_full is not None else jd.get('alias')
+    if child_alias is not None:
+        children['alias'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__alias(child_alias)
+    child_description_full = jd.get('jc:description')
+    child_description = child_description_full if child_description_full is not None else jd.get('description')
+    if child_description is not None:
+        children['description'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__description(child_description)
+    child_vlan_id_full = jd.get('jc:vlan-id')
+    child_vlan_id = child_vlan_id_full if child_vlan_id_full is not None else jd.get('vlan-id')
+    if child_vlan_id is not None:
+        children['vlan-id'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__vlan_id(child_vlan_id)
+    child_encapsulation_full = jd.get('jc:encapsulation')
+    child_encapsulation = child_encapsulation_full if child_encapsulation_full is not None else jd.get('encapsulation')
+    if child_encapsulation is not None:
+        children['encapsulation'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__encapsulation(child_encapsulation)
+    child_family_full = jd.get('jc:family')
+    child_family = child_family_full if child_family_full is not None else jd.get('family')
+    if child_family is not None and isinstance(child_family, dict):
+        children['family'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family(child_family)
+    child_mtu_full = jd.get('jc:mtu')
+    child_mtu = child_mtu_full if child_mtu_full is not None else jd.get('mtu')
+    if child_mtu is not None:
+        children['mtu'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__mtu(child_mtu)
+    child_mac_full = jd.get('jc:mac')
+    child_mac = child_mac_full if child_mac_full is not None else jd.get('mac')
+    if child_mac is not None:
+        children['mac'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__unit__mac(child_mac)
+    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface__unit(jd: list[dict[str, ?value]]) -> yang.gdata.List:
+    elements = []
+    for e in jd:
+        if isinstance(e, dict):
+            elements.append(from_json_junos_conf_root__configuration__groups__interfaces__interface__unit_element(e))
+    return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
+
+mut def to_json_junos_conf_root__configuration__groups__interfaces__interface__unit_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+    children = {}
+    child_name = n.children.get('name')
+    if child_name is not None:
+        if isinstance(child_name, yang.gdata.Leaf):
+            children['name'] = child_name.val
+    child_alias = n.children.get('alias')
+    if child_alias is not None:
+        if isinstance(child_alias, yang.gdata.Leaf):
+            children['alias'] = child_alias.val
+    child_description = n.children.get('description')
+    if child_description is not None:
+        if isinstance(child_description, yang.gdata.Leaf):
+            children['description'] = child_description.val
+    child_vlan_id = n.children.get('vlan-id')
+    if child_vlan_id is not None:
+        if isinstance(child_vlan_id, yang.gdata.Leaf):
+            children['vlan-id'] = child_vlan_id.val
+    child_encapsulation = n.children.get('encapsulation')
+    if child_encapsulation is not None:
+        if isinstance(child_encapsulation, yang.gdata.Leaf):
+            children['encapsulation'] = child_encapsulation.val
+    child_family = n.children.get('family')
+    if child_family is not None:
+        if isinstance(child_family, yang.gdata.Container):
+            children['family'] = to_json_junos_conf_root__configuration__groups__interfaces__interface__unit__family(child_family)
+    child_mtu = n.children.get('mtu')
+    if child_mtu is not None:
+        if isinstance(child_mtu, yang.gdata.Leaf):
+            children['mtu'] = child_mtu.val
+    child_mac = n.children.get('mac')
+    if child_mac is not None:
+        if isinstance(child_mac, yang.gdata.Leaf):
+            children['mac'] = child_mac.val
+    return children
+
+mut def to_json_junos_conf_root__configuration__groups__interfaces__interface__unit(n: yang.gdata.List) -> list[dict[str, ?value]]:
+    elements = []
+    for e in n.elements:
+        elements.append(to_json_junos_conf_root__configuration__groups__interfaces__interface__unit_element(e))
+    return elements
+
+
 class junos_conf_root__configuration__groups__interfaces__interface_entry(yang.adata.MNode):
     name: str
     description: ?str
@@ -1163,6 +2688,132 @@ class junos_conf_root__configuration__groups__interfaces__interface(yang.adata.M
         return res
 
 
+mut def from_json_path_junos_conf_root__configuration__groups__interfaces__interface_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        val = from_json_junos_conf_root__configuration__groups__interfaces__interface_element(jd_dict)
+        if op == "merge":
+            return val
+        elif op == "remove":
+            return yang.gdata.AbsentListElement(val.key_vals)
+        raise ValueError("Invalid operation")
+    elif len(path) > 1:
+        keys = path[0].split(",")
+        point = path[1]
+        rest_path = path[2:]
+        children: dict[str, yang.gdata.Node] = {}
+        for idx, key in enumerate(['name']):
+            children[key] = yang.gdata.Leaf("str", keys[idx])
+        if point == 'description':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'mtu':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'mac':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'native-vlan-id':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'unit':
+            children['unit'] = from_json_path_junos_conf_root__configuration__groups__interfaces__interface__unit(jd, rest_path, op)
+        return yang.gdata.ListElement(keys, children)
+    raise ValueError("unreachable - no keys to list element")
+
+mut def from_json_path_junos_conf_root__configuration__groups__interfaces__interface(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        # Check that all keys are present in payload.
+        # If present, they must equal the keys in the path
+        # If not present, fill in from path
+        for key in ['name']:
+            if key not in jd_dict:
+                jd_dict[key] = keys.pop(0)
+            else:
+                if str(jd_dict[key]) != keys.pop(0):
+                    raise ValueError("Key value mismatch between path and payload")
+        element = from_json_junos_conf_root__configuration__groups__interfaces__interface_element(jd_dict)
+        elements = []
+        if op == "merge":
+            elements.append(element)
+        elif op == "remove":
+            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+        return yang.gdata.List(['name'], elements)
+    elif len(path) > 1:
+        return yang.gdata.List(['name'], [from_json_path_junos_conf_root__configuration__groups__interfaces__interface_element(jd, path, op)])
+    raise ValueError("Unable to resolve path, no keys provided")
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+    children = {}
+    child_name_full = jd.get('jc:name')
+    child_name = child_name_full if child_name_full is not None else jd.get('name')
+    if child_name is not None:
+        children['name'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__name(child_name)
+    child_description_full = jd.get('jc:description')
+    child_description = child_description_full if child_description_full is not None else jd.get('description')
+    if child_description is not None:
+        children['description'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__description(child_description)
+    child_mtu_full = jd.get('jc:mtu')
+    child_mtu = child_mtu_full if child_mtu_full is not None else jd.get('mtu')
+    if child_mtu is not None:
+        children['mtu'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__mtu(child_mtu)
+    child_mac_full = jd.get('jc:mac')
+    child_mac = child_mac_full if child_mac_full is not None else jd.get('mac')
+    if child_mac is not None:
+        children['mac'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__mac(child_mac)
+    child_native_vlan_id_full = jd.get('jc:native-vlan-id')
+    child_native_vlan_id = child_native_vlan_id_full if child_native_vlan_id_full is not None else jd.get('native-vlan-id')
+    if child_native_vlan_id is not None:
+        children['native-vlan-id'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__native_vlan_id(child_native_vlan_id)
+    child_unit_full = jd.get('jc:unit')
+    child_unit = child_unit_full if child_unit_full is not None else jd.get('unit')
+    if child_unit is not None and isinstance(child_unit, list):
+        children['unit'] = from_json_junos_conf_root__configuration__groups__interfaces__interface__unit(child_unit)
+    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces__interface(jd: list[dict[str, ?value]]) -> yang.gdata.List:
+    elements = []
+    for e in jd:
+        if isinstance(e, dict):
+            elements.append(from_json_junos_conf_root__configuration__groups__interfaces__interface_element(e))
+    return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
+
+mut def to_json_junos_conf_root__configuration__groups__interfaces__interface_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+    children = {}
+    child_name = n.children.get('name')
+    if child_name is not None:
+        if isinstance(child_name, yang.gdata.Leaf):
+            children['name'] = child_name.val
+    child_description = n.children.get('description')
+    if child_description is not None:
+        if isinstance(child_description, yang.gdata.Leaf):
+            children['description'] = child_description.val
+    child_mtu = n.children.get('mtu')
+    if child_mtu is not None:
+        if isinstance(child_mtu, yang.gdata.Leaf):
+            children['mtu'] = child_mtu.val
+    child_mac = n.children.get('mac')
+    if child_mac is not None:
+        if isinstance(child_mac, yang.gdata.Leaf):
+            children['mac'] = child_mac.val
+    child_native_vlan_id = n.children.get('native-vlan-id')
+    if child_native_vlan_id is not None:
+        if isinstance(child_native_vlan_id, yang.gdata.Leaf):
+            children['native-vlan-id'] = child_native_vlan_id.val
+    child_unit = n.children.get('unit')
+    if child_unit is not None:
+        if isinstance(child_unit, yang.gdata.List):
+            children['unit'] = to_json_junos_conf_root__configuration__groups__interfaces__interface__unit(child_unit)
+    return children
+
+mut def to_json_junos_conf_root__configuration__groups__interfaces__interface(n: yang.gdata.List) -> list[dict[str, ?value]]:
+    elements = []
+    for e in n.elements:
+        elements.append(to_json_junos_conf_root__configuration__groups__interfaces__interface_element(e))
+    return elements
+
+
 class junos_conf_root__configuration__groups__interfaces(yang.adata.MNode):
     interface: junos_conf_root__configuration__groups__interfaces__interface
 
@@ -1190,6 +2841,61 @@ class junos_conf_root__configuration__groups__interfaces(yang.adata.MNode):
             return junos_conf_root__configuration__groups__interfaces(interface=junos_conf_root__configuration__groups__interfaces__interface.from_xml(yang.gdata.get_xml_children(n, "interface")))
         return junos_conf_root__configuration__groups__interfaces()
 
+
+mut def from_json_path_junos_conf_root__configuration__groups__interfaces(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:interface' or point == 'interface':
+            child = {'interface': from_json_path_junos_conf_root__configuration__groups__interfaces__interface(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__groups__interfaces(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__groups__interfaces(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_interface_full = jd.get('jc:interface')
+    child_interface = child_interface_full if child_interface_full is not None else jd.get('interface')
+    if child_interface is not None and isinstance(child_interface, list):
+        children['interface'] = from_json_junos_conf_root__configuration__groups__interfaces__interface(child_interface)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__groups__interfaces(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_interface = n.children.get('interface')
+    if child_interface is not None:
+        if isinstance(child_interface, yang.gdata.List):
+            children['interface'] = to_json_junos_conf_root__configuration__groups__interfaces__interface(child_interface)
+    return children
+
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__name(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__instance_type(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("enumeration", val)
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__interface__name(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__interface__any(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("empty", val)
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__interface__unicast(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("empty", val)
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__interface__multicast(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("empty", val)
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__interface__primary(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("empty", val)
 
 class junos_conf_root__configuration__groups__routing_instances__instance__interface_entry(yang.adata.MNode):
     name: str
@@ -1277,6 +2983,125 @@ class junos_conf_root__configuration__groups__routing_instances__instance__inter
         return res
 
 
+mut def from_json_path_junos_conf_root__configuration__groups__routing_instances__instance__interface_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        val = from_json_junos_conf_root__configuration__groups__routing_instances__instance__interface_element(jd_dict)
+        if op == "merge":
+            return val
+        elif op == "remove":
+            return yang.gdata.AbsentListElement(val.key_vals)
+        raise ValueError("Invalid operation")
+    elif len(path) > 1:
+        keys = path[0].split(",")
+        point = path[1]
+        rest_path = path[2:]
+        children: dict[str, yang.gdata.Node] = {}
+        for idx, key in enumerate(['name']):
+            children[key] = yang.gdata.Leaf("str", keys[idx])
+        if point == 'any':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'unicast':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'multicast':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'primary':
+            raise ValueError("Invalid json path to non-inner node")
+        return yang.gdata.ListElement(keys, children)
+    raise ValueError("unreachable - no keys to list element")
+
+mut def from_json_path_junos_conf_root__configuration__groups__routing_instances__instance__interface(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        # Check that all keys are present in payload.
+        # If present, they must equal the keys in the path
+        # If not present, fill in from path
+        for key in ['name']:
+            if key not in jd_dict:
+                jd_dict[key] = keys.pop(0)
+            else:
+                if str(jd_dict[key]) != keys.pop(0):
+                    raise ValueError("Key value mismatch between path and payload")
+        element = from_json_junos_conf_root__configuration__groups__routing_instances__instance__interface_element(jd_dict)
+        elements = []
+        if op == "merge":
+            elements.append(element)
+        elif op == "remove":
+            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+        return yang.gdata.List(['name'], elements)
+    elif len(path) > 1:
+        return yang.gdata.List(['name'], [from_json_path_junos_conf_root__configuration__groups__routing_instances__instance__interface_element(jd, path, op)])
+    raise ValueError("Unable to resolve path, no keys provided")
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__interface_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+    children = {}
+    child_name_full = jd.get('jc:name')
+    child_name = child_name_full if child_name_full is not None else jd.get('name')
+    if child_name is not None:
+        children['name'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__interface__name(child_name)
+    child_any_full = jd.get('jc:any')
+    child_any = child_any_full if child_any_full is not None else jd.get('any')
+    if child_any is not None:
+        children['any'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__interface__any(child_any)
+    child_unicast_full = jd.get('jc:unicast')
+    child_unicast = child_unicast_full if child_unicast_full is not None else jd.get('unicast')
+    if child_unicast is not None:
+        children['unicast'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__interface__unicast(child_unicast)
+    child_multicast_full = jd.get('jc:multicast')
+    child_multicast = child_multicast_full if child_multicast_full is not None else jd.get('multicast')
+    if child_multicast is not None:
+        children['multicast'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__interface__multicast(child_multicast)
+    child_primary_full = jd.get('jc:primary')
+    child_primary = child_primary_full if child_primary_full is not None else jd.get('primary')
+    if child_primary is not None:
+        children['primary'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__interface__primary(child_primary)
+    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__interface(jd: list[dict[str, ?value]]) -> yang.gdata.List:
+    elements = []
+    for e in jd:
+        if isinstance(e, dict):
+            elements.append(from_json_junos_conf_root__configuration__groups__routing_instances__instance__interface_element(e))
+    return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
+
+mut def to_json_junos_conf_root__configuration__groups__routing_instances__instance__interface_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+    children = {}
+    child_name = n.children.get('name')
+    if child_name is not None:
+        if isinstance(child_name, yang.gdata.Leaf):
+            children['name'] = child_name.val
+    child_any = n.children.get('any')
+    if child_any is not None:
+        if isinstance(child_any, yang.gdata.Leaf):
+            children['any'] = child_any.val
+    child_unicast = n.children.get('unicast')
+    if child_unicast is not None:
+        if isinstance(child_unicast, yang.gdata.Leaf):
+            children['unicast'] = child_unicast.val
+    child_multicast = n.children.get('multicast')
+    if child_multicast is not None:
+        if isinstance(child_multicast, yang.gdata.Leaf):
+            children['multicast'] = child_multicast.val
+    child_primary = n.children.get('primary')
+    if child_primary is not None:
+        if isinstance(child_primary, yang.gdata.Leaf):
+            children['primary'] = child_primary.val
+    return children
+
+mut def to_json_junos_conf_root__configuration__groups__routing_instances__instance__interface(n: yang.gdata.List) -> list[dict[str, ?value]]:
+    elements = []
+    for e in n.elements:
+        elements.append(to_json_junos_conf_root__configuration__groups__routing_instances__instance__interface_element(e))
+    return elements
+
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher__rd_type(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
 class junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher(yang.adata.MNode):
     rd_type: ?str
 
@@ -1303,6 +3128,57 @@ class junos_conf_root__configuration__groups__routing_instances__instance__route
             return junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher(rd_type=yang.gdata.from_xml_opt_str(n, "rd-type"))
         return junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher()
 
+
+mut def from_json_path_junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:rd-type' or point == 'rd-type':
+            raise ValueError("Invalid json path to non-inner node")
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_rd_type_full = jd.get('jc:rd-type')
+    child_rd_type = child_rd_type_full if child_rd_type_full is not None else jd.get('rd-type')
+    if child_rd_type is not None:
+        children['rd-type'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher__rd_type(child_rd_type)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_rd_type = n.children.get('rd-type')
+    if child_rd_type is not None:
+        if isinstance(child_rd_type, yang.gdata.Leaf):
+            children['rd-type'] = child_rd_type.val
+    return children
+
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__export_default_action(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("enumeration", val)
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__import_default_action(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("enumeration", val)
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__vrf_target__community(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__vrf_target__import(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__vrf_target__export(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__vrf_target__auto(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("empty", val)
 
 class junos_conf_root__configuration__groups__routing_instances__instance__vrf_target(yang.adata.MNode):
     community: ?str
@@ -1345,6 +3221,72 @@ class junos_conf_root__configuration__groups__routing_instances__instance__vrf_t
             return junos_conf_root__configuration__groups__routing_instances__instance__vrf_target(community=yang.gdata.from_xml_opt_str(n, "community"), import_=yang.gdata.from_xml_opt_str(n, "import"), export=yang.gdata.from_xml_opt_str(n, "export"), auto=yang.gdata.from_xml_opt_bool(n, "auto"))
         return junos_conf_root__configuration__groups__routing_instances__instance__vrf_target()
 
+
+mut def from_json_path_junos_conf_root__configuration__groups__routing_instances__instance__vrf_target(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:community' or point == 'community':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'jc:import' or point == 'import':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'jc:export' or point == 'export':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'jc:auto' or point == 'auto':
+            raise ValueError("Invalid json path to non-inner node")
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__groups__routing_instances__instance__vrf_target(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__vrf_target(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_community_full = jd.get('jc:community')
+    child_community = child_community_full if child_community_full is not None else jd.get('community')
+    if child_community is not None:
+        children['community'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__vrf_target__community(child_community)
+    child_import__full = jd.get('jc:import')
+    child_import_ = child_import__full if child_import__full is not None else jd.get('import')
+    if child_import_ is not None:
+        children['import'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__vrf_target__import(child_import_)
+    child_export_full = jd.get('jc:export')
+    child_export = child_export_full if child_export_full is not None else jd.get('export')
+    if child_export is not None:
+        children['export'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__vrf_target__export(child_export)
+    child_auto_full = jd.get('jc:auto')
+    child_auto = child_auto_full if child_auto_full is not None else jd.get('auto')
+    if child_auto is not None:
+        children['auto'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__vrf_target__auto(child_auto)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__groups__routing_instances__instance__vrf_target(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_community = n.children.get('community')
+    if child_community is not None:
+        if isinstance(child_community, yang.gdata.Leaf):
+            children['community'] = child_community.val
+    child_import_ = n.children.get('import')
+    if child_import_ is not None:
+        if isinstance(child_import_, yang.gdata.Leaf):
+            children['import'] = child_import_.val
+    child_export = n.children.get('export')
+    if child_export is not None:
+        if isinstance(child_export, yang.gdata.Leaf):
+            children['export'] = child_export.val
+    child_auto = n.children.get('auto')
+    if child_auto is not None:
+        if isinstance(child_auto, yang.gdata.Leaf):
+            children['auto'] = child_auto.val
+    return children
+
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance__no_vrf_advertise(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("empty", val)
 
 class junos_conf_root__configuration__groups__routing_instances__instance_entry(yang.adata.MNode):
     name: str
@@ -1460,6 +3402,152 @@ class junos_conf_root__configuration__groups__routing_instances__instance(yang.a
         return res
 
 
+mut def from_json_path_junos_conf_root__configuration__groups__routing_instances__instance_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        val = from_json_junos_conf_root__configuration__groups__routing_instances__instance_element(jd_dict)
+        if op == "merge":
+            return val
+        elif op == "remove":
+            return yang.gdata.AbsentListElement(val.key_vals)
+        raise ValueError("Invalid operation")
+    elif len(path) > 1:
+        keys = path[0].split(",")
+        point = path[1]
+        rest_path = path[2:]
+        children: dict[str, yang.gdata.Node] = {}
+        for idx, key in enumerate(['name']):
+            children[key] = yang.gdata.Leaf("str", keys[idx])
+        if point == 'instance-type':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'interface':
+            children['interface'] = from_json_path_junos_conf_root__configuration__groups__routing_instances__instance__interface(jd, rest_path, op)
+        if point == 'route-distinguisher':
+            children['route-distinguisher'] = from_json_path_junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher(jd, rest_path, op)
+        if point == 'export-default-action':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'import-default-action':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'vrf-target':
+            children['vrf-target'] = from_json_path_junos_conf_root__configuration__groups__routing_instances__instance__vrf_target(jd, rest_path, op)
+        if point == 'no-vrf-advertise':
+            raise ValueError("Invalid json path to non-inner node")
+        return yang.gdata.ListElement(keys, children)
+    raise ValueError("unreachable - no keys to list element")
+
+mut def from_json_path_junos_conf_root__configuration__groups__routing_instances__instance(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        # Check that all keys are present in payload.
+        # If present, they must equal the keys in the path
+        # If not present, fill in from path
+        for key in ['name']:
+            if key not in jd_dict:
+                jd_dict[key] = keys.pop(0)
+            else:
+                if str(jd_dict[key]) != keys.pop(0):
+                    raise ValueError("Key value mismatch between path and payload")
+        element = from_json_junos_conf_root__configuration__groups__routing_instances__instance_element(jd_dict)
+        elements = []
+        if op == "merge":
+            elements.append(element)
+        elif op == "remove":
+            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+        return yang.gdata.List(['name'], elements)
+    elif len(path) > 1:
+        return yang.gdata.List(['name'], [from_json_path_junos_conf_root__configuration__groups__routing_instances__instance_element(jd, path, op)])
+    raise ValueError("Unable to resolve path, no keys provided")
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+    children = {}
+    child_name_full = jd.get('jc:name')
+    child_name = child_name_full if child_name_full is not None else jd.get('name')
+    if child_name is not None:
+        children['name'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__name(child_name)
+    child_instance_type_full = jd.get('jc:instance-type')
+    child_instance_type = child_instance_type_full if child_instance_type_full is not None else jd.get('instance-type')
+    if child_instance_type is not None:
+        children['instance-type'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__instance_type(child_instance_type)
+    child_interface_full = jd.get('jc:interface')
+    child_interface = child_interface_full if child_interface_full is not None else jd.get('interface')
+    if child_interface is not None and isinstance(child_interface, list):
+        children['interface'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__interface(child_interface)
+    child_route_distinguisher_full = jd.get('jc:route-distinguisher')
+    child_route_distinguisher = child_route_distinguisher_full if child_route_distinguisher_full is not None else jd.get('route-distinguisher')
+    if child_route_distinguisher is not None and isinstance(child_route_distinguisher, dict):
+        children['route-distinguisher'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher(child_route_distinguisher)
+    child_export_default_action_full = jd.get('jc:export-default-action')
+    child_export_default_action = child_export_default_action_full if child_export_default_action_full is not None else jd.get('export-default-action')
+    if child_export_default_action is not None:
+        children['export-default-action'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__export_default_action(child_export_default_action)
+    child_import_default_action_full = jd.get('jc:import-default-action')
+    child_import_default_action = child_import_default_action_full if child_import_default_action_full is not None else jd.get('import-default-action')
+    if child_import_default_action is not None:
+        children['import-default-action'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__import_default_action(child_import_default_action)
+    child_vrf_target_full = jd.get('jc:vrf-target')
+    child_vrf_target = child_vrf_target_full if child_vrf_target_full is not None else jd.get('vrf-target')
+    if child_vrf_target is not None and isinstance(child_vrf_target, dict):
+        children['vrf-target'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__vrf_target(child_vrf_target)
+    child_no_vrf_advertise_full = jd.get('jc:no-vrf-advertise')
+    child_no_vrf_advertise = child_no_vrf_advertise_full if child_no_vrf_advertise_full is not None else jd.get('no-vrf-advertise')
+    if child_no_vrf_advertise is not None:
+        children['no-vrf-advertise'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance__no_vrf_advertise(child_no_vrf_advertise)
+    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances__instance(jd: list[dict[str, ?value]]) -> yang.gdata.List:
+    elements = []
+    for e in jd:
+        if isinstance(e, dict):
+            elements.append(from_json_junos_conf_root__configuration__groups__routing_instances__instance_element(e))
+    return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
+
+mut def to_json_junos_conf_root__configuration__groups__routing_instances__instance_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+    children = {}
+    child_name = n.children.get('name')
+    if child_name is not None:
+        if isinstance(child_name, yang.gdata.Leaf):
+            children['name'] = child_name.val
+    child_instance_type = n.children.get('instance-type')
+    if child_instance_type is not None:
+        if isinstance(child_instance_type, yang.gdata.Leaf):
+            children['instance-type'] = child_instance_type.val
+    child_interface = n.children.get('interface')
+    if child_interface is not None:
+        if isinstance(child_interface, yang.gdata.List):
+            children['interface'] = to_json_junos_conf_root__configuration__groups__routing_instances__instance__interface(child_interface)
+    child_route_distinguisher = n.children.get('route-distinguisher')
+    if child_route_distinguisher is not None:
+        if isinstance(child_route_distinguisher, yang.gdata.Container):
+            children['route-distinguisher'] = to_json_junos_conf_root__configuration__groups__routing_instances__instance__route_distinguisher(child_route_distinguisher)
+    child_export_default_action = n.children.get('export-default-action')
+    if child_export_default_action is not None:
+        if isinstance(child_export_default_action, yang.gdata.Leaf):
+            children['export-default-action'] = child_export_default_action.val
+    child_import_default_action = n.children.get('import-default-action')
+    if child_import_default_action is not None:
+        if isinstance(child_import_default_action, yang.gdata.Leaf):
+            children['import-default-action'] = child_import_default_action.val
+    child_vrf_target = n.children.get('vrf-target')
+    if child_vrf_target is not None:
+        if isinstance(child_vrf_target, yang.gdata.Container):
+            children['vrf-target'] = to_json_junos_conf_root__configuration__groups__routing_instances__instance__vrf_target(child_vrf_target)
+    child_no_vrf_advertise = n.children.get('no-vrf-advertise')
+    if child_no_vrf_advertise is not None:
+        if isinstance(child_no_vrf_advertise, yang.gdata.Leaf):
+            children['no-vrf-advertise'] = child_no_vrf_advertise.val
+    return children
+
+mut def to_json_junos_conf_root__configuration__groups__routing_instances__instance(n: yang.gdata.List) -> list[dict[str, ?value]]:
+    elements = []
+    for e in n.elements:
+        elements.append(to_json_junos_conf_root__configuration__groups__routing_instances__instance_element(e))
+    return elements
+
+
 class junos_conf_root__configuration__groups__routing_instances(yang.adata.MNode):
     instance: junos_conf_root__configuration__groups__routing_instances__instance
 
@@ -1486,6 +3574,40 @@ class junos_conf_root__configuration__groups__routing_instances(yang.adata.MNode
         if n != None:
             return junos_conf_root__configuration__groups__routing_instances(instance=junos_conf_root__configuration__groups__routing_instances__instance.from_xml(yang.gdata.get_xml_children(n, "instance")))
         return junos_conf_root__configuration__groups__routing_instances()
+
+
+mut def from_json_path_junos_conf_root__configuration__groups__routing_instances(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:instance' or point == 'instance':
+            child = {'instance': from_json_path_junos_conf_root__configuration__groups__routing_instances__instance(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration__groups__routing_instances(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration__groups__routing_instances(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_instance_full = jd.get('jc:instance')
+    child_instance = child_instance_full if child_instance_full is not None else jd.get('instance')
+    if child_instance is not None and isinstance(child_instance, list):
+        children['instance'] = from_json_junos_conf_root__configuration__groups__routing_instances__instance(child_instance)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration__groups__routing_instances(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_instance = n.children.get('instance')
+    if child_instance is not None:
+        if isinstance(child_instance, yang.gdata.List):
+            children['instance'] = to_json_junos_conf_root__configuration__groups__routing_instances__instance(child_instance)
+    return children
 
 
 class junos_conf_root__configuration__groups_entry(yang.adata.MNode):
@@ -1608,6 +3730,142 @@ class junos_conf_root__configuration__groups(yang.adata.MNode):
         return res
 
 
+mut def from_json_path_junos_conf_root__configuration__groups_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        val = from_json_junos_conf_root__configuration__groups_element(jd_dict)
+        if op == "merge":
+            return val
+        elif op == "remove":
+            return yang.gdata.AbsentListElement(val.key_vals)
+        raise ValueError("Invalid operation")
+    elif len(path) > 1:
+        keys = path[0].split(",")
+        point = path[1]
+        rest_path = path[2:]
+        children: dict[str, yang.gdata.Node] = {}
+        for idx, key in enumerate(['name']):
+            children[key] = yang.gdata.Leaf("str", keys[idx])
+        if point == 'when':
+            children['when'] = from_json_path_junos_conf_root__configuration__groups__when(jd, rest_path, op)
+        if point == 'rcsid':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'version':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'system':
+            children['system'] = from_json_path_junos_conf_root__configuration__groups__system(jd, rest_path, op)
+        if point == 'interfaces':
+            children['interfaces'] = from_json_path_junos_conf_root__configuration__groups__interfaces(jd, rest_path, op)
+        if point == 'routing-instances':
+            children['routing-instances'] = from_json_path_junos_conf_root__configuration__groups__routing_instances(jd, rest_path, op)
+        return yang.gdata.ListElement(keys, children)
+    raise ValueError("unreachable - no keys to list element")
+
+mut def from_json_path_junos_conf_root__configuration__groups(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
+    if len(path) == 1:
+        point = path[0]
+        keys = point.split(",")
+        jd_dict = yang.gdata.unwrap_dict(jd)
+        # Check that all keys are present in payload.
+        # If present, they must equal the keys in the path
+        # If not present, fill in from path
+        for key in ['name']:
+            if key not in jd_dict:
+                jd_dict[key] = keys.pop(0)
+            else:
+                if str(jd_dict[key]) != keys.pop(0):
+                    raise ValueError("Key value mismatch between path and payload")
+        element = from_json_junos_conf_root__configuration__groups_element(jd_dict)
+        elements = []
+        if op == "merge":
+            elements.append(element)
+        elif op == "remove":
+            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+        return yang.gdata.List(['name'], elements)
+    elif len(path) > 1:
+        return yang.gdata.List(['name'], [from_json_path_junos_conf_root__configuration__groups_element(jd, path, op)])
+    raise ValueError("Unable to resolve path, no keys provided")
+
+mut def from_json_junos_conf_root__configuration__groups_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+    children = {}
+    child_name_full = jd.get('jc:name')
+    child_name = child_name_full if child_name_full is not None else jd.get('name')
+    if child_name is not None:
+        children['name'] = from_json_junos_conf_root__configuration__groups__name(child_name)
+    child_when_full = jd.get('jc:when')
+    child_when = child_when_full if child_when_full is not None else jd.get('when')
+    if child_when is not None and isinstance(child_when, dict):
+        children['when'] = from_json_junos_conf_root__configuration__groups__when(child_when)
+    child_rcsid_full = jd.get('jc:rcsid')
+    child_rcsid = child_rcsid_full if child_rcsid_full is not None else jd.get('rcsid')
+    if child_rcsid is not None:
+        children['rcsid'] = from_json_junos_conf_root__configuration__groups__rcsid(child_rcsid)
+    child_version_full = jd.get('jc:version')
+    child_version = child_version_full if child_version_full is not None else jd.get('version')
+    if child_version is not None:
+        children['version'] = from_json_junos_conf_root__configuration__groups__version(child_version)
+    child_system_full = jd.get('jc:system')
+    child_system = child_system_full if child_system_full is not None else jd.get('system')
+    if child_system is not None and isinstance(child_system, dict):
+        children['system'] = from_json_junos_conf_root__configuration__groups__system(child_system)
+    child_interfaces_full = jd.get('jc:interfaces')
+    child_interfaces = child_interfaces_full if child_interfaces_full is not None else jd.get('interfaces')
+    if child_interfaces is not None and isinstance(child_interfaces, dict):
+        children['interfaces'] = from_json_junos_conf_root__configuration__groups__interfaces(child_interfaces)
+    child_routing_instances_full = jd.get('jc:routing-instances')
+    child_routing_instances = child_routing_instances_full if child_routing_instances_full is not None else jd.get('routing-instances')
+    if child_routing_instances is not None and isinstance(child_routing_instances, dict):
+        children['routing-instances'] = from_json_junos_conf_root__configuration__groups__routing_instances(child_routing_instances)
+    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+
+mut def from_json_junos_conf_root__configuration__groups(jd: list[dict[str, ?value]]) -> yang.gdata.List:
+    elements = []
+    for e in jd:
+        if isinstance(e, dict):
+            elements.append(from_json_junos_conf_root__configuration__groups_element(e))
+    return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
+
+mut def to_json_junos_conf_root__configuration__groups_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+    children = {}
+    child_name = n.children.get('name')
+    if child_name is not None:
+        if isinstance(child_name, yang.gdata.Leaf):
+            children['name'] = child_name.val
+    child_when = n.children.get('when')
+    if child_when is not None:
+        if isinstance(child_when, yang.gdata.Container):
+            children['when'] = to_json_junos_conf_root__configuration__groups__when(child_when)
+    child_rcsid = n.children.get('rcsid')
+    if child_rcsid is not None:
+        if isinstance(child_rcsid, yang.gdata.Leaf):
+            children['rcsid'] = child_rcsid.val
+    child_version = n.children.get('version')
+    if child_version is not None:
+        if isinstance(child_version, yang.gdata.Leaf):
+            children['version'] = child_version.val
+    child_system = n.children.get('system')
+    if child_system is not None:
+        if isinstance(child_system, yang.gdata.Container):
+            children['system'] = to_json_junos_conf_root__configuration__groups__system(child_system)
+    child_interfaces = n.children.get('interfaces')
+    if child_interfaces is not None:
+        if isinstance(child_interfaces, yang.gdata.Container):
+            children['interfaces'] = to_json_junos_conf_root__configuration__groups__interfaces(child_interfaces)
+    child_routing_instances = n.children.get('routing-instances')
+    if child_routing_instances is not None:
+        if isinstance(child_routing_instances, yang.gdata.Container):
+            children['routing-instances'] = to_json_junos_conf_root__configuration__groups__routing_instances(child_routing_instances)
+    return children
+
+mut def to_json_junos_conf_root__configuration__groups(n: yang.gdata.List) -> list[dict[str, ?value]]:
+    elements = []
+    for e in n.elements:
+        elements.append(to_json_junos_conf_root__configuration__groups_element(e))
+    return elements
+
+
 class junos_conf_root__configuration(yang.adata.MNode):
     rcsid: ?str
     version: ?str
@@ -1679,6 +3937,93 @@ class junos_conf_root__configuration(yang.adata.MNode):
         return junos_conf_root__configuration()
 
 
+mut def from_json_path_junos_conf_root__configuration(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:rcsid' or point == 'rcsid':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'jc:version' or point == 'version':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'jc:system' or point == 'system':
+            child = {'system': from_json_path_junos_conf_root__configuration__system(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        if point == 'jc:interfaces' or point == 'interfaces':
+            child = {'interfaces': from_json_path_junos_conf_root__configuration__interfaces(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        if point == 'jc:routing-instances' or point == 'routing-instances':
+            child = {'routing-instances': from_json_path_junos_conf_root__configuration__routing_instances(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        if point == 'jc:groups' or point == 'groups':
+            child = {'groups': from_json_path_junos_conf_root__configuration__groups(jd, rest_path, op) }
+            return yang.gdata.Container(child)
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_junos_conf_root__configuration(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_junos_conf_root__configuration(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_rcsid_full = jd.get('jc:rcsid')
+    child_rcsid = child_rcsid_full if child_rcsid_full is not None else jd.get('rcsid')
+    if child_rcsid is not None:
+        children['rcsid'] = from_json_junos_conf_root__configuration__rcsid(child_rcsid)
+    child_version_full = jd.get('jc:version')
+    child_version = child_version_full if child_version_full is not None else jd.get('version')
+    if child_version is not None:
+        children['version'] = from_json_junos_conf_root__configuration__version(child_version)
+    child_system_full = jd.get('jc:system')
+    child_system = child_system_full if child_system_full is not None else jd.get('system')
+    if child_system is not None and isinstance(child_system, dict):
+        children['system'] = from_json_junos_conf_root__configuration__system(child_system)
+    child_interfaces_full = jd.get('jc:interfaces')
+    child_interfaces = child_interfaces_full if child_interfaces_full is not None else jd.get('interfaces')
+    if child_interfaces is not None and isinstance(child_interfaces, dict):
+        children['interfaces'] = from_json_junos_conf_root__configuration__interfaces(child_interfaces)
+    child_routing_instances_full = jd.get('jc:routing-instances')
+    child_routing_instances = child_routing_instances_full if child_routing_instances_full is not None else jd.get('routing-instances')
+    if child_routing_instances is not None and isinstance(child_routing_instances, dict):
+        children['routing-instances'] = from_json_junos_conf_root__configuration__routing_instances(child_routing_instances)
+    child_groups_full = jd.get('jc:groups')
+    child_groups = child_groups_full if child_groups_full is not None else jd.get('groups')
+    if child_groups is not None and isinstance(child_groups, list):
+        children['groups'] = from_json_junos_conf_root__configuration__groups(child_groups)
+    return yang.gdata.Container(children)
+
+mut def to_json_junos_conf_root__configuration(n: yang.gdata.Container) -> dict[str, ?value]:
+    children = {}
+    child_rcsid = n.children.get('rcsid')
+    if child_rcsid is not None:
+        if isinstance(child_rcsid, yang.gdata.Leaf):
+            children['rcsid'] = child_rcsid.val
+    child_version = n.children.get('version')
+    if child_version is not None:
+        if isinstance(child_version, yang.gdata.Leaf):
+            children['version'] = child_version.val
+    child_system = n.children.get('system')
+    if child_system is not None:
+        if isinstance(child_system, yang.gdata.Container):
+            children['system'] = to_json_junos_conf_root__configuration__system(child_system)
+    child_interfaces = n.children.get('interfaces')
+    if child_interfaces is not None:
+        if isinstance(child_interfaces, yang.gdata.Container):
+            children['interfaces'] = to_json_junos_conf_root__configuration__interfaces(child_interfaces)
+    child_routing_instances = n.children.get('routing-instances')
+    if child_routing_instances is not None:
+        if isinstance(child_routing_instances, yang.gdata.Container):
+            children['routing-instances'] = to_json_junos_conf_root__configuration__routing_instances(child_routing_instances)
+    child_groups = n.children.get('groups')
+    if child_groups is not None:
+        if isinstance(child_groups, yang.gdata.List):
+            children['groups'] = to_json_junos_conf_root__configuration__groups(child_groups)
+    return children
+
+
 class root(yang.adata.MNode):
     configuration: junos_conf_root__configuration
 
@@ -1710,4 +4055,37 @@ class root(yang.adata.MNode):
         if n != None:
             return root(configuration=junos_conf_root__configuration.from_xml(yang.gdata.get_xml_opt_child(n, "configuration", "http://yang.juniper.net/junos/conf/root")))
         return root()
+
+
+mut def from_json_path(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'jc:configuration':
+            child = {'configuration': from_json_path_junos_conf_root__configuration(jd, rest_path, op) }
+            return yang.gdata.Root(child)
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json(jd: dict[str, ?value]) -> yang.gdata.Root:
+    children = {}
+    child_configuration = jd.get('jc:configuration')
+    if child_configuration is not None and isinstance(child_configuration, dict):
+        children['configuration'] = from_json_junos_conf_root__configuration(child_configuration)
+    return yang.gdata.Root(children)
+
+mut def to_json(n: yang.gdata.Root) -> dict[str, ?value]:
+    children = {}
+    child_configuration = n.children.get('configuration')
+    if child_configuration is not None:
+        if isinstance(child_configuration, yang.gdata.Container):
+            children['jc:configuration'] = to_json_junos_conf_root__configuration(child_configuration)
+    return children
 
