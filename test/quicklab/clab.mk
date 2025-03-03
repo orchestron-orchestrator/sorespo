@@ -1,4 +1,6 @@
 PROJECT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+# Set this env var to empty string if you have local cRPD, XRd container images
+IMAGE_PATH?=registry.devops.telekom.de/containerlab/containerlab/
 
 CLAB_VERSION?=0.62.2
 CLAB_CONTAINER_IMAGE?=ghcr.io/srl-labs/clab:$(CLAB_VERSION)
@@ -11,5 +13,6 @@ CLAB_BIN:=docker run --rm $(INTERACTIVE) --privileged \
 	-v ${HOME}/.docker:/root/.docker \
     --pid="host" \
     -v $(PROJECT_DIR):$(PROJECT_DIR) \
+    -e IMAGE_PATH=$(IMAGE_PATH) \
     -w $(CURDIR) \
     $(CLAB_CONTAINER_IMAGE) containerlab
