@@ -4,6 +4,8 @@ IMAGE_PATH?=registry.devops.telekom.de/containerlab/containerlab/
 
 ifeq (true,$(REMOTE_CONTAINERS))
 CLAB_BIN:=containerlab
+else ifeq (true,$(CODESPACES))
+CLAB_BIN:=containerlab
 else
 
 CLAB_VERSION?=0.64.0
