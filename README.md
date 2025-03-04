@@ -15,6 +15,8 @@ So typical REPL loop is like
 - edit code
 - in test/quicklab: `(cd ../../ && make build ) && make copy run-and-configure` and see the code run interactively
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/orchestron-orchestrator/respnet/tree/notconf?quickstart=1&devcontainer_path=.devcontainer%2Fdocker-in-docker%2Fdevcontainer.json)
+
 ## Running on ARM64 (and Apple silicon)
 
 The default `quicklab` testenv uses a mix of Juniper cRPD and Cisco IOS XRd
