@@ -6,7 +6,7 @@ ifeq (true,$(REMOTE_CONTAINERS))
 CLAB_BIN:=containerlab
 else
 
-CLAB_VERSION?=0.62.2
+CLAB_VERSION?=0.64.0
 CLAB_CONTAINER_IMAGE?=ghcr.io/srl-labs/clab:$(CLAB_VERSION)
 CLAB_BIN:=docker run --rm $(INTERACTIVE) --privileged \
     --network host \
