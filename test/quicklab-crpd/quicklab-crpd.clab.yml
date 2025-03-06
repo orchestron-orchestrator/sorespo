@@ -1,0 +1,58 @@
+name: respnet-quicklab-crpd
+# The prefix is prepended to container node names. We override the default
+# "clab-<lab-name>-" prefix here by using the "__lab-name" magic value.
+# Containerlab replaces it with the lab name defined above. This ensures we're
+# creating unique containers for each instance of the lab based on the same
+# topology (=testenv).
+prefix: __lab-name
+
+mgmt:
+  network: respnet-quicklab-crpd
+  ipv4-subnet: auto
+  ipv6-subnet: auto
+
+topology:
+  kinds:
+    crpd:
+      image: ${IMAGE_PATH}crpd:24.4R1.9
+      startup-config: crpd-startup.conf
+      license: crpd-trial.lic
+  nodes:
+    ams-core-1:
+      kind: crpd
+    fra-core-1:
+      kind: crpd
+    sto-core-1:
+      kind: crpd
+    lju-core-1:
+      kind: crpd
+    cust-1:
+      kind: crpd
+      startup-config: cust-1-junos.conf
+    cust-2:
+      kind: crpd
+      startup-config: cust-2-junos.conf
+    cust-3:
+      kind: crpd
+      startup-config: cust-3-junos.conf
+    cust-4:
+      kind: crpd
+      startup-config: cust-4-junos.conf
+    otron:
+      kind: linux
+      image: debian
+      image-pull-policy: if-not-present
+      ports:
+        - "80/tcp"
+        - "830/tcp"
+
+  links:
+    - endpoints: ["ams-core-1:eth1", "fra-core-1:eth1"]
+    - endpoints: ["ams-core-1:eth2", "sto-core-1:eth1"]
+    - endpoints: ["fra-core-1:eth2", "sto-core-1:eth2"]
+    - endpoints: ["fra-core-1:eth3", "lju-core-1:eth1"]
+    - endpoints: ["sto-core-1:eth3", "lju-core-1:eth2"]
+    - endpoints: ["ams-core-1:eth3", "cust-1:eth1"]
+    - endpoints: ["fra-core-1:eth4", "cust-2:eth1"]
+    - endpoints: ["sto-core-1:eth4", "cust-3:eth1"]
+    - endpoints: ["lju-core-1:eth3", "cust-4:eth1"]
