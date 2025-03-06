@@ -57,3 +57,25 @@ $(addprefix cli-,$(ROUTERS_CRPD)):
 .PHONY: $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD))
 $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
 	docker run -it --rm --network container:$(TESTENV)-$(@:get-dev-config-%=%) ghcr.io/notconf/notconf:debug netconf-console2 --port 830 --user clab --pass clab@123 --get-config
+
+# These test-ping-% recipes will "install" themselves for all PE routers too.
+# Pretty sure pinging the customer loopback from the default VRF in core does
+# not work, but these are internal helpers anyway ...
+$(addprefix test-ping-,$(ROUTERS_CRPD)):
+# brew install coreutils on MacOS
+	timeout 10s bash -c "until docker exec -t $(TESTENV)-$(@:test-ping-%=%) ping -c 1 -W 1 $(IP); do sleep 1; done"
+
+$(addprefix test-ping-,$(ROUTERS_XR)):
+# brew install coreutils on MacOS
+	timeout 10s bash -c "until docker exec -t $(TESTENV)-$(@:test-ping-%=%) ip netns exec global-vrf ping -c 1 -W 1 $(IP); do sleep 1; done"
+
+.PHONY: test-ping
+test-ping:
+# Do a full mesh of ping between all cust-X routers loopbacks
+	@for i in 1 2 3 4; do \
+		for j in 1 2 3 4; do \
+			if [ $$i -ne $$j ]; then \
+				$(MAKE) test-ping-cust-$$i IP=10.200.1.$$j; \
+			fi; \
+		done; \
+	done
