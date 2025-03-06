@@ -15,6 +15,26 @@ So typical REPL loop is like
 - edit code
 - in test/quicklab: `(cd ../../ && make build ) && make copy run-and-configure` and see the code run interactively
 
+## Running in dev container
+
+This repository includes a [Development Container](https://containers.dev)
+configuration. The container image includes everything you need to get started,
+apart from the licensed containerized router images. Use VS Code to open this
+project and it will detect the dev container configuration automatically.
+
+There are two flavors of the container:
+
+1. *docker-outside-of-docker*: This is the default for local development.
+   containerlab and other tools will run inside the dev container and will use
+   the hosts Docker daemon for new containers. This means your dev container is
+   a sibling to the testenv containers and you can also interact with the new
+   containers from your host OS.
+2. *docker-in-docker*: This is the default for Codespaces. The dev container
+   runs its own nested Docker daemon so the containers you start for testenvs
+   are only visible to the dev container.
+
+If you're using GitHub Codespaces, use the *docker-in-docker* flavor.
+
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/orchestron-orchestrator/respnet/tree/notconf?quickstart=1&devcontainer_path=.devcontainer%2Fdocker-in-docker%2Fdevcontainer.json)
 
 ## Running on ARM64 (and Apple silicon)
