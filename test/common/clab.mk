@@ -1,8 +1,14 @@
-PROJECT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+PROJECT_DIR:=$(realpath $(dir $(lastword $(MAKEFILE_LIST)))/../../)
 # Set this env var to empty string if you have local cRPD, XRd container images
-IMAGE_PATH?=registry.devops.telekom.de/containerlab/containerlab/
+export IMAGE_PATH?=registry.devops.telekom.de/containerlab/containerlab/
 
-CLAB_VERSION?=0.62.2
+ifeq (true,$(REMOTE_CONTAINERS))
+CLAB_BIN:=containerlab
+else ifeq (true,$(CODESPACES))
+CLAB_BIN:=containerlab
+else
+
+CLAB_VERSION?=0.64.0
 CLAB_CONTAINER_IMAGE?=ghcr.io/srl-labs/clab:$(CLAB_VERSION)
 CLAB_BIN:=docker run --rm $(INTERACTIVE) --privileged \
     --network host \
@@ -16,3 +22,4 @@ CLAB_BIN:=docker run --rm $(INTERACTIVE) --privileged \
     -e IMAGE_PATH=$(IMAGE_PATH) \
     -w $(CURDIR) \
     $(CLAB_CONTAINER_IMAGE) containerlab
+endif
