@@ -5,8 +5,9 @@ RESPNET, the REalistic Service Provider Network, is an example of network automa
 ## Getting started
 
 Set up your development environment using one of the methods outlined in the
-next section. You should have the dependencies (Acton, Containerlab) installed
-and the project source checked out.
+[Preparing the Development Environment](#preparing-the-development-environment)
+chapter. You should have the dependencies (Acton, Containerlab) installed and
+the project source checked out.
 
 ### Building the RESPNET application
 
@@ -102,7 +103,7 @@ Containerlab topology YAML (file `$TESTENV.clab.yml`)
 - `test/quicklab`: fully functioning network using Juniper cRPD and Cisco IOS XRd
   for PE routers, Cisco IOS XRd for CPE
 - `test/quicklab-crpd`: fully functioninf network using only Juniper cRPD for
-  all devices (runs native on ARM64)
+  all devices ([runs native on ARM64](#running-on-arm64-and-apple-silicon))
 - `test/quicklab-notconf`: simulated core network PE routers using [notconf](https://github.com/notconf/notconf)
 
 All testenvs share a common interface for startup, using RESPNET to create an
@@ -314,6 +315,7 @@ writing). We recommend using a 4-core VM for development, which means you
 effectively get 30 hours per month.
 
 Start your Codespace here:
+
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/orchestron-orchestrator/respnet/tree/notconf?quickstart=1&devcontainer_path=.devcontainer%2Fdocker-in-docker%2Fdevcontainer.json)
 
 Setting up a fresh VM will take a couple of minutes. After is it done you have
