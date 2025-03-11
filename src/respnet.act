@@ -11,6 +11,9 @@ import orchestron.ttt as ttt
 import yang.adata
 import yang.gdata
 
+import tmf.tmf641
+import respnet.tmf
+
 import respnet.layers
 from respnet.layers.y_0 import root as cfs_root
 import respnet.layers.y_0
@@ -99,12 +102,57 @@ actor main(env):
 
     tcpl_cap = net.TCPListenCap(net.TCPCap(net.NetCap(env.cap)))
 
+    tmf_store = respnet.tmf.SOStore()
+
     def _on_http_accept(server):
         server.cb_install(_on_http_server_request, _on_http_server_error)
 
     def _on_http_server_request(server, request, respond):
+        path_elements = request.path.split("/")
+        if len(path_elements) > 1 and path_elements[1] == "tmf-api":
+            # GET /tmf-api/serviceOrdering/v4/serviceOrder/{id}
+            if request.method == "GET":
+                if len(path_elements) == 5 and path_elements[2] == "serviceOrdering" and path_elements[3] == "v4" and path_elements[4] == "serviceOrder":
+                    res = []
+                    for so in tmf_store.get_service_orders():
+                        res.append(so.to_json())
+                    respond(200, {}, json.encode({"items": res}))
+                    return
+
+                elif len(path_elements) == 6 and path_elements[2] == "serviceOrdering" and path_elements[3] == "v4" and path_elements[4] == "serviceOrder":
+                    try:
+                        so_id = path_elements[5]
+                        sr = tmf_store.get_service_order(so_id)
+                        if sr is not None:
+                            respond(200, {}, json.encode(sr.to_json()))
+                            return
+                        else:
+                            respond(404, {}, "Not found")
+                            return
+                    except Exception as e:
+                        respond(400, {}, "Error getting service order: %s" % str(e))
+                        return
+
+            # POST /tmf-api/serviceOrdering/v4/serviceOrder
+            if request.method == "POST":
+                if len(path_elements) > 3 and path_elements[2] == "serviceOrdering" and path_elements[3] == "v4" and path_elements[4] == "serviceOrder":
+                    so_in = json.decode(request.body.decode())
+                    try:
+                        sr = tmf_store.create_service_order(so_in)
+                        sr_diff = sr.diff
+                        if sr_diff is not None:
+                            conf(sr_diff)
+                        respond(200, {}, "OK")
+                        return
+                    except Exception as e:
+                        respond(400, {}, "Error creating service order: %s" % str(e))
+                        return
+
+            # no more tmf-api
+            respond(404, {}, "Not found")
+            return
+
         if request.method == "GET":
-            path_elements = request.path.split("/")
             if len(path_elements) > 1 and path_elements[1] == "reconf":
                 conf()
                 respond(200, {}, "OK")
