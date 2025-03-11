@@ -1,0 +1,233 @@
+import testing
+
+import yang.adata
+import yang.gdata
+
+import tmf.tmf641
+
+import respnet.layers.y_0 as cfs_layer
+
+def merge_confpsrc(confpsrc: dict[str, yang.gdata.Node]) -> yang.gdata.Node:
+    chunks = list(confpsrc.values())
+    if len(chunks) > 0:
+        merged = chunks[0]
+        if len(chunks) > 1:
+            for chunk in chunks[1:]:
+                merged = yang.gdata.merge(merged, chunk)
+        return merged
+    return yang.gdata.Root()
+
+
+class StoreResult(object):
+    def __init__(self, success: bool, so: ?tmf.tmf641.ServiceOrder, diff: ?yang.gdata.Node):
+        self.success = success
+        self.so = so
+        self.diff = diff
+
+class SOStore(object):
+    """Store for TMF641 Service Orders"""
+
+    next_id: int
+    so: dict[str, tmf.tmf641.ServiceOrder]
+    svc_configs: dict[str, yang.gdata.Node]
+    last_config: yang.gdata.Node
+
+    def __init__(self):
+        self.next_id = 0
+        self.so = {}
+        self.svc_configs = {}
+        self.last_config = yang.gdata.Root()
+
+    def get_config(self) -> ?yang.gdata.Node:
+        new_conf = merge_confpsrc(self.svc_configs)
+        diff = yang.gdata.diff(self.last_config, new_conf)
+        self.last_config = new_conf
+        return diff
+
+    def get_service_orders(self) -> list[tmf.tmf641.ServiceOrder]:
+        return list(self.so.values())
+
+    def get_service_order(self, so_id: str) -> ?tmf.tmf641.ServiceOrder:
+        return self.so.get(so_id)
+
+    def create_service_order(self, so_json: dict[str, ?value]) -> StoreResult:
+        so = tmf.tmf641.ServiceOrder.from_json(so_json)
+        # Assign a unique ID to the service order, overwriting any ID that may have been set
+        so_id = str(self.next_id)
+        self.next_id += 1
+        so.id = so_id
+        self.so[so_id] = so
+
+        for soi in so.serviceOrderItem:
+            print("Service order item: %s" % str(soi))
+            svc = soi.service
+            if soi.action_ in {"add", "modify"}:
+                for chr in svc.serviceCharacteristic:
+                    svc_id = svc.id
+                    if svc_id is not None:
+                        exists = self.svc_configs.get(svc_id)
+                        if exists is not None:
+                            raise ValueError("Service already exists")
+
+                        svc_conf_json = chr.value
+                        try:
+                            del svc_conf_json["@type"]
+                        except:
+                            pass
+                        try:
+                            del svc_conf_json["@schemaLocation"]
+                        except:
+                            pass
+                        try:
+                            del svc_conf_json["@baseType"]
+                        except:
+                            pass
+                        svc_conf = cfs_layer.from_json_path(svc_conf_json, [])
+                        self.svc_configs[svc_id] = svc_conf
+                    else:
+                        raise ValueError("Service has no ID")
+
+            elif soi.action_ == "delete":
+                svc_id = svc.id
+                if svc_id is not None:
+                    exists = self.svc_configs.get(svc_id)
+                    if exists is None:
+                        raise ValueError("Service does not exist")
+                    del self.svc_configs[svc_id]
+                else:
+                    raise ValueError("Service has no ID")
+
+        return StoreResult(True, so, self.get_config())
+
+def _test_create_so():
+    so_in = {
+        "@type": "ServiceOrder",
+        "serviceOrderItem": [
+            {
+                "id": "1",
+                "action": "add",
+                "service": {
+                    "@type": "Service",
+                    "id": "some-service-id-1234",
+                    "serviceCharacteristic": [
+                        {
+                            "valueType": "object",
+                            "value": {
+                                "@type": "JSONSpecification",
+                                "@schemaLocation": "http://otron/tmf-api/v4/serviceSpecification/respnet_spec/specificationInputSchema",
+                                "netinfra:netinfra": {
+                                    "routers": [
+                                        {
+                                            "name": "AMS-CORE-1",
+                                            "id": 1,
+                                            "role": "edge",
+                                            "asn": 65001
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                }
+            }
+        ]
+    }
+    store = SOStore()
+    return test_so(store, so_in)
+
+def _test_create_delete():
+    so_in1 = {
+        "@type": "ServiceOrder",
+        "serviceOrderItem": [
+            {
+                "id": "1",
+                "action": "add",
+                "service": {
+                    "@type": "Service",
+                    "id": "some-service-id-1234",
+                    "serviceCharacteristic": [
+                        {
+                            "valueType": "object",
+                            "value": {
+                                "@type": "JSONSpecification",
+                                "@schemaLocation": "http://otron/tmf-api/v4/serviceSpecification/respnet_spec/specificationInputSchema",
+                                "netinfra:netinfra": {
+                                    "routers": [
+                                        {
+                                            "name": "AMS-CORE-1",
+                                            "id": 1,
+                                            "role": "edge",
+                                            "asn": 65001
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                }
+            }
+        ]
+    }
+
+    so_in2 = {
+        "@type": "ServiceOrder",
+        "serviceOrderItem": [
+            {
+                "id": "1",
+                "action": "add",
+                "service": {
+                    "@type": "Service",
+                    "id": "foobar789",
+                    "serviceCharacteristic": [
+                        {
+                            "valueType": "object",
+                            "value": {
+                                "@type": "JSONSpecification",
+                                "@schemaLocation": "http://otron/tmf-api/v4/serviceSpecification/respnet_spec/specificationInputSchema",
+                                "netinfra:netinfra": {
+                                    "routers": [
+                                        {
+                                            "name": "FRA-CORE-1",
+                                            "id": 2,
+                                            "role": "edge",
+                                            "asn": 65001
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                }
+            }
+        ]
+    }
+
+
+    so_in3 = {
+        "@type": "ServiceOrder",
+        "serviceOrderItem": [
+            {
+                "id": "1",
+                "action": "delete",
+                "service": {
+                    "@type": "Service",
+                    "id": "some-service-id-1234"
+                }
+            }
+        ]
+    }
+
+    store = SOStore()
+    log = ""
+    log += test_so(store, so_in1)
+    log += test_so(store, so_in2)
+    log += test_so(store, so_in3)
+
+    return log
+
+def test_so(store, so_in):
+    so = store.create_service_order(so_in)
+    diff = so.diff
+    if diff is not None:
+        return diff.to_xmlstr() + "\n"
+    return ""
