@@ -40,7 +40,7 @@ send-config-tmf:
 
 .PHONY: get-config-tmf
 get-config-tmf:
-	curl -X GET http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/serviceOrdering/v4/serviceOrder/$(ID)
+	curl -X GET http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/serviceOrdering/v4/serviceOrder$(if $(ID),/$(ID),)
 
 .PHONY: get-config0 get-config1 get-config2 get-config3
 get-config0 get-config1 get-config2 get-config3:
