@@ -1,3 +1,4 @@
+import base64
 import json
 import xml
 import yang.adata
@@ -8435,12 +8436,6 @@ mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols(n: yan
     return children
 
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__actual_site_start(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf("string", val)
-
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__actual_site_stop(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf("string", val)
-
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__site_network_access_id(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf("string", val)
 
@@ -15397,11 +15392,9 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site_entry(yang.adata.MNode):
     service: ietf_l3vpn_svc__l3vpn_svc__sites__site__service
     traffic_protection: ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection
     routing_protocols: ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols
-    actual_site_start: ?str
-    actual_site_stop: ?str
     site_network_accesses: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses
 
-    mut def __init__(self, site_id: str, management: ietf_l3vpn_svc__l3vpn_svc__sites__site__management, requested_site_start: ?str, requested_site_stop: ?str, locations: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__locations=None, devices: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__devices=None, site_diversity: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity=None, vpn_policies: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies=None, site_vpn_flavor: ?str=None, maximum_routes: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes=None, security: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__security=None, service: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__service=None, traffic_protection: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection=None, routing_protocols: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols=None, actual_site_start: ?str, actual_site_stop: ?str, site_network_accesses: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses=None):
+    mut def __init__(self, site_id: str, management: ietf_l3vpn_svc__l3vpn_svc__sites__site__management, requested_site_start: ?str, requested_site_stop: ?str, locations: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__locations=None, devices: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__devices=None, site_diversity: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity=None, vpn_policies: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies=None, site_vpn_flavor: ?str=None, maximum_routes: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes=None, security: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__security=None, service: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__service=None, traffic_protection: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection=None, routing_protocols: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols=None, site_network_accesses: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses=None):
         self._ns = "urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc"
         self.site_id = site_id
         self.requested_site_start = requested_site_start
@@ -15475,8 +15468,6 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site_entry(yang.adata.MNode):
         self_routing_protocols = self.routing_protocols
         if self_routing_protocols is not None:
             self_routing_protocols._parent = self
-        self.actual_site_start = actual_site_start
-        self.actual_site_stop = actual_site_stop
         if site_network_accesses is not None:
             self.site_network_accesses = site_network_accesses
         else:
@@ -15501,8 +15492,6 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site_entry(yang.adata.MNode):
         _service = self.service
         _traffic_protection = self.traffic_protection
         _routing_protocols = self.routing_protocols
-        _actual_site_start = self.actual_site_start
-        _actual_site_stop = self.actual_site_stop
         _site_network_accesses = self.site_network_accesses
         if _site_id is not None:
             children['site-id'] = yang.gdata.Leaf('string', _site_id)
@@ -15532,21 +15521,17 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site_entry(yang.adata.MNode):
             children['traffic-protection'] = _traffic_protection.to_gdata()
         if _routing_protocols is not None:
             children['routing-protocols'] = _routing_protocols.to_gdata()
-        if _actual_site_start is not None:
-            children['actual-site-start'] = yang.gdata.Leaf('string', _actual_site_start)
-        if _actual_site_stop is not None:
-            children['actual-site-stop'] = yang.gdata.Leaf('string', _actual_site_stop)
         if _site_network_accesses is not None:
             children['site-network-accesses'] = _site_network_accesses.to_gdata()
         return yang.gdata.ListElement([yang.gdata.yang_str(self.site_id)], children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site_entry:
-        return ietf_l3vpn_svc__l3vpn_svc__sites__site_entry(site_id=n.get_str("site-id"), requested_site_start=n.get_opt_str("requested-site-start"), requested_site_stop=n.get_opt_str("requested-site-stop"), locations=ietf_l3vpn_svc__l3vpn_svc__sites__site__locations.from_gdata(n.get_opt_container("locations")), devices=ietf_l3vpn_svc__l3vpn_svc__sites__site__devices.from_gdata(n.get_opt_container("devices")), site_diversity=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity.from_gdata(n.get_opt_container("site-diversity")), management=ietf_l3vpn_svc__l3vpn_svc__sites__site__management.from_gdata(n.get_container("management")), vpn_policies=ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies.from_gdata(n.get_opt_container("vpn-policies")), site_vpn_flavor=n.get_opt_str("site-vpn-flavor"), maximum_routes=ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes.from_gdata(n.get_opt_container("maximum-routes")), security=ietf_l3vpn_svc__l3vpn_svc__sites__site__security.from_gdata(n.get_opt_container("security")), service=ietf_l3vpn_svc__l3vpn_svc__sites__site__service.from_gdata(n.get_opt_container("service")), traffic_protection=ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection.from_gdata(n.get_opt_container("traffic-protection")), routing_protocols=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols.from_gdata(n.get_opt_container("routing-protocols")), actual_site_start=n.get_opt_str("actual-site-start"), actual_site_stop=n.get_opt_str("actual-site-stop"), site_network_accesses=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses.from_gdata(n.get_opt_container("site-network-accesses")))
+        return ietf_l3vpn_svc__l3vpn_svc__sites__site_entry(site_id=n.get_str("site-id"), requested_site_start=n.get_opt_str("requested-site-start"), requested_site_stop=n.get_opt_str("requested-site-stop"), locations=ietf_l3vpn_svc__l3vpn_svc__sites__site__locations.from_gdata(n.get_opt_container("locations")), devices=ietf_l3vpn_svc__l3vpn_svc__sites__site__devices.from_gdata(n.get_opt_container("devices")), site_diversity=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity.from_gdata(n.get_opt_container("site-diversity")), management=ietf_l3vpn_svc__l3vpn_svc__sites__site__management.from_gdata(n.get_container("management")), vpn_policies=ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies.from_gdata(n.get_opt_container("vpn-policies")), site_vpn_flavor=n.get_opt_str("site-vpn-flavor"), maximum_routes=ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes.from_gdata(n.get_opt_container("maximum-routes")), security=ietf_l3vpn_svc__l3vpn_svc__sites__site__security.from_gdata(n.get_opt_container("security")), service=ietf_l3vpn_svc__l3vpn_svc__sites__site__service.from_gdata(n.get_opt_container("service")), traffic_protection=ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection.from_gdata(n.get_opt_container("traffic-protection")), routing_protocols=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols.from_gdata(n.get_opt_container("routing-protocols")), site_network_accesses=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses.from_gdata(n.get_opt_container("site-network-accesses")))
 
     @staticmethod
     mut def from_xml(n: xml.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site_entry:
-        return ietf_l3vpn_svc__l3vpn_svc__sites__site_entry(site_id=yang.gdata.from_xml_str(n, "site-id"), requested_site_start=yang.gdata.from_xml_opt_str(n, "requested-site-start"), requested_site_stop=yang.gdata.from_xml_opt_str(n, "requested-site-stop"), locations=ietf_l3vpn_svc__l3vpn_svc__sites__site__locations.from_xml(yang.gdata.get_xml_opt_child(n, "locations")), devices=ietf_l3vpn_svc__l3vpn_svc__sites__site__devices.from_xml(yang.gdata.get_xml_opt_child(n, "devices")), site_diversity=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity.from_xml(yang.gdata.get_xml_opt_child(n, "site-diversity")), management=ietf_l3vpn_svc__l3vpn_svc__sites__site__management.from_xml(yang.gdata.get_xml_child(n, "management")), vpn_policies=ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies.from_xml(yang.gdata.get_xml_opt_child(n, "vpn-policies")), site_vpn_flavor=yang.gdata.from_xml_opt_str(n, "site-vpn-flavor"), maximum_routes=ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes.from_xml(yang.gdata.get_xml_opt_child(n, "maximum-routes")), security=ietf_l3vpn_svc__l3vpn_svc__sites__site__security.from_xml(yang.gdata.get_xml_opt_child(n, "security")), service=ietf_l3vpn_svc__l3vpn_svc__sites__site__service.from_xml(yang.gdata.get_xml_opt_child(n, "service")), traffic_protection=ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection.from_xml(yang.gdata.get_xml_opt_child(n, "traffic-protection")), routing_protocols=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols.from_xml(yang.gdata.get_xml_opt_child(n, "routing-protocols")), actual_site_start=yang.gdata.from_xml_opt_str(n, "actual-site-start"), actual_site_stop=yang.gdata.from_xml_opt_str(n, "actual-site-stop"), site_network_accesses=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses.from_xml(yang.gdata.get_xml_opt_child(n, "site-network-accesses")))
+        return ietf_l3vpn_svc__l3vpn_svc__sites__site_entry(site_id=yang.gdata.from_xml_str(n, "site-id"), requested_site_start=yang.gdata.from_xml_opt_str(n, "requested-site-start"), requested_site_stop=yang.gdata.from_xml_opt_str(n, "requested-site-stop"), locations=ietf_l3vpn_svc__l3vpn_svc__sites__site__locations.from_xml(yang.gdata.get_xml_opt_child(n, "locations")), devices=ietf_l3vpn_svc__l3vpn_svc__sites__site__devices.from_xml(yang.gdata.get_xml_opt_child(n, "devices")), site_diversity=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity.from_xml(yang.gdata.get_xml_opt_child(n, "site-diversity")), management=ietf_l3vpn_svc__l3vpn_svc__sites__site__management.from_xml(yang.gdata.get_xml_child(n, "management")), vpn_policies=ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies.from_xml(yang.gdata.get_xml_opt_child(n, "vpn-policies")), site_vpn_flavor=yang.gdata.from_xml_opt_str(n, "site-vpn-flavor"), maximum_routes=ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes.from_xml(yang.gdata.get_xml_opt_child(n, "maximum-routes")), security=ietf_l3vpn_svc__l3vpn_svc__sites__site__security.from_xml(yang.gdata.get_xml_opt_child(n, "security")), service=ietf_l3vpn_svc__l3vpn_svc__sites__site__service.from_xml(yang.gdata.get_xml_opt_child(n, "service")), traffic_protection=ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection.from_xml(yang.gdata.get_xml_opt_child(n, "traffic-protection")), routing_protocols=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols.from_xml(yang.gdata.get_xml_opt_child(n, "routing-protocols")), site_network_accesses=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses.from_xml(yang.gdata.get_xml_opt_child(n, "site-network-accesses")))
 
 class ietf_l3vpn_svc__l3vpn_svc__sites__site(yang.adata.MNode):
     elements: list[ietf_l3vpn_svc__l3vpn_svc__sites__site_entry]
@@ -15636,10 +15621,6 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site_element(jd: value,
             children['traffic-protection'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection(jd, rest_path, op)
         if point == 'routing-protocols':
             children['routing-protocols'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols(jd, rest_path, op)
-        if point == 'actual-site-start':
-            raise ValueError("Invalid json path to non-inner node")
-        if point == 'actual-site-stop':
-            raise ValueError("Invalid json path to non-inner node")
         if point == 'site-network-accesses':
             children['site-network-accesses'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses(jd, rest_path, op)
         return yang.gdata.ListElement(keys, children)
@@ -15728,14 +15709,6 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site_element(jd: dict[str, ?
     child_routing_protocols = child_routing_protocols_full if child_routing_protocols_full is not None else jd.get('routing-protocols')
     if child_routing_protocols is not None and isinstance(child_routing_protocols, dict):
         children['routing-protocols'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols(child_routing_protocols)
-    child_actual_site_start_full = jd.get('l3vpn-svc:actual-site-start')
-    child_actual_site_start = child_actual_site_start_full if child_actual_site_start_full is not None else jd.get('actual-site-start')
-    if child_actual_site_start is not None:
-        children['actual-site-start'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__actual_site_start(child_actual_site_start)
-    child_actual_site_stop_full = jd.get('l3vpn-svc:actual-site-stop')
-    child_actual_site_stop = child_actual_site_stop_full if child_actual_site_stop_full is not None else jd.get('actual-site-stop')
-    if child_actual_site_stop is not None:
-        children['actual-site-stop'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__actual_site_stop(child_actual_site_stop)
     child_site_network_accesses_full = jd.get('l3vpn-svc:site-network-accesses')
     child_site_network_accesses = child_site_network_accesses_full if child_site_network_accesses_full is not None else jd.get('site-network-accesses')
     if child_site_network_accesses is not None and isinstance(child_site_network_accesses, dict):
@@ -15807,14 +15780,6 @@ mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site_element(n: yang.gdata.Lis
     if child_routing_protocols is not None:
         if isinstance(child_routing_protocols, yang.gdata.Container):
             children['routing-protocols'] = to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols(child_routing_protocols)
-    child_actual_site_start = n.children.get('actual-site-start')
-    if child_actual_site_start is not None:
-        if isinstance(child_actual_site_start, yang.gdata.Leaf):
-            children['actual-site-start'] = child_actual_site_start.val
-    child_actual_site_stop = n.children.get('actual-site-stop')
-    if child_actual_site_stop is not None:
-        if isinstance(child_actual_site_stop, yang.gdata.Leaf):
-            children['actual-site-stop'] = child_actual_site_stop.val
     child_site_network_accesses = n.children.get('site-network-accesses')
     if child_site_network_accesses is not None:
         if isinstance(child_site_network_accesses, yang.gdata.Container):
