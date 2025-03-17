@@ -249,9 +249,11 @@ actor main(env):
     server = http.Listener(tcpl_cap, "0.0.0.0", 80, _on_http_accept, log_handler=logh_http)
 
     configs = []
+    env_exit_on_done = env.getenv("EXIT_ON_DONE")
+    exit_on_done = env_exit_on_done if env_exit_on_done is not None else ""
 
     def _conf_file():
-        # Grab te first config
+        # Grab the first config
         print("Applying config file..")
         try:
             nb_input = configs.pop(0)
@@ -260,6 +262,13 @@ actor main(env):
             after 3: _conf_file()
         except IndexError:
             print("All config files applied")
+            # TODO: exit_on_done.lower() once Acton bug is fixed!?
+            if exit_on_done in ["1", "true", "yes"]:
+                print("No more config files to apply, exiting..")
+                after 3: _exit()
+
+    def _exit():
+        env.exit(0)
 
     if len(env.argv) > 1:
         # Read and apply config files, but paced
