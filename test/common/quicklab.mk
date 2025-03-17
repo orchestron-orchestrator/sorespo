@@ -80,7 +80,7 @@ $(addprefix test-ping-,$(ROUTERS_XR)):
 .PHONY: test-ping
 test-ping:
 # Do a full mesh of ping between all cust-X routers loopbacks
-	@for i in 1 2 3 4; do \
+	@set -e; for i in 1 2 3 4; do \
 		for j in 1 2 3 4; do \
 			if [ $$i -ne $$j ]; then \
 				$(MAKE) test-ping-cust-$$i IP=10.200.1.$$j; \
