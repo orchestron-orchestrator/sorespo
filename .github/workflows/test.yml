@@ -30,4 +30,10 @@ jobs:
             out
           key: acton-${{ runner.os }}-${{ runner.arch }}
       - run: acton build
-      - run: acton test
+      - name: Login to ghcr.io
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: "Start quicklab"
+        run: |
+          make -C test/quicklab start
+          docker logs respnet-quicklab-ams-core-1
