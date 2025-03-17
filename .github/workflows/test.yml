@@ -15,3 +15,19 @@ jobs:
       - run: acton build
       - run: acton test
       - run: acton test perf
+
+  net-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Check out repository code"
+        uses: actions/checkout@v4
+      - name: "Cache acton stuff"
+        uses: actions/cache@v4
+        with:
+          # Is it safe to cache the out directory?
+          path: |
+            ~/.cache/acton
+            out
+          key: acton-${{ runner.os }}-${{ runner.arch }}
+      - run: acton build
+      - run: acton test
