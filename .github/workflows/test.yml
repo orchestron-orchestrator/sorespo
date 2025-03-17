@@ -16,6 +16,27 @@ jobs:
       - run: acton test
       - run: acton test perf
 
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actonlang/setup-acton@v1
+        with:
+          channel: 'tip'
+      - name: "Check out repository code"
+        uses: actions/checkout@v4
+      - name: "Cache acton stuff"
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/acton
+            out
+          key: acton-${{ runner.os }}-${{ runner.arch }}
+      - run: acton build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: respnet
+          path: out/bin/respnet
+
   net-test:
     strategy:
       fail-fast: false
@@ -24,6 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_PATH: ${{ vars.IMAGE_PATH }}
+    needs: build
     steps:
       - name: Set up env for containers
         run: |
@@ -33,15 +55,11 @@ jobs:
           sudo apt install linux-modules-extra-$(uname -r)
       - name: "Check out repository code"
         uses: actions/checkout@v4
-      - name: "Cache acton stuff"
-        uses: actions/cache@v4
+      - uses: actions/download-artifact@v4
         with:
-          # Is it safe to cache the out directory?
-          path: |
-            ~/.cache/acton
-            out
-          key: acton-${{ runner.os }}-${{ runner.arch }}
-      - run: acton build
+          name: respnet
+          path: out/bin/
+      - run: chmod a+x out/bin/respnet
       - name: Login to ghcr.io
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
