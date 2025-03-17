@@ -21,6 +21,12 @@ jobs:
     env:
       IMAGE_PATH: ${{ vars.IMAGE_PATH }}
     steps:
+      - name: Set up env for containers
+        run: |
+          # IOS XRd
+          sudo sysctl -w fs.inotify.max_user_instances=64000
+          # cRPD
+          sudo apt install linux-modules-extra-$(uname -r)
       - name: "Check out repository code"
         uses: actions/checkout@v4
       - name: "Cache acton stuff"
