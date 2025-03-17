@@ -20,7 +20,7 @@ run:
 	docker exec -it $(TESTENV)-otron /respnet --rts-bt-dbg
 
 run-and-configure:
-	docker exec -it $(TESTENV)-otron /respnet netinfra.xml l3vpn-svc.xml --rts-bt-dbg
+	docker exec -it -e EXIT_ON_DONE=$(CI) $(TESTENV)-otron /respnet netinfra.xml l3vpn-svc.xml --rts-bt-dbg
 
 configure:
 	$(MAKE) FILE="netinfra.xml" send-config
