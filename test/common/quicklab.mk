@@ -69,11 +69,11 @@ $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
 # not work, but these are internal helpers anyway ...
 $(addprefix test-ping-,$(ROUTERS_CRPD)):
 # brew install coreutils on MacOS
-	timeout 10s bash -c "until docker exec -t $(TESTENV)-$(@:test-ping-%=%) ping -c 1 -W 1 $(IP); do sleep 1; done"
+	timeout --foreground 10s bash -c "until docker exec -t $(TESTENV)-$(@:test-ping-%=%) ping -c 1 -W 1 $(IP); do sleep 1; done"
 
 $(addprefix test-ping-,$(ROUTERS_XR)):
 # brew install coreutils on MacOS
-	timeout 10s bash -c "until docker exec -t $(TESTENV)-$(@:test-ping-%=%) ip netns exec global-vrf ping -c 1 -W 1 $(IP); do sleep 1; done"
+	timeout --foreground 10s bash -c "until docker exec -t $(TESTENV)-$(@:test-ping-%=%) ip netns exec global-vrf ping -c 1 -W 1 $(IP); do sleep 1; done"
 
 .PHONY: test-ping
 test-ping:
