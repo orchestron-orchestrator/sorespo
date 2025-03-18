@@ -63,7 +63,7 @@ $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD)): cli-%: platform-cli-%
 
 .PHONY: $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD))
 $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
-	docker run -it --rm --network container:$(TESTENV)-$(@:get-dev-config-%=%) ghcr.io/notconf/notconf:debug netconf-console2 --port 830 --user clab --pass clab@123 --get-config
+	docker run -it --rm --network container:$(TESTENV)-otron ghcr.io/notconf/notconf:debug netconf-console2 --host $(@:get-dev-config-%=%) --port 830 --user clab --pass clab@123 --get-config
 
 .phony: test
 test::
