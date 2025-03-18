@@ -17,7 +17,10 @@ jobs:
       - run: acton test perf
 
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ARCH: [x86_64, aarch64]
+    runs-on: ${{ matrix.arch == 'x86_64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     steps:
       - uses: actonlang/setup-acton@v1
         with:
@@ -34,7 +37,7 @@ jobs:
       - run: acton build
       - uses: actions/upload-artifact@v4
         with:
-          name: respnet
+          name: respnet-${{ runner.arch }}
           path: out/bin/respnet
 
   net-test:
@@ -42,7 +45,11 @@ jobs:
       fail-fast: false
       matrix:
         TESTENV: [quicklab, quicklab-crpd, quicklab-notconf]
-    runs-on: ubuntu-latest
+        ARCH: [x86_64, aarch64]
+        exclude:
+          - TESTENV: quicklab
+            ARCH: aarch64
+    runs-on: ${{ matrix.arch == 'x86_64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     env:
       IMAGE_PATH: ${{ vars.IMAGE_PATH }}
     needs: build
@@ -58,7 +65,7 @@ jobs:
         uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: respnet
+          name: respnet-${{ runner.arch }}
           path: out/bin/
       - run: chmod a+x out/bin/respnet
       - name: Login to ghcr.io
