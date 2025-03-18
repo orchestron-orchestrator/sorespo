@@ -17,14 +17,14 @@ copy:
 	docker cp netinfra.xml $(TESTENV)-otron:/netinfra.xml
 
 run:
-	docker exec -it $(TESTENV)-otron /respnet --rts-bt-dbg
+	docker exec $(INTERACTIVE) $(TESTENV)-otron /respnet --rts-bt-dbg
+
+ifndef CI
+INTERACTIVE=-it
+endif
 
 run-and-configure:
-ifdef CI
-	docker exec -e EXIT_ON_DONE=1 $(TESTENV)-otron /respnet netinfra.xml l3vpn-svc.xml --rts-bt-dbg
-else
-	docker exec -it $(TESTENV)-otron /respnet netinfra.xml l3vpn-svc.xml --rts-bt-dbg
-endif
+	docker exec $(INTERACTIVE) -e EXIT_ON_DONE=$(CI) $(TESTENV)-otron /respnet netinfra.xml l3vpn-svc.xml --rts-bt-dbg
 
 configure:
 	$(MAKE) FILE="netinfra.xml" send-config
@@ -67,7 +67,7 @@ $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD)): cli-%: platform-cli-%
 
 .PHONY: $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD))
 $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
-	docker run -it --rm --network container:$(TESTENV)-otron ghcr.io/notconf/notconf:debug netconf-console2 --host $(@:get-dev-config-%=%) --port 830 --user clab --pass clab@123 --get-config
+	docker run $(INTERACTIVE) --rm --network container:$(TESTENV)-otron ghcr.io/notconf/notconf:debug netconf-console2 --host $(@:get-dev-config-%=%) --port 830 --user clab --pass clab@123 --get-config
 
 .phony: test
 test::
