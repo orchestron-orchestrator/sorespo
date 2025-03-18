@@ -8,6 +8,7 @@ stop:
 	$(CLAB_BIN) destroy --topo $(TESTENV:respnet-%=%).clab.yml --log-level trace
 
 .PHONY: wait $(addprefix wait-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+WAIT?=60
 wait: $(addprefix platform-wait-,$(ROUTERS_XR) $(ROUTERS_CRPD))
 
 copy:
