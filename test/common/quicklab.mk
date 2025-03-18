@@ -65,13 +65,8 @@ get-config-json0 get-config-json1 get-config-json2 get-config-json3:
 delete-config:
 	curl -X DELETE http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/netinfra:netinfra/routers=STO-CORE-1
 
-.PHONY: $(addprefix cli-,$(ROUTERS_XR))
-$(addprefix cli-,$(ROUTERS_XR)):
-	docker exec -it $(TESTENV)-$(subst cli-,,$@) /pkg/bin/xr_cli.sh
-
-.PHONY: $(addprefix cli-,$(ROUTERS_CRPD))
-$(addprefix cli-,$(ROUTERS_CRPD)):
-	docker exec -it $(TESTENV)-$(subst cli-,,$@) cli
+.PHONY: $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+$(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD)): cli-%: platform-cli-%
 
 .PHONY: $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD))
 $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
