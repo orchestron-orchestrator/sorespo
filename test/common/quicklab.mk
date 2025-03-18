@@ -66,3 +66,4 @@ $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
 
 .phony: test
 test::
+	$(MAKE) $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD))
