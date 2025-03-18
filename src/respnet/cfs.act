@@ -5,6 +5,14 @@ from respnet.conf import IGBP_AUTHENTICATION_KEY
 import respnet.layers.base_0 as base
 import respnet.layers.y_1_loose
 
+#  City to router interface mapping
+CITY_ROUTER_INTERFACE_MAP = {
+    "amsterdam": ("AMS-CORE-1", "GigabitEthernet0/0/0/2.100"),
+    "frankfurt": ("FRA-CORE-1", "GigabitEthernet0/0/0/3.100"),
+    "stockholm": ("STO-CORE-1", "eth4.100"),
+    "ljubljana": ("LJU-CORE-1", "eth3.100"),
+}
+
 class Router(base.Router):
     def transform(self, i):
         o = base.o_root()
@@ -50,13 +58,14 @@ class L3VpnSite(base.L3VpnSite):
         o = base.o_root()
         for sna in i.site_network_accesses.site_network_access.elements:
             vpn_id = sna.vpn_attachment.vpn_id
-            bearer_ref = sna.bearer.bearer_reference
-            if bearer_ref != None:
-                parts = bearer_ref.split(",")
-                device = parts[0]
-                interface = parts[1]
-            else:
-                device, interface = None, None
+
+            device, interface = None, None
+            for l in i.locations.location.elements:
+                if l.location_id == sna.location_reference:
+                    city = l.city
+                    if city != None:
+                        device, interface = CITY_ROUTER_INTERFACE_MAP.get_def(city.lower(), (None, None))
+
             provider_ipv4_address = sna.ip_connection.ipv4.addresses.provider_address
             customer_ipv4_address = sna.ip_connection.ipv4.addresses.customer_address
             ipv4_len = sna.ip_connection.ipv4.addresses.prefix_length
