@@ -4,23 +4,8 @@ on:
   push:
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actonlang/setup-acton@v1
-        with:
-          channel: 'tip'
-      - name: "Check out repository code"
-        uses: actions/checkout@v4
-      - run: acton build
-      - run: acton test
-      - run: acton test perf
-
-  build:
-    strategy:
-      matrix:
-        ARCH: [x86_64, aarch64]
-    runs-on: ${{ matrix.arch == 'x86_64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     steps:
       - id: setup-acton
         uses: actonlang/setup-acton@v1
@@ -34,11 +19,18 @@ jobs:
           path: |
             ~/.cache/acton
             out
-          key: acton-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/build.act.json') }}-${{ steps.setup-acton.outputs.version }}
+          key: acton-${{ hashFiles('**/build.act.json') }}-${{ steps.setup-acton.outputs.version }}
       - run: acton build
+      - run: acton test
+      - run: acton test perf
       - uses: actions/upload-artifact@v4
         with:
-          name: respnet-${{ runner.arch }}
+          name: respnet-amd64
+          path: out/bin/respnet
+      - run: acton build --target aarch64-linux-gnu.2.27
+      - uses: actions/upload-artifact@v4
+        with:
+          name: respnet-aarch64
           path: out/bin/respnet
 
   net-test:
@@ -46,14 +38,15 @@ jobs:
       fail-fast: false
       matrix:
         TESTENV: [quicklab, quicklab-crpd, quicklab-notconf]
-        ARCH: [x86_64, aarch64]
+        ARCH: [amd64, aarch64]
         exclude:
+          # No Cisco IOS XRd support for aarch64 :/
           - TESTENV: quicklab
             ARCH: aarch64
-    runs-on: ${{ matrix.arch == 'x86_64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
+    runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     env:
       IMAGE_PATH: ${{ vars.IMAGE_PATH }}
-    needs: build
+    needs: build-and-test
     steps:
       - name: Set up env for containers
         run: |
@@ -66,7 +59,7 @@ jobs:
         uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: respnet-${{ runner.arch }}
+          name: respnet-${{ matrix.ARCH }}
           path: out/bin/
       - run: chmod a+x out/bin/respnet
       - name: Login to ghcr.io
