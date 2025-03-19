@@ -22,7 +22,8 @@ jobs:
         ARCH: [x86_64, aarch64]
     runs-on: ${{ matrix.arch == 'x86_64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     steps:
-      - uses: actonlang/setup-acton@v1
+      - id: setup-acton
+        uses: actonlang/setup-acton@v1
         with:
           channel: 'tip'
       - name: "Check out repository code"
@@ -33,7 +34,7 @@ jobs:
           path: |
             ~/.cache/acton
             out
-          key: acton-${{ runner.os }}-${{ runner.arch }}
+          key: acton-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/build.act.json') }}-${{ steps.setup-acton.outputs.version }}
       - run: acton build
       - uses: actions/upload-artifact@v4
         with:
