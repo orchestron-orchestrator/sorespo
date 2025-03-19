@@ -7,6 +7,10 @@ start: build-otron-image
 stop:
 	$(CLAB_BIN) destroy --topo $(TESTENV:respnet-%=%).clab.yml --log-level trace
 
+.PHONY: wait $(addprefix wait-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+WAIT?=60
+wait: $(addprefix platform-wait-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+
 copy:
 	docker cp ../../out/bin/respnet $(TESTENV)-otron:/respnet
 	docker cp l3vpn-svc.xml $(TESTENV)-otron:/l3vpn-svc.xml
@@ -54,36 +58,13 @@ get-config-json0 get-config-json1 get-config-json2 get-config-json3:
 delete-config:
 	curl -X DELETE http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/netinfra:netinfra/routers=STO-CORE-1
 
-.PHONY: $(addprefix cli-,$(ROUTERS_XR))
-$(addprefix cli-,$(ROUTERS_XR)):
-	docker exec -it $(TESTENV)-$(subst cli-,,$@) /pkg/bin/xr_cli.sh
-
-.PHONY: $(addprefix cli-,$(ROUTERS_CRPD))
-$(addprefix cli-,$(ROUTERS_CRPD)):
-	docker exec -it $(TESTENV)-$(subst cli-,,$@) cli
+.PHONY: $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+$(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD)): cli-%: platform-cli-%
 
 .PHONY: $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD))
 $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
-	docker run -it --rm --network container:$(TESTENV)-$(@:get-dev-config-%=%) ghcr.io/notconf/notconf:debug netconf-console2 --port 830 --user clab --pass clab@123 --get-config
+	docker run -it --rm --network container:$(TESTENV)-otron ghcr.io/notconf/notconf:debug netconf-console2 --host $(@:get-dev-config-%=%) --port 830 --user clab --pass clab@123 --get-config
 
-# These test-ping-% recipes will "install" themselves for all PE routers too.
-# Pretty sure pinging the customer loopback from the default VRF in core does
-# not work, but these are internal helpers anyway ...
-$(addprefix test-ping-,$(ROUTERS_CRPD)):
-# brew install coreutils on MacOS
-	timeout 10s bash -c "until docker exec -t $(TESTENV)-$(@:test-ping-%=%) ping -c 1 -W 1 $(IP); do sleep 1; done"
-
-$(addprefix test-ping-,$(ROUTERS_XR)):
-# brew install coreutils on MacOS
-	timeout 10s bash -c "until docker exec -t $(TESTENV)-$(@:test-ping-%=%) ip netns exec global-vrf ping -c 1 -W 1 $(IP); do sleep 1; done"
-
-.PHONY: test-ping
-test-ping:
-# Do a full mesh of ping between all cust-X routers loopbacks
-	@for i in 1 2 3 4; do \
-		for j in 1 2 3 4; do \
-			if [ $$i -ne $$j ]; then \
-				$(MAKE) test-ping-cust-$$i IP=10.200.1.$$j; \
-			fi; \
-		done; \
-	done
+.phony: test
+test::
+	$(MAKE) $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD))
