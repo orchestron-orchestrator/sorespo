@@ -17,10 +17,14 @@ copy:
 	docker cp netinfra.xml $(TESTENV)-otron:/netinfra.xml
 
 run:
-	docker exec -it $(TESTENV)-otron /respnet --rts-bt-dbg
+	docker exec $(INTERACTIVE) $(TESTENV)-otron /respnet --rts-bt-dbg
+
+ifndef CI
+INTERACTIVE=-it
+endif
 
 run-and-configure:
-	docker exec -it $(TESTENV)-otron /respnet netinfra.xml l3vpn-svc.xml --rts-bt-dbg
+	docker exec $(INTERACTIVE) -e EXIT_ON_DONE=$(CI) $(TESTENV)-otron /respnet netinfra.xml l3vpn-svc.xml --rts-bt-dbg
 
 configure:
 	$(MAKE) FILE="netinfra.xml" send-config
@@ -63,8 +67,17 @@ $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD)): cli-%: platform-cli-%
 
 .PHONY: $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD))
 $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
-	docker run -it --rm --network container:$(TESTENV)-otron ghcr.io/notconf/notconf:debug netconf-console2 --host $(@:get-dev-config-%=%) --port 830 --user clab --pass clab@123 --get-config
+	docker run $(INTERACTIVE) --rm --network container:$(TESTENV)-otron ghcr.io/notconf/notconf:debug netconf-console2 --host $(@:get-dev-config-%=%) --port 830 --user clab --pass clab@123 --get-config
 
 .phony: test
 test::
 	$(MAKE) $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+
+.PHONY: save-logs
+save-logs: $(addprefix save-logs-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+
+.PHONY: $(addprefix save-logs-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+$(addprefix save-logs-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
+	mkdir -p logs
+	docker logs --timestamps $(TESTENV)-$(@:save-logs-%=%) > logs/$(@:save-logs-%=%)_docker.log 2>&1
+	$(MAKE) get-dev-config-$(@:save-logs-%=%) > logs/$(@:save-logs-%=%)_netconf.log || true
