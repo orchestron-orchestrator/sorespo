@@ -72,3 +72,12 @@ $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
 .phony: test
 test::
 	$(MAKE) $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+
+.PHONY: save-logs
+save-logs: $(addprefix save-logs-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+
+.PHONY: $(addprefix save-logs-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+$(addprefix save-logs-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
+	mkdir -p logs
+	docker logs --timestamps $(TESTENV)-$(@:save-logs-%=%) > logs/$(@:save-logs-%=%)_docker.log 2>&1
+	$(MAKE) get-dev-config-$(@:save-logs-%=%) > logs/$(@:save-logs-%=%)_netconf.log || true
