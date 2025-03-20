@@ -45,7 +45,7 @@ jobs:
             ARCH: aarch64
     runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     env:
-      IMAGE_PATH: ${{ vars.IMAGE_PATH }}
+      IMAGE_PATH: ${{ vars.IMAGE_PATH || format('ghcr.io/{0}/', github.repository) }}
     needs: build-and-test
     steps:
       - name: Set up env for containers
@@ -62,7 +62,10 @@ jobs:
           name: respnet-${{ matrix.ARCH }}
           path: out/bin/
       - run: chmod a+x out/bin/respnet
+      # If we're using IMAGE_PATH=ghcr.io/... login to ghcr.io using GITHUB_TOKEN
+      # TODO: what about other (external) registries that require login?
       - name: Login to ghcr.io
+        if: ${{ startsWith(env.IMAGE_PATH, 'ghcr.io') }}
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: "Start quicklab"
