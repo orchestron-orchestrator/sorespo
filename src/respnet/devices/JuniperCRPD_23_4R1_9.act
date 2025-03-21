@@ -3445,19 +3445,13 @@ mut def from_json_junos_conf_root__configuration__protocols__bgp__path_selection
     return yang.gdata.Leaf("union", val)
 
 class junos_conf_root__configuration__protocols__bgp__path_selection__med_plus_igp(yang.adata.MNode):
-    med_multiplier: value
-    igp_multiplier: value
+    med_multiplier: ?value
+    igp_multiplier: ?value
 
-    mut def __init__(self, med_multiplier: ?value=None, igp_multiplier: ?value=None):
+    mut def __init__(self, med_multiplier: ?value, igp_multiplier: ?value):
         self._ns = "http://yang.juniper.net/junos/conf/protocols"
-        if med_multiplier != None:
-            self.med_multiplier = med_multiplier
-        else:
-            self.med_multiplier = 1
-        if igp_multiplier != None:
-            self.igp_multiplier = igp_multiplier
-        else:
-            self.igp_multiplier = 1
+        self.med_multiplier = med_multiplier
+        self.igp_multiplier = igp_multiplier
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -7496,13 +7490,13 @@ mut def from_json_junos_conf_root__configuration__protocols__isis__interface__fa
     return yang.gdata.Leaf("union", val)
 
 class junos_conf_root__configuration__protocols__isis__interface__family__bfd_liveness_detection(yang.adata.MNode):
-    version: str
+    version: ?str
     minimum_interval: ?value
     minimum_transmit_interval: ?value
     minimum_receive_interval: ?value
-    multiplier: value
+    multiplier: ?value
     inline_disable: ?bool
-    pdu_size: value
+    pdu_size: ?value
     no_adaptation: ?bool
     transmit_interval: junos_conf_root__configuration__protocols__isis__interface__family__bfd_liveness_detection__transmit_interval
     detection_time: junos_conf_root__configuration__protocols__isis__interface__family__bfd_liveness_detection__detection_time
@@ -7511,24 +7505,15 @@ class junos_conf_root__configuration__protocols__isis__interface__family__bfd_li
     echo_lite: junos_conf_root__configuration__protocols__isis__interface__family__bfd_liveness_detection__echo_lite
     holddown_interval: ?value
 
-    mut def __init__(self, version: ?str=None, minimum_interval: ?value, minimum_transmit_interval: ?value, minimum_receive_interval: ?value, multiplier: ?value=None, inline_disable: ?bool, pdu_size: ?value=None, no_adaptation: ?bool, transmit_interval: ?junos_conf_root__configuration__protocols__isis__interface__family__bfd_liveness_detection__transmit_interval=None, detection_time: ?junos_conf_root__configuration__protocols__isis__interface__family__bfd_liveness_detection__detection_time=None, authentication: ?junos_conf_root__configuration__protocols__isis__interface__family__bfd_liveness_detection__authentication=None, echo: ?junos_conf_root__configuration__protocols__isis__interface__family__bfd_liveness_detection__echo=None, echo_lite: ?junos_conf_root__configuration__protocols__isis__interface__family__bfd_liveness_detection__echo_lite=None, holddown_interval: ?value):
+    mut def __init__(self, version: ?str, minimum_interval: ?value, minimum_transmit_interval: ?value, minimum_receive_interval: ?value, multiplier: ?value, inline_disable: ?bool, pdu_size: ?value, no_adaptation: ?bool, transmit_interval: ?junos_conf_root__configuration__protocols__isis__interface__family__bfd_liveness_detection__transmit_interval=None, detection_time: ?junos_conf_root__configuration__protocols__isis__interface__family__bfd_liveness_detection__detection_time=None, authentication: ?junos_conf_root__configuration__protocols__isis__interface__family__bfd_liveness_detection__authentication=None, echo: ?junos_conf_root__configuration__protocols__isis__interface__family__bfd_liveness_detection__echo=None, echo_lite: ?junos_conf_root__configuration__protocols__isis__interface__family__bfd_liveness_detection__echo_lite=None, holddown_interval: ?value):
         self._ns = "http://yang.juniper.net/junos/conf/protocols"
-        if version != None:
-            self.version = version
-        else:
-            self.version = "automatic"
+        self.version = version
         self.minimum_interval = minimum_interval
         self.minimum_transmit_interval = minimum_transmit_interval
         self.minimum_receive_interval = minimum_receive_interval
-        if multiplier != None:
-            self.multiplier = multiplier
-        else:
-            self.multiplier = 3
+        self.multiplier = multiplier
         self.inline_disable = inline_disable
-        if pdu_size != None:
-            self.pdu_size = pdu_size
-        else:
-            self.pdu_size = 24
+        self.pdu_size = pdu_size
         self.no_adaptation = no_adaptation
         if transmit_interval is not None:
             self.transmit_interval = transmit_interval
@@ -7707,12 +7692,12 @@ class junos_conf_root__configuration__protocols__isis__interface_entry(yang.adat
     name: str
     ldp_synchronization: ?junos_conf_root__configuration__protocols__isis__interface__ldp_synchronization
     level: junos_conf_root__configuration__protocols__isis__interface__level
-    lsp_interval: value
+    lsp_interval: ?value
     point_to_point: ?bool
     passive: ?junos_conf_root__configuration__protocols__isis__interface__passive
     family: junos_conf_root__configuration__protocols__isis__interface__family
 
-    mut def __init__(self, name: str, ldp_synchronization: ?junos_conf_root__configuration__protocols__isis__interface__ldp_synchronization=None, level: list[junos_conf_root__configuration__protocols__isis__interface__level_entry]=[], lsp_interval: ?value=None, point_to_point: ?bool, passive: ?junos_conf_root__configuration__protocols__isis__interface__passive=None, family: list[junos_conf_root__configuration__protocols__isis__interface__family_entry]=[]):
+    mut def __init__(self, name: str, ldp_synchronization: ?junos_conf_root__configuration__protocols__isis__interface__ldp_synchronization=None, level: list[junos_conf_root__configuration__protocols__isis__interface__level_entry]=[], lsp_interval: ?value, point_to_point: ?bool, passive: ?junos_conf_root__configuration__protocols__isis__interface__passive=None, family: list[junos_conf_root__configuration__protocols__isis__interface__family_entry]=[]):
         self._ns = "http://yang.juniper.net/junos/conf/protocols"
         self.name = name
         self.ldp_synchronization = ldp_synchronization
@@ -7721,10 +7706,7 @@ class junos_conf_root__configuration__protocols__isis__interface_entry(yang.adat
             self_ldp_synchronization._parent = self
         self.level = junos_conf_root__configuration__protocols__isis__interface__level(elements=level)
         self.level._parent = self
-        if lsp_interval != None:
-            self.lsp_interval = lsp_interval
-        else:
-            self.lsp_interval = 100
+        self.lsp_interval = lsp_interval
         self.point_to_point = point_to_point
         self.passive = passive
         self_passive = self.passive
@@ -8941,20 +8923,17 @@ class junos_conf_root__configuration__protocols__ldp__traffic_statistics__file(y
     filename: ?str
     replace: ?bool
     size: ?str
-    files: value
+    files: ?value
     no_stamp: ?bool
     world_readable: ?bool
     no_world_readable: ?bool
 
-    mut def __init__(self, filename: ?str, replace: ?bool, size: ?str, files: ?value=None, no_stamp: ?bool, world_readable: ?bool, no_world_readable: ?bool):
+    mut def __init__(self, filename: ?str, replace: ?bool, size: ?str, files: ?value, no_stamp: ?bool, world_readable: ?bool, no_world_readable: ?bool):
         self._ns = "http://yang.juniper.net/junos/conf/protocols"
         self.filename = filename
         self.replace = replace
         self.size = size
-        if files != None:
-            self.files = files
-        else:
-            self.files = 10
+        self.files = files
         self.no_stamp = no_stamp
         self.world_readable = world_readable
         self.no_world_readable = no_world_readable
