@@ -107,8 +107,8 @@ actor main(env):
                         sr = tmf_store.create_service_order(so_in)
                         sr_diff = sr.diff
                         if sr_diff is not None:
-                            conf(sr_diff)
-                        respond(200, {}, "OK")
+                            session = cfs.newsession()
+                            session.edit_config(sr_diff, config_done)
                         return
                     except Exception as e:
                         respond(400, {}, "Error creating service order: %s" % str(e))
