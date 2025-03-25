@@ -18,6 +18,6 @@ from respnet.layers.y_2 import orchestron_rfs__rfs__ebgp_customer_entry
 
 import respnet.rfs
 
-def get_ttx(dev_mgr: odev.DeviceManager, log_handler: logging.Handler) -> proc(list[str])->ttx.Node:
+def get_ttx(dev_mgr: odev.DeviceManager, log_handler: ?logging.Handler=None) -> proc(list[str])->ttx.Node:
     r = ttx.Container({"device": ttx.List(ttx.Device(dev_mgr, log_handler)), "rfs": ttx.List(ttx.Container({"base-config": ttx.List(ttx.RFSTransform(respnet.rfs.BaseConfig, dev_mgr, log_handler)), "backbone-interface": ttx.List(ttx.RFSTransform(respnet.rfs.BBInterface, dev_mgr, log_handler)), "ibgp-neighbor": ttx.List(ttx.RFSTransform(respnet.rfs.IbgpNeighbor, dev_mgr, log_handler)), "vrf": ttx.List(ttx.RFSTransform(respnet.rfs.Vrf, dev_mgr, log_handler)), "vrf-interface": ttx.List(ttx.RFSTransform(respnet.rfs.VrfInterface, dev_mgr, log_handler)), "ebgp-customer": ttx.List(ttx.RFSTransform(respnet.rfs.EbgpCustomer, dev_mgr, log_handler))}))})
     return r
