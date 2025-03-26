@@ -4,26 +4,21 @@ import testing
 import xml
 
 import yang.adata
-import yang.gdata
-import orchestron.ttt
+import yang.gdata as gdata
+import orchestron.ttx
 import orchestron.device as odev
 
 import respnet.layers
 from respnet.layers.y_0 import root as cfs_root
 
+def rfs_for_device(dev):
+    return gdata.Container({
+        'rfs': gdata.List(["name"], [
+            gdata.ListElement([dev])
+        ])
+    })
 
-def merge_confpsrc(confpsrc: dict[str, yang.gdata.Node]):
-    chunks = list(confpsrc.values())
-    if len(chunks) > 0:
-        merged = chunks[0]
-        if len(chunks) > 1:
-            for chunk in chunks[1:]:
-                merged = yang.gdata.merge(merged, chunk)
-        return merged
-    return yang.gdata.Root()
-
-def _test_netinfra1(log_handler: logging.Handler) -> str:
-    xmlin = """<data>
+netinfra1_in = """<data>
     <netinfra xmlns="http://example.com/netinfra">
         <router>
             <name>AMS-CORE-1</name>
@@ -54,27 +49,28 @@ def _test_netinfra1(log_handler: logging.Handler) -> str:
         </backbone-link>
     </netinfra>
 </data>"""
-    xml_conf = xml.decode(xmlin)
-    dev_mgr = odev.DeviceManager(log_handler=log_handler)
-    layers = respnet.layers.get_layers(dev_mgr, log_handler)
 
+actor netinfra_tester(testenv: testing.AsyncT):
+    xml_conf = xml.decode(netinfra1_in)
     input_config = cfs_root.from_xml(xml_conf)
-    config_in = {"source1": input_config.to_gdata()}
 
-    config_out = {}
-    device_configs = {}
-    xml_out = ""
-    for idx, layer in enumerate(layers[:-1]):
-        print("Computing layer %d" % idx)
-        config_out = {}
-        layer.configure(config_in, config_out)
-        config_in = config_out
+    dev_mgr = odev.DeviceManager()
+    cfs = respnet.layers.get_layers(dev_mgr)
+    rfs = cfs.below().below()
+    dev_mgr.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
+    session = cfs.newsession()
 
-    mc = merge_confpsrc(config_out)
-    return mc.to_xmlstr()
+    def cont(_r: value):
+        res = session.below().below().below().get()
+        testenv.success(res.to_xmlstr())
 
-def _test_l3vpn_svc(log_handler: logging.Handler) -> str:
-    xmlin = """<data>
+    session.edit_config(input_config.to_gdata(), None, cont)
+
+def _test_netinfra1(testenv: testing.AsyncT):
+    netinfra_tester(testenv)
+
+
+l3vpn_in = """<data>
     <netinfra xmlns="http://example.com/netinfra">
         <router>
             <name>AMS-CORE-1</name>
@@ -338,21 +334,31 @@ def _test_l3vpn_svc(log_handler: logging.Handler) -> str:
     </l3vpn-svc>
 </data>
 """
-    xml_conf = xml.decode(xmlin)
-    dev_mgr = odev.DeviceManager(log_handler=log_handler)
-    layers = respnet.layers.get_layers(dev_mgr, log_handler)
 
+actor l3vpn_tester(testenv: testing.AsyncT):
+    xml_conf = xml.decode(l3vpn_in)
     input_config = cfs_root.from_xml(xml_conf)
-    config_in = {"source1": input_config.to_gdata()}
 
-    config_out = {}
-    device_configs = {}
-    xml_out = ""
-    for idx, layer in enumerate(layers[:-1]):
-        print("Computing layer %d" % idx)
-        config_out = {}
-        layer.configure(config_in, config_out)
-        config_in = config_out
+    dev_mgr = odev.DeviceManager()
+    cfs = respnet.layers.get_layers(dev_mgr)
+    rfs = cfs.below().below()
+    dev_mgr.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
+    session = cfs.newsession()
 
-    mc = merge_confpsrc(config_out)
-    return mc.to_xmlstr()
+    def cont(_r: value):
+        res = session.below().below().below().get()
+        print(res.to_xmlstr())
+        testenv.success(res.to_xmlstr())
+
+    session.edit_config(input_config.to_gdata(), None, cont)
+
+def _test_l3vpn_svc(testenv: testing.AsyncT):
+    l3vpn_tester(testenv)
+
+actor main(env):
+    logh = logging.Handler("Otron")
+#    logh.add_sink(logging.StdoutSink())
+    logh.set_output_level(logging.DEBUG)
+    testenv = testing.AsyncT(lambda ok,ex,out: env.exit(0), logh)
+#    netinfra_tester(testenv)
+    l3vpn_tester(testenv)

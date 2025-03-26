@@ -5,7 +5,7 @@
 import logging
 
 import orchestron.device as odev
-import orchestron.ttt as ttt
+import orchestron.ttx as ttx
 import yang.adata
 import yang.gdata
 
@@ -16,8 +16,6 @@ from respnet.layers.y_1 import l3vpn_inter__l3vpns__l3vpn_entry
 
 import respnet.inter
 
-def get_ttt(dev_mgr: odev.DeviceManager, log_handler: logging.Handler) -> ttt.TTTNode:
-
-
-    r = ttt.TTTContainer({"netinfra": ttt.TTTContainer({"router": ttt.TTTList(lambda: respnet.inter.Router(log_handler), log_handler), "backbone-link": ttt.TTTList(lambda: respnet.inter.BBLink(log_handler), log_handler), "ibgp-fullmesh": ttt.TTTList(lambda: respnet.inter.IbgpFullmesh(log_handler), log_handler)}, log_handler), "l3vpns": ttt.TTTContainer({"l3vpn": ttt.TTTList(lambda: respnet.inter.L3Vpn(log_handler), log_handler)}, log_handler)}, log_handler)
+def get_ttx(dev_mgr: odev.DeviceManager, log_handler: ?logging.Handler=None) -> proc(list[str])->ttx.Node:
+    r = ttx.Container({"netinfra": ttx.Container({"router": ttx.List(ttx.Transform(respnet.inter.Router, log_handler)), "backbone-link": ttx.List(ttx.Transform(respnet.inter.BBLink, log_handler)), "ibgp-fullmesh": ttx.List(ttx.Transform(respnet.inter.IbgpFullmesh, log_handler))}, ns='http://example.com/netinfra-inter'), "l3vpns": ttx.Container({"l3vpn": ttx.List(ttx.Transform(respnet.inter.L3Vpn, log_handler))}, ns='http://example.com/l3vpn-inter')}, ns='')
     return r
