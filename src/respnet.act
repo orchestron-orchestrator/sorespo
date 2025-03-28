@@ -16,7 +16,7 @@ import tmf.tmf641
 import respnet.tmf
 
 import respnet.layers
-from respnet.layers.y_0 import root as cfs_root
+from respnet.layers.y_0_loose import root as cfs_root
 import respnet.layers.y_0
 import respnet.layers.y_1
 import respnet.layers.y_2
@@ -183,11 +183,15 @@ actor main(env):
                     session.edit_config(input_config, config_done)
                     return
                 elif request.headers.get("content-type") == "application/yang-data+xml":
-                    xml_in = xml.decode(request.body.decode())
-                    input_config = cfs_root.from_xml(xml_in).to_gdata()
-                    session = cfs.newsession()
-                    session.edit_config(input_config, config_done)
-                    return
+                    try:
+                        xml_in = xml.decode(request.body.decode())
+                        input_config = cfs_root.from_xml(xml_in).to_gdata()
+                        session = cfs.newsession()
+                        session.edit_config(input_config, config_done)
+                        return
+                    except Exception as e:
+                        respond(400, {}, "Error parsing XML: %s" % str(e))
+                        return
                 else:
                     respond(415, {}, "Unsupported media type")
                     return
