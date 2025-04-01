@@ -5,7 +5,7 @@
 import logging
 
 import orchestron.device as odev
-import orchestron.ttx as ttx
+import orchestron.ttt as ttt
 import yang.adata
 import yang.gdata
 
@@ -16,6 +16,6 @@ from respnet.layers.y_0 import ietf_l3vpn_svc__l3vpn_svc__sites__site_entry
 
 import respnet.cfs
 
-def get_ttx(dev_mgr: odev.DeviceManager, log_handler: ?logging.Handler=None) -> proc(list[str])->ttx.Node:
-    r = ttx.Container({"netinfra": ttx.Container({"router": ttx.List(ttx.Transform(respnet.cfs.Router, log_handler)), "backbone-link": ttx.List(ttx.Transform(respnet.cfs.BBLink, log_handler))}, ns='http://example.com/netinfra'), "l3vpn-svc": ttx.Container({"vpn-profiles": ttx.Container({"valid-provider-identifiers": ttx.Container({"cloud-identifier": ttx.List(ttx.Container({})), "encryption-profile-identifier": ttx.List(ttx.Container({})), "qos-profile-identifier": ttx.List(ttx.Container({})), "bfd-profile-identifier": ttx.List(ttx.Container({}))})}), "vpn-services": ttx.Container({"vpn-service": ttx.List(ttx.Transform(respnet.cfs.L3VpnVpnService, log_handler))}), "sites": ttx.Container({"site": ttx.List(ttx.Transform(respnet.cfs.L3VpnSite, log_handler))})}, ns='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc')}, ns='')
+def get_ttt(dev_mgr: odev.DeviceManager, log_handler: ?logging.Handler=None) -> proc(list[str])->ttt.Node:
+    r = ttt.Container({"netinfra": ttt.Container({"router": ttt.List(ttt.Transform(respnet.cfs.Router, log_handler)), "backbone-link": ttt.List(ttt.Transform(respnet.cfs.BBLink, log_handler))}, ns='http://example.com/netinfra'), "l3vpn-svc": ttt.Container({"vpn-profiles": ttt.Container({"valid-provider-identifiers": ttt.Container({"cloud-identifier": ttt.List(ttt.Container({})), "encryption-profile-identifier": ttt.List(ttt.Container({})), "qos-profile-identifier": ttt.List(ttt.Container({})), "bfd-profile-identifier": ttt.List(ttt.Container({}))})}), "vpn-services": ttt.Container({"vpn-service": ttt.List(ttt.Transform(respnet.cfs.L3VpnVpnService, log_handler))}), "sites": ttt.Container({"site": ttt.List(ttt.Transform(respnet.cfs.L3VpnSite, log_handler))})}, ns='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc')}, ns='')
     return r
