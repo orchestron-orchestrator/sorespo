@@ -30,7 +30,7 @@ def optional_str[T](v: ?T, default: str = "None") -> str:
 def rfs_for_device(dev):
     return yang.gdata.Container({
         'rfs': yang.gdata.List(["name"], [
-            yang.gdata.ListElement([dev])
+            yang.gdata.Container({}, [dev])
         ])
     })
 
@@ -151,7 +151,7 @@ actor main(env):
                     layer_config: yang.gdata.Node = session.get()
                     content = ""
                     if request.headers.get("accept") == "application/yang-data+json":
-                        if isinstance(layer_config, yang.gdata.Root):
+                        if isinstance(layer_config, yang.gdata.Container):
                             content = json.encode(respnet.layers.to_json(layer_idx)(layer_config))
                         if request.headers.get("accept") == "application/yang-data+xml":
                             content = layer_config.to_xmlstr()

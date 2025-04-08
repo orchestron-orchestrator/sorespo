@@ -53,7 +53,7 @@ class orchestron_rfs__device__address__initial_credentials_entry(yang.adata.MNod
             children['password'] = yang.gdata.Leaf('string', _password)
         if _key is not None:
             children['key'] = yang.gdata.Leaf('string', _key)
-        return yang.gdata.ListElement([yang.gdata.yang_str(self.username), yang.gdata.yang_str(self.password), yang.gdata.yang_str(self.key)], children)
+        return yang.gdata.Container(children, [yang.gdata.yang_str(self.username), yang.gdata.yang_str(self.password), yang.gdata.yang_str(self.key)])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__device__address__initial_credentials_entry:
@@ -93,7 +93,7 @@ class orchestron_rfs__device__address__initial_credentials(yang.adata.MNode):
         elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
+            if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
         return yang.gdata.List(['username', 'password', 'key'], elements)
 
@@ -113,7 +113,7 @@ class orchestron_rfs__device__address__initial_credentials(yang.adata.MNode):
         return res
 
 
-mut def from_json_path_orchestron_rfs__device__address__initial_credentials_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+mut def from_json_path_orchestron_rfs__device__address__initial_credentials_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
     if len(path) == 1:
         point = path[0]
         keys = point.split(",")
@@ -122,7 +122,7 @@ mut def from_json_path_orchestron_rfs__device__address__initial_credentials_elem
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.AbsentListElement(val.key_vals)
+            return yang.gdata.Absent(val.key)
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -131,7 +131,7 @@ mut def from_json_path_orchestron_rfs__device__address__initial_credentials_elem
         children: dict[str, yang.gdata.Node] = {}
         for idx, key in enumerate(['username', 'password', 'key']):
             children[key] = yang.gdata.Leaf("str", keys[idx])
-        return yang.gdata.ListElement(keys, children)
+        return yang.gdata.Container(children, keys)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_orchestron_rfs__device__address__initial_credentials(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
@@ -153,13 +153,13 @@ mut def from_json_path_orchestron_rfs__device__address__initial_credentials(jd: 
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+            elements.append(yang.gdata.Absent(element.key))
         return yang.gdata.List(['username', 'password', 'key'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['username', 'password', 'key'], [from_json_path_orchestron_rfs__device__address__initial_credentials_element(jd, path, op)])
     raise ValueError("Unable to resolve path, no keys provided")
 
-mut def from_json_orchestron_rfs__device__address__initial_credentials_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+mut def from_json_orchestron_rfs__device__address__initial_credentials_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
     child_username_full = jd.get('orfs:username')
     child_username = child_username_full if child_username_full is not None else jd.get('username')
@@ -173,7 +173,7 @@ mut def from_json_orchestron_rfs__device__address__initial_credentials_element(j
     child_key = child_key_full if child_key_full is not None else jd.get('key')
     if child_key is not None:
         children['key'] = from_json_orchestron_rfs__device__address__initial_credentials__key(child_key)
-    return yang.gdata.ListElement([str(child_username if child_username is not None else ""), str(child_password if child_password is not None else ""), str(child_key if child_key is not None else "")], children)
+    return yang.gdata.Container(children, [str(child_username if child_username is not None else ""), str(child_password if child_password is not None else ""), str(child_key if child_key is not None else "")])
 
 mut def from_json_orchestron_rfs__device__address__initial_credentials(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -182,7 +182,7 @@ mut def from_json_orchestron_rfs__device__address__initial_credentials(jd: list[
             elements.append(from_json_orchestron_rfs__device__address__initial_credentials_element(e))
     return yang.gdata.List(keys=['username', 'password', 'key'], elements=elements, user_order=False, ns=None, prefix=None)
 
-mut def to_json_orchestron_rfs__device__address__initial_credentials_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+mut def to_json_orchestron_rfs__device__address__initial_credentials_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_username = n.children.get('username')
     if child_username is not None:
@@ -232,7 +232,7 @@ class orchestron_rfs__device__address_entry(yang.adata.MNode):
             children['port'] = yang.gdata.Leaf('string', _port)
         if _initial_credentials is not None:
             children['initial-credentials'] = _initial_credentials.to_gdata()
-        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
+        return yang.gdata.Container(children, [yang.gdata.yang_str(self.name)])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__device__address_entry:
@@ -266,7 +266,7 @@ class orchestron_rfs__device__address(yang.adata.MNode):
         elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
+            if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
         return yang.gdata.List(['name'], elements)
 
@@ -286,7 +286,7 @@ class orchestron_rfs__device__address(yang.adata.MNode):
         return res
 
 
-mut def from_json_path_orchestron_rfs__device__address_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+mut def from_json_path_orchestron_rfs__device__address_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
     if len(path) == 1:
         point = path[0]
         keys = point.split(",")
@@ -295,7 +295,7 @@ mut def from_json_path_orchestron_rfs__device__address_element(jd: value, path: 
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.AbsentListElement(val.key_vals)
+            return yang.gdata.Absent(val.key)
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -310,7 +310,7 @@ mut def from_json_path_orchestron_rfs__device__address_element(jd: value, path: 
             raise ValueError("Invalid json path to non-inner node")
         if point == 'initial-credentials':
             children['initial-credentials'] = from_json_path_orchestron_rfs__device__address__initial_credentials(jd, rest_path, op)
-        return yang.gdata.ListElement(keys, children)
+        return yang.gdata.Container(children, keys)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_orchestron_rfs__device__address(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
@@ -332,13 +332,13 @@ mut def from_json_path_orchestron_rfs__device__address(jd: value, path: list[str
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+            elements.append(yang.gdata.Absent(element.key))
         return yang.gdata.List(['name'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['name'], [from_json_path_orchestron_rfs__device__address_element(jd, path, op)])
     raise ValueError("Unable to resolve path, no keys provided")
 
-mut def from_json_orchestron_rfs__device__address_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+mut def from_json_orchestron_rfs__device__address_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
     child_name_full = jd.get('orfs:name')
     child_name = child_name_full if child_name_full is not None else jd.get('name')
@@ -356,7 +356,7 @@ mut def from_json_orchestron_rfs__device__address_element(jd: dict[str, ?value])
     child_initial_credentials = child_initial_credentials_full if child_initial_credentials_full is not None else jd.get('initial-credentials')
     if child_initial_credentials is not None and isinstance(child_initial_credentials, list):
         children['initial-credentials'] = from_json_orchestron_rfs__device__address__initial_credentials(child_initial_credentials)
-    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+    return yang.gdata.Container(children, [str(child_name if child_name is not None else "")])
 
 mut def from_json_orchestron_rfs__device__address(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -365,7 +365,7 @@ mut def from_json_orchestron_rfs__device__address(jd: list[dict[str, ?value]]) -
             elements.append(from_json_orchestron_rfs__device__address_element(e))
     return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
 
-mut def to_json_orchestron_rfs__device__address_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+mut def to_json_orchestron_rfs__device__address_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_name = n.children.get('name')
     if child_name is not None:
@@ -420,7 +420,7 @@ class orchestron_rfs__device__credentials__key_entry(yang.adata.MNode):
             children['key'] = yang.gdata.Leaf('string', _key)
         if _private_key is not None:
             children['private-key'] = yang.gdata.Leaf('string', _private_key)
-        return yang.gdata.ListElement([yang.gdata.yang_str(self.key)], children)
+        return yang.gdata.Container(children, [yang.gdata.yang_str(self.key)])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__device__credentials__key_entry:
@@ -454,7 +454,7 @@ class orchestron_rfs__device__credentials__key(yang.adata.MNode):
         elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
+            if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
         return yang.gdata.List(['key'], elements)
 
@@ -474,7 +474,7 @@ class orchestron_rfs__device__credentials__key(yang.adata.MNode):
         return res
 
 
-mut def from_json_path_orchestron_rfs__device__credentials__key_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+mut def from_json_path_orchestron_rfs__device__credentials__key_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
     if len(path) == 1:
         point = path[0]
         keys = point.split(",")
@@ -483,7 +483,7 @@ mut def from_json_path_orchestron_rfs__device__credentials__key_element(jd: valu
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.AbsentListElement(val.key_vals)
+            return yang.gdata.Absent(val.key)
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -494,7 +494,7 @@ mut def from_json_path_orchestron_rfs__device__credentials__key_element(jd: valu
             children[key] = yang.gdata.Leaf("str", keys[idx])
         if point == 'private-key':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.ListElement(keys, children)
+        return yang.gdata.Container(children, keys)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_orchestron_rfs__device__credentials__key(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
@@ -516,13 +516,13 @@ mut def from_json_path_orchestron_rfs__device__credentials__key(jd: value, path:
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+            elements.append(yang.gdata.Absent(element.key))
         return yang.gdata.List(['key'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['key'], [from_json_path_orchestron_rfs__device__credentials__key_element(jd, path, op)])
     raise ValueError("Unable to resolve path, no keys provided")
 
-mut def from_json_orchestron_rfs__device__credentials__key_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+mut def from_json_orchestron_rfs__device__credentials__key_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
     child_key_full = jd.get('orfs:key')
     child_key = child_key_full if child_key_full is not None else jd.get('key')
@@ -532,7 +532,7 @@ mut def from_json_orchestron_rfs__device__credentials__key_element(jd: dict[str,
     child_private_key = child_private_key_full if child_private_key_full is not None else jd.get('private-key')
     if child_private_key is not None:
         children['private-key'] = from_json_orchestron_rfs__device__credentials__key__private_key(child_private_key)
-    return yang.gdata.ListElement([str(child_key if child_key is not None else "")], children)
+    return yang.gdata.Container(children, [str(child_key if child_key is not None else "")])
 
 mut def from_json_orchestron_rfs__device__credentials__key(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -541,7 +541,7 @@ mut def from_json_orchestron_rfs__device__credentials__key(jd: list[dict[str, ?v
             elements.append(from_json_orchestron_rfs__device__credentials__key_element(e))
     return yang.gdata.List(keys=['key'], elements=elements, user_order=False, ns=None, prefix=None)
 
-mut def to_json_orchestron_rfs__device__credentials__key_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+mut def to_json_orchestron_rfs__device__credentials__key_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_key = n.children.get('key')
     if child_key is not None:
@@ -634,7 +634,7 @@ mut def from_json_orchestron_rfs__device__credentials(jd: dict[str, ?value]) -> 
         children['key'] = from_json_orchestron_rfs__device__credentials__key(child_key)
     return yang.gdata.Container(children)
 
-mut def to_json_orchestron_rfs__device__credentials(n: yang.gdata.Container) -> dict[str, ?value]:
+mut def to_json_orchestron_rfs__device__credentials(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_username = n.children.get('username')
     if child_username is not None:
@@ -681,7 +681,7 @@ class orchestron_rfs__device__initial_credentials_entry(yang.adata.MNode):
             children['password'] = yang.gdata.Leaf('string', _password)
         if _key is not None:
             children['key'] = yang.gdata.Leaf('string', _key)
-        return yang.gdata.ListElement([yang.gdata.yang_str(self.username), yang.gdata.yang_str(self.password), yang.gdata.yang_str(self.key)], children)
+        return yang.gdata.Container(children, [yang.gdata.yang_str(self.username), yang.gdata.yang_str(self.password), yang.gdata.yang_str(self.key)])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__device__initial_credentials_entry:
@@ -721,7 +721,7 @@ class orchestron_rfs__device__initial_credentials(yang.adata.MNode):
         elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
+            if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
         return yang.gdata.List(['username', 'password', 'key'], elements)
 
@@ -741,7 +741,7 @@ class orchestron_rfs__device__initial_credentials(yang.adata.MNode):
         return res
 
 
-mut def from_json_path_orchestron_rfs__device__initial_credentials_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+mut def from_json_path_orchestron_rfs__device__initial_credentials_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
     if len(path) == 1:
         point = path[0]
         keys = point.split(",")
@@ -750,7 +750,7 @@ mut def from_json_path_orchestron_rfs__device__initial_credentials_element(jd: v
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.AbsentListElement(val.key_vals)
+            return yang.gdata.Absent(val.key)
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -759,7 +759,7 @@ mut def from_json_path_orchestron_rfs__device__initial_credentials_element(jd: v
         children: dict[str, yang.gdata.Node] = {}
         for idx, key in enumerate(['username', 'password', 'key']):
             children[key] = yang.gdata.Leaf("str", keys[idx])
-        return yang.gdata.ListElement(keys, children)
+        return yang.gdata.Container(children, keys)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_orchestron_rfs__device__initial_credentials(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
@@ -781,13 +781,13 @@ mut def from_json_path_orchestron_rfs__device__initial_credentials(jd: value, pa
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+            elements.append(yang.gdata.Absent(element.key))
         return yang.gdata.List(['username', 'password', 'key'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['username', 'password', 'key'], [from_json_path_orchestron_rfs__device__initial_credentials_element(jd, path, op)])
     raise ValueError("Unable to resolve path, no keys provided")
 
-mut def from_json_orchestron_rfs__device__initial_credentials_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+mut def from_json_orchestron_rfs__device__initial_credentials_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
     child_username_full = jd.get('orfs:username')
     child_username = child_username_full if child_username_full is not None else jd.get('username')
@@ -801,7 +801,7 @@ mut def from_json_orchestron_rfs__device__initial_credentials_element(jd: dict[s
     child_key = child_key_full if child_key_full is not None else jd.get('key')
     if child_key is not None:
         children['key'] = from_json_orchestron_rfs__device__initial_credentials__key(child_key)
-    return yang.gdata.ListElement([str(child_username if child_username is not None else ""), str(child_password if child_password is not None else ""), str(child_key if child_key is not None else "")], children)
+    return yang.gdata.Container(children, [str(child_username if child_username is not None else ""), str(child_password if child_password is not None else ""), str(child_key if child_key is not None else "")])
 
 mut def from_json_orchestron_rfs__device__initial_credentials(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -810,7 +810,7 @@ mut def from_json_orchestron_rfs__device__initial_credentials(jd: list[dict[str,
             elements.append(from_json_orchestron_rfs__device__initial_credentials_element(e))
     return yang.gdata.List(keys=['username', 'password', 'key'], elements=elements, user_order=False, ns=None, prefix=None)
 
-mut def to_json_orchestron_rfs__device__initial_credentials_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+mut def to_json_orchestron_rfs__device__initial_credentials_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_username = n.children.get('username')
     if child_username is not None:
@@ -875,7 +875,7 @@ class orchestron_rfs__device__mock__module_entry(yang.adata.MNode):
         if _revision is not None:
             children['revision'] = yang.gdata.Leaf('string', _revision)
         children['feature'] = yang.gdata.LeafList(self.feature)
-        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
+        return yang.gdata.Container(children, [yang.gdata.yang_str(self.name)])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__device__mock__module_entry:
@@ -909,7 +909,7 @@ class orchestron_rfs__device__mock__module(yang.adata.MNode):
         elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
+            if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
         return yang.gdata.List(['name'], elements)
 
@@ -929,7 +929,7 @@ class orchestron_rfs__device__mock__module(yang.adata.MNode):
         return res
 
 
-mut def from_json_path_orchestron_rfs__device__mock__module_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+mut def from_json_path_orchestron_rfs__device__mock__module_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
     if len(path) == 1:
         point = path[0]
         keys = point.split(",")
@@ -938,7 +938,7 @@ mut def from_json_path_orchestron_rfs__device__mock__module_element(jd: value, p
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.AbsentListElement(val.key_vals)
+            return yang.gdata.Absent(val.key)
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -953,7 +953,7 @@ mut def from_json_path_orchestron_rfs__device__mock__module_element(jd: value, p
             raise ValueError("Invalid json path to non-inner node")
         if point == 'feature':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.ListElement(keys, children)
+        return yang.gdata.Container(children, keys)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_orchestron_rfs__device__mock__module(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
@@ -975,13 +975,13 @@ mut def from_json_path_orchestron_rfs__device__mock__module(jd: value, path: lis
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+            elements.append(yang.gdata.Absent(element.key))
         return yang.gdata.List(['name'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['name'], [from_json_path_orchestron_rfs__device__mock__module_element(jd, path, op)])
     raise ValueError("Unable to resolve path, no keys provided")
 
-mut def from_json_orchestron_rfs__device__mock__module_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+mut def from_json_orchestron_rfs__device__mock__module_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
     child_name_full = jd.get('orfs:name')
     child_name = child_name_full if child_name_full is not None else jd.get('name')
@@ -999,7 +999,7 @@ mut def from_json_orchestron_rfs__device__mock__module_element(jd: dict[str, ?va
     child_feature = child_feature_full if child_feature_full is not None else jd.get('feature')
     if child_feature is not None and isinstance(child_feature, list):
         children['feature'] = from_json_orchestron_rfs__device__mock__module__feature(child_feature)
-    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+    return yang.gdata.Container(children, [str(child_name if child_name is not None else "")])
 
 mut def from_json_orchestron_rfs__device__mock__module(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -1008,7 +1008,7 @@ mut def from_json_orchestron_rfs__device__mock__module(jd: list[dict[str, ?value
             elements.append(from_json_orchestron_rfs__device__mock__module_element(e))
     return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
 
-mut def to_json_orchestron_rfs__device__mock__module_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+mut def to_json_orchestron_rfs__device__mock__module_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_name = n.children.get('name')
     if child_name is not None:
@@ -1099,7 +1099,7 @@ mut def from_json_orchestron_rfs__device__mock(jd: dict[str, ?value]) -> yang.gd
         children['module'] = from_json_orchestron_rfs__device__mock__module(child_module)
     return yang.gdata.Container(children)
 
-mut def to_json_orchestron_rfs__device__mock(n: yang.gdata.Container) -> dict[str, ?value]:
+mut def to_json_orchestron_rfs__device__mock(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_preset = n.children.get('preset')
     if child_preset is not None:
@@ -1162,7 +1162,7 @@ class orchestron_rfs__device_entry(yang.adata.MNode):
             children['initial-credentials'] = _initial_credentials.to_gdata()
         if _mock is not None:
             children['mock'] = _mock.to_gdata()
-        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
+        return yang.gdata.Container(children, [yang.gdata.yang_str(self.name)])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__device_entry:
@@ -1196,7 +1196,7 @@ class orchestron_rfs__device(yang.adata.MNode):
         elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
+            if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
         return yang.gdata.List(['name'], elements, ns='http://orchestron.org/yang/orchestron-rfs.yang')
 
@@ -1216,7 +1216,7 @@ class orchestron_rfs__device(yang.adata.MNode):
         return res
 
 
-mut def from_json_path_orchestron_rfs__device_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+mut def from_json_path_orchestron_rfs__device_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
     if len(path) == 1:
         point = path[0]
         keys = point.split(",")
@@ -1225,7 +1225,7 @@ mut def from_json_path_orchestron_rfs__device_element(jd: value, path: list[str]
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.AbsentListElement(val.key_vals)
+            return yang.gdata.Absent(val.key)
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -1244,7 +1244,7 @@ mut def from_json_path_orchestron_rfs__device_element(jd: value, path: list[str]
             children['initial-credentials'] = from_json_path_orchestron_rfs__device__initial_credentials(jd, rest_path, op)
         if point == 'mock':
             children['mock'] = from_json_path_orchestron_rfs__device__mock(jd, rest_path, op)
-        return yang.gdata.ListElement(keys, children)
+        return yang.gdata.Container(children, keys)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_orchestron_rfs__device(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
@@ -1266,13 +1266,13 @@ mut def from_json_path_orchestron_rfs__device(jd: value, path: list[str]=[], op:
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+            elements.append(yang.gdata.Absent(element.key))
         return yang.gdata.List(['name'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['name'], [from_json_path_orchestron_rfs__device_element(jd, path, op)])
     raise ValueError("Unable to resolve path, no keys provided")
 
-mut def from_json_orchestron_rfs__device_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+mut def from_json_orchestron_rfs__device_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
     child_name_full = jd.get('orfs:name')
     child_name = child_name_full if child_name_full is not None else jd.get('name')
@@ -1298,7 +1298,7 @@ mut def from_json_orchestron_rfs__device_element(jd: dict[str, ?value]) -> yang.
     child_mock = child_mock_full if child_mock_full is not None else jd.get('mock')
     if child_mock is not None and isinstance(child_mock, dict):
         children['mock'] = from_json_orchestron_rfs__device__mock(child_mock)
-    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+    return yang.gdata.Container(children, [str(child_name if child_name is not None else "")])
 
 mut def from_json_orchestron_rfs__device(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -1307,7 +1307,7 @@ mut def from_json_orchestron_rfs__device(jd: list[dict[str, ?value]]) -> yang.gd
             elements.append(from_json_orchestron_rfs__device_element(e))
     return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
 
-mut def to_json_orchestron_rfs__device_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+mut def to_json_orchestron_rfs__device_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_name = n.children.get('name')
     if child_name is not None:
@@ -1391,7 +1391,7 @@ class orchestron_rfs__rfs__base_config_entry(yang.adata.MNode):
             children['asn'] = yang.gdata.Leaf('uint32', _asn)
         if _ibgp_authentication_key is not None:
             children['ibgp-authentication-key'] = yang.gdata.Leaf('string', _ibgp_authentication_key)
-        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
+        return yang.gdata.Container(children, [yang.gdata.yang_str(self.name)])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__base_config_entry:
@@ -1425,7 +1425,7 @@ class orchestron_rfs__rfs__base_config(yang.adata.MNode):
         elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
+            if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
         return yang.gdata.List(['name'], elements, ns='http://example.com/respnet-rfs')
 
@@ -1445,7 +1445,7 @@ class orchestron_rfs__rfs__base_config(yang.adata.MNode):
         return res
 
 
-mut def from_json_path_orchestron_rfs__rfs__base_config_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+mut def from_json_path_orchestron_rfs__rfs__base_config_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
     if len(path) == 1:
         point = path[0]
         keys = point.split(",")
@@ -1454,7 +1454,7 @@ mut def from_json_path_orchestron_rfs__rfs__base_config_element(jd: value, path:
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.AbsentListElement(val.key_vals)
+            return yang.gdata.Absent(val.key)
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -1471,7 +1471,7 @@ mut def from_json_path_orchestron_rfs__rfs__base_config_element(jd: value, path:
             raise ValueError("Invalid json path to non-inner node")
         if point == 'ibgp-authentication-key':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.ListElement(keys, children)
+        return yang.gdata.Container(children, keys)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_orchestron_rfs__rfs__base_config(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
@@ -1493,13 +1493,13 @@ mut def from_json_path_orchestron_rfs__rfs__base_config(jd: value, path: list[st
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+            elements.append(yang.gdata.Absent(element.key))
         return yang.gdata.List(['name'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['name'], [from_json_path_orchestron_rfs__rfs__base_config_element(jd, path, op)])
     raise ValueError("Unable to resolve path, no keys provided")
 
-mut def from_json_orchestron_rfs__rfs__base_config_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+mut def from_json_orchestron_rfs__rfs__base_config_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
     child_name_full = jd.get('respnet-rfs:name')
     child_name = child_name_full if child_name_full is not None else jd.get('name')
@@ -1521,7 +1521,7 @@ mut def from_json_orchestron_rfs__rfs__base_config_element(jd: dict[str, ?value]
     child_ibgp_authentication_key = child_ibgp_authentication_key_full if child_ibgp_authentication_key_full is not None else jd.get('ibgp-authentication-key')
     if child_ibgp_authentication_key is not None:
         children['ibgp-authentication-key'] = from_json_orchestron_rfs__rfs__base_config__ibgp_authentication_key(child_ibgp_authentication_key)
-    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+    return yang.gdata.Container(children, [str(child_name if child_name is not None else "")])
 
 mut def from_json_orchestron_rfs__rfs__base_config(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -1530,7 +1530,7 @@ mut def from_json_orchestron_rfs__rfs__base_config(jd: list[dict[str, ?value]]) 
             elements.append(from_json_orchestron_rfs__rfs__base_config_element(e))
     return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
 
-mut def to_json_orchestron_rfs__rfs__base_config_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+mut def to_json_orchestron_rfs__rfs__base_config_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_name = n.children.get('name')
     if child_name is not None:
@@ -1643,7 +1643,7 @@ mut def from_json_orchestron_rfs__rfs__backbone_interface__remote(jd: dict[str, 
         children['interface'] = from_json_orchestron_rfs__rfs__backbone_interface__remote__interface(child_interface)
     return yang.gdata.Container(children)
 
-mut def to_json_orchestron_rfs__rfs__backbone_interface__remote(n: yang.gdata.Container) -> dict[str, ?value]:
+mut def to_json_orchestron_rfs__rfs__backbone_interface__remote(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_device = n.children.get('device')
     if child_device is not None:
@@ -1698,7 +1698,7 @@ class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
             children['ipv6-prefix-length'] = yang.gdata.Leaf('uint8', _ipv6_prefix_length)
         if _remote is not None:
             children['remote'] = _remote.to_gdata()
-        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
+        return yang.gdata.Container(children, [yang.gdata.yang_str(self.name)])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__backbone_interface_entry:
@@ -1732,7 +1732,7 @@ class orchestron_rfs__rfs__backbone_interface(yang.adata.MNode):
         elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
+            if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
         return yang.gdata.List(['name'], elements, ns='http://example.com/respnet-rfs')
 
@@ -1752,7 +1752,7 @@ class orchestron_rfs__rfs__backbone_interface(yang.adata.MNode):
         return res
 
 
-mut def from_json_path_orchestron_rfs__rfs__backbone_interface_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+mut def from_json_path_orchestron_rfs__rfs__backbone_interface_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
     if len(path) == 1:
         point = path[0]
         keys = point.split(",")
@@ -1761,7 +1761,7 @@ mut def from_json_path_orchestron_rfs__rfs__backbone_interface_element(jd: value
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.AbsentListElement(val.key_vals)
+            return yang.gdata.Absent(val.key)
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -1780,7 +1780,7 @@ mut def from_json_path_orchestron_rfs__rfs__backbone_interface_element(jd: value
             raise ValueError("Invalid json path to non-inner node")
         if point == 'remote':
             children['remote'] = from_json_path_orchestron_rfs__rfs__backbone_interface__remote(jd, rest_path, op)
-        return yang.gdata.ListElement(keys, children)
+        return yang.gdata.Container(children, keys)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_orchestron_rfs__rfs__backbone_interface(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
@@ -1802,13 +1802,13 @@ mut def from_json_path_orchestron_rfs__rfs__backbone_interface(jd: value, path: 
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+            elements.append(yang.gdata.Absent(element.key))
         return yang.gdata.List(['name'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['name'], [from_json_path_orchestron_rfs__rfs__backbone_interface_element(jd, path, op)])
     raise ValueError("Unable to resolve path, no keys provided")
 
-mut def from_json_orchestron_rfs__rfs__backbone_interface_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+mut def from_json_orchestron_rfs__rfs__backbone_interface_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
     child_name_full = jd.get('respnet-rfs:name')
     child_name = child_name_full if child_name_full is not None else jd.get('name')
@@ -1834,7 +1834,7 @@ mut def from_json_orchestron_rfs__rfs__backbone_interface_element(jd: dict[str, 
     child_remote = child_remote_full if child_remote_full is not None else jd.get('remote')
     if child_remote is not None and isinstance(child_remote, dict):
         children['remote'] = from_json_orchestron_rfs__rfs__backbone_interface__remote(child_remote)
-    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+    return yang.gdata.Container(children, [str(child_name if child_name is not None else "")])
 
 mut def from_json_orchestron_rfs__rfs__backbone_interface(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -1843,7 +1843,7 @@ mut def from_json_orchestron_rfs__rfs__backbone_interface(jd: list[dict[str, ?va
             elements.append(from_json_orchestron_rfs__rfs__backbone_interface_element(e))
     return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
 
-mut def to_json_orchestron_rfs__rfs__backbone_interface_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+mut def to_json_orchestron_rfs__rfs__backbone_interface_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_name = n.children.get('name')
     if child_name is not None:
@@ -1908,7 +1908,7 @@ class orchestron_rfs__rfs__ibgp_neighbor_entry(yang.adata.MNode):
             children['asn'] = yang.gdata.Leaf('uint32', _asn)
         if _description is not None:
             children['description'] = yang.gdata.Leaf('string', _description)
-        return yang.gdata.ListElement([yang.gdata.yang_str(self.address)], children)
+        return yang.gdata.Container(children, [yang.gdata.yang_str(self.address)])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__ibgp_neighbor_entry:
@@ -1942,7 +1942,7 @@ class orchestron_rfs__rfs__ibgp_neighbor(yang.adata.MNode):
         elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
+            if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
         return yang.gdata.List(['address'], elements, ns='http://example.com/respnet-rfs')
 
@@ -1962,7 +1962,7 @@ class orchestron_rfs__rfs__ibgp_neighbor(yang.adata.MNode):
         return res
 
 
-mut def from_json_path_orchestron_rfs__rfs__ibgp_neighbor_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+mut def from_json_path_orchestron_rfs__rfs__ibgp_neighbor_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
     if len(path) == 1:
         point = path[0]
         keys = point.split(",")
@@ -1971,7 +1971,7 @@ mut def from_json_path_orchestron_rfs__rfs__ibgp_neighbor_element(jd: value, pat
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.AbsentListElement(val.key_vals)
+            return yang.gdata.Absent(val.key)
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -1984,7 +1984,7 @@ mut def from_json_path_orchestron_rfs__rfs__ibgp_neighbor_element(jd: value, pat
             raise ValueError("Invalid json path to non-inner node")
         if point == 'description':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.ListElement(keys, children)
+        return yang.gdata.Container(children, keys)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_orchestron_rfs__rfs__ibgp_neighbor(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
@@ -2006,13 +2006,13 @@ mut def from_json_path_orchestron_rfs__rfs__ibgp_neighbor(jd: value, path: list[
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+            elements.append(yang.gdata.Absent(element.key))
         return yang.gdata.List(['address'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['address'], [from_json_path_orchestron_rfs__rfs__ibgp_neighbor_element(jd, path, op)])
     raise ValueError("Unable to resolve path, no keys provided")
 
-mut def from_json_orchestron_rfs__rfs__ibgp_neighbor_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+mut def from_json_orchestron_rfs__rfs__ibgp_neighbor_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
     child_address_full = jd.get('respnet-rfs:address')
     child_address = child_address_full if child_address_full is not None else jd.get('address')
@@ -2026,7 +2026,7 @@ mut def from_json_orchestron_rfs__rfs__ibgp_neighbor_element(jd: dict[str, ?valu
     child_description = child_description_full if child_description_full is not None else jd.get('description')
     if child_description is not None:
         children['description'] = from_json_orchestron_rfs__rfs__ibgp_neighbor__description(child_description)
-    return yang.gdata.ListElement([str(child_address if child_address is not None else "")], children)
+    return yang.gdata.Container(children, [str(child_address if child_address is not None else "")])
 
 mut def from_json_orchestron_rfs__rfs__ibgp_neighbor(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -2035,7 +2035,7 @@ mut def from_json_orchestron_rfs__rfs__ibgp_neighbor(jd: list[dict[str, ?value]]
             elements.append(from_json_orchestron_rfs__rfs__ibgp_neighbor_element(e))
     return yang.gdata.List(keys=['address'], elements=elements, user_order=False, ns=None, prefix=None)
 
-mut def to_json_orchestron_rfs__rfs__ibgp_neighbor_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+mut def to_json_orchestron_rfs__rfs__ibgp_neighbor_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_address = n.children.get('address')
     if child_address is not None:
@@ -2104,7 +2104,7 @@ class orchestron_rfs__rfs__vrf_entry(yang.adata.MNode):
             children['router-id'] = yang.gdata.Leaf('uint32', _router_id)
         if _asn is not None:
             children['asn'] = yang.gdata.Leaf('uint32', _asn)
-        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
+        return yang.gdata.Container(children, [yang.gdata.yang_str(self.name)])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__vrf_entry:
@@ -2138,7 +2138,7 @@ class orchestron_rfs__rfs__vrf(yang.adata.MNode):
         elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
+            if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
         return yang.gdata.List(['name'], elements, ns='http://example.com/respnet-rfs')
 
@@ -2158,7 +2158,7 @@ class orchestron_rfs__rfs__vrf(yang.adata.MNode):
         return res
 
 
-mut def from_json_path_orchestron_rfs__rfs__vrf_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+mut def from_json_path_orchestron_rfs__rfs__vrf_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
     if len(path) == 1:
         point = path[0]
         keys = point.split(",")
@@ -2167,7 +2167,7 @@ mut def from_json_path_orchestron_rfs__rfs__vrf_element(jd: value, path: list[st
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.AbsentListElement(val.key_vals)
+            return yang.gdata.Absent(val.key)
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -2184,7 +2184,7 @@ mut def from_json_path_orchestron_rfs__rfs__vrf_element(jd: value, path: list[st
             raise ValueError("Invalid json path to non-inner node")
         if point == 'asn':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.ListElement(keys, children)
+        return yang.gdata.Container(children, keys)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_orchestron_rfs__rfs__vrf(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
@@ -2206,13 +2206,13 @@ mut def from_json_path_orchestron_rfs__rfs__vrf(jd: value, path: list[str]=[], o
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+            elements.append(yang.gdata.Absent(element.key))
         return yang.gdata.List(['name'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['name'], [from_json_path_orchestron_rfs__rfs__vrf_element(jd, path, op)])
     raise ValueError("Unable to resolve path, no keys provided")
 
-mut def from_json_orchestron_rfs__rfs__vrf_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+mut def from_json_orchestron_rfs__rfs__vrf_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
     child_name_full = jd.get('respnet-rfs:name')
     child_name = child_name_full if child_name_full is not None else jd.get('name')
@@ -2234,7 +2234,7 @@ mut def from_json_orchestron_rfs__rfs__vrf_element(jd: dict[str, ?value]) -> yan
     child_asn = child_asn_full if child_asn_full is not None else jd.get('asn')
     if child_asn is not None:
         children['asn'] = from_json_orchestron_rfs__rfs__vrf__asn(child_asn)
-    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+    return yang.gdata.Container(children, [str(child_name if child_name is not None else "")])
 
 mut def from_json_orchestron_rfs__rfs__vrf(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -2243,7 +2243,7 @@ mut def from_json_orchestron_rfs__rfs__vrf(jd: list[dict[str, ?value]]) -> yang.
             elements.append(from_json_orchestron_rfs__rfs__vrf_element(e))
     return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
 
-mut def to_json_orchestron_rfs__rfs__vrf_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+mut def to_json_orchestron_rfs__rfs__vrf_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_name = n.children.get('name')
     if child_name is not None:
@@ -2320,7 +2320,7 @@ class orchestron_rfs__rfs__vrf_interface_entry(yang.adata.MNode):
             children['ipv4-address'] = yang.gdata.Leaf('string', _ipv4_address)
         if _ipv4_prefix_length is not None:
             children['ipv4-prefix-length'] = yang.gdata.Leaf('uint8', _ipv4_prefix_length)
-        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
+        return yang.gdata.Container(children, [yang.gdata.yang_str(self.name)])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__vrf_interface_entry:
@@ -2354,7 +2354,7 @@ class orchestron_rfs__rfs__vrf_interface(yang.adata.MNode):
         elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
+            if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
         return yang.gdata.List(['name'], elements, ns='http://example.com/respnet-rfs')
 
@@ -2374,7 +2374,7 @@ class orchestron_rfs__rfs__vrf_interface(yang.adata.MNode):
         return res
 
 
-mut def from_json_path_orchestron_rfs__rfs__vrf_interface_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+mut def from_json_path_orchestron_rfs__rfs__vrf_interface_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
     if len(path) == 1:
         point = path[0]
         keys = point.split(",")
@@ -2383,7 +2383,7 @@ mut def from_json_path_orchestron_rfs__rfs__vrf_interface_element(jd: value, pat
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.AbsentListElement(val.key_vals)
+            return yang.gdata.Absent(val.key)
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -2400,7 +2400,7 @@ mut def from_json_path_orchestron_rfs__rfs__vrf_interface_element(jd: value, pat
             raise ValueError("Invalid json path to non-inner node")
         if point == 'ipv4-prefix-length':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.ListElement(keys, children)
+        return yang.gdata.Container(children, keys)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_orchestron_rfs__rfs__vrf_interface(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
@@ -2422,13 +2422,13 @@ mut def from_json_path_orchestron_rfs__rfs__vrf_interface(jd: value, path: list[
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+            elements.append(yang.gdata.Absent(element.key))
         return yang.gdata.List(['name'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['name'], [from_json_path_orchestron_rfs__rfs__vrf_interface_element(jd, path, op)])
     raise ValueError("Unable to resolve path, no keys provided")
 
-mut def from_json_orchestron_rfs__rfs__vrf_interface_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+mut def from_json_orchestron_rfs__rfs__vrf_interface_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
     child_name_full = jd.get('respnet-rfs:name')
     child_name = child_name_full if child_name_full is not None else jd.get('name')
@@ -2450,7 +2450,7 @@ mut def from_json_orchestron_rfs__rfs__vrf_interface_element(jd: dict[str, ?valu
     child_ipv4_prefix_length = child_ipv4_prefix_length_full if child_ipv4_prefix_length_full is not None else jd.get('ipv4-prefix-length')
     if child_ipv4_prefix_length is not None:
         children['ipv4-prefix-length'] = from_json_orchestron_rfs__rfs__vrf_interface__ipv4_prefix_length(child_ipv4_prefix_length)
-    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+    return yang.gdata.Container(children, [str(child_name if child_name is not None else "")])
 
 mut def from_json_orchestron_rfs__rfs__vrf_interface(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -2459,7 +2459,7 @@ mut def from_json_orchestron_rfs__rfs__vrf_interface(jd: list[dict[str, ?value]]
             elements.append(from_json_orchestron_rfs__rfs__vrf_interface_element(e))
     return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
 
-mut def to_json_orchestron_rfs__rfs__vrf_interface_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+mut def to_json_orchestron_rfs__rfs__vrf_interface_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_name = n.children.get('name')
     if child_name is not None:
@@ -2544,7 +2544,7 @@ class orchestron_rfs__rfs__ebgp_customer_entry(yang.adata.MNode):
             children['description'] = yang.gdata.Leaf('string', _description)
         if _authentication_key is not None:
             children['authentication-key'] = yang.gdata.Leaf('string', _authentication_key)
-        return yang.gdata.ListElement([yang.gdata.yang_str(self.vrf), yang.gdata.yang_str(self.address)], children)
+        return yang.gdata.Container(children, [yang.gdata.yang_str(self.vrf), yang.gdata.yang_str(self.address)])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__ebgp_customer_entry:
@@ -2581,7 +2581,7 @@ class orchestron_rfs__rfs__ebgp_customer(yang.adata.MNode):
         elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
+            if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
         return yang.gdata.List(['vrf', 'address'], elements, ns='http://example.com/respnet-rfs')
 
@@ -2601,7 +2601,7 @@ class orchestron_rfs__rfs__ebgp_customer(yang.adata.MNode):
         return res
 
 
-mut def from_json_path_orchestron_rfs__rfs__ebgp_customer_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+mut def from_json_path_orchestron_rfs__rfs__ebgp_customer_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
     if len(path) == 1:
         point = path[0]
         keys = point.split(",")
@@ -2610,7 +2610,7 @@ mut def from_json_path_orchestron_rfs__rfs__ebgp_customer_element(jd: value, pat
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.AbsentListElement(val.key_vals)
+            return yang.gdata.Absent(val.key)
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -2627,7 +2627,7 @@ mut def from_json_path_orchestron_rfs__rfs__ebgp_customer_element(jd: value, pat
             raise ValueError("Invalid json path to non-inner node")
         if point == 'authentication-key':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.ListElement(keys, children)
+        return yang.gdata.Container(children, keys)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_orchestron_rfs__rfs__ebgp_customer(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
@@ -2649,13 +2649,13 @@ mut def from_json_path_orchestron_rfs__rfs__ebgp_customer(jd: value, path: list[
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+            elements.append(yang.gdata.Absent(element.key))
         return yang.gdata.List(['vrf', 'address'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['vrf', 'address'], [from_json_path_orchestron_rfs__rfs__ebgp_customer_element(jd, path, op)])
     raise ValueError("Unable to resolve path, no keys provided")
 
-mut def from_json_orchestron_rfs__rfs__ebgp_customer_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+mut def from_json_orchestron_rfs__rfs__ebgp_customer_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
     child_vrf_full = jd.get('respnet-rfs:vrf')
     child_vrf = child_vrf_full if child_vrf_full is not None else jd.get('vrf')
@@ -2681,7 +2681,7 @@ mut def from_json_orchestron_rfs__rfs__ebgp_customer_element(jd: dict[str, ?valu
     child_authentication_key = child_authentication_key_full if child_authentication_key_full is not None else jd.get('authentication-key')
     if child_authentication_key is not None:
         children['authentication-key'] = from_json_orchestron_rfs__rfs__ebgp_customer__authentication_key(child_authentication_key)
-    return yang.gdata.ListElement([str(child_vrf if child_vrf is not None else ""), str(child_address if child_address is not None else "")], children)
+    return yang.gdata.Container(children, [str(child_vrf if child_vrf is not None else ""), str(child_address if child_address is not None else "")])
 
 mut def from_json_orchestron_rfs__rfs__ebgp_customer(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -2690,7 +2690,7 @@ mut def from_json_orchestron_rfs__rfs__ebgp_customer(jd: list[dict[str, ?value]]
             elements.append(from_json_orchestron_rfs__rfs__ebgp_customer_element(e))
     return yang.gdata.List(keys=['vrf', 'address'], elements=elements, user_order=False, ns=None, prefix=None)
 
-mut def to_json_orchestron_rfs__rfs__ebgp_customer_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+mut def to_json_orchestron_rfs__rfs__ebgp_customer_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_vrf = n.children.get('vrf')
     if child_vrf is not None:
@@ -2772,7 +2772,7 @@ class orchestron_rfs__rfs_entry(yang.adata.MNode):
             children['vrf-interface'] = _vrf_interface.to_gdata()
         if _ebgp_customer is not None:
             children['ebgp-customer'] = _ebgp_customer.to_gdata()
-        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
+        return yang.gdata.Container(children, [yang.gdata.yang_str(self.name)])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs_entry:
@@ -2806,7 +2806,7 @@ class orchestron_rfs__rfs(yang.adata.MNode):
         elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
+            if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
         return yang.gdata.List(['name'], elements, ns='http://orchestron.org/yang/orchestron-rfs.yang')
 
@@ -2826,7 +2826,7 @@ class orchestron_rfs__rfs(yang.adata.MNode):
         return res
 
 
-mut def from_json_path_orchestron_rfs__rfs_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+mut def from_json_path_orchestron_rfs__rfs_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
     if len(path) == 1:
         point = path[0]
         keys = point.split(",")
@@ -2835,7 +2835,7 @@ mut def from_json_path_orchestron_rfs__rfs_element(jd: value, path: list[str]=[]
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.AbsentListElement(val.key_vals)
+            return yang.gdata.Absent(val.key)
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -2856,7 +2856,7 @@ mut def from_json_path_orchestron_rfs__rfs_element(jd: value, path: list[str]=[]
             children['vrf-interface'] = from_json_path_orchestron_rfs__rfs__vrf_interface(jd, rest_path, op)
         if point == 'ebgp-customer':
             children['ebgp-customer'] = from_json_path_orchestron_rfs__rfs__ebgp_customer(jd, rest_path, op)
-        return yang.gdata.ListElement(keys, children)
+        return yang.gdata.Container(children, keys)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_orchestron_rfs__rfs(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
@@ -2878,13 +2878,13 @@ mut def from_json_path_orchestron_rfs__rfs(jd: value, path: list[str]=[], op: ?s
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+            elements.append(yang.gdata.Absent(element.key))
         return yang.gdata.List(['name'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['name'], [from_json_path_orchestron_rfs__rfs_element(jd, path, op)])
     raise ValueError("Unable to resolve path, no keys provided")
 
-mut def from_json_orchestron_rfs__rfs_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+mut def from_json_orchestron_rfs__rfs_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
     child_name_full = jd.get('orfs:name')
     child_name = child_name_full if child_name_full is not None else jd.get('name')
@@ -2908,7 +2908,7 @@ mut def from_json_orchestron_rfs__rfs_element(jd: dict[str, ?value]) -> yang.gda
     child_ebgp_customer = jd.get('respnet-rfs:ebgp-customer')
     if child_ebgp_customer is not None and isinstance(child_ebgp_customer, list):
         children['ebgp-customer'] = from_json_orchestron_rfs__rfs__ebgp_customer(child_ebgp_customer)
-    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+    return yang.gdata.Container(children, [str(child_name if child_name is not None else "")])
 
 mut def from_json_orchestron_rfs__rfs(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -2917,7 +2917,7 @@ mut def from_json_orchestron_rfs__rfs(jd: list[dict[str, ?value]]) -> yang.gdata
             elements.append(from_json_orchestron_rfs__rfs_element(e))
     return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
 
-mut def to_json_orchestron_rfs__rfs_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+mut def to_json_orchestron_rfs__rfs_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_name = n.children.get('name')
     if child_name is not None:
@@ -2974,7 +2974,7 @@ class root(yang.adata.MNode):
             children['device'] = _device.to_gdata()
         if _rfs is not None:
             children['rfs'] = _rfs.to_gdata()
-        return yang.gdata.Root(children)
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> root:
@@ -2996,10 +2996,10 @@ mut def from_json_path(jd: value, path: list[str]=[], op: ?str="merge") -> yang.
         rest_path = path[1:]
         if point == 'orfs:device':
             child = {'device': from_json_path_orchestron_rfs__device(jd, rest_path, op) }
-            return yang.gdata.Root(child)
+            return yang.gdata.Container(child)
         if point == 'orfs:rfs':
             child = {'rfs': from_json_path_orchestron_rfs__rfs(jd, rest_path, op) }
-            return yang.gdata.Root(child)
+            return yang.gdata.Container(child)
         raise ValueError("Invalid path")
     elif len(path) == 0:
         if op == "merge":
@@ -3009,7 +3009,7 @@ mut def from_json_path(jd: value, path: list[str]=[], op: ?str="merge") -> yang.
         raise ValueError("Invalid operation")
     raise ValueError("Unable to resolve path")
 
-mut def from_json(jd: dict[str, ?value]) -> yang.gdata.Root:
+mut def from_json(jd: dict[str, ?value]) -> yang.gdata.Container:
     children = {}
     child_device = jd.get('orfs:device')
     if child_device is not None and isinstance(child_device, list):
@@ -3017,9 +3017,9 @@ mut def from_json(jd: dict[str, ?value]) -> yang.gdata.Root:
     child_rfs = jd.get('orfs:rfs')
     if child_rfs is not None and isinstance(child_rfs, list):
         children['rfs'] = from_json_orchestron_rfs__rfs(child_rfs)
-    return yang.gdata.Root(children)
+    return yang.gdata.Container(children)
 
-mut def to_json(n: yang.gdata.Root) -> dict[str, ?value]:
+mut def to_json(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_device = n.children.get('device')
     if child_device is not None:

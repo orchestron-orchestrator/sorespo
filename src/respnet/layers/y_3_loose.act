@@ -22,7 +22,7 @@ class orchestron_device__devices__device_entry(yang.adata.MNode):
         _name = self.name
         if _name is not None:
             children['name'] = yang.gdata.Leaf('string', _name)
-        return yang.gdata.ListElement([yang.gdata.yang_str(self.name)], children)
+        return yang.gdata.Container(children, [yang.gdata.yang_str(self.name)])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_device__devices__device_entry:
@@ -56,7 +56,7 @@ class orchestron_device__devices__device(yang.adata.MNode):
         elements = []
         for e in self.elements:
             e_gdata = e.to_gdata()
-            if isinstance(e_gdata, yang.gdata.ListElement):
+            if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
         return yang.gdata.List(['name'], elements)
 
@@ -76,7 +76,7 @@ class orchestron_device__devices__device(yang.adata.MNode):
         return res
 
 
-mut def from_json_path_orchestron_device__devices__device_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.ListElement:
+mut def from_json_path_orchestron_device__devices__device_element(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.Node:
     if len(path) == 1:
         point = path[0]
         keys = point.split(",")
@@ -85,7 +85,7 @@ mut def from_json_path_orchestron_device__devices__device_element(jd: value, pat
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.AbsentListElement(val.key_vals)
+            return yang.gdata.Absent(val.key)
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -94,7 +94,7 @@ mut def from_json_path_orchestron_device__devices__device_element(jd: value, pat
         children: dict[str, yang.gdata.Node] = {}
         for idx, key in enumerate(['name']):
             children[key] = yang.gdata.Leaf("str", keys[idx])
-        return yang.gdata.ListElement(keys, children)
+        return yang.gdata.Container(children, keys)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_orchestron_device__devices__device(jd: value, path: list[str]=[], op: ?str="merge") -> yang.gdata.List:
@@ -116,19 +116,19 @@ mut def from_json_path_orchestron_device__devices__device(jd: value, path: list[
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.AbsentListElement(element.key_vals))
+            elements.append(yang.gdata.Absent(element.key))
         return yang.gdata.List(['name'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['name'], [from_json_path_orchestron_device__devices__device_element(jd, path, op)])
     raise ValueError("Unable to resolve path, no keys provided")
 
-mut def from_json_orchestron_device__devices__device_element(jd: dict[str, ?value]) -> yang.gdata.ListElement:
+mut def from_json_orchestron_device__devices__device_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
     child_name_full = jd.get('odev:name')
     child_name = child_name_full if child_name_full is not None else jd.get('name')
     if child_name is not None:
         children['name'] = from_json_orchestron_device__devices__device__name(child_name)
-    return yang.gdata.ListElement([str(child_name if child_name is not None else "")], children)
+    return yang.gdata.Container(children, [str(child_name if child_name is not None else "")])
 
 mut def from_json_orchestron_device__devices__device(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -137,7 +137,7 @@ mut def from_json_orchestron_device__devices__device(jd: list[dict[str, ?value]]
             elements.append(from_json_orchestron_device__devices__device_element(e))
     return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
 
-mut def to_json_orchestron_device__devices__device_element(n: yang.gdata.ListElement) -> dict[str, ?value]:
+mut def to_json_orchestron_device__devices__device_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_name = n.children.get('name')
     if child_name is not None:
@@ -204,7 +204,7 @@ mut def from_json_orchestron_device__devices(jd: dict[str, ?value]) -> yang.gdat
         children['device'] = from_json_orchestron_device__devices__device(child_device)
     return yang.gdata.Container(children)
 
-mut def to_json_orchestron_device__devices(n: yang.gdata.Container) -> dict[str, ?value]:
+mut def to_json_orchestron_device__devices(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_device = n.children.get('device')
     if child_device is not None:
@@ -230,7 +230,7 @@ class root(yang.adata.MNode):
         _devices = self.devices
         if _devices is not None:
             children['devices'] = _devices.to_gdata()
-        return yang.gdata.Root(children)
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> root:
@@ -252,7 +252,7 @@ mut def from_json_path(jd: value, path: list[str]=[], op: ?str="merge") -> yang.
         rest_path = path[1:]
         if point == 'odev:devices':
             child = {'devices': from_json_path_orchestron_device__devices(jd, rest_path, op) }
-            return yang.gdata.Root(child)
+            return yang.gdata.Container(child)
         raise ValueError("Invalid path")
     elif len(path) == 0:
         if op == "merge":
@@ -262,14 +262,14 @@ mut def from_json_path(jd: value, path: list[str]=[], op: ?str="merge") -> yang.
         raise ValueError("Invalid operation")
     raise ValueError("Unable to resolve path")
 
-mut def from_json(jd: dict[str, ?value]) -> yang.gdata.Root:
+mut def from_json(jd: dict[str, ?value]) -> yang.gdata.Container:
     children = {}
     child_devices = jd.get('odev:devices')
     if child_devices is not None and isinstance(child_devices, dict):
         children['devices'] = from_json_orchestron_device__devices(child_devices)
-    return yang.gdata.Root(children)
+    return yang.gdata.Container(children)
 
-mut def to_json(n: yang.gdata.Root) -> dict[str, ?value]:
+mut def to_json(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
     child_devices = n.children.get('devices')
     if child_devices is not None:
