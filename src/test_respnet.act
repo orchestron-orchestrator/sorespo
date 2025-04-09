@@ -50,24 +50,32 @@ netinfra1_in = """<data>
     </netinfra>
 </data>"""
 
-actor netinfra_tester(testenv: testing.AsyncT):
+actor netinfra_tester(t: testing.AsyncT):
     xml_conf = xml.decode(netinfra1_in)
     input_config = cfs_root.from_xml(xml_conf)
 
-    dev_mgr = odev.DeviceManager()
+    dev_mgr = odev.DeviceManager(log_handler=t.log_handler)
     cfs = respnet.layers.get_layers(dev_mgr)
     rfs = cfs.below().below()
     dev_mgr.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
     session = cfs.newsession()
 
     def cont(_r: value):
+        print("Test Config applied successfully", str(_r), err=True)
         res = session.below().below().below().get()
-        testenv.success(res.to_xmlstr())
+        dev_conf = res.to_xmlstr()
+        print(dev_conf, err=True)
+        t.success(dev_conf)
 
     session.edit_config(input_config.to_gdata(), None, cont)
 
-def _test_netinfra1(testenv: testing.AsyncT):
-    netinfra_tester(testenv)
+    def fail():
+        print("Test Config failed", err=True)
+        t.failure(ValueError())
+    after 2.5: fail()
+
+def _test_netinfra1(t: testing.AsyncT):
+    netinfra_tester(t)
 
 
 l3vpn_in = """<data>
@@ -335,11 +343,11 @@ l3vpn_in = """<data>
 </data>
 """
 
-actor l3vpn_tester(testenv: testing.AsyncT):
+actor l3vpn_tester(t: testing.AsyncT):
     xml_conf = xml.decode(l3vpn_in)
     input_config = cfs_root.from_xml(xml_conf)
 
-    dev_mgr = odev.DeviceManager()
+    dev_mgr = odev.DeviceManager(log_handler=t.log_handler)
     cfs = respnet.layers.get_layers(dev_mgr)
     rfs = cfs.below().below()
     dev_mgr.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
@@ -348,17 +356,17 @@ actor l3vpn_tester(testenv: testing.AsyncT):
     def cont(_r: value):
         res = session.below().below().below().get()
         print(res.to_xmlstr())
-        testenv.success(res.to_xmlstr())
+        t.success(res.to_xmlstr())
 
     session.edit_config(input_config.to_gdata(), None, cont)
 
-def _test_l3vpn_svc(testenv: testing.AsyncT):
-    l3vpn_tester(testenv)
+def _test_l3vpn_svc(t: testing.AsyncT):
+    l3vpn_tester(t)
 
 actor main(env):
     logh = logging.Handler("Otron")
 #    logh.add_sink(logging.StdoutSink())
     logh.set_output_level(logging.DEBUG)
-    testenv = testing.AsyncT(lambda ok,ex,out: env.exit(0), logh)
-#    netinfra_tester(testenv)
-    l3vpn_tester(testenv)
+    t = testing.AsyncT(lambda ok,ex,out: env.exit(0), logh)
+#    netinfra_tester(t)
+    l3vpn_tester(t)
