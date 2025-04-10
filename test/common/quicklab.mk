@@ -2,10 +2,10 @@ build-otron-image:
 	docker build -t respnet-otron-base -f ../common/Dockerfile.otron .
 
 start: build-otron-image
-	$(CLAB_BIN) deploy --topo $(TESTENV:respnet-%=%).clab.yml --log-level trace --reconfigure
+	$(CLAB_BIN) deploy --topo $(TESTENV:respnet-%=%).clab.yml --log-level debug --reconfigure
 
 stop:
-	$(CLAB_BIN) destroy --topo $(TESTENV:respnet-%=%).clab.yml --log-level trace
+	$(CLAB_BIN) destroy --topo $(TESTENV:respnet-%=%).clab.yml --log-level debug
 
 .PHONY: wait $(addprefix wait-,$(ROUTERS_XR) $(ROUTERS_CRPD))
 WAIT?=60
