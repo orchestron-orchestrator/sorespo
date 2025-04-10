@@ -1,6 +1,6 @@
 import yang.adata
 import orchestron.ttt
-from orchestron.device import UnsupportedDevice
+from orchestron import UnsupportedDevice
 
 import respnet.cisco_vigenere
 
@@ -32,7 +32,7 @@ def split_interface_name(interface):
 
 class BaseConfig(base.BaseConfig):
     def transform(self, i, di):
-        print("RFS /rfs{%s}/base-config transform running" % (di.name))
+        print("RFS /rfs{%s}/base-config transform running" % (di.name), err=True)
         # calculate the net-clns-address from IPv4 address:
         # first split the address into an array of padded strings
         # 123.45.67.8 => ['123', '045', '067', '008'],
@@ -47,6 +47,7 @@ class BaseConfig(base.BaseConfig):
         net_clns_address = '49.0001.' + join_str[0:4] + '.' + join_str[4:8] + '.' + join_str[8:] + '.00'
 
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
+            print("RFS /rfs{%s}/base-config transform for Cisco IOS XR" % (di.name), err=True)
             dev = xr24.root()
             dev.hostname.system_network_name = di.name
             intf = dev.interfaces.interface.create("Loopback0")
@@ -86,6 +87,7 @@ end-policy"""
 
             return dev
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
+            print("RFS /rfs{%s}/base-config transform for JUNOS" % (di.name), err=True)
             dev = crpd23.root()
             dev.configuration.system.host_name = di.name
             unit = dev.configuration.interfaces.interface.create("lo0").unit.create("0")
@@ -124,9 +126,10 @@ end-policy"""
 
 class BBInterface(base.BBInterface):
     def transform(self, i, di):
-        print("RFS /rfs{%s}/backbone-interface transform running [%s] <-> %s [%s]" % (di.name, i.name, i.remote.device, i.remote.interface))
+        print("RFS /rfs{%s}/backbone-interface transform running [%s] <-> %s [%s]" % (di.name, i.name, i.remote.device, i.remote.interface), err=True)
 
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
+            print("RFS /rfs{%s}/backbone-interface transform running [%s] <-> %s [%s] for Cisco IOS XR" % (di.name, i.name, i.remote.device, i.remote.interface), err=True)
             dev = xr24.root()
 
             # Create the interface
@@ -152,6 +155,7 @@ class BBInterface(base.BBInterface):
 
             return dev
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
+            print("RFS /rfs{%s}/backbone-interface transform running [%s] <-> %s [%s] for JUNOS" % (di.name, i.name, i.remote.device, i.remote.interface), err=True)
             dev = crpd23.root()
 
             # Create the interface
@@ -186,9 +190,10 @@ class BBInterface(base.BBInterface):
 
 class IbgpNeighbor(base.IbgpNeighbor):
     def transform(self, i, di):
-        print("RFS /rfs{%s}/ibgp-neighbor transform running %s" % (di.name, i.address))
+        print("RFS /rfs{%s}/ibgp-neighbor transform running %s" % (di.name, i.address), err=True)
 
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
+            print("RFS /rfs{%s}/ibgp-neighbor transform running %s for Cisco IOS XR" % (di.name, i.address), err=True)
             dev = xr24.root()
             bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(str(i.asn))
             nb = bgp_as.neighbors.neighbor.create(i.address)
@@ -196,6 +201,7 @@ class IbgpNeighbor(base.IbgpNeighbor):
             nb.description = i.description
             return dev
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
+            print("RFS /rfs{%s}/ibgp-neighbor transform running %s for JUNOS" % (di.name, i.address), err=True)
             dev = crpd23.root()
             bgp = dev.configuration.protocols.bgp
             g = bgp.group.create("IPV4-IBGP")
@@ -208,10 +214,11 @@ class IbgpNeighbor(base.IbgpNeighbor):
 
 class Vrf(base.Vrf):
     def transform(self, i, di):
-        print("RFS /rfs{%s}/vrf transform running %s" % (di.name, i.name))
+        print("RFS /rfs{%s}/vrf transform running %s" % (di.name, i.name), err=True)
 
         route_distinguisher_id = "%d%d" % (i.id, i.router_id)
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
+            print("RFS /rfs{%s}/vrf transform running %s for Cisco IOS XR" % (di.name, i.name), err=True)
             dev = xr24.root()
 
             # Create global VRF
@@ -228,6 +235,7 @@ class Vrf(base.Vrf):
 
             return dev
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
+            print("RFS /rfs{%s}/vrf transform running %s for JUNOS" % (di.name, i.name), err=True)
             dev = crpd23.root()
             ri = dev.configuration.routing_instances.instance.create(i.name)
             ri.instance_type = "vrf"
@@ -246,12 +254,13 @@ class Vrf(base.Vrf):
 
 class VrfInterface(base.VrfInterface):
     def transform(self, i, di):
-        print("RFS /rfs{%s}/vrf-interface transform running %s" % (di.name, i.name))
+        print("RFS /rfs{%s}/vrf-interface transform running %s" % (di.name, i.name), err=True)
         # TODO: input validation to ensure this is a subinterface with VLAN ID
         # Split interface name into main interface and unit
         main_intf, vlan_id = split_interface_name(i.name)
 
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
+            print("RFS /rfs{%s}/vrf-interface transform running %s for Cisco IOS XR" % (di.name, i.name), err=True)
             dev = xr24.root()
 
             # Main interface config
@@ -268,6 +277,7 @@ class VrfInterface(base.VrfInterface):
             return dev
 
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
+            print("RFS /rfs{%s}/vrf-interface transform running %s for JUNOS" % (di.name, i.name), err=True)
             dev = crpd23.root()
 
             # Main interface config
@@ -292,9 +302,10 @@ class VrfInterface(base.VrfInterface):
 
 class EbgpCustomer(base.EbgpCustomer):
     def transform(self, i, di):
-        print("RFS /rfs{%s}/ebgp-customer transform running %s" % (di.name, i.address))
+        print("RFS /rfs{%s}/ebgp-customer transform running %s" % (di.name, i.address), err=True)
 
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
+            print("RFS /rfs{%s}/ebgp-customer transform running %s for Cisco IOS XR" % (di.name, i.address), err=True)
             dev = xr24.root()
 
             bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(str(i.local_asn))
@@ -316,6 +327,7 @@ class EbgpCustomer(base.EbgpCustomer):
             return dev
 
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
+            print("RFS /rfs{%s}/ebgp-customer transform running %s for JUNOS" % (di.name, i.address), err=True)
             dev = crpd23.root()
 
             ri = dev.configuration.routing_instances.instance.create(i.vrf)
