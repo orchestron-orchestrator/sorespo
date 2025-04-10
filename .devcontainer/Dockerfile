@@ -1,4 +1,4 @@
-FROM ghcr.io/srl-labs/containerlab/devcontainer-dood-slim:0.64.0
+FROM ghcr.io/srl-labs/containerlab/devcontainer-dood-slim:0.67.0
 
 RUN sudo apt-get update \
  && sudo apt-get install -qy git-lfs gdb
