@@ -10,27 +10,35 @@ import yang.gdata
 mut def from_json_orchestron_device__devices__device__name(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf("string", val)
 
+mut def from_json_orchestron_device__devices__device__modset_id(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf("string", val)
+
 class orchestron_device__devices__device_entry(yang.adata.MNode):
     name: str
+    modset_id: ?str
 
-    mut def __init__(self, name: str):
+    mut def __init__(self, name: str, modset_id: ?str):
         self._ns = "http://orchestron.org/yang/orchestron-device.yang"
         self.name = name
+        self.modset_id = modset_id
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
         _name = self.name
+        _modset_id = self.modset_id
         if _name is not None:
             children['name'] = yang.gdata.Leaf('string', _name)
+        if _modset_id is not None:
+            children['modset_id'] = yang.gdata.Leaf('string', _modset_id)
         return yang.gdata.Container(children, [yang.gdata.yang_str(self.name)])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_device__devices__device_entry:
-        return orchestron_device__devices__device_entry(name=n.get_str("name"))
+        return orchestron_device__devices__device_entry(name=n.get_str("name"), modset_id=n.get_opt_str("modset_id"))
 
     @staticmethod
     mut def from_xml(n: xml.Node) -> orchestron_device__devices__device_entry:
-        return orchestron_device__devices__device_entry(name=yang.gdata.from_xml_str(n, "name"))
+        return orchestron_device__devices__device_entry(name=yang.gdata.from_xml_str(n, "name"), modset_id=yang.gdata.from_xml_opt_str(n, "modset_id"))
 
 class orchestron_device__devices__device(yang.adata.MNode):
     elements: list[orchestron_device__devices__device_entry]
@@ -94,6 +102,8 @@ mut def from_json_path_orchestron_device__devices__device_element(jd: value, pat
         children: dict[str, yang.gdata.Node] = {}
         for idx, key in enumerate(['name']):
             children[key] = yang.gdata.Leaf("str", keys[idx])
+        if point == 'modset_id':
+            raise ValueError("Invalid json path to non-inner node")
         return yang.gdata.Container(children, keys)
     raise ValueError("unreachable - no keys to list element")
 
@@ -128,6 +138,10 @@ mut def from_json_orchestron_device__devices__device_element(jd: dict[str, ?valu
     child_name = child_name_full if child_name_full is not None else jd.get('name')
     if child_name is not None:
         children['name'] = from_json_orchestron_device__devices__device__name(child_name)
+    child_modset_id_full = jd.get('odev:modset_id')
+    child_modset_id = child_modset_id_full if child_modset_id_full is not None else jd.get('modset_id')
+    if child_modset_id is not None:
+        children['modset_id'] = from_json_orchestron_device__devices__device__modset_id(child_modset_id)
     return yang.gdata.Container(children, [str(child_name if child_name is not None else "")])
 
 mut def from_json_orchestron_device__devices__device(jd: list[dict[str, ?value]]) -> yang.gdata.List:
@@ -143,6 +157,10 @@ mut def to_json_orchestron_device__devices__device_element(n: yang.gdata.Node) -
     if child_name is not None:
         if isinstance(child_name, yang.gdata.Leaf):
             children['name'] = child_name.val
+    child_modset_id = n.children.get('modset_id')
+    if child_modset_id is not None:
+        if isinstance(child_modset_id, yang.gdata.Leaf):
+            children['modset_id'] = child_modset_id.val
     return children
 
 mut def to_json_orchestron_device__devices__device(n: yang.gdata.List) -> list[dict[str, ?value]]:
