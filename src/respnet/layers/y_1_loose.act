@@ -298,11 +298,7 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
             self.base_config = base_config
         else:
             self.base_config = netinfra_inter__netinfra__router__base_config()
-        self_base_config = self.base_config
-        if self_base_config is not None:
-            self_base_config._parent = self
         self.l3vpn_vrf = netinfra_inter__netinfra__router__l3vpn_vrf(elements=l3vpn_vrf)
-        self.l3vpn_vrf._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -882,7 +878,6 @@ class netinfra_inter__netinfra__ibgp_fullmesh_entry(yang.adata.MNode):
         self.asn = asn
         self.authentication_key = authentication_key
         self.router = netinfra_inter__netinfra__ibgp_fullmesh__router(elements=router)
-        self.router._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -1052,11 +1047,8 @@ class netinfra_inter__netinfra(yang.adata.MNode):
     mut def __init__(self, router: list[netinfra_inter__netinfra__router_entry]=[], backbone_link: list[netinfra_inter__netinfra__backbone_link_entry]=[], ibgp_fullmesh: list[netinfra_inter__netinfra__ibgp_fullmesh_entry]=[]):
         self._ns = "http://example.com/netinfra-inter"
         self.router = netinfra_inter__netinfra__router(elements=router)
-        self.router._parent = self
         self.backbone_link = netinfra_inter__netinfra__backbone_link(elements=backbone_link)
-        self.backbone_link._parent = self
         self.ibgp_fullmesh = netinfra_inter__netinfra__ibgp_fullmesh(elements=ibgp_fullmesh)
-        self.ibgp_fullmesh._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -1248,9 +1240,6 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yang.adata.MNode):
         self.customer_ipv4_address = customer_ipv4_address
         self.ipv4_prefix_length = ipv4_prefix_length
         self.bgp = bgp
-        self_bgp = self.bgp
-        if self_bgp is not None:
-            self_bgp._parent = self
 
     mut def create_bgp(self, as_number):
         res = l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(as_number)
@@ -1493,7 +1482,6 @@ class l3vpn_inter__l3vpns__l3vpn_entry(yang.adata.MNode):
         self.name = name
         self.description = description
         self.endpoint = l3vpn_inter__l3vpns__l3vpn__endpoint(elements=endpoint)
-        self.endpoint._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -1661,7 +1649,6 @@ class l3vpn_inter__l3vpns(yang.adata.MNode):
     mut def __init__(self, l3vpn: list[l3vpn_inter__l3vpns__l3vpn_entry]=[]):
         self._ns = "http://example.com/l3vpn-inter"
         self.l3vpn = l3vpn_inter__l3vpns__l3vpn(elements=l3vpn)
-        self.l3vpn._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -1726,16 +1713,10 @@ class root(yang.adata.MNode):
             self.netinfra = netinfra
         else:
             self.netinfra = netinfra_inter__netinfra()
-        self_netinfra = self.netinfra
-        if self_netinfra is not None:
-            self_netinfra._parent = self
         if l3vpns is not None:
             self.l3vpns = l3vpns
         else:
             self.l3vpns = l3vpn_inter__l3vpns()
-        self_l3vpns = self.l3vpns
-        if self_l3vpns is not None:
-            self_l3vpns._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}

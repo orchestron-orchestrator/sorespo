@@ -219,7 +219,6 @@ class orchestron_rfs__device__address_entry(yang.adata.MNode):
         self.address = address
         self.port = port
         self.initial_credentials = orchestron_rfs__device__address__initial_credentials(elements=initial_credentials)
-        self.initial_credentials._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -572,7 +571,6 @@ class orchestron_rfs__device__credentials(yang.adata.MNode):
         self.username = username
         self.password = password
         self.key = orchestron_rfs__device__credentials__key(elements=key)
-        self.key._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -1048,7 +1046,6 @@ class orchestron_rfs__device__mock(yang.adata.MNode):
         else:
             self.preset = []
         self.module = orchestron_rfs__device__mock__module(elements=module)
-        self.module._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -1129,18 +1126,12 @@ class orchestron_rfs__device_entry(yang.adata.MNode):
         self.description = description
         self.type = type
         self.address = orchestron_rfs__device__address(elements=address)
-        self.address._parent = self
         self.credentials = credentials
-        self.credentials._parent = self
         self.initial_credentials = orchestron_rfs__device__initial_credentials(elements=initial_credentials)
-        self.initial_credentials._parent = self
         if mock is not None:
             self.mock = mock
         else:
             self.mock = orchestron_rfs__device__mock()
-        self_mock = self.mock
-        if self_mock is not None:
-            self_mock._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -1687,7 +1678,6 @@ class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
         self.ipv6_address = ipv6_address
         self.ipv6_prefix_length = ipv6_prefix_length
         self.remote = remote
-        self.remote._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -2751,17 +2741,11 @@ class orchestron_rfs__rfs_entry(yang.adata.MNode):
         self._ns = "http://orchestron.org/yang/orchestron-rfs.yang"
         self.name = name
         self.base_config = orchestron_rfs__rfs__base_config(elements=base_config)
-        self.base_config._parent = self
         self.backbone_interface = orchestron_rfs__rfs__backbone_interface(elements=backbone_interface)
-        self.backbone_interface._parent = self
         self.ibgp_neighbor = orchestron_rfs__rfs__ibgp_neighbor(elements=ibgp_neighbor)
-        self.ibgp_neighbor._parent = self
         self.vrf = orchestron_rfs__rfs__vrf(elements=vrf)
-        self.vrf._parent = self
         self.vrf_interface = orchestron_rfs__rfs__vrf_interface(elements=vrf_interface)
-        self.vrf_interface._parent = self
         self.ebgp_customer = orchestron_rfs__rfs__ebgp_customer(elements=ebgp_customer)
-        self.ebgp_customer._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -2976,9 +2960,7 @@ class root(yang.adata.MNode):
     mut def __init__(self, device: list[orchestron_rfs__device_entry]=[], rfs: list[orchestron_rfs__rfs_entry]=[]):
         self._ns = ""
         self.device = orchestron_rfs__device(elements=device)
-        self.device._parent = self
         self.rfs = orchestron_rfs__rfs(elements=rfs)
-        self.rfs._parent = self
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
