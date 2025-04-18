@@ -343,7 +343,7 @@ l3vpn_in = """<data>
 </data>
 """
 
-actor l3vpn_tester(t: testing.AsyncT):
+actor l3vpn_tester(t: testing.AsyncT, output_formatter: mut(gdata.Node) -> str):
     xml_conf = xml.decode(l3vpn_in)
     input_config = cfs_root.from_xml(xml_conf)
 
@@ -355,13 +355,21 @@ actor l3vpn_tester(t: testing.AsyncT):
 
     def cont(_r: value):
         res = session.below().below().below().get()
-        print(res.to_xmlstr())
-        t.success(res.to_xmlstr())
+        output = output_formatter(res)
+        print(output)
+        t.success(output)
 
     session.edit_config(input_config.to_gdata(), None, cont)
 
 def _test_l3vpn_svc(t: testing.AsyncT):
-    l3vpn_tester(t)
+    l3vpn_tester(t, lambda n: n.to_xmlstr())
+
+def _test_l3vpn_svc_json(t: testing.AsyncT):
+    l3vpn_tester(t, lambda n: n.to_json())
+
+# TODO: enable once gdata after transform is valid (= sorted where it needs to be)
+# def _test_l3vpn_svc_gdata(t: testing.AsyncT):
+#     l3vpn_tester(t, lambda n: n.prsrc())
 
 actor main(env):
     logh = logging.Handler("Otron")
@@ -369,4 +377,4 @@ actor main(env):
     logh.set_output_level(logging.DEBUG)
     t = testing.AsyncT(lambda ok,ex,out: env.exit(0), logh)
 #    netinfra_tester(t)
-    l3vpn_tester(t)
+    l3vpn_tester(t, lambda n: n.to_xmlstr())
