@@ -3,6 +3,7 @@ import process
 
 import orchestron.build
 import orchestron.yang as oyang
+from transform_list_order import remove_list_user_order
 
 actor main(env):
     fc = file.FileCap(env.cap)
@@ -22,14 +23,24 @@ actor main(env):
     rfs_layer = orchestron.build.Layer.from_dir(fc, "yang/rfs")
     rfs_layer.models.extend([oyang.rfs, oyang.ietf_inet_types])
 
+    def transform(dt):
+        paths = [
+            "/jc:configuration/protocols/bgp/group/neighbor",
+            "/jc:configuration/protocols/mpls/interface",
+        ]
+        remove_list_user_order(dt.root, paths)
+        return dt
+
     spec = orchestron.build.SysSpec("respnet", [
         cfs_layer,
         inter_layer,
         rfs_layer,
     ], [
         orchestron.build.DeviceType.from_dir(fc, "CiscoIosXr_24_1_ncs55a1", "yang/CiscoIosXr_24_1_ncs55a1"),
-        orchestron.build.DeviceType.from_dir(fc, "JuniperCRPD_23_4R1_9", "yang/JuniperCRPD_23_4R1_9")
+        orchestron.build.DeviceType.from_dir(fc, "JuniperCRPD_23_4R1_9", "yang/JuniperCRPD_23_4R1_9"),
     ])
-    spec.gen_app(fc, "../src/")
+    compiled_spec = spec.compile()
+    transform(compiled_spec.dev_types["JuniperCRPD_23_4R1_9"])
+    compiled_spec.gen_app(fc, "../src/")
 
     env.exit(0)

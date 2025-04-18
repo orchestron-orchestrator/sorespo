@@ -133,12 +133,10 @@ mut def from_json_path_orchestron_device__devices__device(jd: value, path: list[
 
 mut def from_json_orchestron_device__devices__device_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
-    child_name_full = jd.get('orchestron-device:name')
-    child_name = child_name_full if child_name_full is not None else jd.get('name')
+    child_name = jd.get('name')
     if child_name is not None:
         children['name'] = from_json_orchestron_device__devices__device__name(child_name)
-    child_modset_id_full = jd.get('orchestron-device:modset_id')
-    child_modset_id = child_modset_id_full if child_modset_id_full is not None else jd.get('modset_id')
+    child_modset_id = jd.get('modset_id')
     if child_modset_id is not None:
         children['modset_id'] = from_json_orchestron_device__devices__device__modset_id(child_modset_id)
     return yang.gdata.Container(children, [str(child_name if child_name is not None else '')])
@@ -148,7 +146,7 @@ mut def from_json_orchestron_device__devices__device(jd: list[dict[str, ?value]]
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_orchestron_device__devices__device_element(e))
-    return yang.gdata.List(keys=['name'], elements=elements, user_order=False, ns=None, prefix=None)
+    return yang.gdata.List(keys=['name'], elements=elements, ns=None, prefix=None)
 
 mut def to_json_orchestron_device__devices__device_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -200,7 +198,7 @@ mut def from_json_path_orchestron_device__devices(jd: value, path: list[str]=[],
     if len(path) > 0:
         point = path[0]
         rest_path = path[1:]
-        if point == 'orchestron-device:device' or point == 'device':
+        if point == 'device':
             child = {'device': from_json_path_orchestron_device__devices__device(jd, rest_path, op) }
             return yang.gdata.Container(child)
         raise ValueError("Invalid path")
@@ -214,8 +212,7 @@ mut def from_json_path_orchestron_device__devices(jd: value, path: list[str]=[],
 
 mut def from_json_orchestron_device__devices(jd: dict[str, ?value]) -> yang.gdata.Container:
     children = {}
-    child_device_full = jd.get('orchestron-device:device')
-    child_device = child_device_full if child_device_full is not None else jd.get('device')
+    child_device = jd.get('device')
     if child_device is not None and isinstance(child_device, list):
         children['device'] = from_json_orchestron_device__devices__device(child_device)
     return yang.gdata.Container(children)
