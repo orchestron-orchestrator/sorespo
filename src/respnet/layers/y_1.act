@@ -118,7 +118,7 @@ mut def from_json_netinfra_inter__netinfra__router__l3vpn_vrf__vpn_id(val: value
     return yang.gdata.Leaf('string', val)
 
 mut def from_json_netinfra_inter__netinfra__router__l3vpn_vrf__ebgp_customer_address(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList(val)
+    return yang.gdata.LeafList('union', val)
 
 class netinfra_inter__netinfra__router__l3vpn_vrf_entry(yang.adata.MNode):
     vpn_id: str
@@ -134,7 +134,7 @@ class netinfra_inter__netinfra__router__l3vpn_vrf_entry(yang.adata.MNode):
         _vpn_id = self.vpn_id
         if _vpn_id is not None:
             children['vpn-id'] = yang.gdata.Leaf('string', _vpn_id)
-        children['ebgp-customer-address'] = yang.gdata.LeafList(self.ebgp_customer_address)
+        children['ebgp-customer-address'] = yang.gdata.LeafList('union', self.ebgp_customer_address)
         return yang.gdata.Container(children, [yang.gdata.yang_str(self.vpn_id)])
 
     @staticmethod
