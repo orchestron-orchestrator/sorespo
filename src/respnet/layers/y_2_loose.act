@@ -819,7 +819,7 @@ mut def to_json_orchestron_rfs__device__initial_credentials(n: yang.gdata.List) 
     return elements
 
 mut def from_json_orchestron_rfs__device__mock__preset(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList(val)
+    return yang.gdata.LeafList('enumeration', val)
 
 mut def from_json_orchestron_rfs__device__mock__module__name(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
@@ -831,7 +831,7 @@ mut def from_json_orchestron_rfs__device__mock__module__revision(val: value) -> 
     return yang.gdata.Leaf('string', val)
 
 mut def from_json_orchestron_rfs__device__mock__module__feature(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList(val)
+    return yang.gdata.LeafList('string', val)
 
 class orchestron_rfs__device__mock__module_entry(yang.adata.MNode):
     name: str
@@ -857,7 +857,7 @@ class orchestron_rfs__device__mock__module_entry(yang.adata.MNode):
         _revision = self.revision
         if _revision is not None:
             children['revision'] = yang.gdata.Leaf('string', _revision)
-        children['feature'] = yang.gdata.LeafList(self.feature)
+        children['feature'] = yang.gdata.LeafList('string', self.feature)
         return yang.gdata.Container(children, [yang.gdata.yang_str(self.name)])
 
     @staticmethod
@@ -1023,7 +1023,7 @@ class orchestron_rfs__device__mock(yang.adata.MNode):
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
-        children['preset'] = yang.gdata.LeafList(self.preset)
+        children['preset'] = yang.gdata.LeafList('enumeration', self.preset)
         _module = self.module
         if _module is not None:
             children['module'] = _module.to_gdata()
