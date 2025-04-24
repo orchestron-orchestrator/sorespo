@@ -185,7 +185,7 @@ mut def from_json_netinfra__netinfra__router(jd: list[dict[str, ?value]]) -> yan
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_netinfra__netinfra__router_element(e))
-    return yang.gdata.List(keys=['name'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['name'], elements=elements)
 
 mut def to_json_netinfra__netinfra__router_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -388,7 +388,7 @@ mut def from_json_netinfra__netinfra__backbone_link(jd: list[dict[str, ?value]])
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_netinfra__netinfra__backbone_link_element(e))
-    return yang.gdata.List(keys=['left-router', 'left-interface', 'right-router', 'right-interface'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['left-router', 'left-interface', 'right-router', 'right-interface'], elements=elements)
 
 mut def to_json_netinfra__netinfra__backbone_link_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -433,7 +433,7 @@ class netinfra__netinfra(yang.adata.MNode):
         _backbone_link = self.backbone_link
         if _backbone_link is not None:
             children['backbone-link'] = _backbone_link.to_gdata()
-        return yang.gdata.Container(children, ns='http://example.com/netinfra')
+        return yang.gdata.Container(children, ns='http://example.com/netinfra', module='netinfra')
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> netinfra__netinfra:
@@ -455,10 +455,10 @@ mut def from_json_path_netinfra__netinfra(jd: value, path: list[str]=[], op: ?st
         rest_path = path[1:]
         if point == 'router':
             child = {'router': from_json_path_netinfra__netinfra__router(jd, rest_path, op) }
-            return yang.gdata.Container(child)
+            return yang.gdata.Container(child, ns='http://example.com/netinfra', module='netinfra')
         if point == 'backbone-link':
             child = {'backbone-link': from_json_path_netinfra__netinfra__backbone_link(jd, rest_path, op) }
-            return yang.gdata.Container(child)
+            return yang.gdata.Container(child, ns='http://example.com/netinfra', module='netinfra')
         raise ValueError("Invalid path")
     elif len(path) == 0:
         if op == "merge":
@@ -476,7 +476,7 @@ mut def from_json_netinfra__netinfra(jd: dict[str, ?value]) -> yang.gdata.Contai
     child_backbone_link = jd.get('backbone-link')
     if child_backbone_link is not None and isinstance(child_backbone_link, list):
         children['backbone-link'] = from_json_netinfra__netinfra__backbone_link(child_backbone_link)
-    return yang.gdata.Container(children)
+    return yang.gdata.Container(children, ns='http://example.com/netinfra', module='netinfra')
 
 mut def to_json_netinfra__netinfra(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -616,7 +616,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identi
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier_element(e))
-    return yang.gdata.List(keys=['id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -758,7 +758,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identi
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier_element(e))
-    return yang.gdata.List(keys=['id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -900,7 +900,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identi
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier_element(e))
-    return yang.gdata.List(keys=['id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -1042,7 +1042,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identi
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier_element(e))
-    return yang.gdata.List(keys=['id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -1538,7 +1538,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_ac
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access_element(e))
-    return yang.gdata.List(keys=['cloud-identifier'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['cloud-identifier'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -1957,7 +1957,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicas
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group_element(e))
-    return yang.gdata.List(keys=['id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -2197,7 +2197,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicas
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping_element(e))
-    return yang.gdata.List(keys=['id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -2723,7 +2723,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn_element(e))
-    return yang.gdata.List(keys=['vpn-id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['vpn-id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -2985,7 +2985,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service(jd: list[
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_element(e))
-    return yang.gdata.List(keys=['vpn-id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['vpn-id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -3284,7 +3284,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location(jd
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location_element(e))
-    return yang.gdata.List(keys=['location-id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['location-id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -3606,7 +3606,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device(jd: li
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_element(e))
-    return yang.gdata.List(keys=['device-id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['device-id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -3815,7 +3815,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group_element(e))
-    return yang.gdata.List(keys=['group-id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['group-id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -4175,7 +4175,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_poli
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter_element(e))
-    return yang.gdata.List(keys=['type'], elements=elements, user_order=True, ns=None, prefix=None)
+    return yang.gdata.List(keys=['type'], elements=elements, user_order=True)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -4401,7 +4401,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_poli
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn_element(e))
-    return yang.gdata.List(keys=['vpn-id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['vpn-id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -4564,7 +4564,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_poli
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_element(e))
-    return yang.gdata.List(keys=['id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -4721,7 +4721,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_poli
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy_element(e))
-    return yang.gdata.List(keys=['vpn-policy-id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['vpn-policy-id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -4942,7 +4942,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__addres
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family_element(e))
-    return yang.gdata.List(keys=['af'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['af'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -5888,7 +5888,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_clas
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule_element(e))
-    return yang.gdata.List(keys=['id'], elements=elements, user_order=True, ns=None, prefix=None)
+    return yang.gdata.List(keys=['id'], elements=elements, user_order=True)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -6394,7 +6394,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_prof
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class_element(e))
-    return yang.gdata.List(keys=['class-id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['class-id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -7169,7 +7169,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__rou
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link_element(e))
-    return yang.gdata.List(keys=['target-site'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['target-site'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -7577,7 +7577,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__rou
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_element(e))
-    return yang.gdata.List(keys=['lan', 'next-hop'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['lan', 'next-hop'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -7755,7 +7755,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__rou
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_element(e))
-    return yang.gdata.List(keys=['lan', 'next-hop'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['lan', 'next-hop'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -8228,7 +8228,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__rou
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol_element(e))
-    return yang.gdata.List(keys=['type'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['type'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -8461,7 +8461,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group_element(e))
-    return yang.gdata.List(keys=['group-id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['group-id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -8665,7 +8665,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group_element(e))
-    return yang.gdata.List(keys=['group-id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['group-id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -8907,7 +8907,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint_element(e))
-    return yang.gdata.List(keys=['constraint-type'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['constraint-type'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -9395,7 +9395,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group_element(e))
-    return yang.gdata.List(keys=['group-id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['group-id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -10093,7 +10093,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group_element(e))
-    return yang.gdata.List(keys=['group-id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['group-id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -11178,9 +11178,13 @@ mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__s
     return children
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__svc_input_bandwidth(val: value) -> yang.gdata.Leaf:
+    if isinstance(val, str):
+        return yang.gdata.Leaf('uint64', int(val))
     return yang.gdata.Leaf('uint64', val)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__svc_output_bandwidth(val: value) -> yang.gdata.Leaf:
+    if isinstance(val, str):
+        return yang.gdata.Leaf('uint64', int(val))
     return yang.gdata.Leaf('uint64', val)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__svc_mtu(val: value) -> yang.gdata.Leaf:
@@ -11746,7 +11750,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule_element(e))
-    return yang.gdata.List(keys=['id'], elements=elements, user_order=True, ns=None, prefix=None)
+    return yang.gdata.List(keys=['id'], elements=elements, user_order=True)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -12252,7 +12256,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class_element(e))
-    return yang.gdata.List(keys=['class-id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['class-id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -13008,7 +13012,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link_element(e))
-    return yang.gdata.List(keys=['target-site'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['target-site'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -13416,7 +13420,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_element(e))
-    return yang.gdata.List(keys=['lan', 'next-hop'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['lan', 'next-hop'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -13594,7 +13598,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_element(e))
-    return yang.gdata.List(keys=['lan', 'next-hop'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['lan', 'next-hop'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -14067,7 +14071,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol_element(e))
-    return yang.gdata.List(keys=['type'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['type'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -14551,7 +14555,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access_element(e))
-    return yang.gdata.List(keys=['site-network-access-id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['site-network-access-id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -14933,7 +14937,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site(jd: list[dict[str, ?val
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site_element(e))
-    return yang.gdata.List(keys=['site-id'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['site-id'], elements=elements)
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc__sites__site_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -15086,7 +15090,7 @@ class ietf_l3vpn_svc__l3vpn_svc(yang.adata.MNode):
         _sites = self.sites
         if _sites is not None:
             children['sites'] = _sites.to_gdata()
-        return yang.gdata.Container(children, ns='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc')
+        return yang.gdata.Container(children, ns='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', module='ietf-l3vpn-svc')
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc:
@@ -15108,13 +15112,13 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc(jd: value, path: list[str]=[], 
         rest_path = path[1:]
         if point == 'vpn-profiles':
             child = {'vpn-profiles': from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles(jd, rest_path, op) }
-            return yang.gdata.Container(child)
+            return yang.gdata.Container(child, ns='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', module='ietf-l3vpn-svc')
         if point == 'vpn-services':
             child = {'vpn-services': from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services(jd, rest_path, op) }
-            return yang.gdata.Container(child)
+            return yang.gdata.Container(child, ns='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', module='ietf-l3vpn-svc')
         if point == 'sites':
             child = {'sites': from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites(jd, rest_path, op) }
-            return yang.gdata.Container(child)
+            return yang.gdata.Container(child, ns='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', module='ietf-l3vpn-svc')
         raise ValueError("Invalid path")
     elif len(path) == 0:
         if op == "merge":
@@ -15135,7 +15139,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc(jd: dict[str, ?value]) -> yang.gdata
     child_sites = jd.get('sites')
     if child_sites is not None and isinstance(child_sites, dict):
         children['sites'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites(child_sites)
-    return yang.gdata.Container(children)
+    return yang.gdata.Container(children, ns='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', module='ietf-l3vpn-svc')
 
 mut def to_json_ietf_l3vpn_svc__l3vpn_svc(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
