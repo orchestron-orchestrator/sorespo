@@ -146,7 +146,7 @@ mut def from_json_orchestron_device__devices__device(jd: list[dict[str, ?value]]
     for e in jd:
         if isinstance(e, dict):
             elements.append(from_json_orchestron_device__devices__device_element(e))
-    return yang.gdata.List(keys=['name'], elements=elements, ns=None, prefix=None)
+    return yang.gdata.List(keys=['name'], elements=elements)
 
 mut def to_json_orchestron_device__devices__device_element(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
@@ -178,7 +178,7 @@ class orchestron_device__devices(yang.adata.MNode):
         _device = self.device
         if _device is not None:
             children['device'] = _device.to_gdata()
-        return yang.gdata.Container(children, ns='http://orchestron.org/yang/orchestron-device.yang')
+        return yang.gdata.Container(children, ns='http://orchestron.org/yang/orchestron-device.yang', module='orchestron-device')
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> orchestron_device__devices:
@@ -200,7 +200,7 @@ mut def from_json_path_orchestron_device__devices(jd: value, path: list[str]=[],
         rest_path = path[1:]
         if point == 'device':
             child = {'device': from_json_path_orchestron_device__devices__device(jd, rest_path, op) }
-            return yang.gdata.Container(child)
+            return yang.gdata.Container(child, ns='http://orchestron.org/yang/orchestron-device.yang', module='orchestron-device')
         raise ValueError("Invalid path")
     elif len(path) == 0:
         if op == "merge":
@@ -215,7 +215,7 @@ mut def from_json_orchestron_device__devices(jd: dict[str, ?value]) -> yang.gdat
     child_device = jd.get('device')
     if child_device is not None and isinstance(child_device, list):
         children['device'] = from_json_orchestron_device__devices__device(child_device)
-    return yang.gdata.Container(children)
+    return yang.gdata.Container(children, ns='http://orchestron.org/yang/orchestron-device.yang', module='orchestron-device')
 
 mut def to_json_orchestron_device__devices(n: yang.gdata.Node) -> dict[str, ?value]:
     children = {}
