@@ -9,16 +9,10 @@ import orchestron.ttt as ttt
 import yang.adata
 import yang.gdata
 
-import respnet.layers.y_0
 import respnet.layers.t_0
-import respnet.layers.y_1
 import respnet.layers.t_1
-import respnet.layers.y_2
 import respnet.layers.t_2
-import respnet.layers.y_3
 import respnet.layers.t_3
-
-
 def get_layers(dev_mgr: odev.DeviceManager, log_handler: ?logging.Handler=None):
     res = ttt.Layer('0', respnet.layers.t_0.get_ttt(dev_mgr, log_handler),
           ttt.Layer('1', respnet.layers.t_1.get_ttt(dev_mgr, log_handler),
@@ -26,15 +20,3 @@ def get_layers(dev_mgr: odev.DeviceManager, log_handler: ?logging.Handler=None):
           ttt.Layer('3', respnet.layers.t_3.get_ttt(dev_mgr, log_handler),
           None))))
     return res
-
-def to_json(idx):
-    if idx == 0:
-        return respnet.layers.y_0.to_json
-    elif idx == 1:
-        return respnet.layers.y_1.to_json
-    elif idx == 2:
-        return respnet.layers.y_2.to_json
-    elif idx == 3:
-        return respnet.layers.y_3.to_json
-    else:
-        raise IndexError(idx)
