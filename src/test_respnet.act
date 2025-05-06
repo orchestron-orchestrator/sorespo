@@ -9,7 +9,7 @@ import orchestron.ttt
 import orchestron.device as odev
 
 import respnet.layers
-from respnet.layers.y_0 import root as cfs_root
+import respnet.layers.y_0 as cfs_layer
 
 def rfs_for_device(dev):
     return gdata.Container({
@@ -52,7 +52,7 @@ netinfra1_in = """<data>
 
 actor netinfra_tester(t: testing.AsyncT):
     xml_conf = xml.decode(netinfra1_in)
-    input_config = cfs_root.from_xml(xml_conf)
+    input_config = cfs_layer.from_xml(xml_conf)
 
     dev_mgr = odev.DeviceManager(log_handler=t.log_handler)
     cfs = respnet.layers.get_layers(dev_mgr)
@@ -67,7 +67,7 @@ actor netinfra_tester(t: testing.AsyncT):
         print(dev_conf, err=True)
         t.success(dev_conf)
 
-    session.edit_config(input_config.to_gdata(), None, cont)
+    session.edit_config(input_config, None, cont)
 
     def fail():
         print("Test Config failed", err=True)
@@ -345,7 +345,7 @@ l3vpn_in = """<data>
 
 actor l3vpn_tester(t: testing.AsyncT, output_formatter: mut(gdata.Node) -> str):
     xml_conf = xml.decode(l3vpn_in)
-    input_config = cfs_root.from_xml(xml_conf)
+    input_config = cfs_layer.from_xml(xml_conf)
 
     dev_mgr = odev.DeviceManager(log_handler=t.log_handler)
     cfs = respnet.layers.get_layers(dev_mgr)
@@ -359,7 +359,7 @@ actor l3vpn_tester(t: testing.AsyncT, output_formatter: mut(gdata.Node) -> str):
         print(output)
         t.success(output)
 
-    session.edit_config(input_config.to_gdata(), None, cont)
+    session.edit_config(input_config, None, cont)
 
 def _test_l3vpn_svc(t: testing.AsyncT):
     l3vpn_tester(t, lambda n: n.to_xmlstr())

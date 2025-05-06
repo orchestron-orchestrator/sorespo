@@ -16,7 +16,7 @@ import tmf.tmf641
 import respnet.tmf
 
 import respnet.layers
-from respnet.layers.y_0_loose import root as cfs_root
+import respnet.layers.y_0_loose as cfs_layer
 import respnet.layers.y_0
 import respnet.layers.y_1
 import respnet.layers.y_2
@@ -185,7 +185,7 @@ actor main(env):
                 elif request.headers.get("content-type") == "application/yang-data+xml":
                     try:
                         xml_in = xml.decode(request.body.decode())
-                        input_config = cfs_root.from_xml(xml_in).to_gdata()
+                        input_config = cfs_layer.from_xml(xml_in)
                         session = cfs.newsession()
                         session.edit_config(input_config, config_done)
                         return
@@ -223,7 +223,7 @@ actor main(env):
         print("Applying config file..")
         try:
             xml_in = configs.pop(0)
-            input_config = cfs_root.from_xml(xml_in).to_gdata()
+            input_config = cfs_layer.from_xml(xml_in)
             session.edit_config(input_config, _conf_file_done)
         except IndexError:
             print("All config files applied")
