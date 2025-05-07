@@ -12,6 +12,10 @@ from respnet.layers.y_0 import netinfra__netinfra__router_entry
 from respnet.layers.y_0 import netinfra__netinfra__backbone_link_entry
 from respnet.layers.y_0 import ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry
 from respnet.layers.y_0 import ietf_l3vpn_svc__l3vpn_svc__sites__site_entry
+from respnet.layers.y_0 import from_xml_netinfra__netinfra__router_element
+from respnet.layers.y_0 import from_xml_netinfra__netinfra__backbone_link_element
+from respnet.layers.y_0 import from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_element
+from respnet.layers.y_0 import from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site_element
 from respnet.layers.y_1_loose import root as output_root
 
 def o_root():
@@ -37,7 +41,8 @@ class Router(ttt.TransformFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        modeled_input = netinfra__netinfra__router_entry.from_xml(i)
+        gdata_input = from_xml_netinfra__netinfra__router_element(i)
+        modeled_input = netinfra__netinfra__router_entry.from_gdata(gdata_input)
         return self.transform(modeled_input).to_gdata()
 
 class BBLink(ttt.TransformFunction):
@@ -59,7 +64,8 @@ class BBLink(ttt.TransformFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        modeled_input = netinfra__netinfra__backbone_link_entry.from_xml(i)
+        gdata_input = from_xml_netinfra__netinfra__backbone_link_element(i)
+        modeled_input = netinfra__netinfra__backbone_link_entry.from_gdata(gdata_input)
         return self.transform(modeled_input).to_gdata()
 
 class L3VpnVpnService(ttt.TransformFunction):
@@ -81,7 +87,8 @@ class L3VpnVpnService(ttt.TransformFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        modeled_input = ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry.from_xml(i)
+        gdata_input = from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_element(i)
+        modeled_input = ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry.from_gdata(gdata_input)
         return self.transform(modeled_input).to_gdata()
 
 class L3VpnSite(ttt.TransformFunction):
@@ -103,5 +110,6 @@ class L3VpnSite(ttt.TransformFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        modeled_input = ietf_l3vpn_svc__l3vpn_svc__sites__site_entry.from_xml(i)
+        gdata_input = from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site_element(i)
+        modeled_input = ietf_l3vpn_svc__l3vpn_svc__sites__site_entry.from_gdata(gdata_input)
         return self.transform(modeled_input).to_gdata()
