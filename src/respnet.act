@@ -151,10 +151,9 @@ actor main(env):
                     layer_config: yang.gdata.Node = session.get()
                     content = ""
                     if request.headers.get("accept") == "application/yang-data+json":
-                        if isinstance(layer_config, yang.gdata.Container):
-                            content = layer_config.to_json()
-                        if request.headers.get("accept") == "application/yang-data+xml":
-                            content = layer_config.to_xmlstr()
+                        content = layer_config.to_json()
+                    if request.headers.get("accept") == "application/yang-data+xml":
+                        content = layer_config.to_xmlstr()
                     respond(200, {}, content)
                     return
                 except ValueError:
