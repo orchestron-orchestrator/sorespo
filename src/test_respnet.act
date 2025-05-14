@@ -62,10 +62,17 @@ actor netinfra_tester(t: testing.AsyncT):
 
     def cont(_r: value):
         print("Test Config applied successfully", str(_r), err=True)
-        res = session.below().below().below().get()
-        dev_conf = res.to_xmlstr()
-        print(dev_conf, err=True)
-        t.success(dev_conf)
+        # Get XML config for all layers. We do this to check whether the gdata
+        # we get from TTT is still valid and can be converted to XML.
+        lnext = session
+        ln_cfg = None
+        for n in range(4):
+            ln = lnext.get()
+            ln_cfg = ln.to_xmlstr()
+            print(f"layer {n}:\n{ln_cfg}", err=True)
+            lnext = lnext.below()
+        # Return last (device) layer config
+        t.success(ln_cfg)
 
     session.edit_config(input_config, None, cont)
 

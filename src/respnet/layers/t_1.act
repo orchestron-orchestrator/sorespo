@@ -12,5 +12,5 @@ import yang.gdata
 import respnet.inter
 
 def get_ttt(dev_mgr: odev.DeviceManager, log_handler: ?logging.Handler=None) -> proc(list[str])->ttt.Node:
-    r = ttt.Container({"netinfra": ttt.Container({"router": ttt.List(ttt.Transform(respnet.inter.Router, log_handler)), "backbone-link": ttt.List(ttt.Transform(respnet.inter.BBLink, log_handler)), "ibgp-fullmesh": ttt.List(ttt.Transform(respnet.inter.IbgpFullmesh, log_handler))}, ns='http://example.com/netinfra-inter'), "l3vpns": ttt.Container({"l3vpn": ttt.List(ttt.Transform(respnet.inter.L3Vpn, log_handler))}, ns='http://example.com/l3vpn-inter')}, ns='')
+    r = ttt.Container({"netinfra": ttt.Container({"router": ttt.List(ttt.Transform(respnet.inter.Router, log_handler), ['name'], ['string']), "backbone-link": ttt.List(ttt.Transform(respnet.inter.BBLink, log_handler), ['left-router', 'left-interface', 'right-router', 'right-interface'], ['string', 'string', 'string', 'string']), "ibgp-fullmesh": ttt.List(ttt.Transform(respnet.inter.IbgpFullmesh, log_handler), ['asn'], ['uint32'])}, ns='http://example.com/netinfra-inter'), "l3vpns": ttt.Container({"l3vpn": ttt.List(ttt.Transform(respnet.inter.L3Vpn, log_handler), ['name'], ['string'])}, ns='http://example.com/l3vpn-inter')}, ns='')
     return r
