@@ -1,6 +1,6 @@
-# RESPNET
+# SORESPO
 
-RESPNET, the REalistic Service Provider Network, is an example of network automation to automate a rather realistic looking SP network. This repository contains a RESPNET implementation POC based on Orchestron.
+The SOmewhat REalistic Service Provider Ooohh network, is an example of network automation to automate a rather realistic looking SP network.  This repository contains a network automation system implementation POC based on Orchestron.
 
 ## Getting started
 
@@ -9,7 +9,7 @@ Set up your development environment using one of the methods outlined in the
 chapter. You should have the dependencies (Acton, Containerlab) installed and
 the project source checked out.
 
-### Building the RESPNET application
+### Building the sorespo application
 
 To compile the code (`make build`) and run unit tests (`make test`):
 
@@ -48,7 +48,7 @@ application uses the Orchestron framework to expose a northbound NETCONF /
 RESTCONF interface with the CFS models, RFS transforms and the NETCONF client
 to configure the devices.
 
-### Running the RESPNET application
+### Running the sorespo application
 
 After building, you may run the application in one of the included testenvs.
 All the testenvs share the same topology, a core network consisting of four PE
@@ -106,12 +106,12 @@ Containerlab topology YAML (file `$TESTENV.clab.yml`)
   all devices ([runs native on ARM64](#running-on-arm64-like-apple-silicon))
 - `test/quicklab-notconf`: simulated core network PE routers using [notconf](https://github.com/notconf/notconf)
 
-All testenvs share a common interface for startup, using RESPNET to create an
+All testenvs share a common interface for startup, using SORESPO to create an
 L3VPN MPLS VPN service and verifying the configuration was applied to the
 network.
 
 To start the testenv, use the `start` recipe, then `run-and-configure` to start
-RESPNET and apply the configuration immediately.
+SORESPO and apply the configuration immediately.
 
 ```shell
 $ make -C test/quicklab-notconf start
@@ -124,7 +124,7 @@ $ make -C test/quicklab-notconf run-and-configure
 All config files applied
 ```
 
-After RESPNET is done with applying the configuration (`All config files
+After SORESPO is done with applying the configuration (`All config files
 applied`), you may verify the device config over NETCONF using the
 `get-dev-config-<device>` recipe:
 
@@ -228,12 +228,12 @@ PING 10.200.1.2 (10.200.1.2) 56(84) bytes of data.
 64 bytes from 10.200.1.2: icmp_seq=1 ttl=253 time=4.02 ms
 ```
 
-### Modifying the RESPNET application
+### Modifying the SORESPO application
 
 Changing the application typically involves modifying the RFS transforms to
 modify the output configuration and optionally modifying the models.
 If you just change the RFS or any other transform without needing to change the
-YANG models, run `make build` and restart the RESPNET application. To stop a
+YANG models, run `make build` and restart the SORESPO application. To stop a
 previously running instance Press *Ctrl+C* in the terminal window where it is
 running.
 
