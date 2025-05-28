@@ -36,7 +36,7 @@ class orchestron_device__devices__device_entry(yang.adata.MNode):
         _modset_id = self.modset_id
         if _modset_id is not None:
             children['modset_id'] = yang.gdata.Leaf('string', _modset_id)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.name)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_device__devices__device_entry:
@@ -85,7 +85,7 @@ mut def from_xml_orchestron_device__devices__device_element(node: xml.Node) -> y
     yang.gdata.maybe_add(children, 'name', from_xml_orchestron_device__devices__device__name, child_name)
     child_modset_id = yang.gdata.from_xml_opt_str(node, 'modset_id')
     yang.gdata.maybe_add(children, 'modset_id', from_xml_orchestron_device__devices__device__modset_id, child_modset_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_name)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_orchestron_device__devices__device(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -102,7 +102,7 @@ mut def from_json_path_orchestron_device__devices__device_element(jd: value, pat
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['name']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -112,7 +112,7 @@ mut def from_json_path_orchestron_device__devices__device_element(jd: value, pat
         children['name'] = from_json_orchestron_device__devices__device__name(keys[0])
         if point == 'modset_id':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_orchestron_device__devices__device(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -134,7 +134,7 @@ mut def from_json_path_orchestron_device__devices__device(jd: value, path: list[
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['name'])))
         return yang.gdata.List(['name'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['name'], [from_json_path_orchestron_device__devices__device_element(jd, path, op)])
@@ -146,7 +146,7 @@ mut def from_json_orchestron_device__devices__device_element(jd: dict[str, ?valu
     yang.gdata.maybe_add(children, 'name', from_json_orchestron_device__devices__device__name, child_name)
     child_modset_id = yang.gdata.take_json_opt_str(jd, 'modset_id')
     yang.gdata.maybe_add(children, 'modset_id', from_json_orchestron_device__devices__device__modset_id, child_modset_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_name)])
+    return yang.gdata.Container(children)
 
 mut def from_json_orchestron_device__devices__device(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []

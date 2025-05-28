@@ -69,7 +69,7 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
         _mock = self.mock
         if _mock is not None:
             children['mock'] = yang.gdata.Leaf('enumeration', _mock)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.name)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra__netinfra__router_entry:
@@ -124,7 +124,7 @@ mut def from_xml_netinfra__netinfra__router_element(node: xml.Node) -> yang.gdat
     yang.gdata.maybe_add(children, 'asn', from_xml_netinfra__netinfra__router__asn, child_asn)
     child_mock = yang.gdata.from_xml_opt_str(node, 'mock')
     yang.gdata.maybe_add(children, 'mock', from_xml_netinfra__netinfra__router__mock, child_mock)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_name)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_netinfra__netinfra__router(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -141,7 +141,7 @@ mut def from_json_path_netinfra__netinfra__router_element(jd: value, path: list[
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['name']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -157,7 +157,7 @@ mut def from_json_path_netinfra__netinfra__router_element(jd: value, path: list[
             raise ValueError("Invalid json path to non-inner node")
         if point == 'mock':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_netinfra__netinfra__router(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -179,7 +179,7 @@ mut def from_json_path_netinfra__netinfra__router(jd: value, path: list[str]=[],
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['name'])))
         return yang.gdata.List(['name'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['name'], [from_json_path_netinfra__netinfra__router_element(jd, path, op)])
@@ -197,7 +197,7 @@ mut def from_json_netinfra__netinfra__router_element(jd: dict[str, ?value]) -> y
     yang.gdata.maybe_add(children, 'asn', from_json_netinfra__netinfra__router__asn, child_asn)
     child_mock = yang.gdata.take_json_opt_str(jd, 'mock')
     yang.gdata.maybe_add(children, 'mock', from_json_netinfra__netinfra__router__mock, child_mock)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_name)])
+    return yang.gdata.Container(children)
 
 mut def from_json_netinfra__netinfra__router(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -257,7 +257,7 @@ class netinfra__netinfra__backbone_link_entry(yang.adata.MNode):
         _right_interface = self.right_interface
         if _right_interface is not None:
             children['right-interface'] = yang.gdata.Leaf('string', _right_interface)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.left_router), yang.gdata.yang_str(self.left_interface), yang.gdata.yang_str(self.right_router), yang.gdata.yang_str(self.right_interface)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra__netinfra__backbone_link_entry:
@@ -319,7 +319,7 @@ mut def from_xml_netinfra__netinfra__backbone_link_element(node: xml.Node) -> ya
     yang.gdata.maybe_add(children, 'right-router', from_xml_netinfra__netinfra__backbone_link__right_router, child_right_router)
     child_right_interface = yang.gdata.from_xml_str(node, 'right-interface')
     yang.gdata.maybe_add(children, 'right-interface', from_xml_netinfra__netinfra__backbone_link__right_interface, child_right_interface)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_left_router), yang.gdata.yang_str(child_left_interface), yang.gdata.yang_str(child_right_router), yang.gdata.yang_str(child_right_interface)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_netinfra__netinfra__backbone_link(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -336,7 +336,7 @@ mut def from_json_path_netinfra__netinfra__backbone_link_element(jd: value, path
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['left-router', 'left-interface', 'right-router', 'right-interface']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -347,7 +347,7 @@ mut def from_json_path_netinfra__netinfra__backbone_link_element(jd: value, path
         children['left-interface'] = from_json_netinfra__netinfra__backbone_link__left_interface(keys[1])
         children['right-router'] = from_json_netinfra__netinfra__backbone_link__right_router(keys[2])
         children['right-interface'] = from_json_netinfra__netinfra__backbone_link__right_interface(keys[3])
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_netinfra__netinfra__backbone_link(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -369,7 +369,7 @@ mut def from_json_path_netinfra__netinfra__backbone_link(jd: value, path: list[s
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['left-router', 'left-interface', 'right-router', 'right-interface'])))
         return yang.gdata.List(['left-router', 'left-interface', 'right-router', 'right-interface'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['left-router', 'left-interface', 'right-router', 'right-interface'], [from_json_path_netinfra__netinfra__backbone_link_element(jd, path, op)])
@@ -385,7 +385,7 @@ mut def from_json_netinfra__netinfra__backbone_link_element(jd: dict[str, ?value
     yang.gdata.maybe_add(children, 'right-router', from_json_netinfra__netinfra__backbone_link__right_router, child_right_router)
     child_right_interface = yang.gdata.take_json_str(jd, 'right-interface')
     yang.gdata.maybe_add(children, 'right-interface', from_json_netinfra__netinfra__backbone_link__right_interface, child_right_interface)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_left_router), yang.gdata.yang_str(child_left_interface), yang.gdata.yang_str(child_right_router), yang.gdata.yang_str(child_right_interface)])
+    return yang.gdata.Container(children)
 
 mut def from_json_netinfra__netinfra__backbone_link(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -474,7 +474,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud
         _id = self.id
         if _id is not None:
             children['id'] = yang.gdata.Leaf('string', _id)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier_entry:
@@ -521,7 +521,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identif
     children = {}
     child_id = yang.gdata.from_xml_str(node, 'id')
     yang.gdata.maybe_add(children, 'id', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier__id, child_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -538,7 +538,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_i
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -546,7 +546,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_i
         rest_path = path[2:]
         children: dict[str, yang.gdata.Node] = {}
         children['id'] = from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier__id(keys[0])
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -568,7 +568,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_i
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['id'])))
         return yang.gdata.List(['id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier_element(jd, path, op)])
@@ -578,7 +578,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identi
     children = {}
     child_id = yang.gdata.take_json_str(jd, 'id')
     yang.gdata.maybe_add(children, 'id', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier__id, child_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -605,7 +605,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encry
         _id = self.id
         if _id is not None:
             children['id'] = yang.gdata.Leaf('string', _id)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier_entry:
@@ -652,7 +652,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identif
     children = {}
     child_id = yang.gdata.from_xml_str(node, 'id')
     yang.gdata.maybe_add(children, 'id', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier__id, child_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -669,7 +669,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_i
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -677,7 +677,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_i
         rest_path = path[2:]
         children: dict[str, yang.gdata.Node] = {}
         children['id'] = from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier__id(keys[0])
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -699,7 +699,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_i
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['id'])))
         return yang.gdata.List(['id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier_element(jd, path, op)])
@@ -709,7 +709,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identi
     children = {}
     child_id = yang.gdata.take_json_str(jd, 'id')
     yang.gdata.maybe_add(children, 'id', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier__id, child_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -736,7 +736,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_p
         _id = self.id
         if _id is not None:
             children['id'] = yang.gdata.Leaf('string', _id)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier_entry:
@@ -783,7 +783,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identif
     children = {}
     child_id = yang.gdata.from_xml_str(node, 'id')
     yang.gdata.maybe_add(children, 'id', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier__id, child_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -800,7 +800,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_i
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -808,7 +808,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_i
         rest_path = path[2:]
         children: dict[str, yang.gdata.Node] = {}
         children['id'] = from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier__id(keys[0])
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -830,7 +830,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_i
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['id'])))
         return yang.gdata.List(['id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier_element(jd, path, op)])
@@ -840,7 +840,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identi
     children = {}
     child_id = yang.gdata.take_json_str(jd, 'id')
     yang.gdata.maybe_add(children, 'id', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier__id, child_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -867,7 +867,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_p
         _id = self.id
         if _id is not None:
             children['id'] = yang.gdata.Leaf('string', _id)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier_entry:
@@ -914,7 +914,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identif
     children = {}
     child_id = yang.gdata.from_xml_str(node, 'id')
     yang.gdata.maybe_add(children, 'id', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier__id, child_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -931,7 +931,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_i
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -939,7 +939,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_i
         rest_path = path[2:]
         children: dict[str, yang.gdata.Node] = {}
         children['id'] = from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier__id(keys[0])
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -961,7 +961,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_i
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['id'])))
         return yang.gdata.List(['id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier_element(jd, path, op)])
@@ -971,7 +971,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identi
     children = {}
     child_id = yang.gdata.take_json_str(jd, 'id')
     yang.gdata.maybe_add(children, 'id', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier__id, child_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -1308,7 +1308,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__clou
         _address_translation = self.address_translation
         if _address_translation is not None:
             children['address-translation'] = _address_translation.to_gdata()
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.cloud_identifier)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access_entry:
@@ -1363,7 +1363,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_acc
     yang.gdata.maybe_add(children, 'deny-site', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access__deny_site, child_deny_site)
     child_address_translation = yang.gdata.from_xml_opt_cnt(node, 'address-translation')
     yang.gdata.maybe_add(children, 'address-translation', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access__address_translation, child_address_translation)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_cloud_identifier)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -1380,7 +1380,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__clo
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['cloud-identifier']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -1396,7 +1396,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__clo
             raise ValueError("Invalid json path to non-inner node")
         if point == 'address-translation':
             children['address-translation'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access__address_translation(jd, rest_path, op)
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -1418,7 +1418,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__clo
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['cloud-identifier'])))
         return yang.gdata.List(['cloud-identifier'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['cloud-identifier'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access_element(jd, path, op)])
@@ -1436,7 +1436,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_ac
     yang.gdata.maybe_add(children, 'deny-site', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access__deny_site, child_deny_site)
     child_address_translation = yang.gdata.take_json_opt_cnt(jd, 'address-translation')
     yang.gdata.maybe_add(children, 'address-translation', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access__address_translation, child_address_translation)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_cloud_identifier)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -1706,7 +1706,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
         _group_end = self.group_end
         if _group_end is not None:
             children['group-end'] = yang.gdata.Leaf('union', _group_end)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group_entry:
@@ -1759,7 +1759,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast
     yang.gdata.maybe_add(children, 'group-start', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group__group_start, child_group_start)
     child_group_end = yang.gdata.from_xml_opt_str(node, 'group-end')
     yang.gdata.maybe_add(children, 'group-end', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group__group_end, child_group_end)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -1776,7 +1776,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__mul
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -1790,7 +1790,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__mul
             raise ValueError("Invalid json path to non-inner node")
         if point == 'group-end':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -1812,7 +1812,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__mul
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['id'])))
         return yang.gdata.List(['id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group_element(jd, path, op)])
@@ -1828,7 +1828,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicas
     yang.gdata.maybe_add(children, 'group-start', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group__group_start, child_group_start)
     child_group_end = yang.gdata.take_json_opt_str(jd, 'group-end')
     yang.gdata.maybe_add(children, 'group-end', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group__group_end, child_group_end)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -1914,7 +1914,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
         _groups = self.groups
         if _groups is not None:
             children['groups'] = _groups.to_gdata()
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping_entry:
@@ -1967,7 +1967,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast
     yang.gdata.maybe_add(children, 'rp-address', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__rp_address, child_rp_address)
     child_groups = yang.gdata.from_xml_opt_cnt(node, 'groups')
     yang.gdata.maybe_add(children, 'groups', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups, child_groups)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -1984,7 +1984,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__mul
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -1998,7 +1998,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__mul
             raise ValueError("Invalid json path to non-inner node")
         if point == 'groups':
             children['groups'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups(jd, rest_path, op)
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -2020,7 +2020,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__mul
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['id'])))
         return yang.gdata.List(['id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping_element(jd, path, op)])
@@ -2036,7 +2036,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicas
     yang.gdata.maybe_add(children, 'rp-address', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__rp_address, child_rp_address)
     child_groups = yang.gdata.take_json_opt_cnt(jd, 'groups')
     yang.gdata.maybe_add(children, 'groups', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups, child_groups)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -2385,7 +2385,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extra
         _local_sites_role = self.local_sites_role
         if _local_sites_role is not None:
             children['local-sites-role'] = yang.gdata.Leaf('identityref', _local_sites_role)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.vpn_id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn_entry:
@@ -2434,7 +2434,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_
     yang.gdata.maybe_add(children, 'vpn-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn__vpn_id, child_vpn_id)
     child_local_sites_role = yang.gdata.from_xml_opt_str(node, 'local-sites-role')
     yang.gdata.maybe_add(children, 'local-sites-role', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn__local_sites_role, child_local_sites_role)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_vpn_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -2451,7 +2451,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__ext
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['vpn-id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -2461,7 +2461,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__ext
         children['vpn-id'] = from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn__vpn_id(keys[0])
         if point == 'local-sites-role':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -2483,7 +2483,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__ext
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['vpn-id'])))
         return yang.gdata.List(['vpn-id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['vpn-id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn_element(jd, path, op)])
@@ -2495,7 +2495,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet
     yang.gdata.maybe_add(children, 'vpn-id', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn__vpn_id, child_vpn_id)
     child_local_sites_role = yang.gdata.take_json_opt_str(jd, 'local-sites-role')
     yang.gdata.maybe_add(children, 'local-sites-role', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn__local_sites_role, child_local_sites_role)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_vpn_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -2596,7 +2596,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry(yang.adata.MNod
         _extranet_vpns = self.extranet_vpns
         if _extranet_vpns is not None:
             children['extranet-vpns'] = _extranet_vpns.to_gdata()
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.vpn_id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry:
@@ -2655,7 +2655,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_element(no
     yang.gdata.maybe_add(children, 'carrierscarrier', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__carrierscarrier, child_carrierscarrier)
     child_extranet_vpns = yang.gdata.from_xml_opt_cnt(node, 'extranet-vpns')
     yang.gdata.maybe_add(children, 'extranet-vpns', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns, child_extranet_vpns)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_vpn_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -2672,7 +2672,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_elem
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['vpn-id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -2692,7 +2692,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_elem
             raise ValueError("Invalid json path to non-inner node")
         if point == 'extranet-vpns':
             children['extranet-vpns'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns(jd, rest_path, op)
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -2714,7 +2714,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service(jd: 
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['vpn-id'])))
         return yang.gdata.List(['vpn-id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['vpn-id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_element(jd, path, op)])
@@ -2736,7 +2736,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_element(j
     yang.gdata.maybe_add(children, 'carrierscarrier', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__carrierscarrier, child_carrierscarrier)
     child_extranet_vpns = yang.gdata.take_json_opt_cnt(jd, 'extranet-vpns')
     yang.gdata.maybe_add(children, 'extranet-vpns', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns, child_extranet_vpns)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_vpn_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -2886,7 +2886,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location_entry(yang.ada
         _country_code = self.country_code
         if _country_code is not None:
             children['country-code'] = yang.gdata.Leaf('string', _country_code)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.location_id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location_entry:
@@ -2943,7 +2943,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location_ele
     yang.gdata.maybe_add(children, 'city', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location__city, child_city)
     child_country_code = yang.gdata.from_xml_opt_str(node, 'country-code')
     yang.gdata.maybe_add(children, 'country-code', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location__country_code, child_country_code)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_location_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -2960,7 +2960,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__locati
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['location-id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -2978,7 +2978,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__locati
             raise ValueError("Invalid json path to non-inner node")
         if point == 'country-code':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -3000,7 +3000,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__locati
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['location-id'])))
         return yang.gdata.List(['location-id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['location-id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location_element(jd, path, op)])
@@ -3020,7 +3020,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location_el
     yang.gdata.maybe_add(children, 'city', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location__city, child_city)
     child_country_code = yang.gdata.take_json_opt_str(jd, 'country-code')
     yang.gdata.maybe_add(children, 'country-code', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location__country_code, child_country_code)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_location_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -3185,7 +3185,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_entry(yang.adata.M
         _management = self.management
         if _management is not None:
             children['management'] = _management.to_gdata()
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.device_id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_entry:
@@ -3236,7 +3236,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_element
     yang.gdata.maybe_add(children, 'location', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device__location, child_location)
     child_management = yang.gdata.from_xml_cnt(node, 'management')
     yang.gdata.maybe_add(children, 'management', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device__management, child_management)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_device_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -3253,7 +3253,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_e
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['device-id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -3265,7 +3265,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_e
             raise ValueError("Invalid json path to non-inner node")
         if point == 'management':
             children['management'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device__management(jd, rest_path, op)
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -3287,7 +3287,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device(j
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['device-id'])))
         return yang.gdata.List(['device-id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['device-id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_element(jd, path, op)])
@@ -3301,7 +3301,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_elemen
     yang.gdata.maybe_add(children, 'location', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device__location, child_location)
     child_management = yang.gdata.take_json_cnt(jd, 'management')
     yang.gdata.maybe_add(children, 'management', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device__management, child_management)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_device_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -3378,7 +3378,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group_entr
         _group_id = self.group_id
         if _group_id is not None:
             children['group-id'] = yang.gdata.Leaf('string', _group_id)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.group_id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group_entry:
@@ -3425,7 +3425,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups_
     children = {}
     child_group_id = yang.gdata.from_xml_str(node, 'group-id')
     yang.gdata.maybe_add(children, 'group-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group__group_id, child_group_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_group_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -3442,7 +3442,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__g
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['group-id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -3450,7 +3450,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__g
         rest_path = path[2:]
         children: dict[str, yang.gdata.Node] = {}
         children['group-id'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group__group_id(keys[0])
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -3472,7 +3472,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__g
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['group-id'])))
         return yang.gdata.List(['group-id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['group-id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group_element(jd, path, op)])
@@ -3482,7 +3482,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups
     children = {}
     child_group_id = yang.gdata.take_json_str(jd, 'group-id')
     yang.gdata.maybe_add(children, 'group-id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group__group_id, child_group_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_group_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -3703,7 +3703,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
         children['lan-tag'] = yang.gdata.LeafList('string', self.lan_tag)
         children['ipv4-lan-prefix'] = yang.gdata.LeafList('string', self.ipv4_lan_prefix)
         children['ipv6-lan-prefix'] = yang.gdata.LeafList('string', self.ipv6_lan_prefix)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.type)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter_entry:
@@ -3756,7 +3756,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_polic
     yang.gdata.maybe_add(children, 'ipv4-lan-prefix', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter__ipv4_lan_prefix, child_ipv4_lan_prefix)
     child_ipv6_lan_prefix = yang.gdata.from_xml_opt_strs(node, 'ipv6-lan-prefix')
     yang.gdata.maybe_add(children, 'ipv6-lan-prefix', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter__ipv6_lan_prefix, child_ipv6_lan_prefix)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_type)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -3773,7 +3773,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['type']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -3787,7 +3787,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn
             raise ValueError("Invalid json path to non-inner node")
         if point == 'ipv6-lan-prefix':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -3809,7 +3809,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['type'])))
         return yang.gdata.List(['type'], elements, user_order=True)
     elif len(path) > 1:
         return yang.gdata.List(['type'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter_element(jd, path, op)], user_order=True)
@@ -3825,7 +3825,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_poli
     yang.gdata.maybe_add(children, 'ipv4-lan-prefix', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter__ipv4_lan_prefix, child_ipv4_lan_prefix)
     child_ipv6_lan_prefix = yang.gdata.take_json_opt_strs(jd, 'ipv6-lan-prefix')
     yang.gdata.maybe_add(children, 'ipv6-lan-prefix', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter__ipv6_lan_prefix, child_ipv6_lan_prefix)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_type)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -3913,7 +3913,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
         _site_role = self.site_role
         if _site_role is not None:
             children['site-role'] = yang.gdata.Leaf('identityref', _site_role)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.vpn_id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn_entry:
@@ -3962,7 +3962,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_polic
     yang.gdata.maybe_add(children, 'vpn-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn__vpn_id, child_vpn_id)
     child_site_role = yang.gdata.from_xml_opt_str(node, 'site-role')
     yang.gdata.maybe_add(children, 'site-role', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn__site_role, child_site_role)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_vpn_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -3979,7 +3979,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['vpn-id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -3989,7 +3989,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn
         children['vpn-id'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn__vpn_id(keys[0])
         if point == 'site-role':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -4011,7 +4011,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['vpn-id'])))
         return yang.gdata.List(['vpn-id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['vpn-id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn_element(jd, path, op)])
@@ -4023,7 +4023,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_poli
     yang.gdata.maybe_add(children, 'vpn-id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn__vpn_id, child_vpn_id)
     child_site_role = yang.gdata.take_json_opt_str(jd, 'site-role')
     yang.gdata.maybe_add(children, 'site-role', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn__site_role, child_site_role)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_vpn_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -4054,7 +4054,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
         _vpn = self.vpn
         if _vpn is not None:
             children['vpn'] = _vpn.to_gdata()
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_entry:
@@ -4105,7 +4105,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_polic
     yang.gdata.maybe_add(children, 'filters', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters, child_filters)
     child_vpn = yang.gdata.from_xml_opt_list(node, 'vpn')
     yang.gdata.maybe_add(children, 'vpn', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn, child_vpn)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -4122,7 +4122,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -4134,7 +4134,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn
             children['filters'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters(jd, rest_path, op)
         if point == 'vpn':
             children['vpn'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn(jd, rest_path, op)
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -4156,7 +4156,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['id'])))
         return yang.gdata.List(['id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_element(jd, path, op)])
@@ -4170,7 +4170,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_poli
     yang.gdata.maybe_add(children, 'filters', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters, child_filters)
     child_vpn = yang.gdata.take_json_opt_list(jd, 'vpn')
     yang.gdata.maybe_add(children, 'vpn', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn, child_vpn)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -4196,7 +4196,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy_entry(yan
         _entries = self.entries
         if _entries is not None:
             children['entries'] = _entries.to_gdata()
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.vpn_policy_id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy_entry:
@@ -4245,7 +4245,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_polic
     yang.gdata.maybe_add(children, 'vpn-policy-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__vpn_policy_id, child_vpn_policy_id)
     child_entries = yang.gdata.from_xml_opt_list(node, 'entries')
     yang.gdata.maybe_add(children, 'entries', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries, child_entries)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_vpn_policy_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -4262,7 +4262,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['vpn-policy-id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -4272,7 +4272,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn
         children['vpn-policy-id'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__vpn_policy_id(keys[0])
         if point == 'entries':
             children['entries'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries(jd, rest_path, op)
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -4294,7 +4294,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['vpn-policy-id'])))
         return yang.gdata.List(['vpn-policy-id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['vpn-policy-id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy_element(jd, path, op)])
@@ -4306,7 +4306,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_poli
     yang.gdata.maybe_add(children, 'vpn-policy-id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__vpn_policy_id, child_vpn_policy_id)
     child_entries = yang.gdata.take_json_opt_list(jd, 'entries')
     yang.gdata.maybe_add(children, 'entries', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries, child_entries)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_vpn_policy_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -4400,7 +4400,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family_ent
         _maximum_routes = self.maximum_routes
         if _maximum_routes is not None:
             children['maximum-routes'] = yang.gdata.Leaf('uint32', _maximum_routes)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.af)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family_entry:
@@ -4449,7 +4449,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address
     yang.gdata.maybe_add(children, 'af', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family__af, child_af)
     child_maximum_routes = yang.gdata.from_xml_opt_int(node, 'maximum-routes')
     yang.gdata.maybe_add(children, 'maximum-routes', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family__maximum_routes, child_maximum_routes)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_af)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -4466,7 +4466,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__a
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['af']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -4476,7 +4476,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__a
         children['af'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family__af(keys[0])
         if point == 'maximum-routes':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -4498,7 +4498,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__a
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['af'])))
         return yang.gdata.List(['af'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['af'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family_element(jd, path, op)])
@@ -4510,7 +4510,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__addres
     yang.gdata.maybe_add(children, 'af', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family__af, child_af)
     child_maximum_routes = yang.gdata.take_json_opt_int(jd, 'maximum-routes')
     yang.gdata.maybe_add(children, 'maximum-routes', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family__maximum_routes, child_maximum_routes)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_af)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -5262,7 +5262,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_p
         _target_class_id = self.target_class_id
         if _target_class_id is not None:
             children['target-class-id'] = yang.gdata.Leaf('string', _target_class_id)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule_entry:
@@ -5315,7 +5315,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_class
     yang.gdata.maybe_add(children, 'match-application', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_application, child_match_application)
     child_target_class_id = yang.gdata.from_xml_opt_str(node, 'target-class-id')
     yang.gdata.maybe_add(children, 'target-class-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__target_class_id, child_target_class_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -5332,7 +5332,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -5346,7 +5346,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos
             raise ValueError("Invalid json path to non-inner node")
         if point == 'target-class-id':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -5368,7 +5368,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['id'])))
         return yang.gdata.List(['id'], elements, user_order=True)
     elif len(path) > 1:
         return yang.gdata.List(['id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule_element(jd, path, op)], user_order=True)
@@ -5384,7 +5384,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_clas
     yang.gdata.maybe_add(children, 'match-application', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_application, child_match_application)
     child_target_class_id = yang.gdata.take_json_opt_str(jd, 'target-class-id')
     yang.gdata.maybe_add(children, 'target-class-id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__target_class_id, child_target_class_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -5720,7 +5720,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes
         _bandwidth = self.bandwidth
         if _bandwidth is not None:
             children['bandwidth'] = _bandwidth.to_gdata()
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.class_id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class_entry:
@@ -5777,7 +5777,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profi
     yang.gdata.maybe_add(children, 'jitter', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__jitter, child_jitter)
     child_bandwidth = yang.gdata.from_xml_cnt(node, 'bandwidth')
     yang.gdata.maybe_add(children, 'bandwidth', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__bandwidth, child_bandwidth)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_class_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -5794,7 +5794,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['class-id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -5812,7 +5812,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos
             children['jitter'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__jitter(jd, rest_path, op)
         if point == 'bandwidth':
             children['bandwidth'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__bandwidth(jd, rest_path, op)
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -5834,7 +5834,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['class-id'])))
         return yang.gdata.List(['class-id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['class-id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class_element(jd, path, op)])
@@ -5854,7 +5854,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_prof
     yang.gdata.maybe_add(children, 'jitter', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__jitter, child_jitter)
     child_bandwidth = yang.gdata.take_json_cnt(jd, 'bandwidth')
     yang.gdata.maybe_add(children, 'bandwidth', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__bandwidth, child_bandwidth)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_class_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -6429,7 +6429,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         _metric = self.metric
         if _metric is not None:
             children['metric'] = yang.gdata.Leaf('uint16', _metric)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.target_site)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link_entry:
@@ -6478,7 +6478,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__rout
     yang.gdata.maybe_add(children, 'target-site', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link__target_site, child_target_site)
     child_metric = yang.gdata.from_xml_opt_int(node, 'metric')
     yang.gdata.maybe_add(children, 'metric', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link__metric, child_metric)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_target_site)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -6495,7 +6495,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['target-site']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -6505,7 +6505,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols
         children['target-site'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link__target_site(keys[0])
         if point == 'metric':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -6527,7 +6527,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['target-site'])))
         return yang.gdata.List(['target-site'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['target-site'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link_element(jd, path, op)])
@@ -6539,7 +6539,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__rou
     yang.gdata.maybe_add(children, 'target-site', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link__target_site, child_target_site)
     child_metric = yang.gdata.take_json_opt_int(jd, 'metric')
     yang.gdata.maybe_add(children, 'metric', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link__metric, child_metric)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_target_site)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -6789,7 +6789,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         _lan_tag = self.lan_tag
         if _lan_tag is not None:
             children['lan-tag'] = yang.gdata.Leaf('string', _lan_tag)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.lan), yang.gdata.yang_str(self.next_hop)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_entry:
@@ -6843,7 +6843,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__rout
     yang.gdata.maybe_add(children, 'next-hop', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes__next_hop, child_next_hop)
     child_lan_tag = yang.gdata.from_xml_opt_str(node, 'lan-tag')
     yang.gdata.maybe_add(children, 'lan-tag', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes__lan_tag, child_lan_tag)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_lan), yang.gdata.yang_str(child_next_hop)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -6860,7 +6860,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['lan', 'next-hop']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -6871,7 +6871,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols
         children['next-hop'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes__next_hop(keys[1])
         if point == 'lan-tag':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -6893,7 +6893,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['lan', 'next-hop'])))
         return yang.gdata.List(['lan', 'next-hop'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['lan', 'next-hop'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_element(jd, path, op)])
@@ -6907,7 +6907,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__rou
     yang.gdata.maybe_add(children, 'next-hop', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes__next_hop, child_next_hop)
     child_lan_tag = yang.gdata.take_json_opt_str(jd, 'lan-tag')
     yang.gdata.maybe_add(children, 'lan-tag', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes__lan_tag, child_lan_tag)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_lan), yang.gdata.yang_str(child_next_hop)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -6956,7 +6956,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         _lan_tag = self.lan_tag
         if _lan_tag is not None:
             children['lan-tag'] = yang.gdata.Leaf('string', _lan_tag)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.lan), yang.gdata.yang_str(self.next_hop)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_entry:
@@ -7010,7 +7010,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__rout
     yang.gdata.maybe_add(children, 'next-hop', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes__next_hop, child_next_hop)
     child_lan_tag = yang.gdata.from_xml_opt_str(node, 'lan-tag')
     yang.gdata.maybe_add(children, 'lan-tag', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes__lan_tag, child_lan_tag)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_lan), yang.gdata.yang_str(child_next_hop)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -7027,7 +7027,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['lan', 'next-hop']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -7038,7 +7038,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols
         children['next-hop'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes__next_hop(keys[1])
         if point == 'lan-tag':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -7060,7 +7060,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['lan', 'next-hop'])))
         return yang.gdata.List(['lan', 'next-hop'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['lan', 'next-hop'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_element(jd, path, op)])
@@ -7074,7 +7074,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__rou
     yang.gdata.maybe_add(children, 'next-hop', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes__next_hop, child_next_hop)
     child_lan_tag = yang.gdata.take_json_opt_str(jd, 'lan-tag')
     yang.gdata.maybe_add(children, 'lan-tag', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes__lan_tag, child_lan_tag)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_lan), yang.gdata.yang_str(child_next_hop)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -7363,7 +7363,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         _vrrp = self.vrrp
         if _vrrp is not None:
             children['vrrp'] = _vrrp.to_gdata()
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.type)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol_entry:
@@ -7420,7 +7420,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__rout
     yang.gdata.maybe_add(children, 'rip', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__rip, child_rip)
     child_vrrp = yang.gdata.from_xml_opt_cnt(node, 'vrrp')
     yang.gdata.maybe_add(children, 'vrrp', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__vrrp, child_vrrp)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_type)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -7437,7 +7437,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['type']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -7455,7 +7455,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols
             children['rip'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__rip(jd, rest_path, op)
         if point == 'vrrp':
             children['vrrp'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__vrrp(jd, rest_path, op)
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -7477,7 +7477,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['type'])))
         return yang.gdata.List(['type'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['type'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol_element(jd, path, op)])
@@ -7497,7 +7497,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__rou
     yang.gdata.maybe_add(children, 'rip', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__rip, child_rip)
     child_vrrp = yang.gdata.take_json_opt_cnt(jd, 'vrrp')
     yang.gdata.maybe_add(children, 'vrrp', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__vrrp, child_vrrp)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_type)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -7598,7 +7598,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         _group_id = self.group_id
         if _group_id is not None:
             children['group-id'] = yang.gdata.Leaf('string', _group_id)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.group_id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group_entry:
@@ -7645,7 +7645,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
     children = {}
     child_group_id = yang.gdata.from_xml_str(node, 'group-id')
     yang.gdata.maybe_add(children, 'group-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group__group_id, child_group_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_group_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -7662,7 +7662,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['group-id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -7670,7 +7670,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         rest_path = path[2:]
         children: dict[str, yang.gdata.Node] = {}
         children['group-id'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group__group_id(keys[0])
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -7692,7 +7692,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['group-id'])))
         return yang.gdata.List(['group-id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['group-id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group_element(jd, path, op)])
@@ -7702,7 +7702,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     children = {}
     child_group_id = yang.gdata.take_json_str(jd, 'group-id')
     yang.gdata.maybe_add(children, 'group-id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group__group_id, child_group_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_group_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -7785,7 +7785,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         _group_id = self.group_id
         if _group_id is not None:
             children['group-id'] = yang.gdata.Leaf('string', _group_id)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.group_id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group_entry:
@@ -7832,7 +7832,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
     children = {}
     child_group_id = yang.gdata.from_xml_str(node, 'group-id')
     yang.gdata.maybe_add(children, 'group-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group__group_id, child_group_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_group_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -7849,7 +7849,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['group-id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -7857,7 +7857,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         rest_path = path[2:]
         children: dict[str, yang.gdata.Node] = {}
         children['group-id'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group__group_id(keys[0])
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -7879,7 +7879,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['group-id'])))
         return yang.gdata.List(['group-id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['group-id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group_element(jd, path, op)])
@@ -7889,7 +7889,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     children = {}
     child_group_id = yang.gdata.take_json_str(jd, 'group-id')
     yang.gdata.maybe_add(children, 'group-id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group__group_id, child_group_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_group_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -7999,7 +7999,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         _target = self.target
         if _target is not None:
             children['target'] = _target.to_gdata()
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.constraint_type)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint_entry:
@@ -8048,7 +8048,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
     yang.gdata.maybe_add(children, 'constraint-type', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__constraint_type, child_constraint_type)
     child_target = yang.gdata.from_xml_opt_cnt(node, 'target')
     yang.gdata.maybe_add(children, 'target', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target, child_target)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_constraint_type)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -8065,7 +8065,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['constraint-type']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -8075,7 +8075,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         children['constraint-type'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__constraint_type(keys[0])
         if point == 'target':
             children['target'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target(jd, rest_path, op)
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -8097,7 +8097,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['constraint-type'])))
         return yang.gdata.List(['constraint-type'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['constraint-type'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint_element(jd, path, op)])
@@ -8109,7 +8109,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'constraint-type', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__constraint_type, child_constraint_type)
     child_target = yang.gdata.take_json_opt_cnt(jd, 'target')
     yang.gdata.maybe_add(children, 'target', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target, child_target)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_constraint_type)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -8450,7 +8450,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         _end_address = self.end_address
         if _end_address is not None:
             children['end-address'] = yang.gdata.Leaf('string', _end_address)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.group_id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group_entry:
@@ -8501,7 +8501,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
     yang.gdata.maybe_add(children, 'start-address', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group__start_address, child_start_address)
     child_end_address = yang.gdata.from_xml_opt_str(node, 'end-address')
     yang.gdata.maybe_add(children, 'end-address', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group__end_address, child_end_address)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_group_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -8518,7 +8518,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['group-id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -8530,7 +8530,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
             raise ValueError("Invalid json path to non-inner node")
         if point == 'end-address':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -8552,7 +8552,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['group-id'])))
         return yang.gdata.List(['group-id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['group-id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group_element(jd, path, op)])
@@ -8566,7 +8566,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'start-address', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group__start_address, child_start_address)
     child_end_address = yang.gdata.take_json_opt_str(jd, 'end-address')
     yang.gdata.maybe_add(children, 'end-address', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group__end_address, child_end_address)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_group_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -9083,7 +9083,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         _end_address = self.end_address
         if _end_address is not None:
             children['end-address'] = yang.gdata.Leaf('string', _end_address)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.group_id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group_entry:
@@ -9134,7 +9134,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
     yang.gdata.maybe_add(children, 'start-address', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group__start_address, child_start_address)
     child_end_address = yang.gdata.from_xml_opt_str(node, 'end-address')
     yang.gdata.maybe_add(children, 'end-address', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group__end_address, child_end_address)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_group_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -9151,7 +9151,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['group-id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -9163,7 +9163,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
             raise ValueError("Invalid json path to non-inner node")
         if point == 'end-address':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -9185,7 +9185,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['group-id'])))
         return yang.gdata.List(['group-id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['group-id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group_element(jd, path, op)])
@@ -9199,7 +9199,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'start-address', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group__start_address, child_start_address)
     child_end_address = yang.gdata.take_json_opt_str(jd, 'end-address')
     yang.gdata.maybe_add(children, 'end-address', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group__end_address, child_end_address)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_group_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -10576,7 +10576,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         _target_class_id = self.target_class_id
         if _target_class_id is not None:
             children['target-class-id'] = yang.gdata.Leaf('string', _target_class_id)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule_entry:
@@ -10629,7 +10629,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
     yang.gdata.maybe_add(children, 'match-application', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_application, child_match_application)
     child_target_class_id = yang.gdata.from_xml_opt_str(node, 'target-class-id')
     yang.gdata.maybe_add(children, 'target-class-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__target_class_id, child_target_class_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -10646,7 +10646,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -10660,7 +10660,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
             raise ValueError("Invalid json path to non-inner node")
         if point == 'target-class-id':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -10682,7 +10682,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['id'])))
         return yang.gdata.List(['id'], elements, user_order=True)
     elif len(path) > 1:
         return yang.gdata.List(['id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule_element(jd, path, op)], user_order=True)
@@ -10698,7 +10698,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'match-application', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_application, child_match_application)
     child_target_class_id = yang.gdata.take_json_opt_str(jd, 'target-class-id')
     yang.gdata.maybe_add(children, 'target-class-id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__target_class_id, child_target_class_id)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -11034,7 +11034,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         _bandwidth = self.bandwidth
         if _bandwidth is not None:
             children['bandwidth'] = _bandwidth.to_gdata()
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.class_id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class_entry:
@@ -11091,7 +11091,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
     yang.gdata.maybe_add(children, 'jitter', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__jitter, child_jitter)
     child_bandwidth = yang.gdata.from_xml_cnt(node, 'bandwidth')
     yang.gdata.maybe_add(children, 'bandwidth', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__bandwidth, child_bandwidth)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_class_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -11108,7 +11108,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['class-id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -11126,7 +11126,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
             children['jitter'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__jitter(jd, rest_path, op)
         if point == 'bandwidth':
             children['bandwidth'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__bandwidth(jd, rest_path, op)
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -11148,7 +11148,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['class-id'])))
         return yang.gdata.List(['class-id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['class-id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class_element(jd, path, op)])
@@ -11168,7 +11168,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'jitter', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__jitter, child_jitter)
     child_bandwidth = yang.gdata.take_json_cnt(jd, 'bandwidth')
     yang.gdata.maybe_add(children, 'bandwidth', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__bandwidth, child_bandwidth)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_class_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -11721,7 +11721,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         _metric = self.metric
         if _metric is not None:
             children['metric'] = yang.gdata.Leaf('uint16', _metric)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.target_site)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link_entry:
@@ -11770,7 +11770,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
     yang.gdata.maybe_add(children, 'target-site', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link__target_site, child_target_site)
     child_metric = yang.gdata.from_xml_opt_int(node, 'metric')
     yang.gdata.maybe_add(children, 'metric', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link__metric, child_metric)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_target_site)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -11787,7 +11787,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['target-site']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -11797,7 +11797,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         children['target-site'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link__target_site(keys[0])
         if point == 'metric':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -11819,7 +11819,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['target-site'])))
         return yang.gdata.List(['target-site'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['target-site'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link_element(jd, path, op)])
@@ -11831,7 +11831,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'target-site', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link__target_site, child_target_site)
     child_metric = yang.gdata.take_json_opt_int(jd, 'metric')
     yang.gdata.maybe_add(children, 'metric', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link__metric, child_metric)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_target_site)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -12081,7 +12081,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         _lan_tag = self.lan_tag
         if _lan_tag is not None:
             children['lan-tag'] = yang.gdata.Leaf('string', _lan_tag)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.lan), yang.gdata.yang_str(self.next_hop)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_entry:
@@ -12135,7 +12135,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
     yang.gdata.maybe_add(children, 'next-hop', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes__next_hop, child_next_hop)
     child_lan_tag = yang.gdata.from_xml_opt_str(node, 'lan-tag')
     yang.gdata.maybe_add(children, 'lan-tag', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes__lan_tag, child_lan_tag)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_lan), yang.gdata.yang_str(child_next_hop)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -12152,7 +12152,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['lan', 'next-hop']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -12163,7 +12163,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         children['next-hop'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes__next_hop(keys[1])
         if point == 'lan-tag':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -12185,7 +12185,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['lan', 'next-hop'])))
         return yang.gdata.List(['lan', 'next-hop'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['lan', 'next-hop'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_element(jd, path, op)])
@@ -12199,7 +12199,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'next-hop', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes__next_hop, child_next_hop)
     child_lan_tag = yang.gdata.take_json_opt_str(jd, 'lan-tag')
     yang.gdata.maybe_add(children, 'lan-tag', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes__lan_tag, child_lan_tag)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_lan), yang.gdata.yang_str(child_next_hop)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -12248,7 +12248,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         _lan_tag = self.lan_tag
         if _lan_tag is not None:
             children['lan-tag'] = yang.gdata.Leaf('string', _lan_tag)
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.lan), yang.gdata.yang_str(self.next_hop)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_entry:
@@ -12302,7 +12302,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
     yang.gdata.maybe_add(children, 'next-hop', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes__next_hop, child_next_hop)
     child_lan_tag = yang.gdata.from_xml_opt_str(node, 'lan-tag')
     yang.gdata.maybe_add(children, 'lan-tag', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes__lan_tag, child_lan_tag)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_lan), yang.gdata.yang_str(child_next_hop)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -12319,7 +12319,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['lan', 'next-hop']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -12330,7 +12330,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         children['next-hop'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes__next_hop(keys[1])
         if point == 'lan-tag':
             raise ValueError("Invalid json path to non-inner node")
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -12352,7 +12352,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['lan', 'next-hop'])))
         return yang.gdata.List(['lan', 'next-hop'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['lan', 'next-hop'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_element(jd, path, op)])
@@ -12366,7 +12366,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'next-hop', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes__next_hop, child_next_hop)
     child_lan_tag = yang.gdata.take_json_opt_str(jd, 'lan-tag')
     yang.gdata.maybe_add(children, 'lan-tag', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes__lan_tag, child_lan_tag)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_lan), yang.gdata.yang_str(child_next_hop)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -12655,7 +12655,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         _vrrp = self.vrrp
         if _vrrp is not None:
             children['vrrp'] = _vrrp.to_gdata()
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.type)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol_entry:
@@ -12712,7 +12712,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
     yang.gdata.maybe_add(children, 'rip', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__rip, child_rip)
     child_vrrp = yang.gdata.from_xml_opt_cnt(node, 'vrrp')
     yang.gdata.maybe_add(children, 'vrrp', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__vrrp, child_vrrp)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_type)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -12729,7 +12729,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['type']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -12747,7 +12747,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
             children['rip'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__rip(jd, rest_path, op)
         if point == 'vrrp':
             children['vrrp'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__vrrp(jd, rest_path, op)
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -12769,7 +12769,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['type'])))
         return yang.gdata.List(['type'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['type'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol_element(jd, path, op)])
@@ -12789,7 +12789,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'rip', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__rip, child_rip)
     child_vrrp = yang.gdata.take_json_opt_cnt(jd, 'vrrp')
     yang.gdata.maybe_add(children, 'vrrp', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__vrrp, child_vrrp)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_type)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -13059,7 +13059,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         _vpn_attachment = self.vpn_attachment
         if _vpn_attachment is not None:
             children['vpn-attachment'] = _vpn_attachment.to_gdata()
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.site_network_access_id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access_entry:
@@ -13128,7 +13128,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
     yang.gdata.maybe_add(children, 'availability', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__availability, child_availability)
     child_vpn_attachment = yang.gdata.from_xml_opt_cnt(node, 'vpn-attachment')
     yang.gdata.maybe_add(children, 'vpn-attachment', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment, child_vpn_attachment)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_site_network_access_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -13145,7 +13145,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['site-network-access-id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -13175,7 +13175,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
             children['availability'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__availability(jd, rest_path, op)
         if point == 'vpn-attachment':
             children['vpn-attachment'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment(jd, rest_path, op)
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -13197,7 +13197,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['site-network-access-id'])))
         return yang.gdata.List(['site-network-access-id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['site-network-access-id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access_element(jd, path, op)])
@@ -13229,7 +13229,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'availability', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__availability, child_availability)
     child_vpn_attachment = yang.gdata.take_json_opt_cnt(jd, 'vpn-attachment')
     yang.gdata.maybe_add(children, 'vpn-attachment', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment, child_vpn_attachment)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_site_network_access_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
@@ -13370,7 +13370,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site_entry(yang.adata.MNode):
         _site_network_accesses = self.site_network_accesses
         if _site_network_accesses is not None:
             children['site-network-accesses'] = _site_network_accesses.to_gdata()
-        return yang.gdata.Container(children, [yang.gdata.yang_str(self.site_id)])
+        return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site_entry:
@@ -13445,7 +13445,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site_element(node: xml.Node) 
     yang.gdata.maybe_add(children, 'routing-protocols', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols, child_routing_protocols)
     child_site_network_accesses = yang.gdata.from_xml_opt_cnt(node, 'site-network-accesses')
     yang.gdata.maybe_add(children, 'site-network-accesses', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses, child_site_network_accesses)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_site_id)])
+    return yang.gdata.Container(children)
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site(nodes: list[xml.Node]) -> yang.gdata.List:
     elements = []
@@ -13462,7 +13462,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site_element(jd: value,
         if op == "merge":
             return val
         elif op == "remove":
-            return yang.gdata.Absent(val.key)
+            return yang.gdata.Absent(val.key_children(['site-id']))
         raise ValueError("Invalid operation")
     elif len(path) > 1:
         keys = path[0].split(",")
@@ -13498,7 +13498,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site_element(jd: value,
             children['routing-protocols'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols(jd, rest_path, op)
         if point == 'site-network-accesses':
             children['site-network-accesses'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses(jd, rest_path, op)
-        return yang.gdata.Container(children, keys)
+        return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
 mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.List:
@@ -13520,7 +13520,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site(jd: value, path: l
         if op == "merge":
             elements.append(element)
         elif op == "remove":
-            elements.append(yang.gdata.Absent(element.key))
+            elements.append(yang.gdata.Absent(element.key_children(['site-id'])))
         return yang.gdata.List(['site-id'], elements)
     elif len(path) > 1:
         return yang.gdata.List(['site-id'], [from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site_element(jd, path, op)])
@@ -13558,7 +13558,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site_element(jd: dict[str, ?
     yang.gdata.maybe_add(children, 'routing-protocols', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols, child_routing_protocols)
     child_site_network_accesses = yang.gdata.take_json_opt_cnt(jd, 'site-network-accesses')
     yang.gdata.maybe_add(children, 'site-network-accesses', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses, child_site_network_accesses)
-    return yang.gdata.Container(children, [yang.gdata.yang_str(child_site_id)])
+    return yang.gdata.Container(children)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site(jd: list[dict[str, ?value]]) -> yang.gdata.List:
     elements = []
