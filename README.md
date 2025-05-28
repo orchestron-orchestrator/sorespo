@@ -367,7 +367,7 @@ effectively get 30 hours per month.
 
 Start your Codespace here:
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/orchestron-orchestrator/respnet/tree/notconf?quickstart=1&devcontainer_path=.devcontainer%2Fdocker-in-docker%2Fdevcontainer.json)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/orchestron-orchestrator/sorespo/tree/notconf?quickstart=1&devcontainer_path=.devcontainer%2Fdocker-in-docker%2Fdevcontainer.json)
 
 Setting up a fresh VM will take a couple of minutes. After is it done you have
 access to VS Code running in Dev Container with all the tools and source code
