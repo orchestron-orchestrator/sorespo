@@ -7,7 +7,6 @@ import net
 import xml
 
 import orchestron.device as odev
-#import orchestron.ttt as ttt
 import orchestron.ttt as ttt
 import yang.adata
 import yang.gdata
@@ -22,6 +21,14 @@ import respnet.layers.y_1
 import respnet.layers.y_2
 import respnet.layers.y_3
 
+import respnet.layers.y_0_loose
+import respnet.layers.y_1_loose
+import respnet.layers.y_2_loose
+import respnet.layers.y_3_loose
+
+from respnet.devices.CiscoIosXr_24_1_ncs55a1 import root as xr24
+from respnet.devices.JuniperCRPD_23_4R1_9 import root as crpd23
+
 import testing
 
 def optional_str[T](v: ?T, default: str = "None") -> str:
@@ -35,6 +42,24 @@ def rfs_for_device(dev):
             })
         ])
     })
+
+def adata_for_layer(layer, gdata):
+    if layer == 0:
+        return respnet.layers.y_0_loose.root.from_gdata(gdata)
+    elif layer == 1:
+        return respnet.layers.y_1_loose.root.from_gdata(gdata)
+    elif layer == 2:
+        return respnet.layers.y_2_loose.root.from_gdata(gdata)
+    elif layer == 3:
+        # Layer 3 (device) is a bit special, in that there is more than one adata tree:
+        # 1. The device manager, defined in orchestron-device.yang
+        # 2. The device configuration, defined in the device's own YANG model
+        # The contents of layer 3 (gdata) is a combination of both, but to
+        # reconstruct adata, we must pick whether we want the internal device
+        # manager or the device configuration. Here we return the device manager tree.
+        return respnet.layers.y_3_loose.root.from_gdata(gdata)
+    else:
+        raise ValueError("Invalid layer: %d" % layer)
 
 actor main(env):
     rfcap = file.ReadFileCap(file.FileCap(env.cap))
@@ -136,6 +161,25 @@ actor main(env):
                         txt += "}"
                         respond(200, {}, txt)
                         return
+                    if path_elements[3] == 'adata':
+                        modset, _ = dev.get_modules()
+                        if "Cisco-IOS-XR-um-hostname-cfg" in modset:
+                            session = cfs.newsession()
+                            device_layer = session.below().below().below().get()
+                            device_entry = device_layer.get_container("devices").get_list("device").get_list_entry(dev_name)
+                            config = device_entry.get_container("config")
+                            config_ad = xr24.from_gdata(config)
+                            respond(200, {}, config_ad.prsrc())
+                            return
+                        if "http://xml.juniper.net/netconf/junos/1.0" in modset or "junos-conf-root" in modset:
+                            session = cfs.newsession()
+                            device_layer = session.below().below().below().get()
+                            device_entry = device_layer.get_container("devices").get_list("device").get_list_entry(dev_name)
+                            config = device_entry.get_container("config")
+                            config_ad = crpd23.from_gdata(config)
+                            respond(200, {}, config_ad.prsrc())
+                            return
+
                     respond(404, {}, "Not found")
                     return
                 except Exception as e:
@@ -145,6 +189,10 @@ actor main(env):
                 try:
                     session = cfs.newsession()
                     layer_idx = int(path_elements[2])
+                except ValueError:
+                    respond(400, {}, "Bad request, layer index must be an integer")
+                    return
+                else:
                     if layer_idx > 3:
                         respond(404, {}, "Unknown layer")
                         return
@@ -156,10 +204,10 @@ actor main(env):
                         content = layer_config.to_json()
                     if request.headers.get("accept") == "application/yang-data+xml":
                         content = layer_config.to_xmlstr()
+                    if request.headers.get("accept") == "application/adata+text":
+                        adata = adata_for_layer(layer_idx, layer_config)
+                        content = adata.prsrc()
                     respond(200, {}, content)
-                    return
-                except ValueError:
-                    respond(400, {}, "Bad request, layer index must be an integer")
                     return
             else:
                 respond(404, {}, "Not found")

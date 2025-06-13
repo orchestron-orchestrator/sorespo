@@ -58,6 +58,10 @@ get-config0 get-config1 get-config2 get-config3:
 get-config-json0 get-config-json1 get-config-json2 get-config-json3:
 	@curl -H "Accept: application/yang-data+json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/layer/$(subst get-config-json,,$@)
 
+.PHONY: get-config-adata0 get-config-adata1 get-config-adata2 get-config-adata3
+get-config-adata0 get-config-adata1 get-config-adata2 get-config-adata3:
+	@curl -H "Accept: application/adata+text" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/layer/$(subst get-config-adata,,$@)
+
 .PHONY: delete-config
 delete-config:
 	curl -X DELETE http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/netinfra:netinfra/routers=STO-CORE-1
