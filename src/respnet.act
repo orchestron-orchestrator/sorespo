@@ -106,9 +106,7 @@ actor main(env):
             # GET /tmf-api/serviceOrdering/v4/serviceOrder/{id}
             if request.method == "GET":
                 if len(path_elements) == 5 and path_elements[2] == "serviceOrdering" and path_elements[3] == "v4" and path_elements[4] == "serviceOrder":
-                    res = []
-                    for so in tmf_store.get_service_orders():
-                        res.append(so.to_json())
+                    res = [so.to_json() for so in tmf_store.get_service_orders()]
                     respond(200, {}, json.encode({"items": res}))
                     return
 

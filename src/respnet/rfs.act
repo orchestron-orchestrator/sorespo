@@ -13,10 +13,7 @@ CRPD = True
 
 def prefix_length_to_netmask(prefix_length):
     binary_netmask = ("1" * prefix_length).ljust(32, "0")
-    octets = []
-    for i in range(0, 32, 8):
-        bit = int(binary_netmask[i:i + 8], 2)
-        octets.append(bit)
+    octets = [int(binary_netmask[i:i + 8], 2) for i in range(0, 32, 8)]
     return ".".join(map(str, octets))
 
 
@@ -39,9 +36,7 @@ class BaseConfig(base.BaseConfig):
         # then join to form a long string '123045067008'
         # and split the long string into '1230.4506.7008' to be used in the final net_clns_address
 
-        padded_split = []
-        for v in i.ipv4_address.split('.'):
-            padded_split.append("%03d" % int(v))
+        padded_split = ["%03d" % int(v) for v in i.ipv4_address.split('.')]
         #padded_split = map(lambda v: "%03d" % int(v), i.ipv4_address.split('.'))
         join_str = ''.join(padded_split)
         net_clns_address = '49.0001.' + join_str[0:4] + '.' + join_str[4:8] + '.' + join_str[8:] + '.00'
