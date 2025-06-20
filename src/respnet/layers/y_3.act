@@ -88,11 +88,9 @@ class orchestron_device__devices__device(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.List) -> list[orchestron_device__devices__device_entry]:
-        res = []
         if n is not None:
-            for e in n.elements:
-                res.append(orchestron_device__devices__device_entry.from_gdata(e))
-        return res
+            return [orchestron_device__devices__device_entry.from_gdata(e) for e in n.elements]
+        return []
 
 
 mut def from_xml_orchestron_device__devices__device_element(node: xml.Node) -> yang.gdata.Node:
@@ -104,9 +102,7 @@ mut def from_xml_orchestron_device__devices__device_element(node: xml.Node) -> y
     return yang.gdata.Container(children)
 
 mut def from_xml_orchestron_device__devices__device(nodes: list[xml.Node]) -> yang.gdata.List:
-    elements = []
-    for e in nodes:
-        elements.append(from_xml_orchestron_device__devices__device_element(e))
+    elements = [from_xml_orchestron_device__devices__device_element(e) for e in nodes]
     return yang.gdata.List(keys=['name'], elements=elements)
 
 mut def from_json_path_orchestron_device__devices__device_element(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.Node:
@@ -165,10 +161,7 @@ mut def from_json_orchestron_device__devices__device_element(jd: dict[str, ?valu
     return yang.gdata.Container(children)
 
 mut def from_json_orchestron_device__devices__device(jd: list[dict[str, ?value]]) -> yang.gdata.List:
-    elements = []
-    for e in jd:
-        if isinstance(e, dict):
-            elements.append(from_json_orchestron_device__devices__device_element(e))
+    elements = [from_json_orchestron_device__devices__device_element(e) for e in jd if isinstance(e, dict)]
     return yang.gdata.List(keys=['name'], elements=elements)
 
 class orchestron_device__devices(yang.adata.MNode):
