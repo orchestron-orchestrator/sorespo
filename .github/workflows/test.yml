@@ -67,6 +67,12 @@ jobs:
           name: respnet-${{ matrix.ARCH }}
           path: out/bin/
       - run: chmod a+x out/bin/respnet
+      - name: "Check out licenses repo"
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/licenses
+          path: licenses
+          ssh-key: ${{ secrets.LICENSES_PRIVATE_KEY }}
       # If we're using IMAGE_PATH=ghcr.io/... login to ghcr.io using GITHUB_TOKEN
       # TODO: what about other (external) registries that require login?
       - name: Login to ghcr.io

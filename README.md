@@ -373,3 +373,26 @@ Setting up a fresh VM will take a couple of minutes. After is it done you have
 access to VS Code running in Dev Container with all the tools and source code
 available in your browser. There is no need to clone the project repository,
 just follow the Getting started guide.
+
+### Network Device Container Images
+
+The testenvs including containerized routers (Juniper cRPD, Cisco IOS XRd) use
+licensed container images. We are not allowed to distribute the images or the
+license files. Please seek out access to the images and licenses through
+appropriate channels.
+
+You may override the container image path by setting the `IMAGE_PATH`
+environment variable to a prefix pointing to a private registry hosting the
+container images. For example, if your Juniper cRPD exists in
+`registry.example.org/containerlab/crpd:24.4R1.9`, then set the environment
+variable `export IMAGE_PATH=registry.example.org/containerlab/`. Or if your
+images only exist locally on your machine without a registry prefix, set the
+environment variable `export IMAGE_PATH=`.
+
+Juniper cRPD also requires a license file. The following options are available
+for exposing the license file to Containerlab:
+1. Place the license in `licenses/juniper_crpd24.lic` in the project root.
+2. Place the license in `../licenses/juniper_crpd24.lic` relative to the
+   project root (sibling directory).
+3. If neither are found, the script will attempt to clone a sibling git
+   repository from the same group / organization.
