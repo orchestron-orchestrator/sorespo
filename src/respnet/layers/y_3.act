@@ -45,12 +45,12 @@ class orchestron_device__devices__device_entry(yang.adata.MNode):
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
         if top:
-            res.append(f'# Top node: /devices/device')
-            res.append(f'{self_name} = orchestron_device__devices__device({repr(self.name)})')
+            res.append('# Top node: /devices/device')
+            res.append('{self_name} = orchestron_device__devices__device({repr(self.name)})')
         leaves = []
         _modset_id = self.modset_id
         if _modset_id is not None:
-            leaves.append(f'{self_name}.modset_id = {repr(_modset_id)}')
+            leaves.append('{self_name}.modset_id = {repr(_modset_id)}')
         if leaves:
             if not list_element:
                res = ['', '# Container: /devices/device'] + leaves + res
@@ -187,16 +187,16 @@ class orchestron_device__devices(yang.adata.MNode):
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
         if top:
-            res.append(f'# Top node: /devices')
-            res.append(f'{self_name} = orchestron_device__devices()')
+            res.append('# Top node: /devices')
+            res.append('{self_name} = orchestron_device__devices()')
         leaves = []
         _device = self.device
         for _element in _device.elements:
             res.append('')
             res.append("# List /devices/device element: {_element.to_gdata().key_str(['name'])}")
-            list_elem = f'device_element = {self_name}.device.create({repr(_element.name)})'
+            list_elem = 'device_element = {self_name}.device.create({repr(_element.name)})'
             res.append(list_elem)
-            res.extend(_element.prsrc(f'device_element', False, list_element=True).splitlines())
+            res.extend(_element.prsrc('device_element', False, list_element=True).splitlines())
         if leaves:
             if not list_element:
                res = ['', '# Container: /devices'] + leaves + res
@@ -257,12 +257,12 @@ class root(yang.adata.MNode):
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
         if top:
-            res.append(f'# Top node: /root')
-            res.append(f'{self_name} = root()')
+            res.append('# Top node: /root')
+            res.append('{self_name} = root()')
         leaves = []
         _devices = self.devices
         if _devices is not None:
-            res.extend(_devices.prsrc(f'{self_name}.devices', False).splitlines())
+            res.extend(_devices.prsrc('{self_name}.devices', False).splitlines())
         if leaves:
             if not list_element:
                res = ['', '# Container: /root'] + leaves + res

@@ -29,3 +29,8 @@ gen:
 .PHONY: gen-ldep
 gen-ldep:
 	$(MAKE) gen DEP_OVERRIDES="--dep netconf=../../netconf --dep orchestron=../../orchestron --dep yang=../../acton-yang"
+
+.PHONY: pkg-upgrade
+pkg-upgrade:
+	acton pkg upgrade
+	cd gen && acton pkg upgrade
