@@ -164,16 +164,16 @@ actor main(env):
                         if "Cisco-IOS-XR-um-hostname-cfg" in modset:
                             session = cfs.newsession()
                             device_layer = session.below().below().below().get()
-                            device_entry = device_layer.get_container("devices").get_list("device").get_list_entry(dev_name)
-                            config = device_entry.get_container("config")
+                            device_entry = device_layer.get_cnt("devices").get_list("device").get_list_entry(dev_name)
+                            config = device_entry.get_cnt("config")
                             config_ad = xr24.from_gdata(config)
                             respond(200, {}, config_ad.prsrc())
                             return
                         if "http://xml.juniper.net/netconf/junos/1.0" in modset or "junos-conf-root" in modset:
                             session = cfs.newsession()
                             device_layer = session.below().below().below().get()
-                            device_entry = device_layer.get_container("devices").get_list("device").get_list_entry(dev_name)
-                            config = device_entry.get_container("config")
+                            device_entry = device_layer.get_cnt("devices").get_list("device").get_list_entry(dev_name)
+                            config = device_entry.get_cnt("config")
                             config_ad = crpd23.from_gdata(config)
                             respond(200, {}, config_ad.prsrc())
                             return

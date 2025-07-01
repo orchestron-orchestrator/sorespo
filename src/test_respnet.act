@@ -381,10 +381,10 @@ def _test_l3vpn_svc_json(t: testing.AsyncT):
 def _test_l3vpn_svc_adata(t: testing.AsyncT):
     def adata_formatter(n: gdata.Node) -> str:
         res = {}
-        device_list = n.get_container("devices").get_list("device")
+        device_list = n.get_cnt("devices").get_list("device")
         # We must sort the elements to ensure the output is deterministic
         for device_entry in gdata.sorted_elements(device_list.elements, device_list.keys):
-            config = device_entry.get_container("config")
+            config = device_entry.get_cnt("config")
             device_name = str(device_entry.get_leaf("name").val)
             if device_name == "AMS-CORE-1" or device_name == "FRA-CORE-1":
                 config_ad = xr24.from_gdata(config)
