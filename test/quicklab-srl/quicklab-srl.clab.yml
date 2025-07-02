@@ -1,0 +1,85 @@
+name: respnet-quicklab-srl
+# The prefix is prepended to container node names. We override the default
+# "clab-<lab-name>-" prefix here by using the "__lab-name" magic value.
+# Containerlab replaces it with the lab name defined above. This ensures we're
+# creating unique containers for each instance of the lab based on the same
+# topology (=testenv).
+prefix: __lab-name
+
+mgmt:
+  network: respnet-quicklab-srl
+  ipv4-subnet: auto
+  ipv6-subnet: auto
+
+topology:
+  kinds:
+    nokia_srlinux:
+      image: ghcr.io/nokia/srlinux:25.3.2
+      image-pull-policy: if-not-present
+      startup-config: srl-startup.conf
+    linux:
+      image: quay.io/frrouting/frr:10.3.1
+      image-pull-policy: if-not-present
+  nodes:
+    ams-core-1:
+      kind: nokia_srlinux
+    fra-core-1:
+      kind: nokia_srlinux
+    sto-core-1:
+      kind: nokia_srlinux
+    lju-core-1:
+      kind: nokia_srlinux
+    cust-1:
+      kind: linux
+      binds:
+        - cust-1-frr.conf:/etc/frr/frr.conf
+        - frr-daemons.conf:/etc/frr/daemons
+      exec:
+        - ip link set dev eth1 address 00:C1:AB:00:01:01
+        - ip link set dev eth0 down
+        - touch /etc/frr/vtysh.conf
+    cust-2:
+      kind: linux
+      binds:
+        - cust-2-frr.conf:/etc/frr/frr.conf
+        - frr-daemons.conf:/etc/frr/daemons
+      exec:
+        - ip link set dev eth1 address 00:C1:AB:00:01:01
+        - ip link set dev eth0 down
+        - touch /etc/frr/vtysh.conf
+    cust-3:
+      kind: linux
+      binds:
+        - cust-3-frr.conf:/etc/frr/frr.conf
+        - frr-daemons.conf:/etc/frr/daemons
+      exec:
+        - ip link set dev eth1 address 00:C1:AB:00:01:01
+        - ip link set dev eth0 down
+        - touch /etc/frr/vtysh.conf
+    cust-4:
+      kind: linux
+      binds:
+        - cust-4-frr.conf:/etc/frr/frr.conf
+        - frr-daemons.conf:/etc/frr/daemons
+      exec:
+        - ip link set dev eth1 address 00:C1:AB:00:01:01
+        - ip link set dev eth0 down
+        - touch /etc/frr/vtysh.conf
+    otron:
+      kind: linux
+      image: respnet-otron-base
+      image-pull-policy: if-not-present
+      ports:
+        - "80/tcp"
+        - "830/tcp"
+
+  links:
+    - endpoints: ["ams-core-1:e1-1", "fra-core-1:e1-1"]
+    - endpoints: ["ams-core-1:e1-2", "sto-core-1:e1-1"]
+    - endpoints: ["fra-core-1:e1-2", "sto-core-1:e1-2"]
+    - endpoints: ["fra-core-1:e1-3", "lju-core-1:e1-1"]
+    - endpoints: ["sto-core-1:e1-3", "lju-core-1:e1-2"]
+    - endpoints: ["ams-core-1:e1-3", "cust-1:eth1"]
+    - endpoints: ["fra-core-1:e1-4", "cust-2:eth1"]
+    - endpoints: ["sto-core-1:e1-4", "cust-3:eth1"]
+    - endpoints: ["lju-core-1:e1-3", "cust-4:eth1"]
