@@ -28,6 +28,7 @@ import respnet.layers.y_3_loose
 
 from respnet.devices.CiscoIosXr_24_1_ncs55a1 import root as xr24
 from respnet.devices.JuniperCRPD_23_4R1_9 import root as crpd23
+from respnet.devices.NokiaSRLinux_25_3_2 import root as srl25
 
 import testing
 
@@ -177,6 +178,14 @@ actor main(env):
                             config_ad = crpd23.from_gdata(config)
                             respond(200, {}, config_ad.prsrc())
                             return
+                        if "urn:nokia.com:srlinux:general:system" in modset:
+                            session = cfs.newsession()
+                            device_layer = session.below().below().below().get()
+                            device_entry = device_layer.get_cnt("devices").get_list("device").get_list_entry(dev_name)
+                            config = device_entry.get_cnt("config")
+                            config_ad = srl25.from_gdata(config)
+                            respond(200, {}, config_ad.prsrc())
+                            return     
 
                     respond(404, {}, "Not found")
                     return

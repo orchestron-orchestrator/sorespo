@@ -8,6 +8,7 @@ import respnet.layers.base_2 as base
 
 import respnet.devices.CiscoIosXr_24_1_ncs55a1 as xr24
 import respnet.devices.JuniperCRPD_23_4R1_9 as crpd23
+import respnet.devices.NokiaSRLinux_25_3_2 as srl25
 
 CRPD = True
 
@@ -114,6 +115,12 @@ end-policy"""
             g1.authentication_key = i.ibgp_authentication_key
 
             return dev
+            
+        elif "srl_nokia-system" in di.modules:
+            print("RFS /rfs{{{di.name}}}/base-config transform for Nokia SRLinux", err=True)
+            dev = srl25.root()
+            dev.system.name.host_name = di.name
+            return dev
 
         raise UnsupportedDevice()
 
@@ -179,6 +186,12 @@ class BBInterface(base.BBInterface):
 
             return dev
 
+        elif "srl_nokia-system" in di.modules:
+            print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}] for Nokia SRLinux", err=True)
+            dev = srl25.root()
+
+            return dev
+
         raise UnsupportedDevice()
 
 
@@ -201,6 +214,12 @@ class IbgpNeighbor(base.IbgpNeighbor):
             g = bgp.group.create("IPV4-IBGP")
             n = g.neighbor.create(i.address)
             n.description = i.description
+            return dev
+
+        elif "srl_nokia-system" in di.modules:
+            print("RFS /rfs{{di.name}}/ibgp-neighbor transform running {i.address} for Nokia SRLinux", err=True)
+            dev = srl25.root()
+
             return dev
 
         raise UnsupportedDevice()
@@ -240,6 +259,12 @@ class Vrf(base.Vrf):
             group.passive = True
             # group.import_.append("ACCEPT")
             # group.export.append("ACCEPT")
+
+            return dev
+
+        elif "srl_nokia-system" in di.modules:
+            print("RFS /rfs{{{di.name}}}/vrf transform running {i.name} for Nokia SRLinux", err=True)
+            dev = srl25.root()
 
             return dev
 
@@ -292,6 +317,12 @@ class VrfInterface(base.VrfInterface):
             ri.interface.create(i.name)
             return dev
 
+        elif "srl_nokia-system" in di.modules:
+            print("RFS /rfs{{{di.name}}}/vrf-interface transform running {i.name} for Nokia SRLinux", err=True)
+            dev = srl25.root()
+
+            return dev
+
         raise UnsupportedDevice()
 
 class EbgpCustomer(base.EbgpCustomer):
@@ -333,6 +364,12 @@ class EbgpCustomer(base.EbgpCustomer):
             neighbor.authentication_key = i.authentication_key
             neighbor.peer_as = str(i.peer_asn)
             neighbor.as_override = True
+
+            return dev
+
+        elif "srl_nokia-system" in di.modules:
+            print("RFS /rfs{{{di.name}}}/ebgp-customer transform running {i.address} for Nokia SRLinux", err=True)
+            dev = srl25.root()
 
             return dev
 
