@@ -26,8 +26,7 @@ import respnet.layers.y_1_loose
 import respnet.layers.y_2_loose
 import respnet.layers.y_3_loose
 
-from respnet.devices.CiscoIosXr_24_1_ncs55a1 import root as xr24
-from respnet.devices.JuniperCRPD_23_4R1_9 import root as crpd23
+import respnet.sysspec
 
 import testing
 
@@ -146,7 +145,9 @@ actor main(env):
         if request.method == "GET":
             if len(path_elements) > 3 and path_elements[1] == "device":
                 try:
-                    dev_name = path_elements[2]
+                    # We use upper case for device names in our configs
+                    # TODO: maybe we should somehow normalize that?!
+                    dev_name = path_elements[2].upper()
                     dev = dev_mgr.get(dev_name)
                     if path_elements[3] == "capabilities":
                         respond(200, {}, str(dev.get_capabilities()))
@@ -159,28 +160,30 @@ actor main(env):
                         txt += r"}"
                         respond(200, {}, txt)
                         return
-                    if path_elements[3] == 'adata':
+                    if path_elements[3] == 'running':
                         modset, _ = dev.get_modules()
+                        device_type = None
                         if "Cisco-IOS-XR-um-hostname-cfg" in modset:
+                            device_type = respnet.sysspec.device_types["CiscoIosXr_24_1_ncs55a1"]
+                        elif "http://xml.juniper.net/netconf/junos/1.0" in modset or "junos-conf-root" in modset:
+                            device_type = respnet.sysspec.device_types["JuniperCRPD_23_4R1_9"]
+                        if device_type is not None:
                             session = cfs.newsession()
                             device_layer = session.below().below().below().get()
                             device_entry = device_layer.get_cnt("devices").get_list("device").get_list_entry(dev_name)
-                            config = device_entry.get_cnt("config")
-                            config_ad = xr24.from_gdata(config)
-                            respond(200, {}, config_ad.prsrc())
-                            return
-                        if "http://xml.juniper.net/netconf/junos/1.0" in modset or "junos-conf-root" in modset:
-                            session = cfs.newsession()
-                            device_layer = session.below().below().below().get()
-                            device_entry = device_layer.get_cnt("devices").get_list("device").get_list_entry(dev_name)
-                            config = device_entry.get_cnt("config")
-                            config_ad = crpd23.from_gdata(config)
-                            respond(200, {}, config_ad.prsrc())
+                            config_gd = device_entry.get_cnt("config")
+                            if request.headers.get("accept") == "application/adata+text":
+                                config_ad = device_type.from_gdata(config_gd)
+                                response = config_ad.prsrc()
+                            else:
+                                response = config_gd.to_xmlstr()
+                            respond(200, {"Content-type": request.headers.get_def("accept", "application/xml+text")}, response)
                             return
 
                     respond(404, {}, "Not found")
                     return
                 except Exception as e:
+                    log.error(str(e))
                     respond(404, {}, "Not found")
                     return
             elif len(path_elements) == 3 and path_elements[1] == "layer":

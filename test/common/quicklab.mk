@@ -85,6 +85,14 @@ get-config-json0 get-config-json1 get-config-json2 get-config-json3:
 get-config-adata0 get-config-adata1 get-config-adata2 get-config-adata3:
 	@curl -H "Accept: application/adata+text" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/layer/$(subst get-config-adata,,$@)
 
+.PHONY: $(addprefix get-running-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+$(addprefix get-running-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
+	@curl $(HEADERS) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/device/$(subst get-running-,,$@)/running
+
+.PHONY: $(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+$(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
+	@$(MAKE) HEADERS="-H \"Accept: application/adata+text\"" $(subst adata-,,$@)
+
 .PHONY: delete-config
 delete-config:
 	curl -X DELETE http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/netinfra:netinfra/routers=STO-CORE-1
