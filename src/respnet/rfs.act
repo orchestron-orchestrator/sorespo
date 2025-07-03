@@ -120,6 +120,22 @@ end-policy"""
             print("RFS /rfs{{{di.name}}}/base-config transform for Nokia SRLinux", err=True)
             dev = srl25.root()
             dev.system.name.host_name = di.name
+            index = dev.interface.create("system0").subinterface.create(0)
+            index.ipv4.admin_state = "enable"
+            index.ipv4.address.create("{i.ipv4_address}/32")
+
+            # IS-IS global config
+            ni = dev.network_instance.create("default")
+            ni.interface.create("system0.0")
+            isis = ni.protocols.create_isis()
+            instance = isis.instance.create("quicklab")
+            instance.level_capability = "L2"
+            instance.net = [ net_clns_address ]
+            instance.ipv4_unicast.admin_state = "enable"
+            ii = instance.interface.create("system0.0")
+            ii.admin_state = "enable"
+            ii.passive = True
+
             return dev
 
         raise UnsupportedDevice()
