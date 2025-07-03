@@ -130,7 +130,9 @@ end-policy"""
             isis = ni.protocols.create_isis()
             instance = isis.instance.create("quicklab")
             instance.level_capability = "L2"
-            instance.net = [ net_clns_address ]
+            # instance.net = [ net_clns_address ]
+            # Temporarily hardcoded NET until leaf-list merges get fixed
+            instance.net = [ "49.0001.0100.0000.0003.00" ]
             instance.ipv4_unicast.admin_state = "enable"
             ii = instance.interface.create("system0.0")
             ii.admin_state = "enable"
@@ -205,6 +207,32 @@ class BBInterface(base.BBInterface):
         elif "srl_nokia-system" in di.modules:
             print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}] for Nokia SRLinux", err=True)
             dev = srl25.root()
+
+            # Create the interface
+            ni = dev.network_instance.create("default")
+            intf = dev.interface.create(i.name)
+            intf.description = "Link to {i.remote.device} [{i.remote.interface}]"
+            subif = intf.subinterface.create(0)
+            subif.admin_state = "enable"
+            subif.description = "Link to {i.remote.device} [{i.remote.interface}]"
+            subif.ipv4.admin_state = "enable"
+            ipv4_address = i.ipv4_address
+            if ipv4_address != None:
+                subif.ipv4.address.create("%s/%s" % (ipv4_address, str(i.ipv4_prefix_length)))
+
+            # Add interface to network-instance
+            ni.interface.create("%s.0" % i.name)
+
+            # IS-IS config for this interface
+            isis = ni.protocols.create_isis()
+            instance = isis.instance.create("quicklab")
+            # Temporarily hardcoded NET until leaf-list merges get fixed
+            instance.net = [ "49.0001.0100.0000.0003.00" ]
+            isis_intf = instance.interface.create("%s.0" % i.name)
+            isis_intf.admin_state = "enable"
+            isis_intf.circuit_type = "point-to-point"
+            il2 = isis_intf.level.create(2)
+            il2.metric = 5000
 
             return dev
 
