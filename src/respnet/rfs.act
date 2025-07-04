@@ -138,6 +138,18 @@ end-policy"""
             ii.admin_state = "enable"
             ii.passive = True
 
+            # BGP global config
+            bgp = ni.protocols.create_bgp()
+            bgp.autonomous_system = i.asn
+            bgp.router_id = i.ipv4_address
+
+            # Create neighbor-group: IPV4-IBGP
+            group = bgp.group.create("IPV4-IBGP")
+            ipv4_afi = bgp.afi_safi.create("ipv4-unicast")
+            ipv4_afi.admin_state = "enable"
+            evpn_afi = group.afi_safi.create("evpn")
+            evpn_afi.admin_state = "enable"
+
             return dev
 
         raise UnsupportedDevice()
@@ -263,7 +275,11 @@ class IbgpNeighbor(base.IbgpNeighbor):
         elif "srl_nokia-system" in di.modules:
             print("RFS /rfs{{di.name}}/ibgp-neighbor transform running {i.address} for Nokia SRLinux", err=True)
             dev = srl25.root()
-
+            bgp = dev.network_instance.create("default").protocols.create_bgp()
+            group = bgp.group.create("IPV4-IBGP")
+            neighbor = bgp.neighbor.create(i.address)
+            neighbor.admin_state = "enable"
+            neighbor.peer_group = "IPV4-IBGP"
             return dev
 
         raise UnsupportedDevice()
@@ -309,6 +325,42 @@ class Vrf(base.Vrf):
         elif "srl_nokia-system" in di.modules:
             print("RFS /rfs{{{di.name}}}/vrf transform running {i.name} for Nokia SRLinux", err=True)
             dev = srl25.root()
+
+            # Create the VRF
+            ni = dev.network_instance.create(i.name)
+            ni.type = "ip-vrf"
+            ni.admin_state = "enable"
+
+            # VXLAN interface
+            tunnel_if = dev.tunnel_interface.create("vxlan1")
+            vxlan_if = tunnel_if.vxlan_interface.create(i.id)
+            vxlan_if.type = "routed"
+            vxlan_if.ingress.vni = i.id
+            vxlan_if_name = "vxlan1.{i.id}"
+            ni.vxlan_interface.create(vxlan_if_name)
+
+            # BGP-VPN protocol
+            bgp_vpn = ni.protocols.create_bgp_vpn()
+            bgp_vpn_instance = bgp_vpn.bgp_instance.create(1)
+            bgp_vpn_instance.route_target.export_rt = "target:{i.asn}:{i.id}"
+            bgp_vpn_instance.route_target.import_rt = "target:{i.asn}:{i.id}"
+
+            # BGP-EVPN protocol
+            bgp_evpn = ni.protocols.create_bgp_evpn()
+            bgp_instance = bgp_evpn.bgp_instance.create(1)
+            bgp_instance.admin_state = "enable"
+            bgp_instance.vxlan_interface = vxlan_if_name
+            bgp_instance.evi = i.id
+
+            # BGP protocol
+            bgp = ni.protocols.create_bgp()
+            bgp.autonomous_system = i.asn
+            bgp.ebgp_default_policy.import_reject_all = False
+            bgp.ebgp_default_policy.export_reject_all = False
+            afi = bgp.afi_safi.create("ipv4-unicast")
+            afi.admin_state = "enable"
+            group = bgp.group.create("customer")
+            group.send_default_route.ipv4_unicast = True
 
             return dev
 
@@ -365,6 +417,25 @@ class VrfInterface(base.VrfInterface):
             print("RFS /rfs{{{di.name}}}/vrf-interface transform running {i.name} for Nokia SRLinux", err=True)
             dev = srl25.root()
 
+            # Create the main interface
+            intf = dev.interface.create(main_intf)
+            intf.admin_state = "enable"
+
+            # Create the subinterface
+            subif = intf.subinterface.create(int(vlan_id))
+            subif.admin_state = "enable"
+            subif.description = i.description
+
+            # Configure IPv4 address if present
+            ipv4_address = i.ipv4_address
+            if ipv4_address != None:
+                subif.ipv4.admin_state = "enable"
+                subif.ipv4.address.create("%s/%s" % (ipv4_address, str(i.ipv4_prefix_length)))
+
+            # Add interface to the correct network-instance (VRF)
+            ni = dev.network_instance.create(i.vrf)
+            ni.interface.create("%s.%s" % (main_intf, vlan_id))
+
             return dev
 
         raise UnsupportedDevice()
@@ -414,6 +485,13 @@ class EbgpCustomer(base.EbgpCustomer):
         elif "srl_nokia-system" in di.modules:
             print("RFS /rfs{{{di.name}}}/ebgp-customer transform running {i.address} for Nokia SRLinux", err=True)
             dev = srl25.root()
+            ni = dev.network_instance.create(i.vrf)
+
+            # Neighbor config
+            bgp = ni.protocols.create_bgp()
+            neighbor = bgp.neighbor.create(i.address)
+            neighbor.peer_as = i.peer_asn
+            neighbor.peer_group = "customer"
 
             return dev
 

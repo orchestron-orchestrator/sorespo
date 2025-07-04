@@ -1,0 +1,44 @@
+module srl_nokia-system-protocols {
+  yang-version 1.1;
+  namespace "urn:nokia.com:srlinux:general:system-protocols";
+  prefix srl_nokia-system-protocols;
+
+  import srl_nokia-system {
+    prefix srl_nokia-system;
+  }
+  import srl_nokia-features {
+    prefix srl_nokia-feat;
+  }
+
+  organization
+    "Nokia";
+  contact
+    "Nokia SR Linux Support
+     Web: <http://www.nokia.com>";
+  description
+    "This yang file models system-wide protocol configuration and state.";
+
+  revision 2025-03-31 {
+    description
+      "SRLinux 2025.3.1";
+  }
+  revision 2023-07-31 {
+    description
+      "SRLinux 23.7.1";
+  }
+
+  grouping system-protocols-top {
+    description
+      "Top-level grouping for system-wide protocol configuration and state.";
+    container protocols {
+      description
+        "The routing protocols that are supported by the system";
+    }
+  }
+
+  augment "/srl_nokia-system:system" {
+    uses system-protocols-top {
+      if-feature "not srl_nokia-feat:platform-imgmt";
+    }
+  }
+}
