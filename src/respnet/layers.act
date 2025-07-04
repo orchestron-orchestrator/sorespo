@@ -9,14 +9,13 @@ import orchestron.ttt as ttt
 import yang.adata
 import yang.gdata
 
-import respnet.layers.t_0
-import respnet.layers.t_1
-import respnet.layers.t_2
 import respnet.layers.t_3
+import respnet.layers.t_2
+import respnet.layers.t_1
+import respnet.layers.t_0
 def get_layers(dev_mgr: odev.DeviceManager, log_handler: ?logging.Handler=None):
-    res = ttt.Layer('0', respnet.layers.t_0.get_ttt(dev_mgr, log_handler),
-          ttt.Layer('1', respnet.layers.t_1.get_ttt(dev_mgr, log_handler),
-          ttt.Layer('2', respnet.layers.t_2.get_ttt(dev_mgr, log_handler),
-          ttt.Layer('3', respnet.layers.t_3.get_ttt(dev_mgr, log_handler),
-          None))))
-    return res
+    layer3 = ttt.Layer('3', respnet.layers.t_3.get_ttt(None, dev_mgr, log_handler), None)
+    layer2 = ttt.Layer('2', respnet.layers.t_2.get_ttt(layer3, dev_mgr, log_handler), layer3)
+    layer1 = ttt.Layer('1', respnet.layers.t_1.get_ttt(layer2, dev_mgr, log_handler), layer2)
+    layer0 = ttt.Layer('0', respnet.layers.t_0.get_ttt(layer1, dev_mgr, log_handler), layer1)
+    return layer0
