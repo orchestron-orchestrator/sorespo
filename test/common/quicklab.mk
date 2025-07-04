@@ -85,6 +85,19 @@ get-config-json0 get-config-json1 get-config-json2 get-config-json3:
 get-config-adata0 get-config-adata1 get-config-adata2 get-config-adata3:
 	@curl -H "Accept: application/adata+text" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/layer/$(subst get-config-adata,,$@)
 
+# "target" is the Orchestron's intended configuration, i.e. the configuration
+# *we* want on the device. Note how this is not NMDA-speak for "intended
+# configuration" of the device itself.
+.PHONY: $(addprefix get-target-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+$(addprefix get-target-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
+	@curl $(HEADERS) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/device/$(subst get-target-,,$@)/target
+
+.PHONY: $(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+$(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
+	@$(MAKE) HEADERS="-H \"Accept: application/adata+text\"" $(subst adata-,,$@)
+
+# "running" is the currently running configuration on the device, which in
+# NMDA-speak is the "intended configuration".
 .PHONY: $(addprefix get-running-,$(ROUTERS_XR) $(ROUTERS_CRPD))
 $(addprefix get-running-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
 	@curl $(HEADERS) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/device/$(subst get-running-,,$@)/running
