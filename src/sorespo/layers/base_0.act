@@ -9,6 +9,8 @@ import yang.adata
 import yang.gdata
 
 from sorespo.layers.y_0 import netinfra__netinfra__router_entry
+from sorespo.layers.y_0 import netinfra__netinfra__router__memory
+from sorespo.layers.y_0 import netinfra__netinfra__router__dynstate
 from sorespo.layers.y_0 import netinfra__netinfra__backbone_link_entry
 from sorespo.layers.y_0 import ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry
 from sorespo.layers.y_0 import ietf_l3vpn_svc__l3vpn_svc__sites__site_entry
@@ -23,7 +25,7 @@ def o_root():
 
 
 class Router(ttt.TransformFunction):
-    transform: mut(netinfra__netinfra__router_entry) -> yang.adata.MNode
+    transform: mut(netinfra__netinfra__router_entry, memory: ?netinfra__netinfra__router__memory, dynstate: ?netinfra__netinfra__router__dynstate) -> (yang.adata.MNode, ?yang.adata.MNode)
 
     @staticmethod
     def input_type():
@@ -35,8 +37,11 @@ class Router(ttt.TransformFunction):
         modeled input and back to gdata
         """
         modeled_input = netinfra__netinfra__router_entry.from_gdata(i)
+        modeled_memory = netinfra__netinfra__router__memory.from_gdata(memory) if memory is not None else None
+        modeled_dynstate = netinfra__netinfra__router__dynstate.from_gdata(dynstate) if dynstate is not None else None
 
-        return self.transform(modeled_input).to_gdata(), None
+        output, new_memory = self.transform(modeled_input, modeled_memory, modeled_dynstate)
+        return output.to_gdata(), new_memory.to_gdata() if new_memory is not None else None
 
     mut def transform_xml(self, i: xml.Node, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from XML to
@@ -44,8 +49,11 @@ class Router(ttt.TransformFunction):
         """
         gdata_input = from_xml_netinfra__netinfra__router_element(i)
         modeled_input = netinfra__netinfra__router_entry.from_gdata(gdata_input)
+        modeled_memory = netinfra__netinfra__router__memory.from_gdata(memory) if memory is not None else None
+        modeled_dynstate = netinfra__netinfra__router__dynstate.from_gdata(dynstate) if dynstate is not None else None
 
-        return self.transform(modeled_input).to_gdata(), None
+        output, new_memory = self.transform(modeled_input, modeled_memory, modeled_dynstate)
+        return output.to_gdata(), new_memory.to_gdata() if new_memory is not None else None
 
 class BBLink(ttt.TransformFunction):
     transform: mut(netinfra__netinfra__backbone_link_entry) -> yang.adata.MNode
