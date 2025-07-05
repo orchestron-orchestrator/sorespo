@@ -54,7 +54,7 @@ netinfra1_in = """<data>
     </netinfra>
 </data>"""
 
-actor netinfra_tester(t: testing.AsyncT):
+actor _test_netinfra1(t: testing.AsyncT):
     xml_conf = xml.decode(netinfra1_in)
     input_config = cfs_layer.from_xml(xml_conf)
 
@@ -84,9 +84,6 @@ actor netinfra_tester(t: testing.AsyncT):
         print("Test Config failed", err=True)
         t.failure(ValueError())
     after 2.5: fail()
-
-def _test_netinfra1(t: testing.AsyncT):
-    netinfra_tester(t)
 
 
 l3vpn_in = """<data>
@@ -372,14 +369,14 @@ actor l3vpn_tester(t: testing.AsyncT, output_formatter: mut(gdata.Node) -> str):
 
     session.edit_config(input_config, None, cont)
 
-def _test_l3vpn_svc(t: testing.AsyncT):
+actor _test_l3vpn_svc(t: testing.AsyncT):
     l3vpn_tester(t, lambda n: n.to_xmlstr())
 
-def _test_l3vpn_svc_json(t: testing.AsyncT):
+actor _test_l3vpn_svc_json(t: testing.AsyncT):
     l3vpn_tester(t, lambda n: n.to_json())
 
-def _test_l3vpn_svc_adata(t: testing.AsyncT):
-    def adata_formatter(n: gdata.Node) -> str:
+actor _test_l3vpn_svc_adata(t: testing.AsyncT):
+    def _adata_formatter(n: gdata.Node) -> str:
         res = {}
         device_list = n.get_cnt("devices").get_list("device")
         # We must sort the elements to ensure the output is deterministic
@@ -402,16 +399,8 @@ def _test_l3vpn_svc_adata(t: testing.AsyncT):
             text += f"def adata_{device.replace('-', '_')}():\n{indented_lines}\n\n"
         return text
 
-    l3vpn_tester(t, adata_formatter)
+    l3vpn_tester(t, _adata_formatter)
 
 # TODO: enable once gdata after transform is valid (= sorted where it needs to be)
 # def _test_l3vpn_svc_gdata(t: testing.AsyncT):
 #     l3vpn_tester(t, lambda n: n.prsrc())
-
-actor main(env):
-    logh = logging.Handler("Otron")
-#    logh.add_sink(logging.StdoutSink())
-    logh.set_output_level(logging.DEBUG)
-    t = testing.AsyncT(lambda ok,ex,out: env.exit(0), logh)
-#    netinfra_tester(t)
-    l3vpn_tester(t, lambda n: n.to_xmlstr())

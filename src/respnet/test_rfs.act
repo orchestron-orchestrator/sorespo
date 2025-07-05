@@ -8,7 +8,7 @@ import orchestron.device
 import respnet.rfs
 from respnet.layers.y_2 import orchestron_rfs__rfs__backbone_interface__remote
 
-def _test_rfs_bbinterface1(log_handler: logging.Handler):
+proc def _test_rfs_bbinterface1(t: testing.SyncT):
     modeled_input = respnet.rfs.BBInterface.input_type()(
         name="GigabitEthernet0/0/0/0",
         ipv4_address="10.0.7.1",
@@ -22,11 +22,11 @@ def _test_rfs_bbinterface1(log_handler: logging.Handler):
     mock_di = orchestron.ttt.DeviceInfo("AMS-CORE-1",
         {"Cisco-IOS-XR-um-hostname-cfg": orchestron.device.ModCap("Cisco-IOS-XR-um-hostname-cfg", "http://cisco.com/ns/yang/Cisco-IOS-XR-um-hostname-cfg")}
     )
-    transform = respnet.rfs.BBInterface(log_handler)
+    transform = respnet.rfs.BBInterface(t.log_handler)
     out = transform.transform(modeled_input, mock_di).to_gdata()
     return out.to_xmlstr()
 
-def _test_rfs_bbinterface2(log_handler: logging.Handler):
+proc def _test_rfs_bbinterface2(t: testing.SyncT):
     xmlin = """<backbone-interface xmlns="http://example.com/respnet-rfs">
   <name>eth1</name>
   <ipv4-address>10.0.20.2/30</ipv4-address>
@@ -40,6 +40,6 @@ def _test_rfs_bbinterface2(log_handler: logging.Handler):
     mock_di = orchestron.ttt.DeviceInfo("STO-CORE-1",
         {"http://xml.juniper.net/netconf/junos/1.0": orchestron.device.ModCap("http://xml.juniper.net/netconf/junos/1.0", "http://xml.juniper.net/netconf/junos/1.0")}
     )
-    transform = respnet.rfs.BBInterface(log_handler)
+    transform = respnet.rfs.BBInterface(t.log_handler)
     out, _ = transform.transform_xml(xml.decode(xmlin), mock_di)
     return out.to_xmlstr()
