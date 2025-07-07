@@ -130,9 +130,14 @@ end-policy"""
             isis = ni.protocols.create_isis()
             instance = isis.instance.create("quicklab")
             instance.level_capability = "L2"
-            # instance.net = [ net_clns_address ]
-            # Temporarily hardcoded NET until leaf-list merges get fixed
-            instance.net = [ "49.0001.0100.0000.0003.00" ]
+            if i.name == "AMS-CORE-1":
+                instance.net = [ "49.0001.0100.0000.0001.00" ]
+            elif i.name == "FRA-CORE-1":
+                instance.net = [ "49.0001.0100.0000.0002.00" ]
+            elif i.name == "STO-CORE-1":
+                instance.net = [ "49.0001.0100.0000.0003.00" ]
+            else:
+                instance.net = [ "49.0001.0100.0000.0004.00" ]
             instance.ipv4_unicast.admin_state = "enable"
             ii = instance.interface.create("system0.0")
             ii.admin_state = "enable"
@@ -145,10 +150,10 @@ end-policy"""
 
             # Create neighbor-group: IPV4-IBGP
             group = bgp.group.create("IPV4-IBGP")
-            ipv4_afi = bgp.afi_safi.create("ipv4-unicast")
-            ipv4_afi.admin_state = "enable"
-            evpn_afi = group.afi_safi.create("evpn")
-            evpn_afi.admin_state = "enable"
+            # ipv4_afi = bgp.afi_safi.create("srl_nokia-comm:ipv4-unicast")
+            # ipv4_afi.admin_state = "enable"
+            # evpn_afi = group.afi_safi.create("srl_nokia-comm:evpn")
+            # evpn_afi.admin_state = "enable"
 
             return dev
 
@@ -238,8 +243,15 @@ class BBInterface(base.BBInterface):
             # IS-IS config for this interface
             isis = ni.protocols.create_isis()
             instance = isis.instance.create("quicklab")
-            # Temporarily hardcoded NET until leaf-list merges get fixed
-            instance.net = [ "49.0001.0100.0000.0003.00" ]
+            # Temporarily cofigure NET to avoid the leaf-list merge issue
+            if i.hack_local_hostname == "AMS-CORE-1":
+                instance.net = [ "49.0001.0100.0000.0001.00" ]
+            elif i.hack_local_hostname == "FRA-CORE-1":
+                instance.net = [ "49.0001.0100.0000.0002.00" ]
+            elif i.hack_local_hostname == "STO-CORE-1":
+                instance.net = [ "49.0001.0100.0000.0003.00" ]
+            else:
+                instance.net = [ "49.0001.0100.0000.0004.00" ]
             isis_intf = instance.interface.create("%s.0" % i.name)
             isis_intf.admin_state = "enable"
             isis_intf.circuit_type = "point-to-point"
@@ -357,8 +369,8 @@ class Vrf(base.Vrf):
             bgp.autonomous_system = i.asn
             bgp.ebgp_default_policy.import_reject_all = False
             bgp.ebgp_default_policy.export_reject_all = False
-            afi = bgp.afi_safi.create("ipv4-unicast")
-            afi.admin_state = "enable"
+            # afi = bgp.afi_safi.create("ipv4-unicast")
+            # afi.admin_state = "enable"
             group = bgp.group.create("customer")
             group.send_default_route.ipv4_unicast = True
 
