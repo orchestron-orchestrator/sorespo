@@ -1,11 +1,45 @@
 import base64
 import json
 import xml
+import yang
 import yang.adata
 import yang.gdata
+import yang.gen3
 
 # == This file is generated ==
 
+
+def src_yang():
+    res = []
+    res.append(r"""module orchestron-device {
+  yang-version "1.1";
+  namespace "http://orchestron.org/yang/orchestron-device.yang";
+  prefix "odev";
+
+  description "Device config";
+
+  container devices {
+    list device {
+      key name;
+
+      orchestron:device-config;
+
+      leaf name {
+        type string;
+      }
+
+      leaf modset_id {
+        type string;
+      }
+
+      //anydata config {
+      //  description "Device configuration";
+      //}
+    }
+  }
+}
+""")
+    return res
 
 mut def from_json_orchestron_device__devices__device__name(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
@@ -92,18 +126,6 @@ class orchestron_device__devices__device(yang.adata.MNode):
             return [orchestron_device__devices__device_entry.from_gdata(e) for e in n.elements]
         return []
 
-
-mut def from_xml_orchestron_device__devices__device_element(node: xml.Node) -> yang.gdata.Node:
-    children = {}
-    child_name = yang.gdata.from_xml_str(node, 'name')
-    yang.gdata.maybe_add(children, 'name', from_xml_orchestron_device__devices__device__name, child_name)
-    child_modset_id = yang.gdata.from_xml_opt_str(node, 'modset_id')
-    yang.gdata.maybe_add(children, 'modset_id', from_xml_orchestron_device__devices__device__modset_id, child_modset_id)
-    return yang.gdata.Container(children)
-
-mut def from_xml_orchestron_device__devices__device(nodes: list[xml.Node]) -> yang.gdata.List:
-    elements = [from_xml_orchestron_device__devices__device_element(e) for e in nodes]
-    return yang.gdata.List(keys=['name'], elements=elements)
 
 mut def from_json_path_orchestron_device__devices__device_element(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.Node:
     if len(path) == 1:
@@ -205,12 +227,6 @@ class orchestron_device__devices(yang.adata.MNode):
         return '\n'.join(res)
 
 
-mut def from_xml_orchestron_device__devices(node: xml.Node) -> yang.gdata.Container:
-    children = {}
-    child_device = yang.gdata.from_xml_opt_list(node, 'device')
-    yang.gdata.maybe_add(children, 'device', from_xml_orchestron_device__devices__device, child_device)
-    return yang.gdata.Container(children, ns='http://orchestron.org/yang/orchestron-device.yang', module='orchestron-device')
-
 mut def from_json_path_orchestron_device__devices(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.Node:
     # path handling
     if len(path) > 0:
@@ -271,11 +287,9 @@ class root(yang.adata.MNode):
         return '\n'.join(res)
 
 
-mut def from_xml(node: xml.Node) -> yang.gdata.Container:
-    children = {}
-    child_devices = yang.gdata.from_xml_opt_cnt(node, 'devices', 'http://orchestron.org/yang/orchestron-device.yang')
-    yang.gdata.maybe_add(children, 'devices', from_xml_orchestron_device__devices, child_devices)
-    return yang.gdata.Container(children)
+def from_xml(node: xml.Node, root_path: list[str]=[]):
+    s = yang.compile(src_yang())
+    return yang.gen3.from_xml(s, node, loose=True, root_path=root_path)
 
 mut def from_json_path(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.Node:
     # path handling
