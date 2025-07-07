@@ -14,12 +14,7 @@ from sorespo.layers.y_2 import orchestron_rfs__rfs__ibgp_neighbor_entry
 from sorespo.layers.y_2 import orchestron_rfs__rfs__vrf_entry
 from sorespo.layers.y_2 import orchestron_rfs__rfs__vrf_interface_entry
 from sorespo.layers.y_2 import orchestron_rfs__rfs__ebgp_customer_entry
-from sorespo.layers.y_2 import from_xml_orchestron_rfs__rfs__base_config_element
-from sorespo.layers.y_2 import from_xml_orchestron_rfs__rfs__backbone_interface_element
-from sorespo.layers.y_2 import from_xml_orchestron_rfs__rfs__ibgp_neighbor_element
-from sorespo.layers.y_2 import from_xml_orchestron_rfs__rfs__vrf_element
-from sorespo.layers.y_2 import from_xml_orchestron_rfs__rfs__vrf_interface_element
-from sorespo.layers.y_2 import from_xml_orchestron_rfs__rfs__ebgp_customer_element
+from sorespo.layers.y_2 import from_xml_gen3 as from_xml
 from sorespo.layers.y_3_loose import root as output_root
 
 def o_root():
@@ -46,7 +41,7 @@ class BaseConfig(ttt.RFSFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = from_xml_orchestron_rfs__rfs__base_config_element(i)
+        gdata_input = from_xml(i, ['rfs', 'base-config'])
         modeled_input = orchestron_rfs__rfs__base_config_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
@@ -71,7 +66,7 @@ class BBInterface(ttt.RFSFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = from_xml_orchestron_rfs__rfs__backbone_interface_element(i)
+        gdata_input = from_xml(i, ['rfs', 'backbone-interface'])
         modeled_input = orchestron_rfs__rfs__backbone_interface_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
@@ -96,7 +91,7 @@ class IbgpNeighbor(ttt.RFSFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = from_xml_orchestron_rfs__rfs__ibgp_neighbor_element(i)
+        gdata_input = from_xml(i, ['rfs', 'ibgp-neighbor'])
         modeled_input = orchestron_rfs__rfs__ibgp_neighbor_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
@@ -121,7 +116,7 @@ class Vrf(ttt.RFSFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = from_xml_orchestron_rfs__rfs__vrf_element(i)
+        gdata_input = from_xml(i, ['rfs', 'vrf'])
         modeled_input = orchestron_rfs__rfs__vrf_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
@@ -146,7 +141,7 @@ class VrfInterface(ttt.RFSFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = from_xml_orchestron_rfs__rfs__vrf_interface_element(i)
+        gdata_input = from_xml(i, ['rfs', 'vrf-interface'])
         modeled_input = orchestron_rfs__rfs__vrf_interface_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
@@ -171,7 +166,7 @@ class EbgpCustomer(ttt.RFSFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = from_xml_orchestron_rfs__rfs__ebgp_customer_element(i)
+        gdata_input = from_xml(i, ['rfs', 'ebgp-customer'])
         modeled_input = orchestron_rfs__rfs__ebgp_customer_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
