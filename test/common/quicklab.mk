@@ -30,9 +30,9 @@ start: build-otron-image
 stop:
 	$(CLAB_BIN) destroy --topo $(TESTENV:respnet-%=%).clab.yml --log-level debug
 
-.PHONY: wait $(addprefix wait-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+.PHONY: wait $(addprefix wait-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 WAIT?=60
-wait: $(addprefix platform-wait-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+wait: $(addprefix platform-wait-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 
 copy:
 	docker cp ../../out/bin/respnet $(TESTENV)-otron:/respnet
@@ -88,44 +88,44 @@ get-config-adata0 get-config-adata1 get-config-adata2 get-config-adata3:
 # "target" is the Orchestron's intended configuration, i.e. the configuration
 # *we* want on the device. Note how this is not NMDA-speak for "intended
 # configuration" of the device itself.
-.PHONY: $(addprefix get-target-,$(ROUTERS_XR) $(ROUTERS_CRPD))
-$(addprefix get-target-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
+.PHONY: $(addprefix get-target-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
+$(addprefix get-target-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 	@curl $(HEADERS) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/device/$(subst get-target-,,$@)/target
 
-.PHONY: $(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD))
-$(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
+.PHONY: $(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
+$(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 	@$(MAKE) HEADERS="-H \"Accept: application/adata+text\"" $(subst adata-,,$@)
 
 # "running" is the currently running configuration on the device, which in
 # NMDA-speak is the "intended configuration".
-.PHONY: $(addprefix get-running-,$(ROUTERS_XR) $(ROUTERS_CRPD))
-$(addprefix get-running-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
+.PHONY: $(addprefix get-running-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
+$(addprefix get-running-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 	@curl $(HEADERS) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/device/$(subst get-running-,,$@)/running
 
-.PHONY: $(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD))
-$(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
+.PHONY: $(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
+$(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 	@$(MAKE) HEADERS="-H \"Accept: application/adata+text\"" $(subst adata-,,$@)
 
 .PHONY: delete-config
 delete-config:
 	curl -X DELETE http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/netinfra:netinfra/routers=STO-CORE-1
 
-.PHONY: $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD))
-$(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD)): cli-%: platform-cli-%
+.PHONY: $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
+$(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)): cli-%: platform-cli-%
 
-.PHONY: $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD))
-$(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
+.PHONY: $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
+$(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 	docker run $(INTERACTIVE) --rm --network container:$(TESTENV)-otron ghcr.io/notconf/notconf:debug netconf-console2 --host $(@:get-dev-config-%=%) --port 830 --user clab --pass clab@123 --get-config
 
 .phony: test
 test::
-	$(MAKE) $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+	$(MAKE) $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 
 .PHONY: save-logs
-save-logs: $(addprefix save-logs-,$(ROUTERS_XR) $(ROUTERS_CRPD))
+save-logs: $(addprefix save-logs-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 
-.PHONY: $(addprefix save-logs-,$(ROUTERS_XR) $(ROUTERS_CRPD))
-$(addprefix save-logs-,$(ROUTERS_XR) $(ROUTERS_CRPD)):
+.PHONY: $(addprefix save-logs-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
+$(addprefix save-logs-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 	mkdir -p logs
 	docker logs --timestamps $(TESTENV)-$(@:save-logs-%=%) > logs/$(@:save-logs-%=%)_docker.log 2>&1
 	$(MAKE) get-dev-config-$(@:save-logs-%=%) > logs/$(@:save-logs-%=%)_netconf.log || true
