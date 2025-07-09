@@ -3,8 +3,13 @@ import json
 import xml
 import yang.adata
 import yang.gdata
+from yang.common import Identityref
 
 # == This file is generated ==
+
+
+mod_to_ns = {'srl_nokia-extensions':'urn:nokia.com:srlinux:general:extensions', 'srl_nokia-features':'urn:nokia.com:srlinux:general:features', 'srl_nokia-common':'urn:nokia.com:srlinux:general:common', 'srl_nokia-tunnel':'urn:nokia.com:srlinux:vxlan:tunnel', 'srl_nokia-system':'urn:nokia.com:srlinux:general:system', 'srl_nokia-platform':'urn:nokia.com:srlinux:chassis:platform', 'srl_nokia-interfaces-bridge-table':'urn:nokia.com:srlinux:chassis:interfaces-bridge-table', 'srl_nokia-if-ip':'urn:nokia.com:srlinux:chassis:if-ip', 'srl_nokia-interfaces':'urn:nokia.com:srlinux:chassis:interfaces', 'srl_nokia-network-instance':'urn:nokia.com:srlinux:net-inst:network-instance', 'srl_nokia-tunnel-interfaces':'urn:nokia.com:srlinux:vxlan:tunnel-interfaces', 'srl_nokia-system-protocols':'urn:nokia.com:srlinux:general:system-protocols', 'srl_nokia-system-name':'urn:nokia.com:srlinux:chassis:system-name', 'srl_nokia-policy-types':'urn:nokia.com:srlinux:general:policy-types', 'srl_nokia-isis-types':'urn:nokia.com:srlinux:general:isis-types', 'ietf-yang-types':'urn:ietf:params:xml:ns:yang:ietf-yang-types', 'srl_nokia-isis':'urn:nokia.com:srlinux:isis:isis', 'srl_nokia-bgp':'urn:nokia.com:srlinux:bgp:bgp', 'srl_nokia-bgp-vpn':'urn:nokia.com:srlinux:bgp:bgp-vpn', 'srl_nokia-bgp-evpn':'urn:nokia.com:srlinux:net-inst:bgp-evpn'}
+ns_to_mod = {'urn:nokia.com:srlinux:general:extensions':'srl_nokia-extensions', 'urn:nokia.com:srlinux:general:features':'srl_nokia-features', 'urn:nokia.com:srlinux:general:common':'srl_nokia-common', 'urn:nokia.com:srlinux:vxlan:tunnel':'srl_nokia-tunnel', 'urn:nokia.com:srlinux:general:system':'srl_nokia-system', 'urn:nokia.com:srlinux:chassis:platform':'srl_nokia-platform', 'urn:nokia.com:srlinux:chassis:interfaces-bridge-table':'srl_nokia-interfaces-bridge-table', 'urn:nokia.com:srlinux:chassis:if-ip':'srl_nokia-if-ip', 'urn:nokia.com:srlinux:chassis:interfaces':'srl_nokia-interfaces', 'urn:nokia.com:srlinux:net-inst:network-instance':'srl_nokia-network-instance', 'urn:nokia.com:srlinux:vxlan:tunnel-interfaces':'srl_nokia-tunnel-interfaces', 'urn:nokia.com:srlinux:general:system-protocols':'srl_nokia-system-protocols', 'urn:nokia.com:srlinux:chassis:system-name':'srl_nokia-system-name', 'urn:nokia.com:srlinux:general:policy-types':'srl_nokia-policy-types', 'urn:nokia.com:srlinux:general:isis-types':'srl_nokia-isis-types', 'urn:ietf:params:xml:ns:yang:ietf-yang-types':'ietf-yang-types', 'urn:nokia.com:srlinux:isis:isis':'srl_nokia-isis', 'urn:nokia.com:srlinux:bgp:bgp':'srl_nokia-bgp', 'urn:nokia.com:srlinux:bgp:bgp-vpn':'srl_nokia-bgp-vpn', 'urn:nokia.com:srlinux:net-inst:bgp-evpn':'srl_nokia-bgp-evpn'}
 
 
 class srl_nokia_tunnel__tunnel(yang.adata.MNode):
@@ -550,8 +555,9 @@ mut def from_xml_srl_nokia_interfaces__interface__loopback_mode(val: value) -> y
 mut def from_xml_srl_nokia_interfaces__interface__swap_src_dst_mac(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
 
-mut def from_xml_srl_nokia_interfaces__interface__transceiver__functional_type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_srl_nokia_interfaces__interface__transceiver__functional_type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_xml_srl_nokia_interfaces__interface__transceiver__tx_laser(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
@@ -563,12 +569,12 @@ mut def from_xml_srl_nokia_interfaces__interface__transceiver__forward_error_cor
     return yang.gdata.Leaf('enumeration', val)
 
 class srl_nokia_interfaces__interface__transceiver(yang.adata.MNode):
-    functional_type: ?str
+    functional_type: ?Identityref
     tx_laser: ?bool
     ddm_events: ?bool
     forward_error_correction: ?str
 
-    mut def __init__(self, functional_type: ?str, tx_laser: ?bool, ddm_events: ?bool, forward_error_correction: ?str):
+    mut def __init__(self, functional_type: ?Identityref, tx_laser: ?bool, ddm_events: ?bool, forward_error_correction: ?str):
         self._ns = 'urn:nokia.com:srlinux:chassis:interfaces'
         self.functional_type = functional_type
         self.tx_laser = tx_laser
@@ -594,7 +600,7 @@ class srl_nokia_interfaces__interface__transceiver(yang.adata.MNode):
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_interfaces__interface__transceiver:
         if n != None:
-            return srl_nokia_interfaces__interface__transceiver(functional_type=n.get_opt_str('functional-type'), tx_laser=n.get_opt_bool('tx-laser'), ddm_events=n.get_opt_bool('ddm-events'), forward_error_correction=n.get_opt_str('forward-error-correction'))
+            return srl_nokia_interfaces__interface__transceiver(functional_type=n.get_opt_Identityref('functional-type'), tx_laser=n.get_opt_bool('tx-laser'), ddm_events=n.get_opt_bool('ddm-events'), forward_error_correction=n.get_opt_str('forward-error-correction'))
         return srl_nokia_interfaces__interface__transceiver()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -625,7 +631,7 @@ class srl_nokia_interfaces__interface__transceiver(yang.adata.MNode):
 
 mut def from_xml_srl_nokia_interfaces__interface__transceiver(node: xml.Node) -> yang.gdata.Container:
     children = {}
-    child_functional_type = yang.gdata.from_xml_opt_str(node, 'functional-type')
+    child_functional_type = yang.gdata.from_xml_opt_Identityref(node, 'functional-type')
     yang.gdata.maybe_add(children, 'functional-type', from_xml_srl_nokia_interfaces__interface__transceiver__functional_type, child_functional_type)
     child_tx_laser = yang.gdata.from_xml_opt_bool(node, 'tx-laser')
     yang.gdata.maybe_add(children, 'tx-laser', from_xml_srl_nokia_interfaces__interface__transceiver__tx_laser, child_tx_laser)
@@ -1876,8 +1882,9 @@ mut def from_xml_srl_nokia_interfaces__interface__load_balancing(node: xml.Node)
 mut def from_xml_srl_nokia_interfaces__interface__subinterface__index(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('uint32', val)
 
-mut def from_xml_srl_nokia_interfaces__interface__subinterface__type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_srl_nokia_interfaces__interface__subinterface__type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_xml_srl_nokia_interfaces__interface__subinterface__description(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
@@ -2715,7 +2722,7 @@ mut def from_xml_srl_nokia_interfaces__interface__subinterface__bridge_table(nod
 
 class srl_nokia_interfaces__interface__subinterface_entry(yang.adata.MNode):
     index: int
-    type: ?str
+    type: ?Identityref
     description: ?str
     admin_state: ?str
     ip_mtu: ?int
@@ -2729,7 +2736,7 @@ class srl_nokia_interfaces__interface__subinterface_entry(yang.adata.MNode):
     anycast_gw: ?srl_nokia_interfaces__interface__subinterface__anycast_gw
     bridge_table: ?srl_nokia_interfaces__interface__subinterface__bridge_table
 
-    mut def __init__(self, index: int, type: ?str, description: ?str, admin_state: ?str, ip_mtu: ?int, l2_mtu: ?int, mpls_mtu: ?int, unidirectional_link_delay: ?srl_nokia_interfaces__interface__subinterface__unidirectional_link_delay=None, collect_irb_stats: ?bool, collect_detailed_stats: ?bool, ipv4: ?srl_nokia_interfaces__interface__subinterface__ipv4=None, ipv6: ?srl_nokia_interfaces__interface__subinterface__ipv6=None, anycast_gw: ?srl_nokia_interfaces__interface__subinterface__anycast_gw=None, bridge_table: ?srl_nokia_interfaces__interface__subinterface__bridge_table=None):
+    mut def __init__(self, index: int, type: ?Identityref, description: ?str, admin_state: ?str, ip_mtu: ?int, l2_mtu: ?int, mpls_mtu: ?int, unidirectional_link_delay: ?srl_nokia_interfaces__interface__subinterface__unidirectional_link_delay=None, collect_irb_stats: ?bool, collect_detailed_stats: ?bool, ipv4: ?srl_nokia_interfaces__interface__subinterface__ipv4=None, ipv6: ?srl_nokia_interfaces__interface__subinterface__ipv6=None, anycast_gw: ?srl_nokia_interfaces__interface__subinterface__anycast_gw=None, bridge_table: ?srl_nokia_interfaces__interface__subinterface__bridge_table=None):
         self._ns = 'urn:nokia.com:srlinux:chassis:interfaces'
         self.index = index
         self.type = type
@@ -2804,7 +2811,7 @@ class srl_nokia_interfaces__interface__subinterface_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> srl_nokia_interfaces__interface__subinterface_entry:
-        return srl_nokia_interfaces__interface__subinterface_entry(index=n.get_int('index'), type=n.get_opt_str('type'), description=n.get_opt_str('description'), admin_state=n.get_opt_str('admin-state'), ip_mtu=n.get_opt_int('ip-mtu'), l2_mtu=n.get_opt_int('l2-mtu'), mpls_mtu=n.get_opt_int('mpls-mtu'), unidirectional_link_delay=srl_nokia_interfaces__interface__subinterface__unidirectional_link_delay.from_gdata(n.get_opt_cnt('unidirectional-link-delay')), collect_irb_stats=n.get_opt_bool('collect-irb-stats'), collect_detailed_stats=n.get_opt_bool('collect-detailed-stats'), ipv4=srl_nokia_interfaces__interface__subinterface__ipv4.from_gdata(n.get_opt_cnt('ipv4')), ipv6=srl_nokia_interfaces__interface__subinterface__ipv6.from_gdata(n.get_opt_cnt('ipv6')), anycast_gw=srl_nokia_interfaces__interface__subinterface__anycast_gw.from_gdata(n.get_opt_cnt('anycast-gw')), bridge_table=srl_nokia_interfaces__interface__subinterface__bridge_table.from_gdata(n.get_opt_cnt('bridge-table')))
+        return srl_nokia_interfaces__interface__subinterface_entry(index=n.get_int('index'), type=n.get_opt_Identityref('type'), description=n.get_opt_str('description'), admin_state=n.get_opt_str('admin-state'), ip_mtu=n.get_opt_int('ip-mtu'), l2_mtu=n.get_opt_int('l2-mtu'), mpls_mtu=n.get_opt_int('mpls-mtu'), unidirectional_link_delay=srl_nokia_interfaces__interface__subinterface__unidirectional_link_delay.from_gdata(n.get_opt_cnt('unidirectional-link-delay')), collect_irb_stats=n.get_opt_bool('collect-irb-stats'), collect_detailed_stats=n.get_opt_bool('collect-detailed-stats'), ipv4=srl_nokia_interfaces__interface__subinterface__ipv4.from_gdata(n.get_opt_cnt('ipv4')), ipv6=srl_nokia_interfaces__interface__subinterface__ipv6.from_gdata(n.get_opt_cnt('ipv6')), anycast_gw=srl_nokia_interfaces__interface__subinterface__anycast_gw.from_gdata(n.get_opt_cnt('anycast-gw')), bridge_table=srl_nokia_interfaces__interface__subinterface__bridge_table.from_gdata(n.get_opt_cnt('bridge-table')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -2903,7 +2910,7 @@ mut def from_xml_srl_nokia_interfaces__interface__subinterface_element(node: xml
     children = {}
     child_index = yang.gdata.from_xml_int(node, 'index')
     yang.gdata.maybe_add(children, 'index', from_xml_srl_nokia_interfaces__interface__subinterface__index, child_index)
-    child_type = yang.gdata.from_xml_opt_str(node, 'type')
+    child_type = yang.gdata.from_xml_opt_Identityref(node, 'type')
     yang.gdata.maybe_add(children, 'type', from_xml_srl_nokia_interfaces__interface__subinterface__type, child_type)
     child_description = yang.gdata.from_xml_opt_str(node, 'description')
     yang.gdata.maybe_add(children, 'description', from_xml_srl_nokia_interfaces__interface__subinterface__description, child_description)
@@ -3226,8 +3233,9 @@ mut def from_xml_srl_nokia_interfaces__interface(nodes: list[xml.Node]) -> yang.
 mut def from_xml_srl_nokia_network_instance__network_instance__name(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__admin_state(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('enumeration', val)
@@ -4304,8 +4312,9 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp_ev
     children = {}
     return yang.gdata.Container(children, presence=True)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution__allowed_tunnel_types(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution__allowed_tunnel_types(val: list[Identityref]) -> yang.gdata.LeafList:
+    new_val = [Identityref.complete(v, ns_to_mod, mod_to_ns) for v in val]
+    return yang.gdata.LeafList('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution__selection_attributes__tag__mandatory(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
@@ -4397,10 +4406,10 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp_ev
     return yang.gdata.Container(children)
 
 class srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution(yang.adata.MNode):
-    allowed_tunnel_types: list[str]
+    allowed_tunnel_types: list[Identityref]
     selection_attributes: srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution__selection_attributes
 
-    mut def __init__(self, allowed_tunnel_types: ?list[str]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution__selection_attributes=None):
+    mut def __init__(self, allowed_tunnel_types: ?list[Identityref]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution__selection_attributes=None):
         self._ns = 'urn:nokia.com:srlinux:net-inst:bgp-evpn'
         self.allowed_tunnel_types = allowed_tunnel_types if allowed_tunnel_types is not None else []
         self.selection_attributes = selection_attributes if selection_attributes is not None else srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution__selection_attributes()
@@ -4416,7 +4425,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_ins
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution:
         if n != None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution(allowed_tunnel_types=n.get_opt_strs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution(allowed_tunnel_types=n.get_opt_Identityrefs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
         raise ValueError('Missing required subtree srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution')
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -4441,7 +4450,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_ins
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution(node: xml.Node) -> yang.gdata.Container:
     children = {}
-    child_allowed_tunnel_types = yang.gdata.from_xml_opt_strs(node, 'allowed-tunnel-types')
+    child_allowed_tunnel_types = yang.gdata.from_xml_opt_Identityrefs(node, 'allowed-tunnel-types')
     yang.gdata.maybe_add(children, 'allowed-tunnel-types', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution__allowed_tunnel_types, child_allowed_tunnel_types)
     child_selection_attributes = yang.gdata.from_xml_opt_cnt(node, 'selection-attributes')
     yang.gdata.maybe_add(children, 'selection-attributes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance__mpls__next_hop_resolution__selection_attributes, child_selection_attributes)
@@ -11120,8 +11129,9 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__b
     yang.gdata.maybe_add(children, 'ignore-default-routes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__route_resolution__ignore_default_routes, child_ignore_default_routes)
     return yang.gdata.Container(children)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[Identityref]) -> yang.gdata.LeafList:
+    new_val = [Identityref.complete(v, ns_to_mod, mod_to_ns) for v in val]
+    return yang.gdata.LeafList('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes__tag__mandatory(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
@@ -11213,10 +11223,10 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__b
     return yang.gdata.Container(children)
 
 class srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution(yang.adata.MNode):
-    allowed_tunnel_types: list[str]
+    allowed_tunnel_types: list[Identityref]
     selection_attributes: srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes
 
-    mut def __init__(self, allowed_tunnel_types: ?list[str]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes=None):
+    mut def __init__(self, allowed_tunnel_types: ?list[Identityref]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.allowed_tunnel_types = allowed_tunnel_types if allowed_tunnel_types is not None else []
         self.selection_attributes = selection_attributes if selection_attributes is not None else srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes()
@@ -11232,7 +11242,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__b
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution:
         if n != None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution(allowed_tunnel_types=n.get_opt_strs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution(allowed_tunnel_types=n.get_opt_Identityrefs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
         return srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -11257,7 +11267,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__b
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution(node: xml.Node) -> yang.gdata.Container:
     children = {}
-    child_allowed_tunnel_types = yang.gdata.from_xml_opt_strs(node, 'allowed-tunnel-types')
+    child_allowed_tunnel_types = yang.gdata.from_xml_opt_Identityrefs(node, 'allowed-tunnel-types')
     yang.gdata.maybe_add(children, 'allowed-tunnel-types', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types, child_allowed_tunnel_types)
     child_selection_attributes = yang.gdata.from_xml_opt_cnt(node, 'selection-attributes')
     yang.gdata.maybe_add(children, 'selection-attributes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes, child_selection_attributes)
@@ -11375,8 +11385,9 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__b
     yang.gdata.maybe_add(children, 'ignore-default-routes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__route_resolution__ignore_default_routes, child_ignore_default_routes)
     return yang.gdata.Container(children)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[Identityref]) -> yang.gdata.LeafList:
+    new_val = [Identityref.complete(v, ns_to_mod, mod_to_ns) for v in val]
+    return yang.gdata.LeafList('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes__tag__mandatory(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
@@ -11468,10 +11479,10 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__b
     return yang.gdata.Container(children)
 
 class srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution(yang.adata.MNode):
-    allowed_tunnel_types: list[str]
+    allowed_tunnel_types: list[Identityref]
     selection_attributes: srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes
 
-    mut def __init__(self, allowed_tunnel_types: ?list[str]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes=None):
+    mut def __init__(self, allowed_tunnel_types: ?list[Identityref]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.allowed_tunnel_types = allowed_tunnel_types if allowed_tunnel_types is not None else []
         self.selection_attributes = selection_attributes if selection_attributes is not None else srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes()
@@ -11487,7 +11498,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__b
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution:
         if n != None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution(allowed_tunnel_types=n.get_opt_strs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution(allowed_tunnel_types=n.get_opt_Identityrefs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
         return srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -11512,7 +11523,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__b
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution(node: xml.Node) -> yang.gdata.Container:
     children = {}
-    child_allowed_tunnel_types = yang.gdata.from_xml_opt_strs(node, 'allowed-tunnel-types')
+    child_allowed_tunnel_types = yang.gdata.from_xml_opt_Identityrefs(node, 'allowed-tunnel-types')
     yang.gdata.maybe_add(children, 'allowed-tunnel-types', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types, child_allowed_tunnel_types)
     child_selection_attributes = yang.gdata.from_xml_opt_cnt(node, 'selection-attributes')
     yang.gdata.maybe_add(children, 'selection-attributes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__bgp_label__bgp_ipvpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes, child_selection_attributes)
@@ -12305,8 +12316,9 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__g
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__max_ecmp_hash_buckets_per_next_hop_group(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('uint16', val)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__afi_safi_name(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__afi_safi_name(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__admin_state(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('enumeration', val)
@@ -12848,8 +12860,9 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__mode(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('enumeration', val)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[Identityref]) -> yang.gdata.LeafList:
+    new_val = [Identityref.complete(v, ns_to_mod, mod_to_ns) for v in val]
+    return yang.gdata.LeafList('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes__tag__mandatory(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
@@ -12942,10 +12955,10 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
 
 class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution(yang.adata.MNode):
     mode: ?str
-    allowed_tunnel_types: list[str]
+    allowed_tunnel_types: list[Identityref]
     selection_attributes: srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes
 
-    mut def __init__(self, mode: ?str, allowed_tunnel_types: ?list[str]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes=None):
+    mut def __init__(self, mode: ?str, allowed_tunnel_types: ?list[Identityref]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.mode = mode
         self.allowed_tunnel_types = allowed_tunnel_types if allowed_tunnel_types is not None else []
@@ -12965,7 +12978,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ip
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution:
         if n != None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution(mode=n.get_opt_str('mode'), allowed_tunnel_types=n.get_opt_strs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution(mode=n.get_opt_str('mode'), allowed_tunnel_types=n.get_opt_Identityrefs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
         return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -12995,7 +13008,7 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     children = {}
     child_mode = yang.gdata.from_xml_opt_str(node, 'mode')
     yang.gdata.maybe_add(children, 'mode', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__mode, child_mode)
-    child_allowed_tunnel_types = yang.gdata.from_xml_opt_strs(node, 'allowed-tunnel-types')
+    child_allowed_tunnel_types = yang.gdata.from_xml_opt_Identityrefs(node, 'allowed-tunnel-types')
     yang.gdata.maybe_add(children, 'allowed-tunnel-types', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types, child_allowed_tunnel_types)
     child_selection_attributes = yang.gdata.from_xml_opt_cnt(node, 'selection-attributes')
     yang.gdata.maybe_add(children, 'selection-attributes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes, child_selection_attributes)
@@ -13047,8 +13060,9 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__mode(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('enumeration', val)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[Identityref]) -> yang.gdata.LeafList:
+    new_val = [Identityref.complete(v, ns_to_mod, mod_to_ns) for v in val]
+    return yang.gdata.LeafList('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes__tag__mandatory(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
@@ -13141,10 +13155,10 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
 
 class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution(yang.adata.MNode):
     mode: ?str
-    allowed_tunnel_types: list[str]
+    allowed_tunnel_types: list[Identityref]
     selection_attributes: srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes
 
-    mut def __init__(self, mode: ?str, allowed_tunnel_types: ?list[str]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes=None):
+    mut def __init__(self, mode: ?str, allowed_tunnel_types: ?list[Identityref]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.mode = mode
         self.allowed_tunnel_types = allowed_tunnel_types if allowed_tunnel_types is not None else []
@@ -13164,7 +13178,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ip
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution:
         if n != None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution(mode=n.get_opt_str('mode'), allowed_tunnel_types=n.get_opt_strs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution(mode=n.get_opt_str('mode'), allowed_tunnel_types=n.get_opt_Identityrefs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
         return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -13194,7 +13208,7 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     children = {}
     child_mode = yang.gdata.from_xml_opt_str(node, 'mode')
     yang.gdata.maybe_add(children, 'mode', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__mode, child_mode)
-    child_allowed_tunnel_types = yang.gdata.from_xml_opt_strs(node, 'allowed-tunnel-types')
+    child_allowed_tunnel_types = yang.gdata.from_xml_opt_Identityrefs(node, 'allowed-tunnel-types')
     yang.gdata.maybe_add(children, 'allowed-tunnel-types', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types, child_allowed_tunnel_types)
     child_selection_attributes = yang.gdata.from_xml_opt_cnt(node, 'selection-attributes')
     yang.gdata.maybe_add(children, 'selection-attributes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes, child_selection_attributes)
@@ -13536,8 +13550,9 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     yang.gdata.maybe_add(children, 'ignore-default-routes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__route_resolution__ignore_default_routes, child_ignore_default_routes)
     return yang.gdata.Container(children)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[Identityref]) -> yang.gdata.LeafList:
+    new_val = [Identityref.complete(v, ns_to_mod, mod_to_ns) for v in val]
+    return yang.gdata.LeafList('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes__tag__mandatory(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
@@ -13629,10 +13644,10 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     return yang.gdata.Container(children)
 
 class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution(yang.adata.MNode):
-    allowed_tunnel_types: list[str]
+    allowed_tunnel_types: list[Identityref]
     selection_attributes: srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes
 
-    mut def __init__(self, allowed_tunnel_types: ?list[str]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes=None):
+    mut def __init__(self, allowed_tunnel_types: ?list[Identityref]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.allowed_tunnel_types = allowed_tunnel_types if allowed_tunnel_types is not None else []
         self.selection_attributes = selection_attributes if selection_attributes is not None else srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes()
@@ -13648,7 +13663,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ip
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution:
         if n != None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution(allowed_tunnel_types=n.get_opt_strs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution(allowed_tunnel_types=n.get_opt_Identityrefs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
         return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -13673,7 +13688,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ip
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution(node: xml.Node) -> yang.gdata.Container:
     children = {}
-    child_allowed_tunnel_types = yang.gdata.from_xml_opt_strs(node, 'allowed-tunnel-types')
+    child_allowed_tunnel_types = yang.gdata.from_xml_opt_Identityrefs(node, 'allowed-tunnel-types')
     yang.gdata.maybe_add(children, 'allowed-tunnel-types', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types, child_allowed_tunnel_types)
     child_selection_attributes = yang.gdata.from_xml_opt_cnt(node, 'selection-attributes')
     yang.gdata.maybe_add(children, 'selection-attributes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes, child_selection_attributes)
@@ -13791,8 +13806,9 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     yang.gdata.maybe_add(children, 'ignore-default-routes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__route_resolution__ignore_default_routes, child_ignore_default_routes)
     return yang.gdata.Container(children)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[Identityref]) -> yang.gdata.LeafList:
+    new_val = [Identityref.complete(v, ns_to_mod, mod_to_ns) for v in val]
+    return yang.gdata.LeafList('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes__tag__mandatory(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
@@ -13884,10 +13900,10 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     return yang.gdata.Container(children)
 
 class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution(yang.adata.MNode):
-    allowed_tunnel_types: list[str]
+    allowed_tunnel_types: list[Identityref]
     selection_attributes: srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes
 
-    mut def __init__(self, allowed_tunnel_types: ?list[str]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes=None):
+    mut def __init__(self, allowed_tunnel_types: ?list[Identityref]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.allowed_tunnel_types = allowed_tunnel_types if allowed_tunnel_types is not None else []
         self.selection_attributes = selection_attributes if selection_attributes is not None else srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes()
@@ -13903,7 +13919,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ip
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution:
         if n != None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution(allowed_tunnel_types=n.get_opt_strs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution(allowed_tunnel_types=n.get_opt_Identityrefs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
         return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -13928,7 +13944,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ip
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution(node: xml.Node) -> yang.gdata.Container:
     children = {}
-    child_allowed_tunnel_types = yang.gdata.from_xml_opt_strs(node, 'allowed-tunnel-types')
+    child_allowed_tunnel_types = yang.gdata.from_xml_opt_Identityrefs(node, 'allowed-tunnel-types')
     yang.gdata.maybe_add(children, 'allowed-tunnel-types', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types, child_allowed_tunnel_types)
     child_selection_attributes = yang.gdata.from_xml_opt_cnt(node, 'selection-attributes')
     yang.gdata.maybe_add(children, 'selection-attributes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes, child_selection_attributes)
@@ -14398,8 +14414,9 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__mode(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('enumeration', val)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[Identityref]) -> yang.gdata.LeafList:
+    new_val = [Identityref.complete(v, ns_to_mod, mod_to_ns) for v in val]
+    return yang.gdata.LeafList('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes__tag__mandatory(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
@@ -14492,10 +14509,10 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
 
 class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution(yang.adata.MNode):
     mode: ?str
-    allowed_tunnel_types: list[str]
+    allowed_tunnel_types: list[Identityref]
     selection_attributes: srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes
 
-    mut def __init__(self, mode: ?str, allowed_tunnel_types: ?list[str]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes=None):
+    mut def __init__(self, mode: ?str, allowed_tunnel_types: ?list[Identityref]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.mode = mode
         self.allowed_tunnel_types = allowed_tunnel_types if allowed_tunnel_types is not None else []
@@ -14515,7 +14532,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ip
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution:
         if n != None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution(mode=n.get_opt_str('mode'), allowed_tunnel_types=n.get_opt_strs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution(mode=n.get_opt_str('mode'), allowed_tunnel_types=n.get_opt_Identityrefs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
         return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -14545,7 +14562,7 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     children = {}
     child_mode = yang.gdata.from_xml_opt_str(node, 'mode')
     yang.gdata.maybe_add(children, 'mode', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__mode, child_mode)
-    child_allowed_tunnel_types = yang.gdata.from_xml_opt_strs(node, 'allowed-tunnel-types')
+    child_allowed_tunnel_types = yang.gdata.from_xml_opt_Identityrefs(node, 'allowed-tunnel-types')
     yang.gdata.maybe_add(children, 'allowed-tunnel-types', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types, child_allowed_tunnel_types)
     child_selection_attributes = yang.gdata.from_xml_opt_cnt(node, 'selection-attributes')
     yang.gdata.maybe_add(children, 'selection-attributes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes, child_selection_attributes)
@@ -14597,8 +14614,9 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__mode(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('enumeration', val)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[Identityref]) -> yang.gdata.LeafList:
+    new_val = [Identityref.complete(v, ns_to_mod, mod_to_ns) for v in val]
+    return yang.gdata.LeafList('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes__tag__mandatory(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
@@ -14691,10 +14709,10 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
 
 class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution(yang.adata.MNode):
     mode: ?str
-    allowed_tunnel_types: list[str]
+    allowed_tunnel_types: list[Identityref]
     selection_attributes: srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes
 
-    mut def __init__(self, mode: ?str, allowed_tunnel_types: ?list[str]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes=None):
+    mut def __init__(self, mode: ?str, allowed_tunnel_types: ?list[Identityref]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.mode = mode
         self.allowed_tunnel_types = allowed_tunnel_types if allowed_tunnel_types is not None else []
@@ -14714,7 +14732,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ip
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution:
         if n != None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution(mode=n.get_opt_str('mode'), allowed_tunnel_types=n.get_opt_strs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution(mode=n.get_opt_str('mode'), allowed_tunnel_types=n.get_opt_Identityrefs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
         return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -14744,7 +14762,7 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     children = {}
     child_mode = yang.gdata.from_xml_opt_str(node, 'mode')
     yang.gdata.maybe_add(children, 'mode', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__mode, child_mode)
-    child_allowed_tunnel_types = yang.gdata.from_xml_opt_strs(node, 'allowed-tunnel-types')
+    child_allowed_tunnel_types = yang.gdata.from_xml_opt_Identityrefs(node, 'allowed-tunnel-types')
     yang.gdata.maybe_add(children, 'allowed-tunnel-types', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types, child_allowed_tunnel_types)
     child_selection_attributes = yang.gdata.from_xml_opt_cnt(node, 'selection-attributes')
     yang.gdata.maybe_add(children, 'selection-attributes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes, child_selection_attributes)
@@ -15060,8 +15078,9 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     yang.gdata.maybe_add(children, 'ignore-default-routes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__route_resolution__ignore_default_routes, child_ignore_default_routes)
     return yang.gdata.Container(children)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[Identityref]) -> yang.gdata.LeafList:
+    new_val = [Identityref.complete(v, ns_to_mod, mod_to_ns) for v in val]
+    return yang.gdata.LeafList('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes__tag__mandatory(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
@@ -15153,10 +15172,10 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     return yang.gdata.Container(children)
 
 class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution(yang.adata.MNode):
-    allowed_tunnel_types: list[str]
+    allowed_tunnel_types: list[Identityref]
     selection_attributes: srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes
 
-    mut def __init__(self, allowed_tunnel_types: ?list[str]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes=None):
+    mut def __init__(self, allowed_tunnel_types: ?list[Identityref]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.allowed_tunnel_types = allowed_tunnel_types if allowed_tunnel_types is not None else []
         self.selection_attributes = selection_attributes if selection_attributes is not None else srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes()
@@ -15172,7 +15191,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ip
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution:
         if n != None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution(allowed_tunnel_types=n.get_opt_strs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution(allowed_tunnel_types=n.get_opt_Identityrefs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
         return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -15197,7 +15216,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ip
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution(node: xml.Node) -> yang.gdata.Container:
     children = {}
-    child_allowed_tunnel_types = yang.gdata.from_xml_opt_strs(node, 'allowed-tunnel-types')
+    child_allowed_tunnel_types = yang.gdata.from_xml_opt_Identityrefs(node, 'allowed-tunnel-types')
     yang.gdata.maybe_add(children, 'allowed-tunnel-types', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types, child_allowed_tunnel_types)
     child_selection_attributes = yang.gdata.from_xml_opt_cnt(node, 'selection-attributes')
     yang.gdata.maybe_add(children, 'selection-attributes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes, child_selection_attributes)
@@ -15315,8 +15334,9 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     yang.gdata.maybe_add(children, 'ignore-default-routes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__route_resolution__ignore_default_routes, child_ignore_default_routes)
     return yang.gdata.Container(children)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[Identityref]) -> yang.gdata.LeafList:
+    new_val = [Identityref.complete(v, ns_to_mod, mod_to_ns) for v in val]
+    return yang.gdata.LeafList('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes__tag__mandatory(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
@@ -15408,10 +15428,10 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     return yang.gdata.Container(children)
 
 class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution(yang.adata.MNode):
-    allowed_tunnel_types: list[str]
+    allowed_tunnel_types: list[Identityref]
     selection_attributes: srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes
 
-    mut def __init__(self, allowed_tunnel_types: ?list[str]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes=None):
+    mut def __init__(self, allowed_tunnel_types: ?list[Identityref]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.allowed_tunnel_types = allowed_tunnel_types if allowed_tunnel_types is not None else []
         self.selection_attributes = selection_attributes if selection_attributes is not None else srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes()
@@ -15427,7 +15447,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ip
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution:
         if n != None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution(allowed_tunnel_types=n.get_opt_strs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution(allowed_tunnel_types=n.get_opt_Identityrefs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
         return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -15452,7 +15472,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ip
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution(node: xml.Node) -> yang.gdata.Container:
     children = {}
-    child_allowed_tunnel_types = yang.gdata.from_xml_opt_strs(node, 'allowed-tunnel-types')
+    child_allowed_tunnel_types = yang.gdata.from_xml_opt_Identityrefs(node, 'allowed-tunnel-types')
     yang.gdata.maybe_add(children, 'allowed-tunnel-types', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types, child_allowed_tunnel_types)
     child_selection_attributes = yang.gdata.from_xml_opt_cnt(node, 'selection-attributes')
     yang.gdata.maybe_add(children, 'selection-attributes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes, child_selection_attributes)
@@ -15846,8 +15866,9 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     yang.gdata.maybe_add(children, 'ignore-default-routes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__route_resolution__ignore_default_routes, child_ignore_default_routes)
     return yang.gdata.Container(children)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[Identityref]) -> yang.gdata.LeafList:
+    new_val = [Identityref.complete(v, ns_to_mod, mod_to_ns) for v in val]
+    return yang.gdata.LeafList('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes__tag__mandatory(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
@@ -15939,10 +15960,10 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     return yang.gdata.Container(children)
 
 class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution(yang.adata.MNode):
-    allowed_tunnel_types: list[str]
+    allowed_tunnel_types: list[Identityref]
     selection_attributes: srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes
 
-    mut def __init__(self, allowed_tunnel_types: ?list[str]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes=None):
+    mut def __init__(self, allowed_tunnel_types: ?list[Identityref]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.allowed_tunnel_types = allowed_tunnel_types if allowed_tunnel_types is not None else []
         self.selection_attributes = selection_attributes if selection_attributes is not None else srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes()
@@ -15958,7 +15979,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ev
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution:
         if n != None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution(allowed_tunnel_types=n.get_opt_strs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution(allowed_tunnel_types=n.get_opt_Identityrefs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
         return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -15983,7 +16004,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ev
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution(node: xml.Node) -> yang.gdata.Container:
     children = {}
-    child_allowed_tunnel_types = yang.gdata.from_xml_opt_strs(node, 'allowed-tunnel-types')
+    child_allowed_tunnel_types = yang.gdata.from_xml_opt_Identityrefs(node, 'allowed-tunnel-types')
     yang.gdata.maybe_add(children, 'allowed-tunnel-types', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__allowed_tunnel_types, child_allowed_tunnel_types)
     child_selection_attributes = yang.gdata.from_xml_opt_cnt(node, 'selection-attributes')
     yang.gdata.maybe_add(children, 'selection-attributes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv4_next_hops__tunnel_resolution__selection_attributes, child_selection_attributes)
@@ -16101,8 +16122,9 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     yang.gdata.maybe_add(children, 'ignore-default-routes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__route_resolution__ignore_default_routes, child_ignore_default_routes)
     return yang.gdata.Container(children)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types(val: list[Identityref]) -> yang.gdata.LeafList:
+    new_val = [Identityref.complete(v, ns_to_mod, mod_to_ns) for v in val]
+    return yang.gdata.LeafList('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes__tag__mandatory(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
@@ -16194,10 +16216,10 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     return yang.gdata.Container(children)
 
 class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution(yang.adata.MNode):
-    allowed_tunnel_types: list[str]
+    allowed_tunnel_types: list[Identityref]
     selection_attributes: srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes
 
-    mut def __init__(self, allowed_tunnel_types: ?list[str]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes=None):
+    mut def __init__(self, allowed_tunnel_types: ?list[Identityref]=None, selection_attributes: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.allowed_tunnel_types = allowed_tunnel_types if allowed_tunnel_types is not None else []
         self.selection_attributes = selection_attributes if selection_attributes is not None else srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes()
@@ -16213,7 +16235,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ev
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution:
         if n != None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution(allowed_tunnel_types=n.get_opt_strs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution(allowed_tunnel_types=n.get_opt_Identityrefs('allowed-tunnel-types'), selection_attributes=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes.from_gdata(n.get_opt_cnt('selection-attributes')))
         return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -16238,7 +16260,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ev
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution(node: xml.Node) -> yang.gdata.Container:
     children = {}
-    child_allowed_tunnel_types = yang.gdata.from_xml_opt_strs(node, 'allowed-tunnel-types')
+    child_allowed_tunnel_types = yang.gdata.from_xml_opt_Identityrefs(node, 'allowed-tunnel-types')
     yang.gdata.maybe_add(children, 'allowed-tunnel-types', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__allowed_tunnel_types, child_allowed_tunnel_types)
     child_selection_attributes = yang.gdata.from_xml_opt_cnt(node, 'selection-attributes')
     yang.gdata.maybe_add(children, 'selection-attributes', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn__next_hop_resolution__ipv6_next_hops__tunnel_resolution__selection_attributes, child_selection_attributes)
@@ -16558,7 +16580,7 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__a
     return yang.gdata.Container(children)
 
 class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_entry(yang.adata.MNode):
-    afi_safi_name: str
+    afi_safi_name: Identityref
     admin_state: ?str
     export_policy: list[str]
     import_policy: list[str]
@@ -16576,7 +16598,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_ent
     srte_policy_ipv4: srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__srte_policy_ipv4
     srte_policy_ipv6: srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__srte_policy_ipv6
 
-    mut def __init__(self, afi_safi_name: str, admin_state: ?str, export_policy: ?list[str]=None, import_policy: ?list[str]=None, add_paths: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__add_paths=None, multipath: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__multipath=None, best_path_selection: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__best_path_selection=None, send_community_type: ?list[str]=None, ipv4_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast=None, ipv4_labeled_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast=None, l3vpn_ipv4_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__l3vpn_ipv4_unicast=None, ipv6_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast=None, ipv6_labeled_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast=None, l3vpn_ipv6_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__l3vpn_ipv6_unicast=None, evpn: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn=None, srte_policy_ipv4: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__srte_policy_ipv4=None, srte_policy_ipv6: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__srte_policy_ipv6=None):
+    mut def __init__(self, afi_safi_name: Identityref, admin_state: ?str, export_policy: ?list[str]=None, import_policy: ?list[str]=None, add_paths: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__add_paths=None, multipath: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__multipath=None, best_path_selection: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__best_path_selection=None, send_community_type: ?list[str]=None, ipv4_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast=None, ipv4_labeled_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast=None, l3vpn_ipv4_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__l3vpn_ipv4_unicast=None, ipv6_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast=None, ipv6_labeled_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast=None, l3vpn_ipv6_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__l3vpn_ipv6_unicast=None, evpn: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn=None, srte_policy_ipv4: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__srte_policy_ipv4=None, srte_policy_ipv6: ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__srte_policy_ipv6=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.afi_safi_name = afi_safi_name
         self.admin_state = admin_state
@@ -16647,7 +16669,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_ent
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_entry:
-        return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_entry(afi_safi_name=n.get_str('afi-safi-name'), admin_state=n.get_opt_str('admin-state'), export_policy=n.get_opt_strs('export-policy'), import_policy=n.get_opt_strs('import-policy'), add_paths=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__add_paths.from_gdata(n.get_opt_cnt('add-paths')), multipath=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__multipath.from_gdata(n.get_opt_cnt('multipath')), best_path_selection=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__best_path_selection.from_gdata(n.get_opt_cnt('best-path-selection')), send_community_type=n.get_opt_strs('send-community-type'), ipv4_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast.from_gdata(n.get_opt_cnt('ipv4-unicast')), ipv4_labeled_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast.from_gdata(n.get_opt_cnt('ipv4-labeled-unicast')), l3vpn_ipv4_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__l3vpn_ipv4_unicast.from_gdata(n.get_opt_cnt('l3vpn-ipv4-unicast')), ipv6_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast.from_gdata(n.get_opt_cnt('ipv6-unicast')), ipv6_labeled_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast.from_gdata(n.get_opt_cnt('ipv6-labeled-unicast')), l3vpn_ipv6_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__l3vpn_ipv6_unicast.from_gdata(n.get_opt_cnt('l3vpn-ipv6-unicast')), evpn=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn.from_gdata(n.get_opt_cnt('evpn')), srte_policy_ipv4=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__srte_policy_ipv4.from_gdata(n.get_opt_cnt('srte-policy-ipv4')), srte_policy_ipv6=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__srte_policy_ipv6.from_gdata(n.get_opt_cnt('srte-policy-ipv6')))
+        return srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_entry(afi_safi_name=n.get_Identityref('afi-safi-name'), admin_state=n.get_opt_str('admin-state'), export_policy=n.get_opt_strs('export-policy'), import_policy=n.get_opt_strs('import-policy'), add_paths=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__add_paths.from_gdata(n.get_opt_cnt('add-paths')), multipath=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__multipath.from_gdata(n.get_opt_cnt('multipath')), best_path_selection=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__best_path_selection.from_gdata(n.get_opt_cnt('best-path-selection')), send_community_type=n.get_opt_strs('send-community-type'), ipv4_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_unicast.from_gdata(n.get_opt_cnt('ipv4-unicast')), ipv4_labeled_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv4_labeled_unicast.from_gdata(n.get_opt_cnt('ipv4-labeled-unicast')), l3vpn_ipv4_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__l3vpn_ipv4_unicast.from_gdata(n.get_opt_cnt('l3vpn-ipv4-unicast')), ipv6_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_unicast.from_gdata(n.get_opt_cnt('ipv6-unicast')), ipv6_labeled_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__ipv6_labeled_unicast.from_gdata(n.get_opt_cnt('ipv6-labeled-unicast')), l3vpn_ipv6_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__l3vpn_ipv6_unicast.from_gdata(n.get_opt_cnt('l3vpn-ipv6-unicast')), evpn=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__evpn.from_gdata(n.get_opt_cnt('evpn')), srte_policy_ipv4=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__srte_policy_ipv4.from_gdata(n.get_opt_cnt('srte-policy-ipv4')), srte_policy_ipv6=srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__srte_policy_ipv6.from_gdata(n.get_opt_cnt('srte-policy-ipv6')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -16747,7 +16769,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi(yan
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
-    child_afi_safi_name = yang.gdata.from_xml_str(node, 'afi-safi-name')
+    child_afi_safi_name = yang.gdata.from_xml_Identityref(node, 'afi-safi-name')
     yang.gdata.maybe_add(children, 'afi-safi-name', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__afi_safi_name, child_afi_safi_name)
     child_admin_state = yang.gdata.from_xml_opt_str(node, 'admin-state')
     yang.gdata.maybe_add(children, 'admin-state', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__admin_state, child_admin_state)
@@ -16846,17 +16868,18 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__p
     yang.gdata.maybe_add(children, 'ibgp', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__preference__ibgp, child_ibgp)
     return yang.gdata.Container(children)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__rib_management__table__address_family(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__rib_management__table__address_family(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__rib_management__table__route_table_import(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('leafref', val)
 
 class srl_nokia_network_instance__network_instance__protocols__bgp__rib_management__table_entry(yang.adata.MNode):
-    address_family: str
+    address_family: Identityref
     route_table_import: ?str
 
-    mut def __init__(self, address_family: str, route_table_import: ?str):
+    mut def __init__(self, address_family: Identityref, route_table_import: ?str):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.address_family = address_family
         self.route_table_import = route_table_import
@@ -16873,7 +16896,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__rib_manageme
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__rib_management__table_entry:
-        return srl_nokia_network_instance__network_instance__protocols__bgp__rib_management__table_entry(address_family=n.get_str('address-family'), route_table_import=n.get_opt_str('route-table-import'))
+        return srl_nokia_network_instance__network_instance__protocols__bgp__rib_management__table_entry(address_family=n.get_Identityref('address-family'), route_table_import=n.get_opt_str('route-table-import'))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -16928,7 +16951,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__rib_manageme
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__rib_management__table_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
-    child_address_family = yang.gdata.from_xml_str(node, 'address-family')
+    child_address_family = yang.gdata.from_xml_Identityref(node, 'address-family')
     yang.gdata.maybe_add(children, 'address-family', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__rib_management__table__address_family, child_address_family)
     child_route_table_import = yang.gdata.from_xml_opt_str(node, 'route-table-import')
     yang.gdata.maybe_add(children, 'route-table-import', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__rib_management__table__route_table_import, child_route_table_import)
@@ -17972,8 +17995,9 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__g
     yang.gdata.maybe_add(children, 'requested-restart-time', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__group__graceful_restart__requested_restart_time, child_requested_restart_time)
     return yang.gdata.Container(children)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__afi_safi_name(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__afi_safi_name(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__admin_state(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('enumeration', val)
@@ -20732,7 +20756,7 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__g
     return yang.gdata.Container(children)
 
 class srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi_entry(yang.adata.MNode):
-    afi_safi_name: str
+    afi_safi_name: Identityref
     admin_state: ?str
     export_policy: list[str]
     default_export_policy: ?str
@@ -20753,7 +20777,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_s
     srte_policy_ipv6: srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__srte_policy_ipv6
     link_state: srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__link_state
 
-    mut def __init__(self, afi_safi_name: str, admin_state: ?str, export_policy: ?list[str]=None, default_export_policy: ?str, import_policy: ?list[str]=None, default_import_policy: ?str, add_paths: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__add_paths=None, multipath: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__multipath=None, send_community_type: ?list[str]=None, ipv4_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__ipv4_unicast=None, ipv4_labeled_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__ipv4_labeled_unicast=None, l3vpn_ipv4_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__l3vpn_ipv4_unicast=None, ipv6_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__ipv6_unicast=None, ipv6_labeled_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__ipv6_labeled_unicast=None, l3vpn_ipv6_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__l3vpn_ipv6_unicast=None, evpn: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__evpn=None, route_target: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__route_target=None, srte_policy_ipv4: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__srte_policy_ipv4=None, srte_policy_ipv6: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__srte_policy_ipv6=None, link_state: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__link_state=None):
+    mut def __init__(self, afi_safi_name: Identityref, admin_state: ?str, export_policy: ?list[str]=None, default_export_policy: ?str, import_policy: ?list[str]=None, default_import_policy: ?str, add_paths: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__add_paths=None, multipath: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__multipath=None, send_community_type: ?list[str]=None, ipv4_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__ipv4_unicast=None, ipv4_labeled_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__ipv4_labeled_unicast=None, l3vpn_ipv4_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__l3vpn_ipv4_unicast=None, ipv6_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__ipv6_unicast=None, ipv6_labeled_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__ipv6_labeled_unicast=None, l3vpn_ipv6_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__l3vpn_ipv6_unicast=None, evpn: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__evpn=None, route_target: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__route_target=None, srte_policy_ipv4: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__srte_policy_ipv4=None, srte_policy_ipv6: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__srte_policy_ipv6=None, link_state: ?srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__link_state=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.afi_safi_name = afi_safi_name
         self.admin_state = admin_state
@@ -20836,7 +20860,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_s
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi_entry:
-        return srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi_entry(afi_safi_name=n.get_str('afi-safi-name'), admin_state=n.get_opt_str('admin-state'), export_policy=n.get_opt_strs('export-policy'), default_export_policy=n.get_opt_str('default-export-policy'), import_policy=n.get_opt_strs('import-policy'), default_import_policy=n.get_opt_str('default-import-policy'), add_paths=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__add_paths.from_gdata(n.get_opt_cnt('add-paths')), multipath=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__multipath.from_gdata(n.get_opt_cnt('multipath')), send_community_type=n.get_opt_strs('send-community-type'), ipv4_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__ipv4_unicast.from_gdata(n.get_opt_cnt('ipv4-unicast')), ipv4_labeled_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__ipv4_labeled_unicast.from_gdata(n.get_opt_cnt('ipv4-labeled-unicast')), l3vpn_ipv4_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__l3vpn_ipv4_unicast.from_gdata(n.get_opt_cnt('l3vpn-ipv4-unicast')), ipv6_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__ipv6_unicast.from_gdata(n.get_opt_cnt('ipv6-unicast')), ipv6_labeled_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__ipv6_labeled_unicast.from_gdata(n.get_opt_cnt('ipv6-labeled-unicast')), l3vpn_ipv6_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__l3vpn_ipv6_unicast.from_gdata(n.get_opt_cnt('l3vpn-ipv6-unicast')), evpn=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__evpn.from_gdata(n.get_opt_cnt('evpn')), route_target=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__route_target.from_gdata(n.get_opt_cnt('route-target')), srte_policy_ipv4=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__srte_policy_ipv4.from_gdata(n.get_opt_cnt('srte-policy-ipv4')), srte_policy_ipv6=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__srte_policy_ipv6.from_gdata(n.get_opt_cnt('srte-policy-ipv6')), link_state=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__link_state.from_gdata(n.get_opt_cnt('link-state')))
+        return srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi_entry(afi_safi_name=n.get_Identityref('afi-safi-name'), admin_state=n.get_opt_str('admin-state'), export_policy=n.get_opt_strs('export-policy'), default_export_policy=n.get_opt_str('default-export-policy'), import_policy=n.get_opt_strs('import-policy'), default_import_policy=n.get_opt_str('default-import-policy'), add_paths=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__add_paths.from_gdata(n.get_opt_cnt('add-paths')), multipath=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__multipath.from_gdata(n.get_opt_cnt('multipath')), send_community_type=n.get_opt_strs('send-community-type'), ipv4_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__ipv4_unicast.from_gdata(n.get_opt_cnt('ipv4-unicast')), ipv4_labeled_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__ipv4_labeled_unicast.from_gdata(n.get_opt_cnt('ipv4-labeled-unicast')), l3vpn_ipv4_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__l3vpn_ipv4_unicast.from_gdata(n.get_opt_cnt('l3vpn-ipv4-unicast')), ipv6_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__ipv6_unicast.from_gdata(n.get_opt_cnt('ipv6-unicast')), ipv6_labeled_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__ipv6_labeled_unicast.from_gdata(n.get_opt_cnt('ipv6-labeled-unicast')), l3vpn_ipv6_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__l3vpn_ipv6_unicast.from_gdata(n.get_opt_cnt('l3vpn-ipv6-unicast')), evpn=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__evpn.from_gdata(n.get_opt_cnt('evpn')), route_target=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__route_target.from_gdata(n.get_opt_cnt('route-target')), srte_policy_ipv4=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__srte_policy_ipv4.from_gdata(n.get_opt_cnt('srte-policy-ipv4')), srte_policy_ipv6=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__srte_policy_ipv6.from_gdata(n.get_opt_cnt('srte-policy-ipv6')), link_state=srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__link_state.from_gdata(n.get_opt_cnt('link-state')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -20945,7 +20969,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_s
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
-    child_afi_safi_name = yang.gdata.from_xml_str(node, 'afi-safi-name')
+    child_afi_safi_name = yang.gdata.from_xml_Identityref(node, 'afi-safi-name')
     yang.gdata.maybe_add(children, 'afi-safi-name', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__afi_safi_name, child_afi_safi_name)
     child_admin_state = yang.gdata.from_xml_opt_str(node, 'admin-state')
     yang.gdata.maybe_add(children, 'admin-state', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__admin_state, child_admin_state)
@@ -22345,8 +22369,9 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__n
     yang.gdata.maybe_add(children, 'block-prefix-sid', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__optional_attributes__block_prefix_sid, child_block_prefix_sid)
     return yang.gdata.Container(children)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__afi_safi_name(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__afi_safi_name(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__admin_state(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('enumeration', val)
@@ -24874,7 +24899,7 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__n
     return yang.gdata.Container(children)
 
 class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi_entry(yang.adata.MNode):
-    afi_safi_name: str
+    afi_safi_name: Identityref
     admin_state: ?str
     export_policy: list[str]
     default_export_policy: ?str
@@ -24894,7 +24919,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__af
     srte_policy_ipv6: srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__srte_policy_ipv6
     link_state: srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__link_state
 
-    mut def __init__(self, afi_safi_name: str, admin_state: ?str, export_policy: ?list[str]=None, default_export_policy: ?str, import_policy: ?list[str]=None, default_import_policy: ?str, add_paths: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__add_paths=None, send_community_type: ?list[str]=None, ipv4_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__ipv4_unicast=None, ipv4_labeled_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__ipv4_labeled_unicast=None, l3vpn_ipv4_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__l3vpn_ipv4_unicast=None, ipv6_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__ipv6_unicast=None, ipv6_labeled_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__ipv6_labeled_unicast=None, l3vpn_ipv6_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__l3vpn_ipv6_unicast=None, evpn: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__evpn=None, route_target: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__route_target=None, srte_policy_ipv4: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__srte_policy_ipv4=None, srte_policy_ipv6: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__srte_policy_ipv6=None, link_state: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__link_state=None):
+    mut def __init__(self, afi_safi_name: Identityref, admin_state: ?str, export_policy: ?list[str]=None, default_export_policy: ?str, import_policy: ?list[str]=None, default_import_policy: ?str, add_paths: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__add_paths=None, send_community_type: ?list[str]=None, ipv4_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__ipv4_unicast=None, ipv4_labeled_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__ipv4_labeled_unicast=None, l3vpn_ipv4_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__l3vpn_ipv4_unicast=None, ipv6_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__ipv6_unicast=None, ipv6_labeled_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__ipv6_labeled_unicast=None, l3vpn_ipv6_unicast: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__l3vpn_ipv6_unicast=None, evpn: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__evpn=None, route_target: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__route_target=None, srte_policy_ipv4: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__srte_policy_ipv4=None, srte_policy_ipv6: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__srte_policy_ipv6=None, link_state: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__link_state=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.afi_safi_name = afi_safi_name
         self.admin_state = admin_state
@@ -24973,7 +24998,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__af
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi_entry:
-        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi_entry(afi_safi_name=n.get_str('afi-safi-name'), admin_state=n.get_opt_str('admin-state'), export_policy=n.get_opt_strs('export-policy'), default_export_policy=n.get_opt_str('default-export-policy'), import_policy=n.get_opt_strs('import-policy'), default_import_policy=n.get_opt_str('default-import-policy'), add_paths=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__add_paths.from_gdata(n.get_opt_cnt('add-paths')), send_community_type=n.get_opt_strs('send-community-type'), ipv4_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__ipv4_unicast.from_gdata(n.get_opt_cnt('ipv4-unicast')), ipv4_labeled_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__ipv4_labeled_unicast.from_gdata(n.get_opt_cnt('ipv4-labeled-unicast')), l3vpn_ipv4_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__l3vpn_ipv4_unicast.from_gdata(n.get_opt_cnt('l3vpn-ipv4-unicast')), ipv6_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__ipv6_unicast.from_gdata(n.get_opt_cnt('ipv6-unicast')), ipv6_labeled_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__ipv6_labeled_unicast.from_gdata(n.get_opt_cnt('ipv6-labeled-unicast')), l3vpn_ipv6_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__l3vpn_ipv6_unicast.from_gdata(n.get_opt_cnt('l3vpn-ipv6-unicast')), evpn=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__evpn.from_gdata(n.get_opt_cnt('evpn')), route_target=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__route_target.from_gdata(n.get_opt_cnt('route-target')), srte_policy_ipv4=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__srte_policy_ipv4.from_gdata(n.get_opt_cnt('srte-policy-ipv4')), srte_policy_ipv6=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__srte_policy_ipv6.from_gdata(n.get_opt_cnt('srte-policy-ipv6')), link_state=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__link_state.from_gdata(n.get_opt_cnt('link-state')))
+        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi_entry(afi_safi_name=n.get_Identityref('afi-safi-name'), admin_state=n.get_opt_str('admin-state'), export_policy=n.get_opt_strs('export-policy'), default_export_policy=n.get_opt_str('default-export-policy'), import_policy=n.get_opt_strs('import-policy'), default_import_policy=n.get_opt_str('default-import-policy'), add_paths=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__add_paths.from_gdata(n.get_opt_cnt('add-paths')), send_community_type=n.get_opt_strs('send-community-type'), ipv4_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__ipv4_unicast.from_gdata(n.get_opt_cnt('ipv4-unicast')), ipv4_labeled_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__ipv4_labeled_unicast.from_gdata(n.get_opt_cnt('ipv4-labeled-unicast')), l3vpn_ipv4_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__l3vpn_ipv4_unicast.from_gdata(n.get_opt_cnt('l3vpn-ipv4-unicast')), ipv6_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__ipv6_unicast.from_gdata(n.get_opt_cnt('ipv6-unicast')), ipv6_labeled_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__ipv6_labeled_unicast.from_gdata(n.get_opt_cnt('ipv6-labeled-unicast')), l3vpn_ipv6_unicast=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__l3vpn_ipv6_unicast.from_gdata(n.get_opt_cnt('l3vpn-ipv6-unicast')), evpn=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__evpn.from_gdata(n.get_opt_cnt('evpn')), route_target=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__route_target.from_gdata(n.get_opt_cnt('route-target')), srte_policy_ipv4=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__srte_policy_ipv4.from_gdata(n.get_opt_cnt('srte-policy-ipv4')), srte_policy_ipv6=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__srte_policy_ipv6.from_gdata(n.get_opt_cnt('srte-policy-ipv6')), link_state=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__link_state.from_gdata(n.get_opt_cnt('link-state')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -25079,7 +25104,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__af
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
-    child_afi_safi_name = yang.gdata.from_xml_str(node, 'afi-safi-name')
+    child_afi_safi_name = yang.gdata.from_xml_Identityref(node, 'afi-safi-name')
     yang.gdata.maybe_add(children, 'afi-safi-name', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__afi_safi_name, child_afi_safi_name)
     child_admin_state = yang.gdata.from_xml_opt_str(node, 'admin-state')
     yang.gdata.maybe_add(children, 'admin-state', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__admin_state, child_admin_state)
@@ -27353,7 +27378,7 @@ mut def from_xml_srl_nokia_network_instance__network_instance__connection_point(
 
 class srl_nokia_network_instance__network_instance_entry(yang.adata.MNode):
     name: str
-    type: ?str
+    type: ?Identityref
     admin_state: ?str
     description: ?str
     router_id: ?str
@@ -27365,7 +27390,7 @@ class srl_nokia_network_instance__network_instance_entry(yang.adata.MNode):
     protocols: srl_nokia_network_instance__network_instance__protocols
     connection_point: srl_nokia_network_instance__network_instance__connection_point
 
-    mut def __init__(self, name: str, type: ?str, admin_state: ?str, description: ?str, router_id: ?str, mpls_forwarding: ?srl_nokia_network_instance__network_instance__mpls_forwarding=None, ip_forwarding: ?srl_nokia_network_instance__network_instance__ip_forwarding=None, ip_load_balancing: ?srl_nokia_network_instance__network_instance__ip_load_balancing=None, interface: list[srl_nokia_network_instance__network_instance__interface_entry]=[], vxlan_interface: list[srl_nokia_network_instance__network_instance__vxlan_interface_entry]=[], protocols: ?srl_nokia_network_instance__network_instance__protocols=None, connection_point: list[srl_nokia_network_instance__network_instance__connection_point_entry]=[]):
+    mut def __init__(self, name: str, type: ?Identityref, admin_state: ?str, description: ?str, router_id: ?str, mpls_forwarding: ?srl_nokia_network_instance__network_instance__mpls_forwarding=None, ip_forwarding: ?srl_nokia_network_instance__network_instance__ip_forwarding=None, ip_load_balancing: ?srl_nokia_network_instance__network_instance__ip_load_balancing=None, interface: list[srl_nokia_network_instance__network_instance__interface_entry]=[], vxlan_interface: list[srl_nokia_network_instance__network_instance__vxlan_interface_entry]=[], protocols: ?srl_nokia_network_instance__network_instance__protocols=None, connection_point: list[srl_nokia_network_instance__network_instance__connection_point_entry]=[]):
         self._ns = 'urn:nokia.com:srlinux:net-inst:network-instance'
         self.name = name
         self.type = type
@@ -27427,7 +27452,7 @@ class srl_nokia_network_instance__network_instance_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> srl_nokia_network_instance__network_instance_entry:
-        return srl_nokia_network_instance__network_instance_entry(name=n.get_str('name'), type=n.get_opt_str('type'), admin_state=n.get_opt_str('admin-state'), description=n.get_opt_str('description'), router_id=n.get_opt_str('router-id'), mpls_forwarding=srl_nokia_network_instance__network_instance__mpls_forwarding.from_gdata(n.get_opt_cnt('mpls-forwarding')), ip_forwarding=srl_nokia_network_instance__network_instance__ip_forwarding.from_gdata(n.get_opt_cnt('ip-forwarding')), ip_load_balancing=srl_nokia_network_instance__network_instance__ip_load_balancing.from_gdata(n.get_opt_cnt('ip-load-balancing')), interface=srl_nokia_network_instance__network_instance__interface.from_gdata(n.get_opt_list('interface')), vxlan_interface=srl_nokia_network_instance__network_instance__vxlan_interface.from_gdata(n.get_opt_list('vxlan-interface')), protocols=srl_nokia_network_instance__network_instance__protocols.from_gdata(n.get_opt_cnt('protocols')), connection_point=srl_nokia_network_instance__network_instance__connection_point.from_gdata(n.get_opt_list('connection-point')))
+        return srl_nokia_network_instance__network_instance_entry(name=n.get_str('name'), type=n.get_opt_Identityref('type'), admin_state=n.get_opt_str('admin-state'), description=n.get_opt_str('description'), router_id=n.get_opt_str('router-id'), mpls_forwarding=srl_nokia_network_instance__network_instance__mpls_forwarding.from_gdata(n.get_opt_cnt('mpls-forwarding')), ip_forwarding=srl_nokia_network_instance__network_instance__ip_forwarding.from_gdata(n.get_opt_cnt('ip-forwarding')), ip_load_balancing=srl_nokia_network_instance__network_instance__ip_load_balancing.from_gdata(n.get_opt_cnt('ip-load-balancing')), interface=srl_nokia_network_instance__network_instance__interface.from_gdata(n.get_opt_list('interface')), vxlan_interface=srl_nokia_network_instance__network_instance__vxlan_interface.from_gdata(n.get_opt_list('vxlan-interface')), protocols=srl_nokia_network_instance__network_instance__protocols.from_gdata(n.get_opt_cnt('protocols')), connection_point=srl_nokia_network_instance__network_instance__connection_point.from_gdata(n.get_opt_list('connection-point')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -27529,7 +27554,7 @@ mut def from_xml_srl_nokia_network_instance__network_instance_element(node: xml.
     children = {}
     child_name = yang.gdata.from_xml_str(node, 'name')
     yang.gdata.maybe_add(children, 'name', from_xml_srl_nokia_network_instance__network_instance__name, child_name)
-    child_type = yang.gdata.from_xml_opt_str(node, 'type')
+    child_type = yang.gdata.from_xml_opt_Identityref(node, 'type')
     yang.gdata.maybe_add(children, 'type', from_xml_srl_nokia_network_instance__network_instance__type, child_type)
     child_admin_state = yang.gdata.from_xml_opt_str(node, 'admin-state')
     yang.gdata.maybe_add(children, 'admin-state', from_xml_srl_nokia_network_instance__network_instance__admin_state, child_admin_state)
@@ -27563,8 +27588,9 @@ mut def from_xml_srl_nokia_tunnel_interfaces__tunnel_interface__name(val: value)
 mut def from_xml_srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__index(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('uint32', val)
 
-mut def from_xml_srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_xml_srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress__vni(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('uint32', val)
@@ -28095,12 +28121,12 @@ mut def from_xml_srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_
 
 class srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry(yang.adata.MNode):
     index: int
-    type: ?str
+    type: ?Identityref
     ingress: srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress
     egress: srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__egress
     bridge_table: ?srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__bridge_table
 
-    mut def __init__(self, index: int, type: ?str, ingress: ?srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress=None, egress: ?srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__egress=None, bridge_table: ?srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__bridge_table=None):
+    mut def __init__(self, index: int, type: ?Identityref, ingress: ?srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress=None, egress: ?srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__egress=None, bridge_table: ?srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__bridge_table=None):
         self._ns = 'urn:nokia.com:srlinux:vxlan:tunnel-interfaces'
         self.index = index
         self.type = type
@@ -28134,7 +28160,7 @@ class srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry(yang.
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry:
-        return srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry(index=n.get_int('index'), type=n.get_opt_str('type'), ingress=srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress.from_gdata(n.get_opt_cnt('ingress')), egress=srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__egress.from_gdata(n.get_opt_cnt('egress')), bridge_table=srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__bridge_table.from_gdata(n.get_opt_cnt('bridge-table')))
+        return srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry(index=n.get_int('index'), type=n.get_opt_Identityref('type'), ingress=srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress.from_gdata(n.get_opt_cnt('ingress')), egress=srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__egress.from_gdata(n.get_opt_cnt('egress')), bridge_table=srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__bridge_table.from_gdata(n.get_opt_cnt('bridge-table')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -28203,7 +28229,7 @@ mut def from_xml_srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_
     children = {}
     child_index = yang.gdata.from_xml_int(node, 'index')
     yang.gdata.maybe_add(children, 'index', from_xml_srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__index, child_index)
-    child_type = yang.gdata.from_xml_opt_str(node, 'type')
+    child_type = yang.gdata.from_xml_opt_Identityref(node, 'type')
     yang.gdata.maybe_add(children, 'type', from_xml_srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__type, child_type)
     child_ingress = yang.gdata.from_xml_opt_cnt(node, 'ingress')
     yang.gdata.maybe_add(children, 'ingress', from_xml_srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress, child_ingress)

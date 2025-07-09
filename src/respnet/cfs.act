@@ -1,4 +1,5 @@
 import yang.adata
+from yang.common import Identityref
 import orchestron.ttt
 
 from respnet.conf import IGBP_AUTHENTICATION_KEY
@@ -69,7 +70,7 @@ class L3VpnSite(base.L3VpnSite):
                 o_ep.ipv4_prefix_length = ipv4_len
 
                 for rp in sna.routing_protocols.routing_protocol.elements:
-                    if rp.type == "bgp":
+                    if rp.type == Identityref("bgp", "urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc", "ietf-l3vpn-svc"):
                         bgp = rp.bgp
                         if bgp is not None:
                             o_bgp = o_ep.create_bgp()

@@ -3,8 +3,13 @@ import json
 import xml
 import yang.adata
 import yang.gdata
+from yang.common import Identityref
 
 # == This file is generated ==
+
+
+mod_to_ns = {'ietf-inet-types':'urn:ietf:params:xml:ns:yang:ietf-inet-types', 'netinfra':'http://example.com/netinfra', 'ietf-yang-types':'urn:ietf:params:xml:ns:yang:ietf-yang-types', 'ietf-l3vpn-svc':'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'}
+ns_to_mod = {'urn:ietf:params:xml:ns:yang:ietf-inet-types':'ietf-inet-types', 'http://example.com/netinfra':'netinfra', 'urn:ietf:params:xml:ns:yang:ietf-yang-types':'ietf-yang-types', 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc':'ietf-l3vpn-svc'}
 
 
 mut def from_json_netinfra__netinfra__router__name(val: value) -> yang.gdata.Leaf:
@@ -1260,11 +1265,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__customer
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__customer_name(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__vpn_service_topology(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__vpn_service_topology(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__vpn_service_topology(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__vpn_service_topology(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access__cloud_identifier(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('leafref', val)
@@ -1706,16 +1713,18 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicas
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__enabled(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors__tree_flavor(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors__tree_flavor(val: list[Identityref]) -> yang.gdata.LeafList:
+    new_val = [Identityref.complete(v, ns_to_mod, mod_to_ns) for v in val]
+    return yang.gdata.LeafList('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors__tree_flavor(val: list[value]) -> yang.gdata.LeafList:
-    return yang.gdata.LeafList('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors__tree_flavor(val: list[Identityref]) -> yang.gdata.LeafList:
+    new_val = [Identityref.complete(v, ns_to_mod, mod_to_ns) for v in val]
+    return yang.gdata.LeafList('identityref', new_val)
 
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors(yang.adata.MNode):
-    tree_flavor: list[str]
+    tree_flavor: list[Identityref]
 
-    mut def __init__(self, tree_flavor: ?list[str]=None):
+    mut def __init__(self, tree_flavor: ?list[Identityref]=None):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.tree_flavor = tree_flavor if tree_flavor is not None else []
 
@@ -1727,7 +1736,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors:
         if n != None:
-            return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors(tree_flavor=n.get_opt_strs('tree-flavor'))
+            return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors(tree_flavor=n.get_opt_Identityrefs('tree-flavor'))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -1749,7 +1758,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors(node: xml.Node) -> yang.gdata.Container:
     children = {}
-    child_tree_flavor = yang.gdata.from_xml_opt_strs(node, 'tree-flavor')
+    child_tree_flavor = yang.gdata.from_xml_opt_Identityrefs(node, 'tree-flavor')
     yang.gdata.maybe_add(children, 'tree-flavor', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors__tree_flavor, child_tree_flavor)
     return yang.gdata.Container(children)
 
@@ -1771,7 +1780,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__mul
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors(jd: dict[str, ?value]) -> yang.gdata.Container:
     children = {}
-    child_tree_flavor = yang.gdata.take_json_opt_strs(jd, 'tree-flavor')
+    child_tree_flavor = yang.gdata.take_json_opt_Identityrefs(jd, 'tree-flavor')
     yang.gdata.maybe_add(children, 'tree-flavor', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors__tree_flavor, child_tree_flavor)
     return yang.gdata.Container(children)
 
@@ -2408,11 +2417,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicas
     yang.gdata.maybe_add(children, 'rp-group-mapping', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping, child_rp_group_mapping)
     return yang.gdata.Container(children)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__rp_discovery_type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__rp_discovery_type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__rp_discovery_type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__rp_discovery_type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__bsr_candidates__bsr_candidate_address(val: list[value]) -> yang.gdata.LeafList:
     return yang.gdata.LeafList('union', val)
@@ -2484,10 +2495,10 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicas
     return yang.gdata.Container(children)
 
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery(yang.adata.MNode):
-    rp_discovery_type: ?str
+    rp_discovery_type: ?Identityref
     bsr_candidates: ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__bsr_candidates
 
-    mut def __init__(self, rp_discovery_type: ?str, bsr_candidates: ?ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__bsr_candidates=None):
+    mut def __init__(self, rp_discovery_type: ?Identityref, bsr_candidates: ?ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__bsr_candidates=None):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.rp_discovery_type = rp_discovery_type
         self.bsr_candidates = bsr_candidates if bsr_candidates is not None else ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__bsr_candidates()
@@ -2505,7 +2516,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_di
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery:
         if n != None:
-            return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery(rp_discovery_type=n.get_opt_str('rp-discovery-type'), bsr_candidates=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__bsr_candidates.from_gdata(n.get_opt_cnt('bsr-candidates')))
+            return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery(rp_discovery_type=n.get_opt_Identityref('rp-discovery-type'), bsr_candidates=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__bsr_candidates.from_gdata(n.get_opt_cnt('bsr-candidates')))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -2530,7 +2541,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_di
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery(node: xml.Node) -> yang.gdata.Container:
     children = {}
-    child_rp_discovery_type = yang.gdata.from_xml_opt_str(node, 'rp-discovery-type')
+    child_rp_discovery_type = yang.gdata.from_xml_opt_Identityref(node, 'rp-discovery-type')
     yang.gdata.maybe_add(children, 'rp-discovery-type', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__rp_discovery_type, child_rp_discovery_type)
     child_bsr_candidates = yang.gdata.from_xml_opt_cnt(node, 'bsr-candidates')
     yang.gdata.maybe_add(children, 'bsr-candidates', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__bsr_candidates, child_bsr_candidates)
@@ -2557,7 +2568,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__mul
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery(jd: dict[str, ?value]) -> yang.gdata.Container:
     children = {}
-    child_rp_discovery_type = yang.gdata.take_json_opt_str(jd, 'rp-discovery-type')
+    child_rp_discovery_type = yang.gdata.take_json_opt_Identityref(jd, 'rp-discovery-type')
     yang.gdata.maybe_add(children, 'rp-discovery-type', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__rp_discovery_type, child_rp_discovery_type)
     child_bsr_candidates = yang.gdata.take_json_opt_cnt(jd, 'bsr-candidates')
     yang.gdata.maybe_add(children, 'bsr-candidates', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__bsr_candidates, child_bsr_candidates)
@@ -2751,17 +2762,19 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn__vpn_id(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn__local_sites_role(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn__local_sites_role(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn__local_sites_role(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn__local_sites_role(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn_entry(yang.adata.MNode):
     vpn_id: str
-    local_sites_role: ?str
+    local_sites_role: ?Identityref
 
-    mut def __init__(self, vpn_id: str, local_sites_role: ?str):
+    mut def __init__(self, vpn_id: str, local_sites_role: ?Identityref):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.vpn_id = vpn_id
         self.local_sites_role = local_sites_role
@@ -2778,7 +2791,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extra
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn_entry:
-        return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn_entry(vpn_id=n.get_str('vpn-id'), local_sites_role=n.get_opt_str('local-sites-role'))
+        return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn_entry(vpn_id=n.get_str('vpn-id'), local_sites_role=n.get_opt_Identityref('local-sites-role'))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -2835,7 +2848,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_
     children = {}
     child_vpn_id = yang.gdata.from_xml_str(node, 'vpn-id')
     yang.gdata.maybe_add(children, 'vpn-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn__vpn_id, child_vpn_id)
-    child_local_sites_role = yang.gdata.from_xml_opt_str(node, 'local-sites-role')
+    child_local_sites_role = yang.gdata.from_xml_opt_Identityref(node, 'local-sites-role')
     yang.gdata.maybe_add(children, 'local-sites-role', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn__local_sites_role, child_local_sites_role)
     return yang.gdata.Container(children)
 
@@ -2894,7 +2907,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet
     children = {}
     child_vpn_id = yang.gdata.take_json_str(jd, 'vpn-id')
     yang.gdata.maybe_add(children, 'vpn-id', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn__vpn_id, child_vpn_id)
-    child_local_sites_role = yang.gdata.take_json_opt_str(jd, 'local-sites-role')
+    child_local_sites_role = yang.gdata.take_json_opt_Identityref(jd, 'local-sites-role')
     yang.gdata.maybe_add(children, 'local-sites-role', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn__local_sites_role, child_local_sites_role)
     return yang.gdata.Container(children)
 
@@ -2975,13 +2988,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry(yang.adata.MNode):
     vpn_id: str
     customer_name: ?str
-    vpn_service_topology: ?str
+    vpn_service_topology: ?Identityref
     cloud_accesses: ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses
     multicast: ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast
     carrierscarrier: ?bool
     extranet_vpns: ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns
 
-    mut def __init__(self, vpn_id: str, customer_name: ?str, vpn_service_topology: ?str, cloud_accesses: ?ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses=None, multicast: ?ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast=None, carrierscarrier: ?bool, extranet_vpns: ?ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns=None):
+    mut def __init__(self, vpn_id: str, customer_name: ?str, vpn_service_topology: ?Identityref, cloud_accesses: ?ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses=None, multicast: ?ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast=None, carrierscarrier: ?bool, extranet_vpns: ?ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns=None):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.vpn_id = vpn_id
         self.customer_name = customer_name
@@ -3018,7 +3031,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry(yang.adata.MNod
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry:
-        return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry(vpn_id=n.get_str('vpn-id'), customer_name=n.get_opt_str('customer-name'), vpn_service_topology=n.get_opt_str('vpn-service-topology'), cloud_accesses=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses.from_gdata(n.get_opt_cnt('cloud-accesses')), multicast=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast.from_gdata(n.get_opt_cnt('multicast')), carrierscarrier=n.get_opt_bool('carrierscarrier'), extranet_vpns=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns.from_gdata(n.get_opt_cnt('extranet-vpns')))
+        return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry(vpn_id=n.get_str('vpn-id'), customer_name=n.get_opt_str('customer-name'), vpn_service_topology=n.get_opt_Identityref('vpn-service-topology'), cloud_accesses=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses.from_gdata(n.get_opt_cnt('cloud-accesses')), multicast=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast.from_gdata(n.get_opt_cnt('multicast')), carrierscarrier=n.get_opt_bool('carrierscarrier'), extranet_vpns=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns.from_gdata(n.get_opt_cnt('extranet-vpns')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -3092,7 +3105,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_element(no
     yang.gdata.maybe_add(children, 'vpn-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__vpn_id, child_vpn_id)
     child_customer_name = yang.gdata.from_xml_opt_str(node, 'customer-name')
     yang.gdata.maybe_add(children, 'customer-name', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__customer_name, child_customer_name)
-    child_vpn_service_topology = yang.gdata.from_xml_opt_str(node, 'vpn-service-topology')
+    child_vpn_service_topology = yang.gdata.from_xml_opt_Identityref(node, 'vpn-service-topology')
     yang.gdata.maybe_add(children, 'vpn-service-topology', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__vpn_service_topology, child_vpn_service_topology)
     child_cloud_accesses = yang.gdata.from_xml_opt_cnt(node, 'cloud-accesses')
     yang.gdata.maybe_add(children, 'cloud-accesses', from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses, child_cloud_accesses)
@@ -3171,7 +3184,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_element(j
     yang.gdata.maybe_add(children, 'vpn-id', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__vpn_id, child_vpn_id)
     child_customer_name = yang.gdata.take_json_opt_str(jd, 'customer-name')
     yang.gdata.maybe_add(children, 'customer-name', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__customer_name, child_customer_name)
-    child_vpn_service_topology = yang.gdata.take_json_opt_str(jd, 'vpn-service-topology')
+    child_vpn_service_topology = yang.gdata.take_json_opt_Identityref(jd, 'vpn-service-topology')
     yang.gdata.maybe_add(children, 'vpn-service-topology', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__vpn_service_topology, child_vpn_service_topology)
     child_cloud_accesses = yang.gdata.take_json_opt_cnt(jd, 'cloud-accesses')
     yang.gdata.maybe_add(children, 'cloud-accesses', from_json_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses, child_cloud_accesses)
@@ -4187,16 +4200,18 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity(jd: dic
     yang.gdata.maybe_add(children, 'groups', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups, child_groups)
     return yang.gdata.Container(children)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__management__type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__management__type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__management__type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__management__type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__management(yang.adata.MNode):
-    type: ?str
+    type: ?Identityref
 
-    mut def __init__(self, type: ?str):
+    mut def __init__(self, type: ?Identityref):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.type = type
 
@@ -4210,7 +4225,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__management(yang.adata.MNode):
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__management:
         if n != None:
-            return ietf_l3vpn_svc__l3vpn_svc__sites__site__management(type=n.get_opt_str('type'))
+            return ietf_l3vpn_svc__l3vpn_svc__sites__site__management(type=n.get_opt_Identityref('type'))
         raise ValueError('Missing required subtree ietf_l3vpn_svc__l3vpn_svc__sites__site__management')
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -4232,7 +4247,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__management(yang.adata.MNode):
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__management(node: xml.Node) -> yang.gdata.Container:
     children = {}
-    child_type = yang.gdata.from_xml_opt_str(node, 'type')
+    child_type = yang.gdata.from_xml_opt_Identityref(node, 'type')
     yang.gdata.maybe_add(children, 'type', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__management__type, child_type)
     return yang.gdata.Container(children)
 
@@ -4254,7 +4269,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__management(jd: va
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__management(jd: dict[str, ?value]) -> yang.gdata.Container:
     children = {}
-    child_type = yang.gdata.take_json_opt_str(jd, 'type')
+    child_type = yang.gdata.take_json_opt_Identityref(jd, 'type')
     yang.gdata.maybe_add(children, 'type', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__management__type, child_type)
     return yang.gdata.Container(children)
 
@@ -4270,11 +4285,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_poli
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__id(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter__type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter__type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter__type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter__type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter__lan_tag(val: list[value]) -> yang.gdata.LeafList:
     return yang.gdata.LeafList('string', val)
@@ -4295,12 +4312,12 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_polic
     return yang.gdata.LeafList('string', val)
 
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter_entry(yang.adata.MNode):
-    type: str
+    type: Identityref
     lan_tag: list[str]
     ipv4_lan_prefix: list[str]
     ipv6_lan_prefix: list[str]
 
-    mut def __init__(self, type: str, lan_tag: ?list[str]=None, ipv4_lan_prefix: ?list[str]=None, ipv6_lan_prefix: ?list[str]=None):
+    mut def __init__(self, type: Identityref, lan_tag: ?list[str]=None, ipv4_lan_prefix: ?list[str]=None, ipv6_lan_prefix: ?list[str]=None):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.type = type
         self.lan_tag = lan_tag if lan_tag is not None else []
@@ -4319,7 +4336,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter_entry:
-        return ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter_entry(type=n.get_str('type'), lan_tag=n.get_opt_strs('lan-tag'), ipv4_lan_prefix=n.get_opt_strs('ipv4-lan-prefix'), ipv6_lan_prefix=n.get_opt_strs('ipv6-lan-prefix'))
+        return ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter_entry(type=n.get_Identityref('type'), lan_tag=n.get_opt_strs('lan-tag'), ipv4_lan_prefix=n.get_opt_strs('ipv4-lan-prefix'), ipv6_lan_prefix=n.get_opt_strs('ipv6-lan-prefix'))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -4380,7 +4397,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
-    child_type = yang.gdata.from_xml_str(node, 'type')
+    child_type = yang.gdata.from_xml_Identityref(node, 'type')
     yang.gdata.maybe_add(children, 'type', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter__type, child_type)
     child_lan_tag = yang.gdata.from_xml_opt_strs(node, 'lan-tag')
     yang.gdata.maybe_add(children, 'lan-tag', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter__lan_tag, child_lan_tag)
@@ -4410,7 +4427,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn
         point = path[1]
         rest_path = path[2:]
         children: dict[str, yang.gdata.Node] = {}
-        children['type'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter__type(keys[0])
+        children['type'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter__type(Identityref.from_json(keys[0]))
         if point == 'lan-tag':
             raise ValueError("Invalid json path to non-inner node")
         if point == 'ipv4-lan-prefix':
@@ -4447,7 +4464,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
-    child_type = yang.gdata.take_json_str(jd, 'type')
+    child_type = yang.gdata.take_json_Identityref(jd, 'type')
     yang.gdata.maybe_add(children, 'type', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter__type, child_type)
     child_lan_tag = yang.gdata.take_json_opt_strs(jd, 'lan-tag')
     yang.gdata.maybe_add(children, 'lan-tag', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter__lan_tag, child_lan_tag)
@@ -4537,17 +4554,19 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_poli
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn__vpn_id(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('leafref', val)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn__site_role(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn__site_role(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn__site_role(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn__site_role(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn_entry(yang.adata.MNode):
     vpn_id: str
-    site_role: ?str
+    site_role: ?Identityref
 
-    mut def __init__(self, vpn_id: str, site_role: ?str):
+    mut def __init__(self, vpn_id: str, site_role: ?Identityref):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.vpn_id = vpn_id
         self.site_role = site_role
@@ -4564,7 +4583,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn_entry:
-        return ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn_entry(vpn_id=n.get_str('vpn-id'), site_role=n.get_opt_str('site-role'))
+        return ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn_entry(vpn_id=n.get_str('vpn-id'), site_role=n.get_opt_Identityref('site-role'))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -4621,7 +4640,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_polic
     children = {}
     child_vpn_id = yang.gdata.from_xml_str(node, 'vpn-id')
     yang.gdata.maybe_add(children, 'vpn-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn__vpn_id, child_vpn_id)
-    child_site_role = yang.gdata.from_xml_opt_str(node, 'site-role')
+    child_site_role = yang.gdata.from_xml_opt_Identityref(node, 'site-role')
     yang.gdata.maybe_add(children, 'site-role', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn__site_role, child_site_role)
     return yang.gdata.Container(children)
 
@@ -4680,7 +4699,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_poli
     children = {}
     child_vpn_id = yang.gdata.take_json_str(jd, 'vpn-id')
     yang.gdata.maybe_add(children, 'vpn-id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn__vpn_id, child_vpn_id)
-    child_site_role = yang.gdata.take_json_opt_str(jd, 'site-role')
+    child_site_role = yang.gdata.take_json_opt_Identityref(jd, 'site-role')
     yang.gdata.maybe_add(children, 'site-role', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn__site_role, child_site_role)
     return yang.gdata.Container(children)
 
@@ -5070,11 +5089,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies(jd: dict[
     yang.gdata.maybe_add(children, 'vpn-policy', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy, child_vpn_policy)
     return yang.gdata.Container(children)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_vpn_flavor(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_vpn_flavor(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_vpn_flavor(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_vpn_flavor(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family__af(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('enumeration', val)
@@ -6120,11 +6141,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_clas
     yang.gdata.maybe_add(children, 'protocol-field', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow__protocol_field, child_protocol_field)
     return yang.gdata.Container(children)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_application(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_application(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_application(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_application(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__target_class_id(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
@@ -6135,10 +6158,10 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_class
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule_entry(yang.adata.MNode):
     id: str
     match_flow: ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow
-    match_application: ?str
+    match_application: ?Identityref
     target_class_id: ?str
 
-    mut def __init__(self, id: str, match_flow: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow=None, match_application: ?str, target_class_id: ?str):
+    mut def __init__(self, id: str, match_flow: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow=None, match_application: ?Identityref, target_class_id: ?str):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.id = id
         self.match_flow = match_flow if match_flow is not None else ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow()
@@ -6163,7 +6186,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_p
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule_entry:
-        return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule_entry(id=n.get_str('id'), match_flow=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow.from_gdata(n.get_opt_cnt('match-flow')), match_application=n.get_opt_str('match-application'), target_class_id=n.get_opt_str('target-class-id'))
+        return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule_entry(id=n.get_str('id'), match_flow=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow.from_gdata(n.get_opt_cnt('match-flow')), match_application=n.get_opt_Identityref('match-application'), target_class_id=n.get_opt_str('target-class-id'))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -6228,7 +6251,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_class
     yang.gdata.maybe_add(children, 'id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__id, child_id)
     child_match_flow = yang.gdata.from_xml_opt_cnt(node, 'match-flow')
     yang.gdata.maybe_add(children, 'match-flow', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow, child_match_flow)
-    child_match_application = yang.gdata.from_xml_opt_str(node, 'match-application')
+    child_match_application = yang.gdata.from_xml_opt_Identityref(node, 'match-application')
     yang.gdata.maybe_add(children, 'match-application', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_application, child_match_application)
     child_target_class_id = yang.gdata.from_xml_opt_str(node, 'target-class-id')
     yang.gdata.maybe_add(children, 'target-class-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__target_class_id, child_target_class_id)
@@ -6295,7 +6318,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_clas
     yang.gdata.maybe_add(children, 'id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__id, child_id)
     child_match_flow = yang.gdata.take_json_opt_cnt(jd, 'match-flow')
     yang.gdata.maybe_add(children, 'match-flow', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow, child_match_flow)
-    child_match_application = yang.gdata.take_json_opt_str(jd, 'match-application')
+    child_match_application = yang.gdata.take_json_opt_Identityref(jd, 'match-application')
     yang.gdata.maybe_add(children, 'match-application', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_application, child_match_application)
     child_target_class_id = yang.gdata.take_json_opt_str(jd, 'target-class-id')
     yang.gdata.maybe_add(children, 'target-class-id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__target_class_id, child_target_class_id)
@@ -6387,11 +6410,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_prof
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__class_id(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__direction(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__direction(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__direction(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__direction(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__rate_limit(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('decimal64', val)
@@ -6674,13 +6699,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_prof
 
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class_entry(yang.adata.MNode):
     class_id: str
-    direction: ?str
+    direction: ?Identityref
     rate_limit: ?float
     latency: ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__latency
     jitter: ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__jitter
     bandwidth: ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__bandwidth
 
-    mut def __init__(self, class_id: str, direction: ?str, rate_limit: ?float, latency: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__latency=None, jitter: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__jitter=None, bandwidth: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__bandwidth=None):
+    mut def __init__(self, class_id: str, direction: ?Identityref, rate_limit: ?float, latency: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__latency=None, jitter: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__jitter=None, bandwidth: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__bandwidth=None):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.class_id = class_id
         self.direction = direction
@@ -6713,7 +6738,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class_entry:
-        return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class_entry(class_id=n.get_str('class-id'), direction=n.get_opt_str('direction'), rate_limit=n.get_opt_float('rate-limit'), latency=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__latency.from_gdata(n.get_opt_cnt('latency')), jitter=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__jitter.from_gdata(n.get_opt_cnt('jitter')), bandwidth=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__bandwidth.from_gdata(n.get_opt_cnt('bandwidth')))
+        return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class_entry(class_id=n.get_str('class-id'), direction=n.get_opt_Identityref('direction'), rate_limit=n.get_opt_float('rate-limit'), latency=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__latency.from_gdata(n.get_opt_cnt('latency')), jitter=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__jitter.from_gdata(n.get_opt_cnt('jitter')), bandwidth=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__bandwidth.from_gdata(n.get_opt_cnt('bandwidth')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -6782,7 +6807,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profi
     children = {}
     child_class_id = yang.gdata.from_xml_str(node, 'class-id')
     yang.gdata.maybe_add(children, 'class-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__class_id, child_class_id)
-    child_direction = yang.gdata.from_xml_opt_str(node, 'direction')
+    child_direction = yang.gdata.from_xml_opt_Identityref(node, 'direction')
     yang.gdata.maybe_add(children, 'direction', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__direction, child_direction)
     child_rate_limit = yang.gdata.from_xml_opt_float(node, 'rate-limit')
     yang.gdata.maybe_add(children, 'rate-limit', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__rate_limit, child_rate_limit)
@@ -6857,7 +6882,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_prof
     children = {}
     child_class_id = yang.gdata.take_json_str(jd, 'class-id')
     yang.gdata.maybe_add(children, 'class-id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__class_id, child_class_id)
-    child_direction = yang.gdata.take_json_opt_str(jd, 'direction')
+    child_direction = yang.gdata.take_json_opt_Identityref(jd, 'direction')
     yang.gdata.maybe_add(children, 'direction', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__direction, child_direction)
     child_rate_limit = yang.gdata.take_json_opt_float(jd, 'rate-limit')
     yang.gdata.maybe_add(children, 'rate-limit', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__rate_limit, child_rate_limit)
@@ -7539,11 +7564,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection(jd:
     yang.gdata.maybe_add(children, 'enabled', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection__enabled, child_enabled)
     return yang.gdata.Container(children)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__address_family(val: list[value]) -> yang.gdata.LeafList:
     return yang.gdata.LeafList('enumeration', val)
@@ -8631,14 +8658,14 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__rou
     return yang.gdata.Container(children, presence=True)
 
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol_entry(yang.adata.MNode):
-    type: str
+    type: Identityref
     ospf: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf
     bgp: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__bgp
     static: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static
     rip: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__rip
     vrrp: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__vrrp
 
-    mut def __init__(self, type: str, ospf: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf=None, bgp: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__bgp=None, static: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static=None, rip: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__rip=None, vrrp: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__vrrp=None):
+    mut def __init__(self, type: Identityref, ospf: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf=None, bgp: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__bgp=None, static: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static=None, rip: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__rip=None, vrrp: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__vrrp=None):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.type = type
         self.ospf = ospf
@@ -8696,7 +8723,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol_entry:
-        return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol_entry(type=n.get_str('type'), ospf=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf.from_gdata(n.get_opt_cnt('ospf')), bgp=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__bgp.from_gdata(n.get_opt_cnt('bgp')), static=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static.from_gdata(n.get_opt_cnt('static')), rip=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__rip.from_gdata(n.get_opt_cnt('rip')), vrrp=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__vrrp.from_gdata(n.get_opt_cnt('vrrp')))
+        return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol_entry(type=n.get_Identityref('type'), ospf=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf.from_gdata(n.get_opt_cnt('ospf')), bgp=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__bgp.from_gdata(n.get_opt_cnt('bgp')), static=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static.from_gdata(n.get_opt_cnt('static')), rip=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__rip.from_gdata(n.get_opt_cnt('rip')), vrrp=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__vrrp.from_gdata(n.get_opt_cnt('vrrp')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -8778,7 +8805,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
-    child_type = yang.gdata.from_xml_str(node, 'type')
+    child_type = yang.gdata.from_xml_Identityref(node, 'type')
     yang.gdata.maybe_add(children, 'type', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__type, child_type)
     child_ospf = yang.gdata.from_xml_opt_cnt(node, 'ospf')
     yang.gdata.maybe_add(children, 'ospf', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf, child_ospf)
@@ -8812,7 +8839,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols
         point = path[1]
         rest_path = path[2:]
         children: dict[str, yang.gdata.Node] = {}
-        children['type'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__type(keys[0])
+        children['type'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__type(Identityref.from_json(keys[0]))
         if point == 'ospf':
             children['ospf'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf(jd, rest_path, op)
         if point == 'bgp':
@@ -8853,7 +8880,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
-    child_type = yang.gdata.take_json_str(jd, 'type')
+    child_type = yang.gdata.take_json_Identityref(jd, 'type')
     yang.gdata.maybe_add(children, 'type', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__type, child_type)
     child_ospf = yang.gdata.take_json_opt_cnt(jd, 'ospf')
     yang.gdata.maybe_add(children, 'ospf', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf, child_ospf)
@@ -8947,11 +8974,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__site_network_access_id(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__site_network_access_type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__site_network_access_type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__site_network_access_type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__site_network_access_type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__location_reference(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('leafref', val)
@@ -9172,11 +9201,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'group', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group, child_group)
     return yang.gdata.Container(children)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__constraint_type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__constraint_type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__constraint_type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__constraint_type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group__group_id(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
@@ -9426,10 +9457,10 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     return yang.gdata.Container(children)
 
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint_entry(yang.adata.MNode):
-    constraint_type: str
+    constraint_type: Identityref
     target: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target
 
-    mut def __init__(self, constraint_type: str, target: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target=None):
+    mut def __init__(self, constraint_type: Identityref, target: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target=None):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.constraint_type = constraint_type
         self.target = target if target is not None else ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target()
@@ -9446,7 +9477,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint_entry:
-        return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint_entry(constraint_type=n.get_str('constraint-type'), target=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target.from_gdata(n.get_opt_cnt('target')))
+        return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint_entry(constraint_type=n.get_Identityref('constraint-type'), target=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target.from_gdata(n.get_opt_cnt('target')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -9501,7 +9532,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
-    child_constraint_type = yang.gdata.from_xml_str(node, 'constraint-type')
+    child_constraint_type = yang.gdata.from_xml_Identityref(node, 'constraint-type')
     yang.gdata.maybe_add(children, 'constraint-type', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__constraint_type, child_constraint_type)
     child_target = yang.gdata.from_xml_opt_cnt(node, 'target')
     yang.gdata.maybe_add(children, 'target', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target, child_target)
@@ -9527,7 +9558,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         point = path[1]
         rest_path = path[2:]
         children: dict[str, yang.gdata.Node] = {}
-        children['constraint-type'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__constraint_type(keys[0])
+        children['constraint-type'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__constraint_type(Identityref.from_json(keys[0]))
         if point == 'target':
             children['target'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target(jd, rest_path, op)
         return yang.gdata.Container(children)
@@ -9560,7 +9591,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
-    child_constraint_type = yang.gdata.take_json_str(jd, 'constraint-type')
+    child_constraint_type = yang.gdata.take_json_Identityref(jd, 'constraint-type')
     yang.gdata.maybe_add(children, 'constraint-type', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__constraint_type, child_constraint_type)
     child_target = yang.gdata.take_json_opt_cnt(jd, 'target')
     yang.gdata.maybe_add(children, 'target', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target, child_target)
@@ -9918,11 +9949,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'bearer-reference', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__bearer__bearer_reference, child_bearer_reference)
     return yang.gdata.Container(children)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__address_allocation_type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__address_allocation_type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__address_allocation_type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__address_allocation_type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__provider_address(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
@@ -10584,12 +10617,12 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     return yang.gdata.Container(children)
 
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4(yang.adata.MNode):
-    address_allocation_type: ?str
+    address_allocation_type: ?Identityref
     provider_dhcp: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp
     dhcp_relay: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__dhcp_relay
     addresses: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__addresses
 
-    mut def __init__(self, address_allocation_type: ?str, provider_dhcp: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp=None, dhcp_relay: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__dhcp_relay=None, addresses: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__addresses=None):
+    mut def __init__(self, address_allocation_type: ?Identityref, provider_dhcp: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp=None, dhcp_relay: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__dhcp_relay=None, addresses: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__addresses=None):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.address_allocation_type = address_allocation_type
         self.provider_dhcp = provider_dhcp if provider_dhcp is not None else ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp()
@@ -10615,7 +10648,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4:
         if n != None:
-            return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4(address_allocation_type=n.get_opt_str('address-allocation-type'), provider_dhcp=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp.from_gdata(n.get_opt_cnt('provider-dhcp')), dhcp_relay=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__dhcp_relay.from_gdata(n.get_opt_cnt('dhcp-relay')), addresses=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__addresses.from_gdata(n.get_opt_cnt('addresses')))
+            return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4(address_allocation_type=n.get_opt_Identityref('address-allocation-type'), provider_dhcp=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp.from_gdata(n.get_opt_cnt('provider-dhcp')), dhcp_relay=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__dhcp_relay.from_gdata(n.get_opt_cnt('dhcp-relay')), addresses=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__addresses.from_gdata(n.get_opt_cnt('addresses')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -10646,7 +10679,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4(node: xml.Node) -> yang.gdata.Container:
     children = {}
-    child_address_allocation_type = yang.gdata.from_xml_opt_str(node, 'address-allocation-type')
+    child_address_allocation_type = yang.gdata.from_xml_opt_Identityref(node, 'address-allocation-type')
     yang.gdata.maybe_add(children, 'address-allocation-type', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__address_allocation_type, child_address_allocation_type)
     child_provider_dhcp = yang.gdata.from_xml_opt_cnt(node, 'provider-dhcp')
     yang.gdata.maybe_add(children, 'provider-dhcp', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp, child_provider_dhcp)
@@ -10683,7 +10716,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4(jd: dict[str, ?value]) -> yang.gdata.Container:
     children = {}
-    child_address_allocation_type = yang.gdata.take_json_opt_str(jd, 'address-allocation-type')
+    child_address_allocation_type = yang.gdata.take_json_opt_Identityref(jd, 'address-allocation-type')
     yang.gdata.maybe_add(children, 'address-allocation-type', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__address_allocation_type, child_address_allocation_type)
     child_provider_dhcp = yang.gdata.take_json_opt_cnt(jd, 'provider-dhcp')
     yang.gdata.maybe_add(children, 'provider-dhcp', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp, child_provider_dhcp)
@@ -10693,11 +10726,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'addresses', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__addresses, child_addresses)
     return yang.gdata.Container(children)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__address_allocation_type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__address_allocation_type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__address_allocation_type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__address_allocation_type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__provider_address(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
@@ -11359,12 +11394,12 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     return yang.gdata.Container(children)
 
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6(yang.adata.MNode):
-    address_allocation_type: ?str
+    address_allocation_type: ?Identityref
     provider_dhcp: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp
     dhcp_relay: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__dhcp_relay
     addresses: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__addresses
 
-    mut def __init__(self, address_allocation_type: ?str, provider_dhcp: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp=None, dhcp_relay: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__dhcp_relay=None, addresses: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__addresses=None):
+    mut def __init__(self, address_allocation_type: ?Identityref, provider_dhcp: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp=None, dhcp_relay: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__dhcp_relay=None, addresses: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__addresses=None):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.address_allocation_type = address_allocation_type
         self.provider_dhcp = provider_dhcp if provider_dhcp is not None else ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp()
@@ -11390,7 +11425,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6:
         if n != None:
-            return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6(address_allocation_type=n.get_opt_str('address-allocation-type'), provider_dhcp=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp.from_gdata(n.get_opt_cnt('provider-dhcp')), dhcp_relay=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__dhcp_relay.from_gdata(n.get_opt_cnt('dhcp-relay')), addresses=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__addresses.from_gdata(n.get_opt_cnt('addresses')))
+            return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6(address_allocation_type=n.get_opt_Identityref('address-allocation-type'), provider_dhcp=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp.from_gdata(n.get_opt_cnt('provider-dhcp')), dhcp_relay=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__dhcp_relay.from_gdata(n.get_opt_cnt('dhcp-relay')), addresses=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__addresses.from_gdata(n.get_opt_cnt('addresses')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -11421,7 +11456,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6(node: xml.Node) -> yang.gdata.Container:
     children = {}
-    child_address_allocation_type = yang.gdata.from_xml_opt_str(node, 'address-allocation-type')
+    child_address_allocation_type = yang.gdata.from_xml_opt_Identityref(node, 'address-allocation-type')
     yang.gdata.maybe_add(children, 'address-allocation-type', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__address_allocation_type, child_address_allocation_type)
     child_provider_dhcp = yang.gdata.from_xml_opt_cnt(node, 'provider-dhcp')
     yang.gdata.maybe_add(children, 'provider-dhcp', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp, child_provider_dhcp)
@@ -11458,7 +11493,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6(jd: dict[str, ?value]) -> yang.gdata.Container:
     children = {}
-    child_address_allocation_type = yang.gdata.take_json_opt_str(jd, 'address-allocation-type')
+    child_address_allocation_type = yang.gdata.take_json_opt_Identityref(jd, 'address-allocation-type')
     yang.gdata.maybe_add(children, 'address-allocation-type', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__address_allocation_type, child_address_allocation_type)
     child_provider_dhcp = yang.gdata.take_json_opt_cnt(jd, 'provider-dhcp')
     yang.gdata.maybe_add(children, 'provider-dhcp', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp, child_provider_dhcp)
@@ -12576,11 +12611,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'protocol-field', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow__protocol_field, child_protocol_field)
     return yang.gdata.Container(children)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_application(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_application(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_application(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_application(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__target_class_id(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
@@ -12591,10 +12628,10 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule_entry(yang.adata.MNode):
     id: str
     match_flow: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow
-    match_application: ?str
+    match_application: ?Identityref
     target_class_id: ?str
 
-    mut def __init__(self, id: str, match_flow: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow=None, match_application: ?str, target_class_id: ?str):
+    mut def __init__(self, id: str, match_flow: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow=None, match_application: ?Identityref, target_class_id: ?str):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.id = id
         self.match_flow = match_flow if match_flow is not None else ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow()
@@ -12619,7 +12656,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule_entry:
-        return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule_entry(id=n.get_str('id'), match_flow=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow.from_gdata(n.get_opt_cnt('match-flow')), match_application=n.get_opt_str('match-application'), target_class_id=n.get_opt_str('target-class-id'))
+        return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule_entry(id=n.get_str('id'), match_flow=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow.from_gdata(n.get_opt_cnt('match-flow')), match_application=n.get_opt_Identityref('match-application'), target_class_id=n.get_opt_str('target-class-id'))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -12684,7 +12721,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
     yang.gdata.maybe_add(children, 'id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__id, child_id)
     child_match_flow = yang.gdata.from_xml_opt_cnt(node, 'match-flow')
     yang.gdata.maybe_add(children, 'match-flow', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow, child_match_flow)
-    child_match_application = yang.gdata.from_xml_opt_str(node, 'match-application')
+    child_match_application = yang.gdata.from_xml_opt_Identityref(node, 'match-application')
     yang.gdata.maybe_add(children, 'match-application', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_application, child_match_application)
     child_target_class_id = yang.gdata.from_xml_opt_str(node, 'target-class-id')
     yang.gdata.maybe_add(children, 'target-class-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__target_class_id, child_target_class_id)
@@ -12751,7 +12788,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__id, child_id)
     child_match_flow = yang.gdata.take_json_opt_cnt(jd, 'match-flow')
     yang.gdata.maybe_add(children, 'match-flow', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow, child_match_flow)
-    child_match_application = yang.gdata.take_json_opt_str(jd, 'match-application')
+    child_match_application = yang.gdata.take_json_opt_Identityref(jd, 'match-application')
     yang.gdata.maybe_add(children, 'match-application', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_application, child_match_application)
     child_target_class_id = yang.gdata.take_json_opt_str(jd, 'target-class-id')
     yang.gdata.maybe_add(children, 'target-class-id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__target_class_id, child_target_class_id)
@@ -12843,11 +12880,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__class_id(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__direction(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__direction(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__direction(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__direction(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__rate_limit(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('decimal64', val)
@@ -13130,13 +13169,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
 
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class_entry(yang.adata.MNode):
     class_id: str
-    direction: ?str
+    direction: ?Identityref
     rate_limit: ?float
     latency: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__latency
     jitter: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__jitter
     bandwidth: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__bandwidth
 
-    mut def __init__(self, class_id: str, direction: ?str, rate_limit: ?float, latency: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__latency=None, jitter: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__jitter=None, bandwidth: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__bandwidth=None):
+    mut def __init__(self, class_id: str, direction: ?Identityref, rate_limit: ?float, latency: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__latency=None, jitter: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__jitter=None, bandwidth: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__bandwidth=None):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.class_id = class_id
         self.direction = direction
@@ -13169,7 +13208,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class_entry:
-        return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class_entry(class_id=n.get_str('class-id'), direction=n.get_opt_str('direction'), rate_limit=n.get_opt_float('rate-limit'), latency=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__latency.from_gdata(n.get_opt_cnt('latency')), jitter=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__jitter.from_gdata(n.get_opt_cnt('jitter')), bandwidth=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__bandwidth.from_gdata(n.get_opt_cnt('bandwidth')))
+        return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class_entry(class_id=n.get_str('class-id'), direction=n.get_opt_Identityref('direction'), rate_limit=n.get_opt_float('rate-limit'), latency=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__latency.from_gdata(n.get_opt_cnt('latency')), jitter=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__jitter.from_gdata(n.get_opt_cnt('jitter')), bandwidth=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__bandwidth.from_gdata(n.get_opt_cnt('bandwidth')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -13238,7 +13277,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
     children = {}
     child_class_id = yang.gdata.from_xml_str(node, 'class-id')
     yang.gdata.maybe_add(children, 'class-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__class_id, child_class_id)
-    child_direction = yang.gdata.from_xml_opt_str(node, 'direction')
+    child_direction = yang.gdata.from_xml_opt_Identityref(node, 'direction')
     yang.gdata.maybe_add(children, 'direction', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__direction, child_direction)
     child_rate_limit = yang.gdata.from_xml_opt_float(node, 'rate-limit')
     yang.gdata.maybe_add(children, 'rate-limit', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__rate_limit, child_rate_limit)
@@ -13313,7 +13352,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     children = {}
     child_class_id = yang.gdata.take_json_str(jd, 'class-id')
     yang.gdata.maybe_add(children, 'class-id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__class_id, child_class_id)
-    child_direction = yang.gdata.take_json_opt_str(jd, 'direction')
+    child_direction = yang.gdata.take_json_opt_Identityref(jd, 'direction')
     yang.gdata.maybe_add(children, 'direction', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__direction, child_direction)
     child_rate_limit = yang.gdata.take_json_opt_float(jd, 'rate-limit')
     yang.gdata.maybe_add(children, 'rate-limit', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__rate_limit, child_rate_limit)
@@ -13966,11 +14005,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'multicast', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__multicast, child_multicast)
     return yang.gdata.Container(children)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__type(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__type(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__address_family(val: list[value]) -> yang.gdata.LeafList:
     return yang.gdata.LeafList('enumeration', val)
@@ -15058,14 +15099,14 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     return yang.gdata.Container(children, presence=True)
 
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol_entry(yang.adata.MNode):
-    type: str
+    type: Identityref
     ospf: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf
     bgp: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp
     static: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static
     rip: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__rip
     vrrp: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__vrrp
 
-    mut def __init__(self, type: str, ospf: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf=None, bgp: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp=None, static: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static=None, rip: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__rip=None, vrrp: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__vrrp=None):
+    mut def __init__(self, type: Identityref, ospf: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf=None, bgp: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp=None, static: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static=None, rip: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__rip=None, vrrp: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__vrrp=None):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.type = type
         self.ospf = ospf
@@ -15123,7 +15164,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol_entry:
-        return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol_entry(type=n.get_str('type'), ospf=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf.from_gdata(n.get_opt_cnt('ospf')), bgp=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp.from_gdata(n.get_opt_cnt('bgp')), static=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static.from_gdata(n.get_opt_cnt('static')), rip=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__rip.from_gdata(n.get_opt_cnt('rip')), vrrp=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__vrrp.from_gdata(n.get_opt_cnt('vrrp')))
+        return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol_entry(type=n.get_Identityref('type'), ospf=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf.from_gdata(n.get_opt_cnt('ospf')), bgp=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp.from_gdata(n.get_opt_cnt('bgp')), static=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static.from_gdata(n.get_opt_cnt('static')), rip=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__rip.from_gdata(n.get_opt_cnt('rip')), vrrp=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__vrrp.from_gdata(n.get_opt_cnt('vrrp')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -15205,7 +15246,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
-    child_type = yang.gdata.from_xml_str(node, 'type')
+    child_type = yang.gdata.from_xml_Identityref(node, 'type')
     yang.gdata.maybe_add(children, 'type', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__type, child_type)
     child_ospf = yang.gdata.from_xml_opt_cnt(node, 'ospf')
     yang.gdata.maybe_add(children, 'ospf', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf, child_ospf)
@@ -15239,7 +15280,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
         point = path[1]
         rest_path = path[2:]
         children: dict[str, yang.gdata.Node] = {}
-        children['type'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__type(keys[0])
+        children['type'] = from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__type(Identityref.from_json(keys[0]))
         if point == 'ospf':
             children['ospf'] = from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf(jd, rest_path, op)
         if point == 'bgp':
@@ -15280,7 +15321,7 @@ mut def from_json_path_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_acce
 
 mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol_element(jd: dict[str, ?value]) -> yang.gdata.Node:
     children = {}
-    child_type = yang.gdata.take_json_str(jd, 'type')
+    child_type = yang.gdata.take_json_Identityref(jd, 'type')
     yang.gdata.maybe_add(children, 'type', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__type, child_type)
     child_ospf = yang.gdata.take_json_opt_cnt(jd, 'ospf')
     yang.gdata.maybe_add(children, 'ospf', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf, child_ospf)
@@ -15451,18 +15492,20 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment__vpn_id(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('leafref', val)
 
-mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment__site_role(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment__site_role(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
-mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment__site_role(val: value) -> yang.gdata.Leaf:
-    return yang.gdata.Leaf('identityref', val)
+mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment__site_role(val: Identityref) -> yang.gdata.Leaf:
+    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
+    return yang.gdata.Leaf('identityref', new_val)
 
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment(yang.adata.MNode):
     vpn_policy_id: ?str
     vpn_id: ?str
-    site_role: ?str
+    site_role: ?Identityref
 
-    mut def __init__(self, vpn_policy_id: ?str, vpn_id: ?str, site_role: ?str):
+    mut def __init__(self, vpn_policy_id: ?str, vpn_id: ?str, site_role: ?Identityref):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.vpn_policy_id = vpn_policy_id
         self.vpn_id = vpn_id
@@ -15484,7 +15527,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment:
         if n != None:
-            return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment(vpn_policy_id=n.get_opt_str('vpn-policy-id'), vpn_id=n.get_opt_str('vpn-id'), site_role=n.get_opt_str('site-role'))
+            return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment(vpn_policy_id=n.get_opt_str('vpn-policy-id'), vpn_id=n.get_opt_str('vpn-id'), site_role=n.get_opt_Identityref('site-role'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -15516,7 +15559,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
     yang.gdata.maybe_add(children, 'vpn-policy-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment__vpn_policy_id, child_vpn_policy_id)
     child_vpn_id = yang.gdata.from_xml_opt_str(node, 'vpn-id')
     yang.gdata.maybe_add(children, 'vpn-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment__vpn_id, child_vpn_id)
-    child_site_role = yang.gdata.from_xml_opt_str(node, 'site-role')
+    child_site_role = yang.gdata.from_xml_opt_Identityref(node, 'site-role')
     yang.gdata.maybe_add(children, 'site-role', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment__site_role, child_site_role)
     return yang.gdata.Container(children)
 
@@ -15546,13 +15589,13 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     yang.gdata.maybe_add(children, 'vpn-policy-id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment__vpn_policy_id, child_vpn_policy_id)
     child_vpn_id = yang.gdata.take_json_opt_str(jd, 'vpn-id')
     yang.gdata.maybe_add(children, 'vpn-id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment__vpn_id, child_vpn_id)
-    child_site_role = yang.gdata.take_json_opt_str(jd, 'site-role')
+    child_site_role = yang.gdata.take_json_opt_Identityref(jd, 'site-role')
     yang.gdata.maybe_add(children, 'site-role', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment__site_role, child_site_role)
     return yang.gdata.Container(children)
 
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access_entry(yang.adata.MNode):
     site_network_access_id: str
-    site_network_access_type: ?str
+    site_network_access_type: ?Identityref
     location_reference: ?str
     device_reference: ?str
     access_diversity: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity
@@ -15564,7 +15607,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
     availability: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__availability
     vpn_attachment: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment
 
-    mut def __init__(self, site_network_access_id: str, site_network_access_type: ?str, location_reference: ?str, device_reference: ?str, access_diversity: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity=None, bearer: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__bearer=None, ip_connection: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection=None, security: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security=None, service: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service=None, routing_protocols: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols=None, availability: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__availability=None, vpn_attachment: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment=None):
+    mut def __init__(self, site_network_access_id: str, site_network_access_type: ?Identityref, location_reference: ?str, device_reference: ?str, access_diversity: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity=None, bearer: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__bearer=None, ip_connection: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection=None, security: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security=None, service: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service=None, routing_protocols: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols=None, availability: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__availability=None, vpn_attachment: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment=None):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.site_network_access_id = site_network_access_id
         self.site_network_access_type = site_network_access_type
@@ -15621,7 +15664,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access_entry:
-        return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access_entry(site_network_access_id=n.get_str('site-network-access-id'), site_network_access_type=n.get_opt_str('site-network-access-type'), location_reference=n.get_opt_str('location-reference'), device_reference=n.get_opt_str('device-reference'), access_diversity=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity.from_gdata(n.get_opt_cnt('access-diversity')), bearer=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__bearer.from_gdata(n.get_opt_cnt('bearer')), ip_connection=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection.from_gdata(n.get_opt_cnt('ip-connection')), security=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security.from_gdata(n.get_opt_cnt('security')), service=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service.from_gdata(n.get_opt_cnt('service')), routing_protocols=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols.from_gdata(n.get_opt_cnt('routing-protocols')), availability=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__availability.from_gdata(n.get_opt_cnt('availability')), vpn_attachment=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment.from_gdata(n.get_opt_cnt('vpn-attachment')))
+        return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access_entry(site_network_access_id=n.get_str('site-network-access-id'), site_network_access_type=n.get_opt_Identityref('site-network-access-type'), location_reference=n.get_opt_str('location-reference'), device_reference=n.get_opt_str('device-reference'), access_diversity=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity.from_gdata(n.get_opt_cnt('access-diversity')), bearer=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__bearer.from_gdata(n.get_opt_cnt('bearer')), ip_connection=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection.from_gdata(n.get_opt_cnt('ip-connection')), security=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security.from_gdata(n.get_opt_cnt('security')), service=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service.from_gdata(n.get_opt_cnt('service')), routing_protocols=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols.from_gdata(n.get_opt_cnt('routing-protocols')), availability=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__availability.from_gdata(n.get_opt_cnt('availability')), vpn_attachment=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment.from_gdata(n.get_opt_cnt('vpn-attachment')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -15708,7 +15751,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__
     children = {}
     child_site_network_access_id = yang.gdata.from_xml_str(node, 'site-network-access-id')
     yang.gdata.maybe_add(children, 'site-network-access-id', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__site_network_access_id, child_site_network_access_id)
-    child_site_network_access_type = yang.gdata.from_xml_opt_str(node, 'site-network-access-type')
+    child_site_network_access_type = yang.gdata.from_xml_opt_Identityref(node, 'site-network-access-type')
     yang.gdata.maybe_add(children, 'site-network-access-type', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__site_network_access_type, child_site_network_access_type)
     child_location_reference = yang.gdata.from_xml_opt_str(node, 'location-reference')
     yang.gdata.maybe_add(children, 'location-reference', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__location_reference, child_location_reference)
@@ -15807,7 +15850,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_
     children = {}
     child_site_network_access_id = yang.gdata.take_json_str(jd, 'site-network-access-id')
     yang.gdata.maybe_add(children, 'site-network-access-id', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__site_network_access_id, child_site_network_access_id)
-    child_site_network_access_type = yang.gdata.take_json_opt_str(jd, 'site-network-access-type')
+    child_site_network_access_type = yang.gdata.take_json_opt_Identityref(jd, 'site-network-access-type')
     yang.gdata.maybe_add(children, 'site-network-access-type', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__site_network_access_type, child_site_network_access_type)
     child_location_reference = yang.gdata.take_json_opt_str(jd, 'location-reference')
     yang.gdata.maybe_add(children, 'location-reference', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__location_reference, child_location_reference)
@@ -15914,7 +15957,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site_entry(yang.adata.MNode):
     site_diversity: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity
     management: ietf_l3vpn_svc__l3vpn_svc__sites__site__management
     vpn_policies: ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies
-    site_vpn_flavor: ?str
+    site_vpn_flavor: ?Identityref
     maximum_routes: ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes
     security: ietf_l3vpn_svc__l3vpn_svc__sites__site__security
     service: ietf_l3vpn_svc__l3vpn_svc__sites__site__service
@@ -15922,7 +15965,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site_entry(yang.adata.MNode):
     routing_protocols: ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols
     site_network_accesses: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses
 
-    mut def __init__(self, site_id: str, requested_site_start: ?str, requested_site_stop: ?str, locations: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__locations=None, devices: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__devices=None, site_diversity: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity=None, management: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__management=None, vpn_policies: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies=None, site_vpn_flavor: ?str, maximum_routes: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes=None, security: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__security=None, service: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__service=None, traffic_protection: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection=None, routing_protocols: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols=None, site_network_accesses: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses=None):
+    mut def __init__(self, site_id: str, requested_site_start: ?str, requested_site_stop: ?str, locations: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__locations=None, devices: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__devices=None, site_diversity: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity=None, management: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__management=None, vpn_policies: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies=None, site_vpn_flavor: ?Identityref, maximum_routes: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes=None, security: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__security=None, service: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__service=None, traffic_protection: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection=None, routing_protocols: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols=None, site_network_accesses: ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses=None):
         self._ns = 'urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc'
         self.site_id = site_id
         self.requested_site_start = requested_site_start
@@ -15991,7 +16034,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site_entry:
-        return ietf_l3vpn_svc__l3vpn_svc__sites__site_entry(site_id=n.get_str('site-id'), requested_site_start=n.get_opt_str('requested-site-start'), requested_site_stop=n.get_opt_str('requested-site-stop'), locations=ietf_l3vpn_svc__l3vpn_svc__sites__site__locations.from_gdata(n.get_opt_cnt('locations')), devices=ietf_l3vpn_svc__l3vpn_svc__sites__site__devices.from_gdata(n.get_opt_cnt('devices')), site_diversity=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity.from_gdata(n.get_opt_cnt('site-diversity')), management=ietf_l3vpn_svc__l3vpn_svc__sites__site__management.from_gdata(n.get_opt_cnt('management')), vpn_policies=ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies.from_gdata(n.get_opt_cnt('vpn-policies')), site_vpn_flavor=n.get_opt_str('site-vpn-flavor'), maximum_routes=ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes.from_gdata(n.get_opt_cnt('maximum-routes')), security=ietf_l3vpn_svc__l3vpn_svc__sites__site__security.from_gdata(n.get_opt_cnt('security')), service=ietf_l3vpn_svc__l3vpn_svc__sites__site__service.from_gdata(n.get_opt_cnt('service')), traffic_protection=ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection.from_gdata(n.get_opt_cnt('traffic-protection')), routing_protocols=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols.from_gdata(n.get_opt_cnt('routing-protocols')), site_network_accesses=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses.from_gdata(n.get_opt_cnt('site-network-accesses')))
+        return ietf_l3vpn_svc__l3vpn_svc__sites__site_entry(site_id=n.get_str('site-id'), requested_site_start=n.get_opt_str('requested-site-start'), requested_site_stop=n.get_opt_str('requested-site-stop'), locations=ietf_l3vpn_svc__l3vpn_svc__sites__site__locations.from_gdata(n.get_opt_cnt('locations')), devices=ietf_l3vpn_svc__l3vpn_svc__sites__site__devices.from_gdata(n.get_opt_cnt('devices')), site_diversity=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity.from_gdata(n.get_opt_cnt('site-diversity')), management=ietf_l3vpn_svc__l3vpn_svc__sites__site__management.from_gdata(n.get_opt_cnt('management')), vpn_policies=ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies.from_gdata(n.get_opt_cnt('vpn-policies')), site_vpn_flavor=n.get_opt_Identityref('site-vpn-flavor'), maximum_routes=ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes.from_gdata(n.get_opt_cnt('maximum-routes')), security=ietf_l3vpn_svc__l3vpn_svc__sites__site__security.from_gdata(n.get_opt_cnt('security')), service=ietf_l3vpn_svc__l3vpn_svc__sites__site__service.from_gdata(n.get_opt_cnt('service')), traffic_protection=ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection.from_gdata(n.get_opt_cnt('traffic-protection')), routing_protocols=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols.from_gdata(n.get_opt_cnt('routing-protocols')), site_network_accesses=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses.from_gdata(n.get_opt_cnt('site-network-accesses')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -16101,7 +16144,7 @@ mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site_element(node: xml.Node) 
     yang.gdata.maybe_add(children, 'management', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__management, child_management)
     child_vpn_policies = yang.gdata.from_xml_opt_cnt(node, 'vpn-policies')
     yang.gdata.maybe_add(children, 'vpn-policies', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies, child_vpn_policies)
-    child_site_vpn_flavor = yang.gdata.from_xml_opt_str(node, 'site-vpn-flavor')
+    child_site_vpn_flavor = yang.gdata.from_xml_opt_Identityref(node, 'site-vpn-flavor')
     yang.gdata.maybe_add(children, 'site-vpn-flavor', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_vpn_flavor, child_site_vpn_flavor)
     child_maximum_routes = yang.gdata.from_xml_opt_cnt(node, 'maximum-routes')
     yang.gdata.maybe_add(children, 'maximum-routes', from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes, child_maximum_routes)
@@ -16212,7 +16255,7 @@ mut def from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site_element(jd: dict[str, ?
     yang.gdata.maybe_add(children, 'management', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__management, child_management)
     child_vpn_policies = yang.gdata.take_json_opt_cnt(jd, 'vpn-policies')
     yang.gdata.maybe_add(children, 'vpn-policies', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies, child_vpn_policies)
-    child_site_vpn_flavor = yang.gdata.take_json_opt_str(jd, 'site-vpn-flavor')
+    child_site_vpn_flavor = yang.gdata.take_json_opt_Identityref(jd, 'site-vpn-flavor')
     yang.gdata.maybe_add(children, 'site-vpn-flavor', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_vpn_flavor, child_site_vpn_flavor)
     child_maximum_routes = yang.gdata.take_json_opt_cnt(jd, 'maximum-routes')
     yang.gdata.maybe_add(children, 'maximum-routes', from_json_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes, child_maximum_routes)

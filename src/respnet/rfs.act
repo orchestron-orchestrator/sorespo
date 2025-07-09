@@ -1,4 +1,5 @@
 import yang.adata
+from yang.common import Identityref
 import orchestron.ttt
 from orchestron import UnsupportedDevice
 
@@ -340,13 +341,13 @@ class Vrf(base.Vrf):
 
             # Create the VRF
             ni = dev.network_instance.create(i.name)
-            ni.type = "ip-vrf"
+            ni.type = Identityref("ip-vrf", "urn:nokia.com:srlinux:net-inst:network-instance", "srl_nokia-network-instance")
             ni.admin_state = "enable"
 
             # VXLAN interface
             tunnel_if = dev.tunnel_interface.create("vxlan1")
             vxlan_if = tunnel_if.vxlan_interface.create(i.id)
-            vxlan_if.type = "routed"
+            vxlan_if.type = Identityref("routed", "urn:nokia.com:srlinux:chassis:interfaces", "srl_nokia-interfaces")
             vxlan_if.ingress.vni = i.id
             vxlan_if_name = "vxlan1.{i.id}"
             ni.vxlan_interface.create(vxlan_if_name)
