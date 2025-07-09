@@ -131,6 +131,7 @@ end-policy"""
             isis = ni.protocols.create_isis()
             instance = isis.instance.create("quicklab")
             instance.level_capability = "L2"
+            instance.admin_state = "enable"
             if i.name == "AMS-CORE-1":
                 instance.net = [ "49.0001.0100.0000.0001.00" ]
             elif i.name == "FRA-CORE-1":
@@ -148,13 +149,14 @@ end-policy"""
             bgp = ni.protocols.create_bgp()
             bgp.autonomous_system = i.asn
             bgp.router_id = i.ipv4_address
+            ipv4_afi = bgp.afi_safi.create(Identityref("ipv4-unicast", "urn:nokia.com:srlinux:general:common", "srl_nokia-common"))
+            ipv4_afi.admin_state = "enable"
+            evpn_afi = bgp.afi_safi.create(Identityref("evpn", "urn:nokia.com:srlinux:general:common", "srl_nokia-common"))
+            evpn_afi.admin_state = "enable"
 
             # Create neighbor-group: IPV4-IBGP
             group = bgp.group.create("IPV4-IBGP")
-            # ipv4_afi = bgp.afi_safi.create("srl_nokia-comm:ipv4-unicast")
-            # ipv4_afi.admin_state = "enable"
-            # evpn_afi = group.afi_safi.create("srl_nokia-comm:evpn")
-            # evpn_afi.admin_state = "enable"
+            group.peer_as = i.asn
 
             return dev
 
@@ -367,11 +369,12 @@ class Vrf(base.Vrf):
 
             # BGP protocol
             bgp = ni.protocols.create_bgp()
+            bgp.router_id = "10.0.0.{i.router_id}"
             bgp.autonomous_system = i.asn
             bgp.ebgp_default_policy.import_reject_all = False
             bgp.ebgp_default_policy.export_reject_all = False
-            # afi = bgp.afi_safi.create("ipv4-unicast")
-            # afi.admin_state = "enable"
+            afi = bgp.afi_safi.create(Identityref("ipv4-unicast", "urn:nokia.com:srlinux:general:common", "srl_nokia-common"))
+            afi.admin_state = "enable"
             group = bgp.group.create("customer")
             group.send_default_route.ipv4_unicast = True
 
