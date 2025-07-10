@@ -6,7 +6,8 @@ import orchestron.ttt
 import orchestron.device
 
 import respnet.rfs
-from respnet.layers.y_2 import orchestron_rfs__rfs__backbone_interface__remote
+from respnet.layers.y_2 import orchestron_rfs__rfs__backbone_interface__remote, \
+    orchestron_rfs__rfs__backbone_interface__local
 
 proc def _test_rfs_bbinterface1(t: testing.SyncT):
     modeled_input = respnet.rfs.BBInterface.input_type()(
@@ -17,7 +18,9 @@ proc def _test_rfs_bbinterface1(t: testing.SyncT):
             device="FRA-CORE-1",
             interface="GigabitEthernet0/0/0/0"
         ),
-        hack_local_hostname="AMS-CORE-1"
+        local=orchestron_rfs__rfs__backbone_interface__local(
+            device="AMS-CORE-1"
+        )
     )
 
     mock_di = orchestron.ttt.DeviceInfo("AMS-CORE-1",
@@ -36,7 +39,9 @@ proc def _test_rfs_bbinterface2(t: testing.SyncT):
       <device>FRA-CORE-1</device>
       <interface>GigabitEthernet0/0/0/1</interface>
   </remote>
-  <hack-local-hostname>AMS-CORE-1</hack-local-hostname>
+  <local>
+      <device>AMS-CORE-1</device>
+  </local>
 </backbone-interface>"""
 
     mock_di = orchestron.ttt.DeviceInfo("STO-CORE-1",
