@@ -12,9 +12,6 @@ module srl_nokia-bgp-vpn {
   import srl_nokia-network-instance {
     prefix srl_nokia-netinst;
   }
-  import srl_nokia-bgp {
-    prefix srl-bgp;
-  }
   import srl_nokia-extensions {
     prefix srl_nokia-ext;
   }
@@ -71,59 +68,6 @@ module srl_nokia-bgp-vpn {
       }
       must '(/srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../srl_nokia-netinst:name]/srl_nokia-netinst:type != "srl_nokia-netinst:host")' {
         error-message "The bgp-vpn configuration is not possible on network-instance of type host.";
-      }
-      container backup-paths {
-        if-feature "srl_nokia-feat:bgp-backup-path-frr-vpn or srl_nokia-feat:bgp-backup-path-frr-evpn";
-        description
-          "Configuration of BGP VPN fast reroute";
-        container ipv4-unicast {
-          description
-            "Configuration of IPv4 unicast backup paths";
-          leaf install {
-            type boolean;
-            default "false";
-            description
-              "Install a backup path for every NLRI in the address family, when a suitable one exists";
-            must ". = false() or current()/../../../../../srl_nokia-netinst:type = 'srl_nokia-netinst:ip-vrf'" {
-              error-message "backup-paths can only be installed in network-instances of type ip-vrf";
-            }
-            must '. = false() or not (current()/../../../../../srl_nokia-netinst:protocols/srl_nokia-netinst:bgp-evpn)' {
-              srl_nokia-ext:if-feature "not srl_nokia-feat:bgp-backup-path-frr-evpn";
-              error-message "backup-paths not supported when EVPN is configured";
-            }
-          }
-        }
-        container ipv6-unicast {
-          description
-            "Configuration of IPv6 unicast backup paths";
-          leaf install {
-            type boolean;
-            default "false";
-            description
-              "Install a backup path for every NLRI in the address family, when a suitable one exists";
-            must ". = false() or current()/../../../../../srl_nokia-netinst:type = 'srl_nokia-netinst:ip-vrf'" {
-              error-message "backup-paths can only be installed in network-instances of type ip-vrf";
-            }
-            must '. = false() or not (current()/../../../../../srl_nokia-netinst:protocols/srl_nokia-netinst:bgp-evpn)' {
-              srl_nokia-ext:if-feature "not srl_nokia-feat:bgp-backup-path-frr-evpn";
-              error-message "backup-paths not supported when EVPN is configured";
-            }
-          }
-        }
-      }
-      container combined-ecmp {
-        if-feature "srl_nokia-feat:combined-bgp-ecmp";
-        presence "Enable the combination of BGP PE-CE, EVPN IFL and/or VPN-IP routes into the same ECMP set";
-        description
-          "Combine BGP owners into the same ECMP set
-
-           When enabled, candidate BGP PE-CE routes and BGP VPN routes (EVPN IFL or VPN-IP) to the same prefix are
-           combined into a single ECMP set. A single route with a combined next hop group is installed in the
-           route table. If different BGP owners are combined and have different configured ecmp maximum values,
-           the minimum of the maximum configured values is considered for the combined ECMP set.";
-        must "current()/../../../srl_nokia-netinst:type = 'srl_nokia-netinst:ip-vrf'" {
-          error-message "combined BGP ECMP can only be enabled in network-instances of type ip-vrf";
-        }
       }
       list bgp-instance {
         key "id";
@@ -187,27 +131,6 @@ module srl_nokia-bgp-vpn {
               "Export Route Target (RT) in the bgp-vpn instance. When used for evpn and if not configured, the RT is auto-derived
                with the format <asn>:<evi> where 'asn' is the autonomous-system configured in the network-instance default.";
           }
-          leaf export-route-target-origin {
-            config false;
-            srl_nokia-ext:show-importance "high";
-            type enumeration {
-              enum auto-derived-from-evi;
-              enum auto-derived-from-esi-bytes-1-6;
-              enum from-export-policy;
-              enum manual;
-              enum none;
-            }
-            description
-              "Origin of the operational export Route Target (RT) of the bgp-vpn instance.
-
-               'Auto-derived-from-evi' refers to an RT that is automatically allocated with the format <asn>:<evi>
-                where 'asn' is the autonomous-system-number configured in the network-instance default.
-               'Auto-derived-from-esi-bytes-1-6' refers to the ES-import RT for the EVPN Ethernet Segment routes that is derived from bytes 1 to 6 of the Ethernet Segment
-                Identifier of the route.
-               'From-export-policy' refers to export RT(s) that are set on the export-policy.
-               'Manual' refers to an export RT that is configured.
-               'None' indicates that the export RT is neither configured nor auto-derived.";
-          }
           leaf import-rt {
             srl_nokia-ext:show-importance "high";
             type srl_nokia-pol-types:bgp-ext-community-type;
@@ -216,41 +139,6 @@ module srl_nokia-bgp-vpn {
               "Import Route Target (RT) in the bgp-vpn instance. When used for evpn and if not configured, the RT is
                auto-derived with the format <asn>:<evi> where 'asn' is the autonomous-system configured in the network-instance default.";
           }
-          leaf import-route-target-origin {
-            config false;
-            srl_nokia-ext:show-importance "high";
-            type enumeration {
-              enum auto-derived-from-evi;
-              enum auto-derived-from-esi-bytes-1-6;
-              enum from-import-policy;
-              enum manual;
-              enum none;
-            }
-            description
-              "Origin of the operational import Route Target (RT) of the bgp-vpn instance.
-
-               'Auto-derived-from-evi' refers to an RT that is automatically allocated with the format <asn>:<evi>
-                where 'asn' is the autonomous-system-number configured in the network-instance default.
-               'Auto-derived-from-esi-bytes-1-6' refers to the ES-import RT for the EVPN Ethernet Segment routes that is derived from bytes 1 to 6 of the Ethernet Segment
-               Identifier of the route.
-               'From-import-policy' refers to import RT(s) that are set on the import-policy.
-               'Manual' refers to an import RT that is configured.
-               'None' indicates that the import RT is neither configured nor auto-derived.";
-          }
-        }
-        uses srl-bgp:bgp-policy;
-        leaf oper-down-reason {
-          config false;
-          srl_nokia-ext:show-importance "high";
-          type enumeration {
-            enum no-loopback-address-or-rd;
-            enum no-autonomous-system-or-rt;
-            enum network-instance-oper-down;
-            enum bad-rd-format;
-            enum none;
-          }
-          description
-            "Reason for bgp-instance being down";
         }
       }
     }
