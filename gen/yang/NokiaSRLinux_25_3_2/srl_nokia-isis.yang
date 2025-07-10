@@ -1,0 +1,703 @@
+module srl_nokia-isis {
+  yang-version 1.1;
+  namespace "urn:nokia.com:srlinux:isis:isis";
+  prefix srl_nokia-isis;
+
+  import ietf-yang-types {
+    prefix yang;
+  }
+  import srl_nokia-common {
+    prefix srl_nokia-comm;
+  }
+  import srl_nokia-network-instance {
+    prefix srl_nokia-netinst;
+  }
+  import srl_nokia-interfaces {
+    prefix srl_nokia-if;
+  }
+  import srl_nokia-extensions {
+    prefix srl_nokia-ext;
+  }
+  import srl_nokia-routing-policy {
+    prefix srl-rpol;
+  }
+  import srl_nokia-system {
+    prefix srl-system;
+  }
+  import srl_nokia-keychains {
+    prefix srl-keychain;
+  }
+  import srl_nokia-features {
+    prefix srl-feat;
+  }
+  import srl_nokia-mpls-label-management {
+    prefix srl_nokia-mplslbl;
+  }
+  import srl_nokia-segment-routing {
+    prefix srl_nokia-segrt;
+  }
+  import srl_nokia-isis-types {
+    prefix srl_nokia-isis-types;
+  }
+
+  organization
+    "Nokia";
+  contact
+    "Nokia SR Linux Support
+     Web: <http://www.nokia.com>";
+  description
+    "This yang file models configuration and state of the IS-IS protocol";
+
+  revision 2025-03-31 {
+    description
+      "SRLinux 2025.3.1";
+  }
+  revision 2024-10-31 {
+    description
+      "SRLinux 24.10.1";
+  }
+  revision 2024-07-31 {
+    description
+      "SRLinux 24.7.1";
+  }
+  revision 2024-03-31 {
+    description
+      "SRLinux 24.3.1";
+  }
+  revision 2023-10-31 {
+    description
+      "SRLinux 23.10.1";
+  }
+  revision 2023-07-31 {
+    description
+      "SRLinux 23.7.1";
+  }
+  revision 2023-03-31 {
+    description
+      "SRLinux 23.3.1";
+  }
+  revision 2022-11-30 {
+    description
+      "SRLinux 22.11.1";
+  }
+  revision 2022-06-30 {
+    description
+      "SRLinux 22.6.1";
+  }
+  revision 2022-03-31 {
+    description
+      "SRLinux 22.3.1";
+  }
+  revision 2021-11-30 {
+    description
+      "SRLinux 21.11.1";
+  }
+  revision 2021-06-30 {
+    description
+      "SRLinux 21.6.1";
+  }
+  revision 2021-03-31 {
+    description
+      "SRLinux 21.3.1";
+  }
+  revision 2020-06-30 {
+    description
+      "SRLinux 20.6.1";
+  }
+
+  grouping isis-inst-key {
+    leaf name {
+      description
+        "The name of the IS-IS instance";
+      type srl_nokia-comm:name;
+    }
+  }
+
+  grouping isis-level-key {
+    leaf level-number {
+      description
+        "Specifies the IS-IS protocol level to which these attributes are applied.";
+      type srl_nokia-isis-types:isis-level-number;
+    }
+  }
+
+  grouping isis-interface-key {
+    leaf interface-name {
+      description
+        "Name of the IS-IS interface";
+      type srl_nokia-netinst:network-instance-subintf-name;
+    }
+  }
+
+  grouping isis-summary-prefix-key {
+    leaf ip-prefix {
+      description
+        "Summary ip prefix.";
+      type srl_nokia-comm:ip-prefix;
+    }
+  }
+
+  grouping isis-authentication-pdu-options {
+    leaf generate {
+      type boolean;
+      description
+        "When set to true, IS-IS is instructed to add an authentication TLV to every transmitted PDU of the specified type";
+      must '(. = false()) or boolean(../../keychain) or boolean(../../key/crypto-algorithm)' {
+        error-message "keychain or key must be configured to send authentication TLV with this PDU";
+      }
+    }
+    leaf check-received {
+      type srl_nokia-isis-types:isis-auth-check-type;
+      description
+        "Specifies the type of authentication checks done for received PDUs of the specified type.";
+      must "(. = 'disable')  or boolean(../../keychain) or boolean(../../key/crypto-algorithm)" {
+        error-message "keychain or key must be configured to check authentication for this PDU";
+      }
+    }
+  }
+
+  grouping isis-instance-level-authentication {
+    container authentication {
+      description
+        "Container for specifying authetication options that apply to the entire IS-IS instance or to an entire level.
+
+         The settings in this container only apply to PDUs without an authentication behavior specified at a more granular level.";
+      container csnp-authentication {
+        description
+          "Container with options to control the authentication of CSNP PDUs";
+        uses isis-authentication-pdu-options;
+      }
+      container psnp-authentication {
+        description
+          "Container with options to control the authentication of PSNP PDUs";
+        uses isis-authentication-pdu-options;
+      }
+      container hello-authentication {
+        description
+          "Container with options to control the authentication of Hello PDUs";
+        uses isis-authentication-pdu-options;
+      }
+      container lsp-authentication {
+        description
+          "Container with options to control the authentication of Link State PDUs";
+        uses isis-authentication-pdu-options;
+      }
+      choice auth-type {
+        case keychain {
+          leaf keychain {
+            description
+              "Specifies a keychain to use for the authentication of PDUs when the behavior is controlled at this level of the configuration hierarchy.";
+            type leafref {
+              path "/srl-system:system/srl-keychain:authentication/srl-keychain:keychain/srl-keychain:name";
+            }
+            must '/srl-system:system/srl-keychain:authentication/srl-keychain:keychain[srl-keychain:name = current()]'
+               + '/srl-keychain:type = "isis"' {
+              error-message "Only keychain of type isis can be assigned";
+            }
+          }
+        }
+        case direct-key {
+          container key {
+            description
+              "Container to specify the secret key and crypto algorithm to use for the authentication of PDUs when the behavior is controlled at this level of the configuration hierarchy";
+            leaf crypto-algorithm {
+              description
+                "The cryptographic algorithm used with the keying material to secure the messages.";
+              type srl_nokia-isis-types:isis-auth-type;
+              mandatory true;
+            }
+            leaf auth-password {
+              description
+                "The secret key to use for authentication of PDUs";
+              type srl_nokia-comm:routing-password;
+              mandatory true;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  grouping isis-interface-authentication {
+    container authentication {
+      description
+        "Container for specifying authetication options that apply to the IS-IS instance.";
+      container hello-authentication {
+        description
+          "Container with options to control the authentication of Hello PDUs";
+        uses isis-authentication-pdu-options;
+      }
+      choice auth-type {
+        case keychain {
+          leaf keychain {
+            description
+              "Specifies a keychain to use for the authentication of Hello PDUs on this interface.";
+            type leafref {
+              path "/srl-system:system/srl-keychain:authentication/srl-keychain:keychain/srl-keychain:name";
+            }
+            must '/srl-system:system/srl-keychain:authentication/srl-keychain:keychain[srl-keychain:name = current()]'
+               + '/srl-keychain:type = "isis"' {
+              error-message "Only keychain of type isis can be assigned";
+            }
+          }
+        }
+        case direct-key {
+          container key {
+            description
+              "Container to specify the secret key and crypto algorithm to use for the authentication of Hello PDUs on this interface";
+            leaf crypto-algorithm {
+              description
+                "The cryptographic algorithm used with the keying material to secure the messages.";
+              type srl_nokia-isis-types:isis-auth-type;
+              mandatory true;
+            }
+            leaf auth-password {
+              description
+                "The secret key to use for authentication of Hello PDUs";
+              type srl_nokia-comm:routing-password;
+              mandatory true;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  grouping isis-interface-level-config {
+    leaf disable {
+      description
+        "Disable the Level for the interface.";
+      type boolean;
+      default "false";
+    }
+    leaf ipv6-unicast-metric {
+      description
+        "Specifies the interface metric associated with the IPv6-unicast multi-topology.
+         The default is based on reference-bandwidth, or else if this is not configured the default is 10.";
+      type srl_nokia-isis-types:isis-wide-metric;
+    }
+    leaf metric {
+      description
+        "Specifies the interface metric associated with the native routing topology.
+         The default is based on reference-bandwidth, or else if this is not configured the default is 10.";
+      type srl_nokia-isis-types:isis-wide-metric;
+    }
+    leaf priority {
+      description
+        "ISIS neighbor priority for becoming Designated IS (LAN hello PDU only).";
+      type uint8 {
+        range "0..127";
+      }
+      default "64";
+    }
+    leaf passive {
+      if-feature "srl-feat:isis-level-passive";
+      description
+        "When set to true the interface is configured as a passive interface for this level and does not send IIH PDUs or try to form an adjacency with other routers.";
+      type boolean;
+    }
+    uses isis-interface-authentication;
+  }
+
+  grouping isis-interface-config {
+    container interface-ref {
+      if-feature "srl-feat:interface-references";
+      description
+        "Reference to a subinterface";
+      leaf interface {
+        type leafref {
+          path "/srl_nokia-if:interface/srl_nokia-if:name";
+        }
+        description
+          "Reference to a base interface, for example a port or LAG";
+        must '../subinterface >= 0' {
+          error-message "subinterface must be configured when interface is set";
+        }
+      }
+      leaf subinterface {
+        type leafref {
+          path "/srl_nokia-if:interface[srl_nokia-if:name=current()/../interface]/srl_nokia-if:subinterface/srl_nokia-if:index";
+        }
+        description
+          "Reference to a subinterface
+           This requires the base interface to be specified using the interface leaf in this container.";
+        must '../interface' {
+          error-message "interface must be configured when subinterface is set";
+        }
+      }
+    }
+    leaf admin-state {
+      description
+        "Used to administratively enable or disable the IS-IS protocol on a
+         routed subinterface";
+      type srl_nokia-comm:admin-state;
+      default "enable";
+    }
+    leaf circuit-type {
+      description
+        "Specifies the circuit type as either point-to-point or broadcast";
+      type srl_nokia-isis-types:isis-circuit-type;
+    }
+    container delay {
+      if-feature "srl-feat:isis-dyn-delay";
+      description
+        "Enter the delay context";
+      leaf delay-selection {
+        description
+          "Delay source advertised by IGP for the interface";
+        type enumeration {
+          enum static {
+            value 1;
+          }
+          enum dynamic {
+            value 2;
+          }
+          enum static-preferred {
+            value 3;
+          }
+          enum dynamic-preferred {
+            value 4;
+          }
+        }
+        default "static-preferred";
+      }
+      leaf unidirectional-minimum-link-delay {
+        config false;
+        type uint32;
+        units "microseconds";
+        description
+          "Operational Unidirectional link delay advertised by ISIS";
+      }
+    }
+    leaf hello-padding {
+      description
+        "Specifies the use of IS-IS Hello PDU padding on the interface";
+      type srl_nokia-isis-types:isis-hello-padding-type;
+    }
+    leaf passive {
+      description
+        "When set to true the interface is configured as a passive interface and does not send IIH PDUs or try to form an adjacency with other routers.";
+      type boolean;
+      default "false";
+    }
+    container ipv4-unicast {
+      leaf admin-state {
+        description
+          "When set to true, the interface and level supports IPv4 unicast routing";
+        type srl_nokia-comm:admin-state;
+        default "enable";
+      }
+      leaf enable-bfd {
+        if-feature "srl-feat:bfd";
+        description
+          "Enable BFD for IPv4";
+        type boolean;
+        default "false";
+      }
+      leaf include-bfd-tlv {
+        if-feature "srl-feat:bfd";
+        description
+          "Specifies whether a BFD-enabled TLV is included for IPv4 on this IS-IS interface.";
+        type boolean;
+        default "false";
+        must 'not(../enable-bfd = false() and . = true())' {
+          error-message "include-bfd-tlv can be set only if enable-bfd is set to true.";
+        }
+      }
+    }
+    container ipv6-unicast {
+      leaf admin-state {
+        description
+          "When set to true, the interface and level supports IPv6 unicast routing";
+        type srl_nokia-comm:admin-state;
+        default "enable";
+      }
+      leaf enable-bfd {
+        if-feature "srl-feat:bfd";
+        description
+          "Enable BFD for IPv6";
+        type boolean;
+        default "false";
+      }
+      leaf include-bfd-tlv {
+        if-feature "srl-feat:bfd";
+        description
+          "Specifies whether a BFD-enabled TLV is included for IPv6 on this IS-IS interface.";
+        type boolean;
+        default "false";
+        must 'not(../enable-bfd = false() and . = true())' {
+          error-message "include-bfd-tlv can be set only if enable-bfd is set to true.";
+        }
+      }
+    }
+    list level {
+      description
+        "List of IS-IS levels supported by this interface";
+      max-elements 2;
+      key "level-number";
+      uses isis-level-key;
+      uses isis-interface-level-config;
+    }
+    uses isis-interface-authentication;
+  }
+
+  grouping isis-inst-common-config {
+    leaf admin-state {
+      description
+        "Used to administratively enable or disable the IS-IS instance";
+      type srl_nokia-comm:admin-state;
+      default "disable";
+    }
+    leaf instance-id {
+      if-feature "srl-feat:isis-mi";
+      description
+        "ISIS instance number";
+      type uint32 {
+        range "0..127";
+      }
+      default "0";
+    }
+    leaf-list net {
+      max-elements 1;
+      description
+        "ISIS network entity title (NET)";
+      reference
+        "International Organization for Standardization,
+         Information technology - Open Systems Interconnection-Network service Definition - ISO/ IEC 8348:2002.";
+      type srl_nokia-isis-types:isis-net-id;
+    }
+    leaf level-capability {
+      description
+        "The level-capability of the intermediate system (router)";
+      type srl_nokia-isis-types:isis-level;
+      default "L2";
+    }
+    leaf max-ecmp-paths {
+      description
+        "The maximum number of ECMP next-hops to program into the FIB for every IP prefix";
+      type srl_nokia-isis-types:isis-ecmp;
+      default "1";
+      must '. <= 8' {
+        error-message "Max ECMP paths cannot be greater than 8 on 7215 A1 platform.";
+        srl_nokia-ext:if-feature "srl_nokia-features:platform-7215-a1";
+      }
+    }
+    leaf poi-tlv {
+      description
+        "When set to true, a TLV is added to purge to record the system ID of the IS generating the purge.";
+      reference
+        "RFC6232: Purge Originator Identification TLV for IS-IS.  TLV 13.";
+      type boolean;
+      default "false";
+    }
+    leaf iid-tlv {
+      if-feature "srl-feat:isis-mi";
+      description
+        "ISIS Instance Identifier TLV. When set to true, IID-TLV identifies
+         the unique instance as well as the topology/topologies to which the
+         PDU applies.";
+      reference
+        "RFC6822: IS-IS Multi-Instance. TLV 7";
+      type boolean;
+      default "false";
+    }
+    leaf advertise-router-capability {
+      if-feature "srl-feat:isis-rtr-capability";
+      description
+        "Allow router advertisement capabilities";
+      type boolean;
+      default "true";
+    }
+    leaf prefix-attributes-tlv {
+      if-feature "srl-feat:isis-rtr-capability";
+      description
+        "Use IS-IS Prefix Attributes TLV to exchange extended IPv4 and IPv6 reachability information";
+      type boolean;
+      default "true";
+    }
+    leaf export-policy {
+      description
+        "Apply an export policy to redistribute non-ISIS routes into ISIS";
+      type leafref {
+        path "/srl-rpol:routing-policy/srl-rpol:policy/srl-rpol:name";
+      }
+    }
+    leaf hello-padding {
+      description
+        "Specifies the use of IS-IS Hello PDU padding all interfaces
+
+         This can be overridden by interface configuration.";
+      type srl_nokia-isis-types:isis-hello-padding-type;
+      default "disable";
+    }
+    leaf enable-csnp-on-p2p-links {
+      description
+        "Enable/disable the transmission of periodic CSNP PDUs on point-to-point interfaces
+
+         When this is set to false, CSNP PDUs will only be sent on a P2P interface when the adjacency is initialized. This setting has no effect on broadcast interfaces.";
+      type boolean;
+      default "true";
+    }
+    container attached-bit {
+      description
+        "This container provides option for handling the ATTached bit in L1 LSPs";
+      leaf ignore {
+        description
+          "When set to true, if the attached bit is set on an incoming Level 1 LSP, the local system ignores it.
+           In this case the local system does not set a default route to the L1L2 router advertising the PDU with the attached bit set.";
+        type boolean;
+        default "false";
+      }
+      leaf suppress {
+        description
+          "When set to true, if the local IS acts as a L1L2 router, then the attached bit is not advertised in locally generated L1 LSPs.";
+        type boolean;
+        default "false";
+      }
+    }
+    container transport {
+      leaf lsp-mtu-size {
+        description
+          "Sets the maximum size of LSPs generated by this router";
+        type uint16 {
+          range "490..9490";
+        }
+        units "bytes";
+        default "1492";
+      }
+    }
+    container ipv4-unicast {
+      description
+        "Enables/disables IPv4 routing in this ISIS instance.";
+      leaf admin-state {
+        description
+          "When set to true, the IS-IS instance supports IPv4 unicast routing";
+        type srl_nokia-comm:admin-state;
+        default "enable";
+      }
+    }
+    container ipv6-unicast {
+      description
+        "Enables/disables IPv6 routing in this ISIS instance.";
+      leaf admin-state {
+        description
+          "When set to true, the IS-IS instance supports IPv6 unicast routing";
+        type srl_nokia-comm:admin-state;
+        default "enable";
+      }
+    }
+  }
+
+  grouping isis-level-config {
+    leaf metric-style {
+      description
+        "Specifies the metric style to be wide or narrow for the level";
+      type srl_nokia-isis-types:isis-metric-style;
+      default "wide";
+    }
+    leaf loopfree-alternate-exclude {
+      if-feature "srl-feat:isis-lfa";
+      description
+        "Enable/disable LFA at ISIS level.";
+      type boolean;
+      default "false";
+      must "(. = false()) or (../../../../../srl_nokia-netinst:type = 'srl_nokia-netinst:default')" {
+        error-message "LFA Configuration is supported only in the default network instance";
+      }
+    }
+    container route-preference {
+      description
+        "Specify the route preference (admin distance) for IP routes asssociated with the level";
+      leaf external {
+        description
+          "Specify the route preference of external routes carried in this level.
+           By default the route preference of external L1 routes is 160.
+           By default the route preference of external L2 routes is 165.";
+        type uint8 {
+          range "1..255";
+        }
+      }
+      leaf internal {
+        description
+          "Specify the route preference of internal routes carried in this level.
+           By default the route preference of internal L1 routes is 15.
+           By default the route preference of internal L2 routes is 18.";
+        type uint8 {
+          range "1..255";
+        }
+      }
+    }
+    uses isis-instance-level-authentication;
+  }
+
+  grouping isis-inst-config {
+    uses isis-inst-common-config;
+    uses isis-instance-level-authentication;
+  }
+
+  grouping isis-top {
+    container isis {
+      presence "Configure ISIS";
+      must "not(../../srl_nokia-netinst:type = 'srl_nokia-netinst:mac-vrf')" {
+        error-message "ISIS routing configuration is not possible on network-instance of type mac-vrf";
+      }
+      must "../../srl_nokia-netinst:type != 'srl_nokia-netinst:host'" {
+        error-message "ISIS routing configuration is not possible on network-instance of type host";
+      }
+      description
+        "Top-level configuration and operational state for Intermediate System to Intermediate System (ISIS)";
+      list instance {
+        description
+          "List of IS-IS protocol instances associated with this
+           network-instance.
+           Only a single instance is supported for now";
+        key "name";
+        uses isis-inst-key;
+        uses isis-inst-config;
+        list interface {
+          description
+            "List of IS-IS interfaces";
+          key "interface-name";
+          unique "segment-routing/mpls/ipv4-node-sid/index";
+          unique "segment-routing/mpls/ipv6-node-sid/index";
+          uses isis-interface-key;
+          uses isis-interface-config;
+        }
+        list level {
+          description
+            "List of IS-IS levels supported by this IS (router)";
+          max-elements 2;
+          key "level-number";
+          uses isis-level-key;
+          uses isis-level-config;
+          must "(((level-number = 1) and (../level-capability != 'L2')) or
+                 ((level-number = 2) and (../level-capability != 'L1')))" {
+            error-message "Level configuration must match the instance level-capability";
+          }
+        }
+        container hostnames {
+          config false;
+          list system-id {
+            description
+              "List of system IDs that have discovered hostnames.";
+            key "host-system-id";
+            leaf host-system-id {
+              description
+                "The system ID";
+              type srl_nokia-comm:isis-system-id;
+            }
+            leaf hostname {
+              description
+                "The hostname of the system.";
+              type string;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  augment "/srl_nokia-netinst:network-instance/srl_nokia-netinst:protocols" {
+    uses isis-top;
+  }
+}

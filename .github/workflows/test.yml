@@ -41,7 +41,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        TESTENV: [quicklab, quicklab-crpd, quicklab-notconf]
+        TESTENV: [quicklab, quicklab-crpd, quicklab-notconf, quicklab-srl]
         ARCH: [amd64, aarch64]
         exclude:
           # No Cisco IOS XRd support for aarch64 :/
@@ -83,7 +83,11 @@ jobs:
         run: |
           if [ "${{ matrix.TESTENV }}" = "quicklab" ]; then
             make -C test/${{ matrix.TESTENV }} start wait WAIT=240
-            echo "Sleeping for 60s to give IOS XRd more time to get ready ..."
+            echo "Sleeping for 120s to give IOS XRd more time to get ready ..."
+            sleep 120
+          elif [ "${{ matrix.TESTENV }}" = "quicklab-srl" ]; then
+            make -C test/${{ matrix.TESTENV }} start wait
+            echo "Sleeping for 60s to give SR Linux more time to get ready ..."
             sleep 60
           else
             make -C test/${{ matrix.TESTENV }} start wait

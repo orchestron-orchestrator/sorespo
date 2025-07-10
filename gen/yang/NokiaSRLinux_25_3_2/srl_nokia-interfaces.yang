@@ -1,0 +1,495 @@
+module srl_nokia-interfaces {
+  yang-version 1.1;
+  namespace "urn:nokia.com:srlinux:chassis:interfaces";
+  prefix srl_nokia-if;
+
+  import srl_nokia-common {
+    prefix srl_nokia-comm;
+  }
+  import srl_nokia-features {
+    prefix srl_nokia-feat;
+  }
+  import srl_nokia-if-ip {
+    prefix srl_nokia-if-ip;
+  }
+  import srl_nokia-extensions {
+    prefix srl_nokia-ext;
+  }
+  import srl_nokia-system {
+    prefix srl_nokia-sys;
+  }
+
+  organization
+    "Nokia";
+  contact
+    "Nokia SR Linux Support
+     Web: <http://www.nokia.com>";
+  description
+    "Model for managing network interfaces and subinterfaces.
+
+     This model reuses data items defined in the IETF YANG model for
+     interfaces described by RFC 7223";
+
+  revision 2025-03-31 {
+    description
+      "SRLinux 2025.3.1";
+  }
+  revision 2024-10-31 {
+    description
+      "SRLinux 24.10.1";
+  }
+  revision 2024-07-31 {
+    description
+      "SRLinux 24.7.1";
+  }
+  revision 2024-03-31 {
+    description
+      "SRLinux 24.3.1";
+  }
+  revision 2023-10-31 {
+    description
+      "SRLinux 23.10.1";
+  }
+  revision 2023-07-31 {
+    description
+      "SRLinux 23.7.1";
+  }
+  revision 2023-03-31 {
+    description
+      "SRLinux 23.3.1";
+  }
+  revision 2022-11-30 {
+    description
+      "SRLinux 22.11.1";
+  }
+  revision 2022-06-30 {
+    description
+      "SRLinux 22.6.1";
+  }
+  revision 2022-03-31 {
+    description
+      "SRLinux 22.3.1";
+  }
+  revision 2021-11-30 {
+    description
+      "SRLinux 21.11.1";
+  }
+  revision 2021-06-30 {
+    description
+      "SRLinux 21.6.1";
+  }
+  revision 2021-03-31 {
+    description
+      "SRLinux 21.3.1";
+  }
+  revision 2020-06-30 {
+    description
+      "SRLinux 20.6.1";
+  }
+  revision 2019-11-30 {
+    description
+      "SRLinux 19.11.1";
+  }
+
+  identity si-type {
+    description
+      "Base type for subinterface types";
+  }
+
+  identity routed {
+    base si-type;
+    description
+      "Indicates subinterface is used in a routed context";
+  }
+
+  identity bridged {
+    if-feature "srl_nokia-feat:bridged";
+    base si-type;
+    description
+      "Indicates subinterface is used in a bridged context";
+  }
+
+  identity local-mirror-dest {
+    if-feature "srl_nokia-feat:mirroring";
+    base si-type;
+    description
+      "Indicates subinterface is used in a mirroring destination SPAN context";
+  }
+
+  identity transceiver-functional-type {
+    description
+      "Base type for transceiver functional types";
+  }
+
+  identity standard {
+    base transceiver-functional-type;
+    description
+      "indicates transceiver supports standard optics";
+  }
+
+  identity digital-coherent-optics {
+    if-feature "srl_nokia-feat:digital-coherent-optics";
+    base transceiver-functional-type;
+    description
+      "Indicates transceiver supports digital coherent optics";
+  }
+
+  identity optical-line-system {
+    if-feature "srl_nokia-feat:optical-line-system";
+    base transceiver-functional-type;
+    description
+      "Indicates transceiver is a QSFP-DD-LS Amplifier
+
+       These are used to multiplex and amplify coherent optical signals and do not themselves support Ethernet interfaces.";
+  }
+
+  typedef oper-fec-type {
+    type enumeration {
+      enum disabled {
+        description
+          "No FEC is active on the host interface";
+      }
+      enum cl74-baser {
+        description
+          "An early form of FEC used with 25G interfaces
+
+           Not very strong performance - cl108-rs528 is preferred.  cl74-baser should only be used if the far end doesn't support cl108-rs528";
+      }
+      enum cl108-rs528 {
+        description
+          "IEEE 802.3 Clause 108 using RS(528,514)
+
+           IEEE defines this as mandatory for 25G interfaces";
+      }
+      enum cl91-rs528 {
+        description
+          "IEEE 802.3 Clause 91 using RS(528,514)
+
+           IEEE defines this as an option for 100G interfaces using NRZ";
+      }
+      enum cl91-rs544 {
+        description
+          "IEEE 802.3 Clause 91 using RS(544,514)
+
+           IEEE defines this as mandatory for 100G interfaces using PAM4";
+      }
+      enum cl119-rs544 {
+        description
+          "IEEE 802.3 Clause 119 using RS(544,514)
+
+           IEEE defines this as mandatory for 200G and 400G interfaces";
+      }
+      enum cl134-rs544 {
+        description
+          "IEEE 802.3 Clause 134 using RS(544,514)
+
+           IEEE defines this as mandatory for 50G interfaces";
+      }
+    }
+    description
+      "Enumerations of fec options for a STANDARD Ethernet interface
+
+       Only a subset of these are configurable.";
+  }
+
+  typedef interface-id {
+    type string;
+    description
+      "User-defined identifier for an interface
+
+       This is generally used to name a interface reference. The id can be arbitrary but a useful convention is to use a combination of base interface name and subinterface index.";
+  }
+
+  typedef loopback-mode-type {
+    type enumeration {
+      enum none {
+        description
+          "No loopback is applied";
+      }
+      enum facility {
+        if-feature "srl_nokia-feat:loopback-mode-facility";
+        description
+          "A loopback which directs traffic received from an external source on the port back out the transmit side of the same port.";
+      }
+      enum terminal {
+        if-feature "srl_nokia-feat:loopback-mode-terminal";
+        description
+          "A loopback which directs traffic normally transmitted on the port back into the switch as if received on the same
+           port from an external source
+
+           On some systems this is also called local loopback.";
+      }
+    }
+    description
+      "Loopback modes for physical ports";
+  }
+
+  typedef ethernet-monitor-report-status {
+    type enumeration {
+      enum none {
+        value 0;
+      }
+      enum sd-threshold-exceeded {
+        value 1;
+      }
+      enum sf-threshold-exceeded {
+        value 2;
+      }
+    }
+  }
+
+  grouping interface-common-config {
+    description
+      "Configuration data nodes common to physical interfaces and subinterfaces";
+    leaf description {
+      type srl_nokia-comm:description;
+      description
+        "A user-configured description of the interface";
+      reference
+        "RFC 2863: The Interfaces Group MIB - ifAlias";
+    }
+  }
+
+  grouping interface-phys-config {
+    description
+      "Configuration data for physical interfaces";
+    uses interface-common-config;
+    leaf admin-state {
+      srl_nokia-ext:show-importance "high";
+      type srl_nokia-comm:admin-state;
+      default "enable";
+      description
+        "The configured, desired state of the interface";
+      reference
+        "RFC 2863: The Interfaces Group MIB - ifAdminStatus";
+      must "((. = 'enable') and starts-with(../srl_nokia-if:name, 'system0')) or not(starts-with(../srl_nokia-if:name, 'system0'))" {
+        error-message "admin-state must be enable";
+      }
+    }
+    leaf mtu {
+      type uint16 {
+        range "1450..9500";
+      }
+      units "bytes";
+      description
+        "Port MTU in bytes including ethernet overhead but excluding 4-bytes FCS
+
+         If a transmitted packet exceeds this size it is dropped.
+         The default value for ethernet-x interfaces is taken from /system/mtu/default-port-mtu. For the mgmt0 and mgmt0-standby interfaces the default is 1514 bytes, but the value can be changed for each interface individually.
+         Port MTU is not configurable for loopback interfaces or irb interfaces. For irb interfaces, if the size of the ip packets to be routed to a mac-vrf has to be restricted, the subinterface.ip-mtu should be configured instead.
+         The max mtu for the mgmt0 and mgmt0-standby interfaces is 9216.
+         The 7220 IXR-D1, 7220 IXR-D2, 7220 IXR-D3, 7220 IXR-D4, 7220 IXR-D5, 7220 IXR-H2, 7220 IXR-H3, and 7220 IXR-H4 systems support a maximum port MTU of 9412 bytes and minimum of 1500 bytes.
+         The VSRL system supports a maximum port MTU of 9500 and minimum of 1450 bytes.
+         The 7730 SXR systems support a maximum port MTU of 9408 bytes and minimum of 1500 bytes.
+         All other systems support a maximum port MTU of 9500 and minimum of 1500 bytes.
+         Each 7250 IXR IMM supports a maximum of 8 different port MTU values. 7220 IXR systems do not have any limit on the maximum number of different port MTU values.";
+      must 'not(../breakout-mode)' {
+        error-message "mtu not configurable when breakout-mode is enabled";
+      }
+      must 'starts-with(../srl_nokia-if:name, "lif") or starts-with(../srl_nokia-if:name, "vhn") or (. >= 1500)' {
+        error-message "minimum mtu is 1500 for this interface type";
+      }
+      must "(not (starts-with(../srl_nokia-if:name, 'mgmt'))) or (. <= 9216)" {
+        error-message "mtu max is 9216 for mgmt interface";
+      }
+    }
+  }
+
+  grouping subinterface-config {
+    description
+      "Configuration data for subinterfaces";
+    uses interface-common-config;
+    leaf admin-state {
+      srl_nokia-ext:show-importance "high";
+      type srl_nokia-comm:admin-state;
+      default "enable";
+      description
+        "The configured, desired state of the subinterface";
+      reference
+        "RFC 2863: The Interfaces Group MIB - ifAdminStatus";
+      must "((. = 'enable') and starts-with(../../srl_nokia-if:name, 'system0')) or not(starts-with(../../srl_nokia-if:name, 'system0'))" {
+        error-message "admin-state must be enable";
+      }
+    }
+    leaf ip-mtu {
+      type uint16 {
+        range "1280..9486";
+      }
+      units "bytes";
+      description
+        "IP MTU of the subinterface in bytes.
+
+         Includes the IP header but excludes Ethernet encapsulation.
+
+         IP MTU specifies the maximum sized IPv4 or IPv6 packet that can be transmitted on the subinterface. If an IPv4 or IPv6 packet exceeds this size it is dropped and this may result in the generation of an ICMP error message back to the source.
+
+         The default IP MTU for a subinterface is taken from /system/mtu/default-ip-mtu.  For the mgmt0 and mgmt0-standby subinterfaces the default is the associated interface MTU minus the Ethernet encapsulation overhead.
+
+         The IP MTU is not configurable for subinterfaces of loopback interfaces.
+
+         The 7220 IXR-D1, 7220 IXR-D2, 7220 IXR-D3, 7220 IXR-D4, 7220 IXR-D5, 7220 IXR-H2, 7220 IXR-H3, and 7220 IXR-H4 systems support a maximum IP MTU of 9398 bytes.
+
+         The 7730 SXR systems support a maximum IP MTU of 9394 bytes.
+
+         Each 7250 IXR IMM supports a maximum of 4 different IP MTU values. 7220 IXR systems do not have any limit on the maximum number of different IP MTU values.";
+      must "not (starts-with(../../srl_nokia-if:name, 'system') or starts-with(../../srl_nokia-if:name, 'lo'))" {
+        error-message "ip-mtu not supported on this interface";
+      }
+      must "(../type != 'srl_nokia-if:bridged') and (../type != 'srl_nokia-if:local-mirror-dest')" {
+        error-message "ip-mtu not allowed with type bridged or type local-mirror-dest";
+      }
+    }
+    leaf l2-mtu {
+      if-feature "srl_nokia-feat:config-sub-if-l2-mtu";
+      type uint16 {
+        range "1450..9500";
+      }
+      units "bytes";
+      description
+        "Layer-2 MTU of the subinterface in bytes.
+
+         Includes the Ethernet header and VLAN tags, and excludes 4-bytes FCS.
+
+         L2 MTU specifies the maximum sized Ethernet frame that can be transmitted on the subinterface. If a frame exceeds this size it is discarded. If the l2-mtu of the subinterface exceeds the port-mtu of the associated
+         interface, the subinterface will remain operationally down.
+
+         The default value for a subinterface is taken from /system/mtu/default-l2-mtu. The L2 MTU is only configurable for bridged subinterfaces.
+
+         The 7220 IXR-D1, 7220 IXR-D2, 7220 IXR-D3, 7220 IXR-D4, 7220 IXR-D5, 7220 IXR-H2, 7220 IXR-H3, and 7220 IXR-H4 systems support a maximum L2 MTU of 9412 bytes and minimum of 1500 bytes.
+
+         The 7730 SXR systems support a maximum L2 MTU of 9408 bytes.
+
+         The VSRL system supports a maximum L2 MTU of 9500 and minimum of 1450 bytes.
+
+         All other systems support a maximum L2 MTU of 9500 and minimum of 1500 bytes.";
+      must "../type = 'srl_nokia-if:bridged'" {
+        error-message "l2-mtu only allowed with type bridged";
+      }
+      must 'starts-with(../../srl_nokia-if:name, "lif") or starts-with(../../srl_nokia-if:name, "vhn") or (. >= 1500)' {
+        error-message "minimum l2-mtu is 1500 for this interface type";
+      }
+    }
+    leaf mpls-mtu {
+      if-feature "srl_nokia-feat:mpls";
+      type uint16 {
+        range "1284..9496";
+      }
+      units "bytes";
+      description
+        "MPLS MTU of the subinterface in bytes, including the transmitted label stack.
+
+         MPLS MTU specifies the maximum sized MPLS packet that can be transmitted on the subinterface. If an MPLS packet containing any payload exceeds this size then it is dropped. If the payload of the dropped packet is IPv4 or IPv6 then this may also result in the generation of an ICMP error message that is either tunneled or sent back to the source.
+
+         The default MPLS MTU for a subinterface is taken from /system/mtu/default-mpls-mtu.
+
+         The MPLS MTU is not configurable for subinterfaces of loopback interfaces.
+
+         The 7730 SXR systems support a maximum MPLS MTU of 9404 bytes.
+
+         Each 7250 IXR IMM supports a maximum of 4 different MPLS MTU values.";
+      must "not (starts-with(../../srl_nokia-if:name, 'system') or starts-with(../../srl_nokia-if:name, 'lo') or starts-with(../../srl_nokia-if:name, 'mgmt'))" {
+        error-message "mpls-mtu not supported on this interface";
+      }
+      must "(../type != 'srl_nokia-if:bridged') and (../type != 'srl_nokia-if:local-mirror-dest')" {
+        error-message "mpls-mtu not allowed with type bridged or type local-mirror-dest";
+      }
+    }
+  }
+
+  grouping subinterface-top {
+    description
+      "Subinterface data for logical interfaces associated with a given interface";
+    list subinterface {
+      max-elements 4095;
+      key "index";
+      description
+        "The list of subinterfaces (logical interfaces) associated with a physical interface";
+      leaf index {
+        type uint32 {
+          range "0..9999";
+        }
+        description
+          "The index of the subinterface, or logical interface number";
+        must "((. = 0) and starts-with(../../srl_nokia-if:name, 'system0')) or not(starts-with(../../srl_nokia-if:name, 'system0'))" {
+          error-message "subinterface index must be 0 for system0 interface";
+        }
+        must "not(starts-with(../../srl_nokia-if:name, 'sync0'))" {
+          error-message "subinterfaces not supported on sync0 port";
+        }
+      }
+      leaf type {
+        type identityref {
+          base si-type;
+        }
+        description
+          "Indicates the context in which the ethernet subinterface will be used";
+        must "(starts-with(../../srl_nokia-if:name, 'ethernet') or starts-with(../../srl_nokia-if:name, 'lag') or starts-with(../../srl_nokia-if:name, 'lif') or starts-with(../../srl_nokia-if:name, 'enp') or starts-with(../../srl_nokia-if:name, 'vhn'))" {
+          error-message "type not supported on this interface";
+        }
+        must "(. != 'srl_nokia-if:local-mirror-dest') or (starts-with(../../srl_nokia-if:name, 'ethernet') or starts-with(../../srl_nokia-if:name, 'lag'))" {
+          error-message "local-mirror-dest is not supported on this interface";
+        }
+      }
+      uses subinterface-config;
+      uses srl_nokia-if-ip:ipv4-top;
+      uses srl_nokia-if-ip:ipv6-top;
+    }
+  }
+
+  grouping interface-top {
+    description
+      "Top-level grouping for interface configuration and operational state data";
+    list interface {
+      key "name";
+      description
+        "The list of named interfaces on the device";
+      leaf name {
+        type srl_nokia-comm:interface-all;
+        description
+          "The name of the interface
+
+           Valid options are:
+           irb<N>, N=0..255
+           lif-<lif_name>
+           enp<bus>s<dev>f<fn>, bus=0..255, dev=0..31, fn=0..7
+           vhn-<vhn_name>
+           lag<N>, N=1..1000 [note1]
+           lo<N>, N=0..255
+           mgmt0
+           mgmt0-standby
+           ethernet-<slot>/<port>
+           ethernet-<slot>/<connector>/<port>
+           ethernet-<slot>/m<mda>/<port>
+           ethernet-<slot>/m<mda>/<connector>/<port>
+           system0
+           sync0
+
+           <lif_name>=Linux interface name
+           <vhn_name>=vhost interface name
+           <slot>=slot number {1,2,3,..}
+           <mda>=mda id {1,2,3,..}
+           <connector>=connector id {1,2,3,..}
+           <port>=port id {1,2,3,..}
+
+           [note1] The maximum number of LAGs per platform is as follows:
+            D1: 32 (N must be 1..32)
+            D2-D3: 128 (N must be 1..1000)
+            D4-D5: 64 (N must be 1..64)
+            H2-H3: 127 (N must be 1..127)
+            H4-32D: 127 (N must be 1..127)
+            H4: 255 (N must be 1..255)
+            IXR: 128 (N must be 1..128)
+            SXR-1d-32D: 128 (N must be 1..128)
+            SXR-1x-44S: 128 (N must be 1..128)
+            vSRL: 8 (N must be 1..8)
+            A1: 10 (N must be 1..10)
+            IXR-X1b: 512 (N must be 1..512)
+            IXR-X3b: 512 (N must be 1..512)";
+      }
+      uses interface-phys-config;
+      uses subinterface-top;
+    }
+  }
+
+  uses interface-top;
+}

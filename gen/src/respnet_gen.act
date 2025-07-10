@@ -15,6 +15,9 @@ actor main(env):
     orchestron.build.apply_schema_transforms_to_dir(fc, "yang/JuniperCRPD_23_4R1_9", [
         orchestron.build.SchemaTransformChain(".*yang.orig", [orchestron.build.SchemaTransformNoComments()])
     ])
+    orchestron.build.apply_schema_transforms_to_dir(fc, "yang/NokiaSRLinux_25_3_2", [
+        orchestron.build.SchemaTransformChain(".*yang.orig", [orchestron.build.SchemaTransformNoComments()])
+    ])
 
     cfs_layer = orchestron.build.Layer.from_dir(fc, "yang/cfs")
     cfs_layer.models.append(oyang.ietf_inet_types)
@@ -38,6 +41,7 @@ actor main(env):
     ], [
         orchestron.build.DeviceType.from_dir(fc, "CiscoIosXr_24_1_ncs55a1", "yang/CiscoIosXr_24_1_ncs55a1"),
         orchestron.build.DeviceType.from_dir(fc, "JuniperCRPD_23_4R1_9", "yang/JuniperCRPD_23_4R1_9"),
+        orchestron.build.DeviceType.from_dir(fc, "NokiaSRLinux_25_3_2", "yang/NokiaSRLinux_25_3_2"),
     ])
     compiled_spec = spec.compile()
     transform(compiled_spec.dev_types["JuniperCRPD_23_4R1_9"])

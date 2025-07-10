@@ -1,0 +1,137 @@
+module srl_nokia-tunnel-interfaces {
+  yang-version 1.1;
+  namespace "urn:nokia.com:srlinux:vxlan:tunnel-interfaces";
+  prefix srl_nokia-tunnel-if;
+
+  import srl_nokia-common {
+    prefix srl_nokia-comm;
+  }
+  import srl_nokia-features {
+    prefix srl-feat;
+  }
+  import srl_nokia-extensions {
+    prefix srl_nokia-ext;
+  }
+  import srl_nokia-interfaces {
+    prefix srl_nokia-if;
+  }
+  import srl_nokia-network-instance {
+    prefix srl_nokia-netinst;
+  }
+  import srl_nokia-tunnel {
+    prefix srl_nokia-tunnel;
+  }
+
+  organization
+    "Nokia";
+  contact
+    "Nokia SR Linux Support
+     Web: <http://www.nokia.com>";
+  description
+    "Model for tunnel-interfaces in SRLinux.";
+
+  revision 2023-10-31 {
+    description
+      "SRLinux 23.10.1";
+  }
+  revision 2022-11-30 {
+    description
+      "SRLinux 22.11.1";
+  }
+  revision 2021-06-30 {
+    description
+      "SRLinux 21.6.1";
+  }
+  revision 2021-03-31 {
+    description
+      "SRLinux 21.3.1";
+  }
+
+  typedef tunnel-interface-all {
+    type string {
+      length "6..8";
+      pattern '(vxlan(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9]))';
+    }
+    description
+      "The type of the tunnel-interface.";
+  }
+
+  typedef vlan-id {
+    type uint16 {
+      range "1..4094";
+    }
+    description
+      "Type definition representing a single-tagged VLAN ID";
+  }
+
+  grouping tunnel-interface-top {
+    description
+      "Top-level configuration and state for tunnel interfaces.";
+    list tunnel-interface {
+      if-feature "srl-feat:vxlan";
+      key "name";
+      srl_nokia-ext:first-released "21.3.1";
+      description
+        "In the case that the interface is logical tunnel
+         interface, the parameters for the tunnel are
+         specified within this subtree. Tunnel interfaces
+         have only a single logical subinterface associated
+         with them.";
+      leaf name {
+        type tunnel-interface-all;
+        description
+          "The name of the tunnel-interface.
+
+           Valid options are:
+           vxlan<N>, N=0..255";
+      }
+      uses vxlan-interface-top;
+    }
+  }
+
+  grouping vxlan-interface-top {
+    description
+      "Vxlan-interface grouping.";
+    list vxlan-interface {
+      max-elements 16384;
+      key "index";
+      srl_nokia-ext:first-released "21.3.1";
+      description
+        "The list of vxlan-interfaces.";
+      leaf index {
+        type uint32 {
+          range "0..99999999";
+        }
+        description
+          "The index of the vxlan-tunnel.";
+      }
+      leaf type {
+        mandatory true;
+        type identityref {
+          base srl_nokia-if:si-type;
+        }
+        description
+          "The value of this leaf indicates the context in which the
+           vxlan-interface will be used in.";
+        must ".='srl_nokia-if:bridged' or .='srl_nokia-if:routed'" {
+          error-message "unsupported type.";
+        }
+      }
+      container ingress {
+        leaf vni {
+          type uint32 {
+            range "1..16777215";
+          }
+          mandatory true;
+          description
+            "Ingress VXLAN Network Identifier of the VXLAN subinterface.
+
+             The egress VNI is determined by the static egress-vni configured in the associated destination
+             or by the dynamic egress-vni learned from the control plane.";
+        }
+      }
+    }
+  }
+
+  uses tunnel-interface-top;
+}

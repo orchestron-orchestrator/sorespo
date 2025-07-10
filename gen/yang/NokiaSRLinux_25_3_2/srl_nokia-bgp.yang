@@ -1,0 +1,1779 @@
+module srl_nokia-bgp {
+  yang-version 1.1;
+  namespace "urn:nokia.com:srlinux:bgp:bgp";
+  prefix srl_nokia-bgp;
+
+  import srl_nokia-common {
+    prefix srl_nokia-comm;
+  }
+  import srl_nokia-network-instance {
+    prefix srl_nokia-netinst;
+  }
+  import srl_nokia-segment-routing {
+    prefix srl_nokia-sr;
+  }
+  import srl_nokia-extensions {
+    prefix srl_nokia-ext;
+  }
+  import srl_nokia-routing-policy {
+    prefix srl-rpol;
+  }
+  import srl_nokia-system {
+    prefix srl_nokia-system;
+  }
+  import srl_nokia-system-protocols {
+    prefix srl_nokia-system-protocols;
+  }
+  import srl_nokia-keychains {
+    prefix srl-keychain;
+  }
+  import srl_nokia-features {
+    prefix srl_nokia-feat;
+  }
+
+  organization
+    "Nokia";
+  contact
+    "Nokia SR Linux Support
+     Web: <http://www.nokia.com>";
+  description
+    "This yang file models configuration and state of the BGP protocol";
+
+  revision 2025-03-31 {
+    description
+      "SRLinux 2025.3.1";
+  }
+  revision 2024-10-31 {
+    description
+      "SRLinux 24.10.1";
+  }
+  revision 2024-07-31 {
+    description
+      "SRLinux 24.7.1";
+  }
+  revision 2024-03-31 {
+    description
+      "SRLinux 24.3.1";
+  }
+  revision 2023-10-31 {
+    description
+      "SRLinux 23.10.1";
+  }
+  revision 2023-07-31 {
+    description
+      "SRLinux 23.7.1";
+  }
+  revision 2023-03-31 {
+    description
+      "SRLinux 23.3.1";
+  }
+  revision 2022-11-30 {
+    description
+      "SRLinux 22.11.1";
+  }
+  revision 2022-06-30 {
+    description
+      "SRLinux 22.6.1";
+  }
+  revision 2022-03-31 {
+    description
+      "SRLinux 22.3.1";
+  }
+  revision 2021-11-30 {
+    description
+      "SRLinux 21.11.1";
+  }
+  revision 2021-06-30 {
+    description
+      "SRLinux 21.6.1";
+  }
+  revision 2021-03-31 {
+    description
+      "SRLinux 21.3.1";
+  }
+  revision 2020-06-30 {
+    description
+      "SRLinux 20.6.1";
+  }
+  revision 2019-11-30 {
+    description
+      "SRLinux 19.11.1";
+  }
+
+  typedef ip-ecmp {
+    description
+      "The supported range of ECMP values for IP routes.";
+    type uint32 {
+      range "1..256";
+    }
+  }
+
+  typedef percentage {
+    type uint8 {
+      range "0..100";
+    }
+    description
+      "Integer indicating a percentage value";
+  }
+
+  typedef community-type {
+    type enumeration {
+      enum none {
+        description
+          "Send no communities";
+      }
+      enum standard {
+        description
+          "Send standard communities";
+      }
+      enum extended {
+        description
+          "Send extended communities";
+      }
+      enum large {
+        description
+          "Send large communities";
+      }
+    }
+    description
+      "Type describing variations of community attributes
+
+       standard: standard BGP community [rfc1997]
+       extended: extended BGP community [rfc4360]
+       large: large BGP community [rfc8092]";
+  }
+
+  typedef cluster-id-type {
+    type union {
+      type uint32 {
+        range "1..max" {
+          error-message "cluster-id cannot be 0";
+        }
+      }
+      type srl_nokia-comm:dotted-quad {
+        pattern '^[0.]+$' {
+          modifier "invert-match";
+          error-message "cluster-id must be IPv4 address different than 0.0.0.0";
+        }
+      }
+    }
+  }
+
+  typedef default-policy-type {
+    type enumeration {
+      enum accept {
+        description
+          "Accept all non-matching routes";
+      }
+      enum reject {
+        description
+          "Reject all non-matching routes";
+      }
+    }
+    description
+      "Type used to specify the processing for routes not matched by any of the applicable policies";
+  }
+
+  grouping bgp-group {
+    list group {
+      key "group-name";
+      description
+        "Peer group templates";
+      leaf group-name {
+        type srl_nokia-comm:name {
+          length "1..64";
+        }
+        description
+          "The configured name of the peer group";
+      }
+      leaf admin-state {
+        type srl_nokia-comm:admin-state;
+        default "enable";
+        must ". = 'disable' or
+              (((not(../afi-safi[afi-safi-name='ipv4-unicast']/admin-state) and ../../afi-safi[afi-safi-name='ipv4-unicast']/admin-state = 'enable') or (../afi-safi[afi-safi-name='ipv4-unicast']/admin-state = 'enable')) or
+              ((not(../afi-safi[afi-safi-name='ipv6-unicast']/admin-state) and ../../afi-safi[afi-safi-name='ipv6-unicast']/admin-state = 'enable') or (../afi-safi[afi-safi-name='ipv6-unicast']/admin-state = 'enable')) or
+              ((not(../afi-safi[afi-safi-name='evpn']/admin-state) and ../../afi-safi[afi-safi-name='evpn']/admin-state = 'enable') or (../afi-safi[afi-safi-name='evpn']/admin-state = 'enable')) or
+              ((not(../afi-safi[afi-safi-name='l3vpn-ipv4-unicast']/admin-state) and ../../afi-safi[afi-safi-name='l3vpn-ipv4-unicast']/admin-state = 'enable') or (../afi-safi[afi-safi-name='l3vpn-ipv4-unicast']/admin-state = 'enable')) or
+              ((not(../afi-safi[afi-safi-name='l3vpn-ipv6-unicast']/admin-state) and ../../afi-safi[afi-safi-name='l3vpn-ipv6-unicast']/admin-state = 'enable') or (../afi-safi[afi-safi-name='l3vpn-ipv6-unicast']/admin-state = 'enable')) or
+              ((not(../afi-safi[afi-safi-name='ipv4-labeled-unicast']/admin-state) and ../../afi-safi[afi-safi-name='ipv4-labeled-unicast']/admin-state = 'enable') or (../afi-safi[afi-safi-name='ipv4-labeled-unicast']/admin-state = 'enable')) or
+              ((not(../afi-safi[afi-safi-name='ipv6-labeled-unicast']/admin-state) and ../../afi-safi[afi-safi-name='ipv6-labeled-unicast']/admin-state = 'enable') or (../afi-safi[afi-safi-name='ipv6-labeled-unicast']/admin-state = 'enable')) or
+              ((not(../afi-safi[afi-safi-name='route-target']/admin-state) and ../../afi-safi[afi-safi-name='route-target']/admin-state = 'enable') or (../afi-safi[afi-safi-name='route-target']/admin-state = 'enable')) or
+              ((not(../afi-safi[afi-safi-name='srte-policy-ipv4']/admin-state) and ../../afi-safi[afi-safi-name='srte-policy-ipv4']/admin-state = 'enable') or (../afi-safi[afi-safi-name='srte-policy-ipv4']/admin-state = 'enable')) or
+              ((not(../afi-safi[afi-safi-name='srte-policy-ipv6']/admin-state) and ../../afi-safi[afi-safi-name='srte-policy-ipv6']/admin-state = 'enable') or (../afi-safi[afi-safi-name='srte-policy-ipv6']/admin-state = 'enable')) or
+              ((not(../afi-safi[afi-safi-name='link-state']/admin-state) and ../../afi-safi[afi-safi-name='link-state']/admin-state = 'enable') or (../afi-safi[afi-safi-name='link-state']/admin-state = 'enable')))" {
+          error-message "One of the address families must be enabled.";
+        }
+        description
+          "Administratively enable or disable the peer group
+
+           Disable will tear down all the BGP sessions in the group, even if they are administratively enabled at the neighbor level.";
+      }
+      leaf description {
+        type srl_nokia-comm:description;
+        description
+          "A user provided description string for the peer group";
+      }
+      leaf local-preference {
+        type uint32;
+        description
+          "The value of the local-preference attribute that is added to received routes from EBGP peers in the group
+
+           It is also used to encode the local preference attribute for locally generated BGP routes.";
+      }
+      leaf next-hop-self {
+        type boolean;
+        default "false";
+        description
+          "When set to true, the next-hop in all IPv4-unicast, IPv6-unicast, EVPN, VPN-IPv4 and VPN-IPv6 BGP routes advertised to all IBGP peers in the peer-group is set equal to the local-address used on each session (or to the router ID if the NLRI is IPv6 and there is no IPv6 local address to use). This is independent of the route origin (EBGP, IBGP-client, IBGP-non-client or redistributed direct/static/aggregate route).
+
+           When set to false, normal BGP rules from RFC 4271 apply.";
+      }
+      leaf peer-as {
+        srl_nokia-ext:show-importance "high";
+        type srl_nokia-comm:as-number;
+        description
+          "The autonomous system number expected from each peer in the group
+
+           A configured session with a peer does not come up if this value does not match the AS value reported by the peer in its OPEN message.";
+      }
+      container as-path-options {
+        description
+          "Options for handling the AS_PATH in received BGP routes";
+        leaf allow-own-as {
+          type uint8;
+          description
+            "The maximum number of times the global AS number or a local AS number of the BGP instance can appear in any received AS_PATH before it is considered a loop and considered invalid
+
+             When this value is changed the new value applies only to the routes received after the change is committed.";
+        }
+        container remove-private-as {
+          presence "Configure remove-private-as";
+          description
+            "Container with options for removing private AS numbers (2-byte and 4-byte) from the advertised AS path towards all peers";
+          leaf mode {
+            description
+              "The method by which private AS numbers are removed from the advertised AS_PATH attribute";
+            type enumeration {
+              enum disabled {
+                description
+                  "Do not strip or replace any private AS numbers";
+              }
+              enum delete {
+                description
+                  "Delete private AS numbers, shortening the AS path";
+              }
+              enum replace {
+                description
+                  "Replace private AS numbers with the local AS number used towards the peer, maintaining the AS path length";
+              }
+            }
+            mandatory true;
+          }
+          leaf leading-only {
+            description
+              "If set to true then only delete or replace private AS numbers that appear before the first occurrence of a non-private ASN in the sequence of most recent ASNs in the AS path";
+            type boolean;
+            default "false";
+            must "not(../mode = 'disabled' and . = true())" {
+              error-message "mode should not be disabled to set leading-only to true.";
+            }
+          }
+          leaf ignore-peer-as {
+            description
+              "If set to true then do not delete or replace a private AS number that is the same as the peer AS number";
+            type boolean;
+            default "false";
+            must "not(../mode = 'disabled' and . = true())" {
+              error-message "mode should not be disabled to set ignore-peer-as to true.";
+            }
+          }
+        }
+        leaf replace-peer-as {
+          description
+            "If set to true then replace every occurrence of the peer AS number that is present in the advertised AS path with the local AS number used towards the peer";
+          type boolean;
+        }
+      }
+      container authentication {
+        description
+          "Container with authentication options that apply to all peers in this peer-group";
+        leaf keychain {
+          description
+            "Reference to a keychain. The keychain type must be tcp-md5.";
+          type leafref {
+            path "/srl_nokia-system:system/srl-keychain:authentication/srl-keychain:keychain/srl-keychain:name";
+          }
+          must '/srl_nokia-system:system/srl-keychain:authentication/srl-keychain:keychain[srl-keychain:name = current()]'
+             + '/srl-keychain:type = "tcp-md5"' {
+            error-message "Only keychain of type tcp-md5 can be assigned";
+          }
+        }
+        leaf password {
+          if-feature "srl_nokia-feat:bgp-auth-password";
+          description
+            "Configures an MD5 authentication password for use with neighboring devices.";
+          type srl_nokia-comm:routing-password;
+          must 'boolean(../keychain) = false()' {
+            error-message "Can not assign both keychain and password";
+          }
+        }
+      }
+      container failure-detection {
+        description
+          "Options related to methods of detecting BGP session failure";
+        leaf enable-bfd {
+          if-feature "srl_nokia-feat:bfd";
+          type boolean;
+          description
+            "The true setting enables Bi-directional Forwarding Detection on BGP sessions belonging to the peer group";
+        }
+        leaf fast-failover {
+          type boolean;
+          description
+            "The true setting causes EBGP and IBGP sessions in the peer group to drop immediately (and not wait for hold timer expiry) when the local interface that they depend upon for neighbor reachability goes down";
+        }
+      }
+      container multihop {
+        description
+          "Configuration parameters specifying the multihop behaviour for IBGP and EBGP peers in the peer group.";
+        leaf admin-state {
+          type srl_nokia-comm:admin-state;
+          description
+            "When enabled, IBGP and EBGP peers in the group are allowed to be indirectly connected by up to N hops, where N is controlled by the maximum-hops parameter. When disabled, only IBGP peers within the peer group support multihop.
+
+             This can be overriden on a per neighbor basis. It is inherited by neighbors in the peer-group only if maximum-hops is also specified.
+
+             By default this is disabled.";
+        }
+        leaf maximum-hops {
+          type uint8 {
+            range "1..255";
+          }
+          description
+            "This sets the maximum number of routing hops towards each peer. It determines the IP TTL value in originated BGP TCP/IP packets. By default the TTL is set to 1 towards EBGP peers and 64 towards IBGP peers. This leaf sets a new IP TTL to use towards both EBGP and IBGP peers in the peer group.
+
+             This can be overriden on a per neighbor basis. It is inherited by neighbors in the peer-group only if admin-state is also specified.";
+        }
+      }
+      list afi-safi {
+        key "afi-safi-name";
+        description
+          "List of address families supported by the BGP peer group";
+        leaf afi-safi-name {
+          type identityref {
+            base srl_nokia-comm:bgp-address-family;
+          }
+          description
+            "The name of a BGP address family, which translates to a specific AFI value and a specific SAFI value";
+          must "not(. = 'evpn') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "EVPN is not supported in network instances other than default";
+          }
+          must "not(. = 'l3vpn-ipv4-unicast') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "L3VPN is not supported in network instances other than default";
+          }
+          must "not(. = 'l3vpn-ipv6-unicast') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "L3VPN is not supported in network instances other than default";
+          }
+          must "not(. = 'ipv4-labeled-unicast') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "Label-ipv4 is not supported in network instances other than default";
+          }
+          must "not(. = 'ipv6-labeled-unicast') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "Label-ipv6 is not supported in network instances other than default";
+          }
+          must "not(. = 'route-target') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "route-target is not supported in network instances other than default";
+          }
+          must "not(. = 'srte-policy-ipv4') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "srte-policy-ipv4 is not supported in network instances other than default";
+          }
+          must "not(. = 'srte-policy-ipv6') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "srte-policy-ipv6 is not supported in network instances other than default";
+          }
+          must "not(. = 'link-state') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "link-state is not supported in network instances other than default";
+          }
+        }
+        leaf admin-state {
+          type srl_nokia-comm:admin-state;
+          description
+            "This leaf indicates whether the AFI-SAFI is enabled for the peer group";
+        }
+      }
+      container local-as {
+        description
+          "Options related to the local autonomous-system number advertised by this router to its peers";
+        leaf as-number {
+          type srl_nokia-comm:as-number;
+          description
+            "The local autonomous system number used to override the global ASN on this group of BGP sessions
+
+             Sets the ASN value that this router sends in its OPEN message towards its peer in the group.";
+        }
+        leaf prepend-global-as {
+          type boolean;
+          description
+            "When set to true, the global ASN value is prepended to the AS path in outbound routes towards each BGP peer in the group
+
+             If a session is EBGP (peer-as is not equal to the local-as) then the local-as is prepended as the final step, so that the local-as is the first element in the AS_PATH received by the peer.";
+          must '../as-number' {
+            error-message "must have as-number to set prepend-global-as";
+          }
+        }
+        leaf prepend-local-as {
+          type boolean;
+          description
+            "When set to true, the local AS value is prepended to the AS path of inbound routes from each EBGP peer belonging to the group";
+          must '../as-number' {
+            error-message "must have as-number to set prepend-local-as";
+          }
+        }
+      }
+      leaf route-flap-damping {
+        if-feature "srl_nokia-feat:bgp-route-flap-damping";
+        description
+          "Enable/disable route flap damping procedures for routes received from EBGP peers in the peer group
+
+           This has no effect on routes received from IBGP peers within the peer group.";
+        type boolean;
+        default "false";
+      }
+      container route-reflector {
+        description
+          "Container with route reflection configuration options.";
+        leaf client {
+          description
+            "When this is set to true all configured and dynamic BGP sessions that belong to the peer-group are considered RR clients.";
+          type boolean;
+        }
+        leaf cluster-id {
+          description
+            "The cluster-id to insert into the CLUSTER_LIST attribute when reflecting routes received by or sent to each client in the peer-group. The default is inherited from instance level configuration.";
+          type cluster-id-type;
+        }
+      }
+      container send-community {
+        if-feature "not srl_nokia-feat:bgp-send-community-leaflist";
+        description
+          "Options for controlling the sending of BGP communities to peers in the group";
+        leaf standard {
+          type boolean;
+          description
+            "The false setting causes BGP to strip all standard (4 byte) communities from all outbound routes advertised to each peer in the group";
+        }
+        leaf large {
+          type boolean;
+          description
+            "The false setting causes BGP to strip all large (12 byte) BGP communities from all outbound routes advertised to each peer in the group";
+        }
+      }
+      container send-default-route {
+        description
+          "Options for controlling the generation of default routes towards group peers";
+        leaf ipv4-unicast {
+          type boolean;
+          default "false";
+          description
+            "Enables the sending of a synthetically generated default IPv4 route [0/0] to each peer in the group";
+        }
+        leaf ipv6-unicast {
+          type boolean;
+          default "false";
+          description
+            "Enables the sending of a synthetically generated default IPv6 route [::/0] to each peer in the group";
+        }
+        leaf export-policy {
+          type leafref {
+            path "/srl-rpol:routing-policy/srl-rpol:policy/srl-rpol:name";
+          }
+          description
+            "The name of a policy that should be applied to the advertised default routes, in order to set their attributes to non-default values
+
+             Only the default-action of this policy is parsed and applied.";
+        }
+      }
+    }
+  }
+
+  grouping bgp-neighbor {
+    list neighbor {
+      description
+        "Create a configured BGP session";
+      key "peer-address";
+      leaf peer-address {
+        type srl_nokia-comm:ip-address-with-zone;
+        description
+          "The transport address of the BGP peer
+
+           The peer-address must be a valid IPv4 unicast address, IPv6 global unicast address or IPv6 link-local address. An IPv6 link-local address requires the interface scope to be identified, using a format such as fe80::1234%ethernet-1/1.1";
+      }
+      leaf admin-state {
+        type srl_nokia-comm:admin-state;
+        default "enable";
+        description
+          "Administratively enable or disable the peer
+
+           Disable will tear down the BGP session (return it to IDLE state).";
+        must ". = 'disable' or
+              ../afi-safi[afi-safi-name='ipv4-unicast']/admin-state = 'enable' or ../afi-safi[afi-safi-name='ipv6-unicast']/admin-state = 'enable' or ../afi-safi[afi-safi-name='evpn']/admin-state = 'enable' or
+              ../afi-safi[afi-safi-name='l3vpn-ipv4-unicast']/admin-state = 'enable' or ../afi-safi[afi-safi-name='l3vpn-ipv6-unicast']/admin-state = 'enable' or
+              ../afi-safi[afi-safi-name='ipv4-labeled-unicast']/admin-state = 'enable' or ../afi-safi[afi-safi-name='ipv6-labeled-unicast']/admin-state = 'enable' or
+              ../afi-safi[afi-safi-name='evpn']/admin-state = 'enable' or ../afi-safi[afi-safi-name='route-target']/admin-state = 'enable' or
+              (not(../afi-safi[afi-safi-name='ipv4-unicast']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='ipv4-unicast']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='ipv4-unicast']/admin-state) and ../../afi-safi[afi-safi-name='ipv4-unicast']/admin-state = 'enable')))  or
+              (not(../afi-safi[afi-safi-name='ipv6-unicast']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='ipv6-unicast']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='ipv6-unicast']/admin-state) and ../../afi-safi[afi-safi-name='ipv6-unicast']/admin-state = 'enable'))) or
+              (not(../afi-safi[afi-safi-name='evpn']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='evpn']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='evpn']/admin-state) and ../../afi-safi[afi-safi-name='evpn']/admin-state = 'enable'))) or
+              (not(../afi-safi[afi-safi-name='l3vpn-ipv4-unicast']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='l3vpn-ipv4-unicast']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='l3vpn-ipv4-unicast']/admin-state) and ../../afi-safi[afi-safi-name='l3vpn-ipv4-unicast']/admin-state = 'enable'))) or
+              (not(../afi-safi[afi-safi-name='l3vpn-ipv6-unicast']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='l3vpn-ipv6-unicast']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='l3vpn-ipv6-unicast']/admin-state) and ../../afi-safi[afi-safi-name='l3vpn-ipv6-unicast']/admin-state = 'enable'))) or
+              (not(../afi-safi[afi-safi-name='ipv4-labeled-unicast']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='ipv4-labeled-unicast']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='ipv4-labeled-unicast']/admin-state) and ../../afi-safi[afi-safi-name='ipv4-labeled-unicast']/admin-state = 'enable'))) or
+              (not(../afi-safi[afi-safi-name='ipv6-labeled-unicast']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='ipv6-labeled-unicast']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='ipv6-labeled-unicast']/admin-state) and ../../afi-safi[afi-safi-name='ipv6-labeled-unicast']/admin-state = 'enable'))) or
+              (not(../afi-safi[afi-safi-name='route-target']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='route-target']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='route-target']/admin-state) and ../../afi-safi[afi-safi-name='route-target']/admin-state = 'enable'))) or
+              (not(../afi-safi[afi-safi-name='srte-policy-ipv4']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='srte-policy-ipv4']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='srte-policy-ipv4']/admin-state) and ../../afi-safi[afi-safi-name='srte-policy-ipv4']/admin-state = 'enable'))) or
+              (not(../afi-safi[afi-safi-name='srte-policy-ipv6']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='srte-policy-ipv6']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='srte-policy-ipv6']/admin-state) and ../../afi-safi[afi-safi-name='srte-policy-ipv6']/admin-state = 'enable'))) or
+              (not(../afi-safi[afi-safi-name='link-state']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='link-state']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='link-state']/admin-state) and ../../afi-safi[afi-safi-name='link-state']/admin-state = 'enable')))" {
+          error-message "One of the address families must be enabled.";
+        }
+      }
+      leaf description {
+        type srl_nokia-comm:description;
+        description
+          "A user provided description string for the peer";
+      }
+      leaf under-maintenance {
+        config false;
+        type boolean;
+        description
+          "State field to determine if this bgp neighbor is in maintenance mode.";
+      }
+      leaf maintenance-group {
+        config false;
+        type string;
+        description
+          "State field to display the maintenance group to which this neighbor belongs to.";
+      }
+      leaf peer-type {
+        config false;
+        type enumeration {
+          enum ibgp {
+            description
+              "Indicates that the peer is IBGP (local-as == peer-as).";
+          }
+          enum ebgp {
+            description
+              "Indicates that the peer is EBGP (local-as != peer-as).";
+          }
+        }
+        description
+          "The session type. The type is EBGP when the local AS and peer AS are different, and the type is IBGP when the local AS and peer AS have the same value.";
+      }
+      leaf local-preference {
+        type uint32;
+        description
+          "The value of the local-preference attribute that is added to received routes from the peer, if it is EBGP
+
+           It is also used to encode the local preference attribute for locally generated BGP routes.";
+      }
+      leaf next-hop-self {
+        type boolean;
+        description
+          "When set to true, the next-hop in all IPv4-unicast, IPv6-unicast and EVPN BGP routes advertised to the peer, if IBGP, is set equal to the local-address used on this session (or to the router ID if the NLRI is IPv6 and there is no IPv6 local address to use). This is independent of the route origin (EBGP, IBGP-client, IBGP-non-client or redistributed direct/static/aggregate route).
+
+           When set to false, normal BGP rules from RFC 4271 apply.";
+      }
+      leaf peer-as {
+        srl_nokia-ext:show-importance "high";
+        type srl_nokia-comm:as-number;
+        description
+          "The autonomous system number expected from the peer
+
+           A configured session with a peer does not come up if this value does not match the AS value reported by the peer in its OPEN message.";
+      }
+      leaf peer-group {
+        type leafref {
+          path "../../group/group-name";
+        }
+        mandatory true;
+        description
+          "A reference to the peer-group template to use for this BGP session
+
+           This is not immutable.";
+      }
+      leaf last-prefix-limit-exceeded {
+        config false;
+        if-feature "srl_nokia-feat:bgp-prefix-limit-last-exceeded";
+        type srl_nokia-comm:date-and-time-delta;
+        description
+          "Time when the neighbor last violated a configured prefix-limit for any AFI/SAFI
+
+           This value is set/updated when any AFI/SAFI prefix-limit-exceeded leaf transitions from false/unset to true.";
+      }
+      container as-path-options {
+        description
+          "Options for handling the AS_PATH in received BGP routes";
+        leaf allow-own-as {
+          type uint8;
+          description
+            "The maximum number of times the global AS number or a local AS number of the BGP instance can appear in any received AS_PATH before it is considered a loop and considered invalid";
+        }
+        container remove-private-as {
+          presence "configure remove-private-as";
+          description
+            "Container with options for removing private AS numbers (2-byte and 4-byte) from the advertised AS path towards all peers";
+          leaf mode {
+            description
+              "The method by which private AS numbers are removed from the advertised AS_PATH attribute";
+            type enumeration {
+              enum disabled {
+                description
+                  "Do not strip or replace any private AS numbers";
+              }
+              enum delete {
+                description
+                  "Delete private AS numbers, shortening the AS path";
+              }
+              enum replace {
+                description
+                  "Replace private AS numbers with the local AS number used towards the peer, maintaining the AS path length";
+              }
+            }
+            mandatory true;
+          }
+          leaf leading-only {
+            description
+              "If set to true then only delete or replace private AS numbers that appear before the first occurrence of a non-private ASN in the sequence of most recent ASNs in the AS path";
+            type boolean;
+            default "false";
+            must "not(../mode = 'disabled' and . = true())" {
+              error-message "mode should not be disabled to set leading-only to true.";
+            }
+          }
+          leaf ignore-peer-as {
+            description
+              "If set to true then do not delete or replace a private AS number that is the same as the peer AS number";
+            type boolean;
+            default "false";
+            must "not(../mode = 'disabled' and . = true())" {
+              error-message "mode should not be disabled to set ignore-peer-as to true.";
+            }
+          }
+        }
+        leaf replace-peer-as {
+          description
+            "If set to true then replace every occurrence of the peer AS number that is present in the advertised AS path with the local AS number used towards the peer";
+          type boolean;
+        }
+      }
+      container authentication {
+        description
+          "Container with authentication options that apply to this specific peer";
+        leaf keychain {
+          description
+            "Reference to a keychain. The keychain type must be tcp-md5.";
+          type leafref {
+            path "/srl_nokia-system:system/srl-keychain:authentication/srl-keychain:keychain/srl-keychain:name";
+          }
+          must '/srl_nokia-system:system/srl-keychain:authentication/srl-keychain:keychain[srl-keychain:name = current()]'
+             + '/srl-keychain:type = "tcp-md5"' {
+            error-message "Only keychain of type tcp-md5 can be assigned";
+          }
+        }
+        leaf password {
+          if-feature "srl_nokia-feat:bgp-auth-password";
+          description
+            "Configures an MD5 authentication password for use with neighboring devices.";
+          type srl_nokia-comm:routing-password;
+          must 'boolean(../keychain) = false()' {
+            error-message "Can not assign both keychain and password";
+          }
+        }
+        leaf transmit-active {
+          config false;
+          description
+            "Reads true when the TCP segments being sent to the peer have authentication data.";
+          type boolean;
+        }
+      }
+      container failure-detection {
+        description
+          "Options related to methods of detecting BGP session failure";
+        leaf enable-bfd {
+          if-feature "srl_nokia-feat:bfd";
+          type boolean;
+          description
+            "The true setting enables Bi-directional Forwarding Detection on BGP sessions belonging to the peer group";
+        }
+        leaf fast-failover {
+          type boolean;
+          description
+            "The true setting the EBGP or IBGP session to drop immediately (and not wait for hold timer expiry) when the local interface that it depends upon for neighbor reachability goes down";
+        }
+      }
+      container graceful-restart {
+        description
+          "Options related to router behavior as a graceful restart helper";
+        leaf admin-state {
+          type srl_nokia-comm:admin-state;
+          description
+            "Administratively enable or disable graceful restart helper for all address families";
+        }
+        leaf stale-routes-time {
+          type uint16 {
+            range "1..3600";
+          }
+          units "seconds";
+          description
+            "The maximum number of seconds that routes received from a helped peer remain stale until they are deleted
+
+             Routes of AFI/SAFI X received from peer Y are marked stale when peer Y goes down and its previous GR capability included AFI/SAFI X.";
+        }
+        leaf requested-restart-time {
+          if-feature "srl_nokia-feat:bgp-graceful-restart-gaps";
+          description
+            "The restart time encoded in this router's GR capability.
+
+             If the neighbor honors this request then this is the maximum time allowed for this router to re-establish its TCP connection after a restart. If this time is exceeded, the neighbor is expected to flush stale routes that it was maintaining on behalf of this router.";
+          type uint16 {
+            range "1..3600";
+          }
+          units "seconds";
+          default "300";
+        }
+        leaf number-of-restarts {
+          config false;
+          type uint16;
+          description
+            "The number of times the peer has restarted";
+        }
+        leaf last-restart-time {
+          config false;
+          type srl_nokia-comm:date-and-time-delta;
+          description
+            "The last time the peer restarted";
+        }
+        leaf helper-active {
+          config false;
+          type boolean;
+          description
+            "Set to true when the router is actively helping the neighbor for at least one address family - i.e. for that address family the peer restarted with F=1 in its capability and the stale-routes-time has not expired yet";
+        }
+        leaf local-restarting {
+          if-feature "srl_nokia-feat:bgp-graceful-restart-state-additions";
+          config false;
+          description
+            "Set to true when session has restarted, the peer is helping and EOR has not been sent for all AFI-SAFI";
+          type boolean;
+        }
+        container neighbor-capability {
+          config false;
+          description
+            "Container for information about the last GR capability received from the neighbor";
+          leaf restart-time {
+            type uint16;
+            description
+              "The value of the Restart Time in the neighbor's last GR capability";
+          }
+          list afi-safi {
+            description
+              "List of AFI/SAFI TLVs that were contained in the neighbor's last GR capability";
+            key "name";
+            leaf name {
+              type identityref {
+                base srl_nokia-comm:bgp-address-family;
+              }
+            }
+            leaf forwarding-preserved {
+              type boolean;
+              description
+                "The F-bit setting in the AFI/SAFI TLV";
+            }
+          }
+        }
+        container local-capability {
+          if-feature "srl_nokia-feat:bgp-graceful-restart-state-additions";
+          config false;
+          description
+            "Container for information about the last GR capability advertised to the neighbor";
+          list afi-safi {
+            description
+              "List of AFI/SAFI TLVs that were contained in thel ast GR capability sent to the neighbor";
+            key "name";
+            leaf name {
+              type identityref {
+                base srl_nokia-comm:bgp-address-family;
+              }
+            }
+          }
+        }
+      }
+      container multihop {
+        description
+          "Configuration parameters specifying the multihop behaviour for an EBGP peer. This is not applicable to an IBGP peer.";
+        leaf admin-state {
+          type srl_nokia-comm:admin-state;
+          description
+            "When enabled, the peer is allowed to be indirectly connected by up to N hops, where N is controlled by the maximum-hops parameter. When disabled, multihop is allowed only if the peer type is IBGP.
+
+             This overrides the group setting for admin-state.";
+        }
+        leaf maximum-hops {
+          type uint8 {
+            range "1..255";
+          }
+          description
+            "This sets the maximum number of routing hops towards the peer. It determines the IP TTL value in originated BGP TCP/IP packets. By default the TTL is set to 1 towards an EBGP peer and 64 towards an IBGP peer.
+
+             This overrides the group setting for maximum-hops.";
+        }
+      }
+      list afi-safi {
+        key "afi-safi-name";
+        description
+          "List of address families supported by the BGP neighbor";
+        leaf afi-safi-name {
+          type identityref {
+            base srl_nokia-comm:bgp-address-family;
+          }
+          description
+            "The name of a BGP address family, which translates to a specific AFI value and a specific SAFI value";
+          must "not(. = 'evpn') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "EVPN is not supported in network instances other than default";
+          }
+          must "not(. = 'l3vpn-ipv4-unicast') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "L3VPN is not supported in network instances other than default";
+          }
+          must "not(. = 'l3vpn-ipv6-unicast') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "L3VPN is not supported in network instances other than default";
+          }
+          must "not(. = 'ipv4-labeled-unicast') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "Label-ipv4 is not supported in network instances other than default";
+          }
+          must "not(. = 'ipv6-labeled-unicast') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "Label-ipv6 is not supported in network instances other than default";
+          }
+          must "not(. = 'route-target') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "route-target is not supported in network instances other than default";
+          }
+          must "not(. = 'srte-policy-ipv4') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "srte-policy-ipv4 is not supported in network instances other than default";
+          }
+          must "not(. = 'srte-policy-ipv6') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "srte-policy-ipv6 is not supported in network instances other than default";
+          }
+          must "not(. = 'link-state') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "link-state is not supported in network instances other than default";
+          }
+        }
+        leaf admin-state {
+          type srl_nokia-comm:admin-state;
+          description
+            "This leaf indicates whether support for the AFI-SAFI is enabled/advertised to the neighbor";
+        }
+      }
+      container local-as {
+        description
+          "Options related to the local autonomous-system number advertised by this router to the peer";
+        leaf as-number {
+          type srl_nokia-comm:as-number;
+          description
+            "The local autonomous system number used to override the global ASN on this session
+
+             Sets the ASN value that this router sends in its OPEN message towards its peer.";
+        }
+        leaf prepend-global-as {
+          type boolean;
+          description
+            "When set to true, the global ASN value is prepended to the AS path in outbound routes towards the peer
+
+             If a session is EBGP (peer-as is not equal to the local-as) then the local-as is prepended as the final step, so that the local-as is the first element in the AS_PATH received by the peer.";
+          must '../as-number' {
+            error-message "must have as-number to set prepend-global-as";
+          }
+        }
+        leaf prepend-local-as {
+          type boolean;
+          description
+            "When set to true, the local AS value is prepended to the AS path of inbound routes from the peer";
+          must '../as-number' {
+            error-message "must have as-number to set prepend-local-as";
+          }
+        }
+      }
+      leaf route-flap-damping {
+        if-feature "srl_nokia-feat:bgp-route-flap-damping";
+        description
+          "Enable/disable route flap damping procedures for routes received from this peer if it is an EBGP peer
+
+           If no value is configured, the setting is inherited from the peer-group to which the peer belongs.
+
+           The configured or omherited setting has no effect if the peer is IBGP.";
+        type boolean;
+      }
+      container route-reflector {
+        description
+          "Container with route reflection configuration options.";
+        leaf client {
+          description
+            "When this is set to true this BGP session is considered an RR client.";
+          type boolean;
+        }
+        leaf cluster-id {
+          description
+            "The cluster-id to insert into the CLUSTER_LIST attribute when reflecting routes received by or sent to this client. The default is inherited from group or instance level configuration.";
+          type cluster-id-type;
+        }
+      }
+      container send-community {
+        if-feature "not srl_nokia-feat:bgp-send-community-leaflist";
+        description
+          "Options for controlling the sending of BGP communities to the peer";
+        leaf standard {
+          type boolean;
+          description
+            "The false setting causes BGP to strip all standard (4 byte) communities from all outbound routes advertised to the peer";
+        }
+        leaf large {
+          type boolean;
+          description
+            "The false setting causes BGP to strip all large (12 byte) BGP communities from all outbound routes advertised to the peer";
+        }
+      }
+      container send-default-route {
+        description
+          "Options for controlling the generation of default routes towards the peer";
+        leaf ipv4-unicast {
+          type boolean;
+          description
+            "Enables the sending of a synthetically generated default IPv4 route [0/0] to the peer";
+        }
+        leaf ipv6-unicast {
+          type boolean;
+          description
+            "Enables the sending of a synthetically generated default IPv6 route [::/0] to the peer";
+        }
+        leaf export-policy {
+          type leafref {
+            path "/srl-rpol:routing-policy/srl-rpol:policy/srl-rpol:name";
+          }
+          description
+            "The name of a policy that should be applied to the advertised default routes, in order to set their attributes to non-default values
+
+             Only the default-action of this policy is parsed and applied.";
+        }
+      }
+      container timers {
+        leaf connect-retry {
+          type uint16 {
+            range "1..65535";
+          }
+          units "seconds";
+          description
+            "The time interval in seconds between successive attempts to establish a session with a peer";
+        }
+        leaf hold-time {
+          type uint16 {
+            range "0|3..65535";
+          }
+          units "seconds";
+          description
+            "The hold-time interval in seconds that the router proposes to the peer in its OPEN message
+
+             The actual in-use hold-time is negotiated to the lowest value proposed by the two peers. A negotiated value of 0 suppresses the sending of keepalives by both peers.";
+        }
+        leaf keepalive-interval {
+          type uint16 {
+            range "0..21845";
+          }
+          units "seconds";
+          description
+            "The interval in seconds between successive keepalive messages sent to the peer
+
+             The period between one keepalive message and the next is the minimum of this configured (or inherited) value and 1/3 of the negotiated hold-time duration. A value of 0 suppresses the sending of keepalives to the peer.";
+        }
+        leaf minimum-advertisement-interval {
+          type uint16 {
+            range "1..255";
+          }
+          units "seconds";
+          description
+            "The value assigned to the MinRouteAdvertisementIntervalTimer of RFC 4271, for both EBGP and IBGP sessions
+
+             Each session runs its own independent timer and the timer affects both route advertisements and route withdrawals, regardless of address family. For route withdrawals only, this timer is bypassed if rapid-withdrawal is set to true.";
+        }
+        leaf prefix-limit-restart-timer {
+          if-feature "srl_nokia-feat:bgp-prefix-limit";
+          type uint16;
+          units "seconds";
+          description
+            "Time interval in seconds after which the BGP session is re-established after being torn down due to exceeding any prefix limit (of any address family)
+
+             This only applies if prevent-teardown is false.";
+        }
+        leaf next-connect-retry-time {
+          config false;
+          type srl_nokia-comm:date-and-time-delta;
+          description
+            "The time when the next connect retry attempt will occur";
+        }
+        leaf negotiated-hold-time {
+          config false;
+          type uint16;
+          description
+            "The operational hold-time
+
+             It is negotiated to the lowest value proposed by the two peers. A negotiated value of 0 suppresses the sending of keepalives by both peers.";
+        }
+        leaf negotiated-keepalive-interval {
+          config false;
+          description
+            "The operational keepalive interval
+
+             It is the minimum of the configured value and 1/3 of the negotiated-hold-time. A value of 0 suppresses the sending of keepalives to the peer.";
+          type uint16;
+        }
+      }
+      container transport {
+        leaf mtu-discovery {
+          if-feature "srl_nokia-feat:bgp-mtu-discovery";
+          type boolean;
+          description
+            "Turns path mtu discovery on (true) or off (false)";
+        }
+        leaf tcp-mss {
+          type uint16 {
+            range "536..9446";
+          }
+          units "bytes";
+          description
+            "The maximum segment size of BGP TCP packets
+
+             The configured value of this leaf is the TCP MSS value advertised to the peer during TCP connection setup (in the TCP MSS option), reduced if necessary to accommodate the outgoing interface IP MTU.
+             The state value of this leaf is the operational TCP MSS used in the data transmit direction towards the peer. It may be less than the received TCP MSS option value due to adjustment for TCP options used in the transit direction and/or the path MTU discovery process (if enabled).";
+        }
+        leaf passive-mode {
+          type boolean;
+          description
+            "The true setting causes BGP to wait for the peer to initiate the TCP connection
+
+             The false setting causes BGP to initiate a TCP connection whenever the BGP session is started or restarted.";
+        }
+        leaf local-address {
+          type union {
+            type srl_nokia-comm:ip-address;
+            type srl_nokia-comm:subinterface-all;
+          }
+          description
+            "The local TCP endpoint of used for the BGP session
+
+             This also the source address for next-hop-self, if it applies. The local-address can be specified as an IP address that is resolvable to a local interface.
+
+             This address must be the primary address of an interface, otherwise the session will not come up.";
+        }
+        leaf local-port {
+          config false;
+          type uint16;
+          description
+            "Local TCP port used for the TCP connection to the peer";
+        }
+        leaf remote-port {
+          config false;
+          type uint16;
+          description
+            "Remote TCP port used by the peer for its TCP connection to the local router";
+        }
+      }
+    }
+  }
+
+  grouping entropy-label {
+    container entropy-label {
+      if-feature "srl_nokia-feat:entropy-bgp-sr";
+      description
+        "Options for configuring control and data plane aspects of entropy label";
+      leaf transmit {
+        description
+          "Specify conditions for adding ELI/EL when pushing BGP label";
+        type enumeration {
+          enum enable;
+          enum disable;
+        }
+        default "disable";
+        must ". = 'disable' or current()/../../../../../../srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+          error-message "entropy-label is not supported in network instance other than default";
+        }
+      }
+    }
+  }
+
+  grouping color-aware-next-hop-resolution {
+    container selection-attributes {
+      description
+        "Attributes for narrowing the selection of tunnels";
+      container tag {
+        if-feature "srl_nokia-feat:bgp-next-hop-resolution-tag";
+        description
+          "Next-hop resolution constraints based on internal tags";
+        leaf mandatory {
+          description
+            "If true, a tunnel can resolve the next-hop only if it has all the same tags as the route
+
+             If false, it is possible to select a tunnel that has none or only some of the same tags as the route.";
+          type boolean;
+          default "false";
+        }
+      }
+    }
+  }
+
+  grouping allowed-tunnel-types-unlabeled {
+    leaf-list allowed-tunnel-types {
+      description
+        "List of allowed tunnel types";
+      type identityref {
+        base srl_nokia-comm:bgp-next-hop-resolution-tunnel-type;
+      }
+      must "not(. = 'bgp')" {
+        srl_nokia-ext:if-feature "not srl_nokia-feat:bgp-labeled-unicast";
+        error-message "unsupported resolving tunnel";
+      }
+    }
+  }
+
+  grouping allowed-tunnel-types-labeled {
+    leaf-list allowed-tunnel-types {
+      description
+        "List of allowed tunnel types";
+      type identityref {
+        base srl_nokia-comm:bgp-next-hop-resolution-tunnel-type;
+      }
+      must "not(. = 'bgp')" {
+        error-message "unsupported resolving tunnel";
+      }
+      must "not(. = 'te-policy-sr-mpls-uncolored')" {
+        srl_nokia-ext:if-feature "not srl_nokia-feat:bgp-labeled-unicast-over-sr-te";
+        error-message "unsupported resolving tunnel";
+      }
+    }
+  }
+
+  grouping next-hop-resolution-labeled {
+    container next-hop-resolution {
+      description
+        "Options for controlling next-hop resolution procedures";
+      container ipv4-next-hops {
+        description
+          "Options related to the resolution of BGP next-hops that are IPv4 addresses";
+        container route-resolution {
+          description
+            "Options related to resolution using IP routes in the FIB";
+          leaf admin-state {
+            description
+              "Enable or disable route resolution if no resolving tunnel is found";
+            type srl_nokia-comm:admin-state;
+            default "enable";
+          }
+          leaf ignore-default-routes {
+            description
+              "Ignore default routes, regardless of route type";
+            type boolean;
+            default "true";
+          }
+        }
+        container tunnel-resolution {
+          description
+            "Options related to resolution using tunnels in the tunnel table";
+          uses allowed-tunnel-types-labeled;
+          uses color-aware-next-hop-resolution {
+            if-feature "(srl_nokia-feat:bgp-next-hop-resolution-tag and srl_nokia-feat:bgp-labeled-unicast-over-sr-te) or srl_nokia-feat:isis-flex-algo or srl_nokia-feat:segment-routing-colored-te-policies";
+          }
+        }
+      }
+      container ipv6-next-hops {
+        description
+          "Options related to the resolution of BGP next-hops that are IPv6 addresses";
+        container route-resolution {
+          description
+            "Options related to resolution using IP routes in the FIB";
+          leaf admin-state {
+            description
+              "Enable or disable route resolution if no resolving tunnel is found";
+            type srl_nokia-comm:admin-state;
+            default "enable";
+          }
+          leaf ignore-default-routes {
+            description
+              "Ignore default routes, regardless of route type";
+            type boolean;
+            default "true";
+          }
+        }
+        container tunnel-resolution {
+          description
+            "Options related to resolution using tunnels in the tunnel table";
+          uses allowed-tunnel-types-labeled;
+          uses color-aware-next-hop-resolution {
+            if-feature "(srl_nokia-feat:bgp-next-hop-resolution-tag and srl_nokia-feat:bgp-labeled-unicast-over-sr-te) or srl_nokia-feat:isis-flex-algo or srl_nokia-feat:segment-routing-colored-te-policies";
+          }
+        }
+      }
+    }
+  }
+
+  grouping allowed-tunnel-types-evpn-ipvpn-mpls {
+    leaf-list allowed-tunnel-types {
+      description
+        "List of allowed tunnel types";
+      type identityref {
+        base srl_nokia-comm:bgp-next-hop-resolution-tunnel-type;
+      }
+    }
+  }
+
+  grouping next-hop-resolution-evpn-ipvpn-mpls {
+    container next-hop-resolution {
+      description
+        "Options for controlling next-hop resolution procedures";
+      container ipv4-next-hops {
+        description
+          "Options related to the resolution of BGP next-hops that are IPv4 addresses";
+        container route-resolution {
+          description
+            "Options related to resolution using IP routes in the FIB";
+          leaf admin-state {
+            description
+              "Enable or disable route resolution if no resolving tunnel is found";
+            type srl_nokia-comm:admin-state;
+            default "enable";
+          }
+          leaf ignore-default-routes {
+            description
+              "Ignore default routes, regardless of route type";
+            type boolean;
+            default "true";
+          }
+        }
+        container tunnel-resolution {
+          description
+            "Options related to resolution using tunnels in the tunnel table";
+          uses allowed-tunnel-types-evpn-ipvpn-mpls;
+          uses color-aware-next-hop-resolution {
+            if-feature "srl_nokia-feat:bgp-next-hop-resolution-tag or srl_nokia-feat:isis-flex-algo or srl_nokia-feat:segment-routing-colored-te-policies";
+          }
+        }
+      }
+      container ipv6-next-hops {
+        description
+          "Options related to the resolution of BGP next-hops that are IPv6 addresses";
+        container route-resolution {
+          description
+            "Options related to resolution using IP routes in the FIB";
+          leaf admin-state {
+            description
+              "Enable or disable route resolution if no resolving tunnel is found";
+            type srl_nokia-comm:admin-state;
+            default "enable";
+          }
+          leaf ignore-default-routes {
+            description
+              "Ignore default routes, regardless of route type";
+            type boolean;
+            default "true";
+          }
+        }
+        container tunnel-resolution {
+          description
+            "Options related to resolution using tunnels in the tunnel table";
+          uses allowed-tunnel-types-evpn-ipvpn-mpls;
+          uses color-aware-next-hop-resolution {
+            if-feature "srl_nokia-feat:bgp-next-hop-resolution-tag or srl_nokia-feat:isis-flex-algo or srl_nokia-feat:segment-routing-colored-te-policies";
+          }
+        }
+      }
+    }
+  }
+
+  grouping selective-label-route-optimizations {
+    container selective-labeled-unicast-install {
+      if-feature "srl_nokia-feat:bgp-labeled-unicast-selective-install";
+      presence "Do not install labeled-unicast routes as tunnels in the tunnel-table unless they match the next-hop of a locally installed VPN route";
+      must "../../../../../srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+        error-message "selective-labeled-unicast-install is not supported in network instance other than default";
+      }
+      leaf program-label-swap {
+        description
+          "When true, program a label swap entry even when the route is not installed as a tunnel";
+        type boolean;
+        default "false";
+        must '. = true() or ../program-route = false()' {
+          error-message "If program-label-swap is false then program-route must be false";
+        }
+      }
+      leaf program-route {
+        description
+          "When true, program IP FIB entry even when the route is not installed as a tunnel";
+        type boolean;
+        default "false";
+      }
+    }
+  }
+
+  grouping link-bandwidth {
+    description
+      "Grouping containing the configuration and state for unequal ECMP";
+    container link-bandwidth {
+      if-feature "srl_nokia-feat:evpn-ifl-unequal-ecmp or srl_nokia-feat:bgp-weighted-ecmp";
+      leaf add-next-hop-count-to-received-bgp-routes {
+        if-feature "srl_nokia-feat:evpn-ifl-unequal-ecmp";
+        must "/srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:ip-vrf'" {
+          error-message "Add next-hop count weight is only supported in network instances of type ip-vrf";
+        }
+        type union {
+          type int32 {
+            range "1..128";
+          }
+          type enumeration {
+            enum disable {
+              value -1;
+            }
+          }
+        }
+        description
+          "Determines the weight that is internally added to the received PE-CE BGP routes
+
+           The configured weight is added to all received BGP PE-CE routes for the purpose of EVPN unequal ECMP.
+           This weight is internal and not added into any link-bandwidth extended community when readvertising
+           the received routes to other ipv4 or ipv6 neighbors.";
+      }
+      leaf aggregate-used-paths {
+        if-feature "srl_nokia-feat:bgp-weighted-ecmp";
+        description
+          "When advertising link-bandwidth to this peer, sum the link bandwidth from all the used multipaths";
+        type boolean;
+      }
+    }
+  }
+
+
+  grouping rib-management {
+    container rib-management {
+      if-feature "srl_nokia-feat:bgp-labeled-unicast";
+      list table {
+        must "/srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+          error-message "RIB management not supported in network-instances other than default";
+        }
+        key "address-family";
+        leaf address-family {
+          description
+            "BGP address family";
+          type identityref {
+            base srl_nokia-comm:bgp-address-family;
+          }
+          must ". = 'ipv4-unicast' or . = 'ipv6-unicast' or . = 'ipv4-labeled-unicast' or . = 'ipv6-labeled-unicast'" {
+            srl_nokia-ext:if-feature "srl_nokia-feat:bgp-labeled-unicast-future";
+            error-message "unsupported address family";
+          }
+          must ". = 'ipv4-labeled-unicast' or . = 'ipv6-labeled-unicast'" {
+            srl_nokia-ext:if-feature "not srl_nokia-feat:bgp-labeled-unicast-future";
+            error-message "unsupported address family";
+          }
+        }
+        description
+          "List of RIB tables maintained by BGP running in this network-instance";
+        leaf route-table-import {
+          description
+            "Apply a route policy to accept routes that should be installed in the BGP RIB table";
+          type leafref {
+            path "/srl-rpol:routing-policy/srl-rpol:policy/srl-rpol:name";
+          }
+        }
+      }
+    }
+  }
+
+  grouping segment-routing {
+    container segment-routing-mpls {
+      if-feature "srl_nokia-feat:bgp-labeled-unicast-prefix-sid";
+      description
+        "BGP support for segment routing using MPLS dataplane";
+      leaf admin-state {
+        description
+          "Enable SR-MPLS support within BGP";
+        type srl_nokia-comm:admin-state;
+        default "disable";
+        must ". = 'disable' or ../../../../srl_nokia-sr:segment-routing/srl_nokia-sr:mpls" {
+          error-message "To enable, sr-mpls not enabled in the network-instance";
+        }
+      }
+    }
+  }
+
+  grouping bgp-top {
+    container bgp {
+      presence "Configure BGP";
+      description
+        "Top-level configuration and operational state for Border Gateway Protocol (BGP)";
+      must 'not(/srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../srl_nokia-netinst:name]/srl_nokia-netinst:type = "srl_nokia-netinst:mac-vrf")' {
+        error-message "BGP configuration is not possible on network-instance of type mac-vrf ";
+      }
+      must "../../srl_nokia-netinst:type != 'srl_nokia-netinst:host'" {
+        error-message "BGP not supported with network-instance of type host";
+      }
+      leaf admin-state {
+        type srl_nokia-comm:admin-state;
+        default "enable";
+        must " (. = 'disable') or
+               (../afi-safi[afi-safi-name='ipv4-unicast']/admin-state = 'enable') or
+               (../afi-safi[afi-safi-name='ipv6-unicast']/admin-state = 'enable') or
+               (../afi-safi[afi-safi-name='evpn']/admin-state = 'enable') or
+               (../afi-safi[afi-safi-name='ipv4-labeled-unicast']/admin-state = 'enable') or
+               (../afi-safi[afi-safi-name='ipv6-labeled-unicast']/admin-state = 'enable') or
+               (../afi-safi[afi-safi-name='l3vpn-ipv4-unicast']/admin-state = 'enable') or
+               (../afi-safi[afi-safi-name='l3vpn-ipv6-unicast']/admin-state = 'enable') or
+               (../afi-safi[afi-safi-name='route-target']/admin-state = 'enable') or
+               (../afi-safi[afi-safi-name='srte-policy-ipv4']/admin-state = 'enable') or
+               (../afi-safi[afi-safi-name='srte-policy-ipv6']/admin-state = 'enable') or
+               (../afi-safi[afi-safi-name='link-state']/admin-state = 'enable')" {
+          error-message "One of the address families must be enabled.";
+        }
+        description
+          "Administratively enable or disable the entire BGP instance
+
+           Disable causes all BGP sessions to be taken down immediately, even if admin-state at the group or neighbor level of some of these sessions is still set as enable.";
+      }
+      leaf autonomous-system {
+        type srl_nokia-comm:as-number;
+        mandatory true;
+        description
+          "The global AS number of the BGP instance
+
+           Values greater than 65535 must be entered in ASPLAIN format.";
+      }
+      leaf local-preference {
+        type uint32;
+        default "100";
+        description
+          "The value of the local-preference attribute that is added to received routes from EBGP peers
+
+           It is also used to encode the local preference attribute for locally generated BGP routes.";
+      }
+      leaf router-id {
+        type srl_nokia-comm:ip-address;
+        mandatory true;
+        description
+          "The BGP identifier used by this BGP instance in all of its OPEN messages
+
+           Any non-zero value is supported.";
+      }
+      container as-path-options {
+        description
+          "Options for handling the AS_PATH in received BGP routes";
+        leaf allow-own-as {
+          type uint8;
+          default "0";
+          description
+            "The maximum number of times the global AS number or a local AS number of the BGP instance can appear in any received AS_PATH before it is considered a loop and considered invalid";
+        }
+        container remove-private-as {
+          description
+            "Container with options for removing private AS numbers (2-byte and 4-byte) from the advertised AS path towards all peers";
+          leaf mode {
+            description
+              "The method by which private AS numbers are removed from the advertised AS_PATH attribute";
+            type enumeration {
+              enum disabled {
+                description
+                  "Do not strip or replace any private AS numbers";
+              }
+              enum delete {
+                description
+                  "Delete private AS numbers, shortening the AS path";
+              }
+              enum replace {
+                description
+                  "Replace private AS numbers with the local AS number used towards the peer, maintaining the AS path length";
+              }
+            }
+            default "disabled";
+          }
+          leaf leading-only {
+            description
+              "If set to true then only delete or replace private AS numbers that appear before the first occurrence of a non-private ASN in the sequence of most recent ASNs in the AS path";
+            type boolean;
+            must "not(../mode = 'disabled' and . = true())" {
+              error-message "mode should not be disabled to set leading-only to true.";
+            }
+            default "false";
+          }
+          leaf ignore-peer-as {
+            description
+              "If set to true then do not delete or replace a private AS number that is the same as the peer AS number";
+            type boolean;
+            must "not(../mode = 'disabled' and . = true())" {
+              error-message "mode should not be disabled if ignore-peer-as has to be true.";
+            }
+            default "false";
+          }
+        }
+      }
+      container authentication {
+        description
+          "Container with authentication options that apply to all peers of the BGP instance";
+        leaf keychain {
+          description
+            "Reference to a keychain. The keychain type must be tcp-md5.";
+          type leafref {
+            path "/srl_nokia-system:system/srl-keychain:authentication/srl-keychain:keychain/srl-keychain:name";
+          }
+          must '/srl_nokia-system:system/srl-keychain:authentication/srl-keychain:keychain[srl-keychain:name = current()]'
+             + '/srl-keychain:type = "tcp-md5"' {
+            error-message "Only keychain of type tcp-md5 can be assigned";
+          }
+        }
+        leaf password {
+          if-feature "srl_nokia-feat:bgp-auth-password";
+          description
+            "Configures an MD5 authentication password for use with neighboring devices.";
+          type srl_nokia-comm:routing-password;
+          must 'boolean(../keychain) = false()' {
+            error-message "Can not assign both keychain and password";
+          }
+        }
+      }
+      container ebgp-default-policy {
+        description
+          "Options for controlling the default policies that apply to EBGP sessions";
+        leaf import-reject-all {
+          type boolean;
+          default "true";
+          description
+            "When set to true, all inbound routes from any EBGP peer to which no explicit import policy is applied are treated as though they were rejected by policy";
+        }
+        leaf export-reject-all {
+          type boolean;
+          default "true";
+          description
+            "When set to true, all outbound routes towards any EBGP peer to which no explicit export policy is applied are treated as though they were rejected by policy";
+        }
+      }
+      list afi-safi {
+        key "afi-safi-name";
+        description
+          "List of address families supported by the BGP instance";
+        leaf afi-safi-name {
+          type identityref {
+            base srl_nokia-comm:bgp-address-family;
+          }
+          description
+            "The name of a BGP address family, which translates to a specific AFI value and a specific SAFI value";
+          must "not(. = 'evpn') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "EVPN is not supported in network instances other than default";
+          }
+          must "not(. = 'route-target') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "route-target is not supported in network instances other than default";
+          }
+          must "not(. = 'l3vpn-ipv4-unicast')  or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "L3VPN is not supported in network instances other than default";
+          }
+          must "not(. = 'l3vpn-ipv6-unicast') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "L3VPN is not supported in network instances other than default";
+          }
+          must "not(. = 'ipv4-labeled-unicast') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "Label-IPv4 is not supported in network instances other than default";
+          }
+          must "not(. = 'ipv6-labeled-unicast') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "Label-IPv6 is not supported in network instances other than default";
+          }
+          must "not(. = 'srte-policy-ipv4') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "srte-policy-ipv4 is not supported in network instances other than default";
+          }
+          must "not(. = 'srte-policy-ipv6') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "srte-policy-ipv6 is not supported in network instances other than default";
+          }
+          must "not(. = 'link-state') or /srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../../../srl_nokia-netinst:name]/srl_nokia-netinst:type = 'srl_nokia-netinst:default'" {
+            error-message "link-state is not supported in network instances other than default";
+          }
+        }
+        leaf admin-state {
+          type srl_nokia-comm:admin-state;
+          default "disable";
+          description
+            "This leaf indicates whether the AFI-SAFI is enabled for the instance";
+        }
+      }
+      container preference {
+        description
+          "Options for controlling the route table preference of BGP routes";
+        leaf ebgp {
+          type uint8 {
+            range "1..255";
+          }
+          default "170";
+          description
+            "The default route table preference for all EBGP learned routes
+
+             BGP import policies can override this preference value on a route by route basis.";
+        }
+        leaf ibgp {
+          type uint8 {
+            range "1..255";
+          }
+          default "170";
+          description
+            "The default route table preference for all IBGP learned routes
+
+             BGP import policies can override this preference value on a route by route basis.";
+        }
+      }
+      uses rib-management;
+      container route-advertisement {
+        description
+          "Options for controlling route advertisement behavior";
+        leaf rapid-withdrawal {
+          type boolean;
+          default "false";
+          description
+            "The true setting enables rapid-withdraw towards BGP peers
+
+             If there is only one BGP route for an NLRI in BGP RIB, and this route is withdrawn or becomes invalid, rapid-withdraw causes BGP to immediately send a withdrawal of the BGP route even if the min-route-advertisement timer has not expired.";
+        }
+        leaf wait-for-fib-install {
+          type boolean;
+          default "true";
+          description
+            "The true setting causes BGP to NOT advertise initial reachability to a prefix, or a change of reachability to a prefix, until it receives acknowledgment from FIB manager that the route change has been applied
+
+             Does not apply to route withdrawals.";
+        }
+      }
+      container route-flap-damping {
+        if-feature "srl_nokia-feat:bgp-route-flap-damping";
+        description
+          "Configuration to control BGP route flap damping procedures";
+        leaf half-life {
+          description
+            "Duration of time for the penalty amount (FOM) to be reduced by half if a route stays stable";
+          type uint16 {
+            range "1..45";
+          }
+          default "15";
+          units "minutes";
+        }
+        leaf max-suppress-time {
+          description
+            "Maximum duration of time that advertisement of a route that has flapped can be suppressed";
+          type uint16 {
+            range "1..720";
+          }
+          default "60";
+          units "minutes";
+        }
+        leaf reuse-threshold {
+          description
+            "A suppressed route can be advertised again after falling below this penalty (FOM) level";
+          type uint16 {
+            range "1..20000";
+          }
+          default "750";
+        }
+        leaf suppress-threshold {
+          description
+            "A flapping route is suppressed after rising above this penalty (FOM) level";
+          type uint16 {
+            range "1..20000";
+          }
+          default "3000";
+        }
+      }
+      container route-reflector {
+        description
+          "Container with route reflection configuration options.";
+        leaf client {
+          description
+            "When this is set to true all configured and dynamic sessions of the BGP instance are considered RR clients, subject to overrides at more specific levels of configuration.";
+          type boolean;
+          default "false";
+        }
+        leaf cluster-id {
+          description
+            "The cluster-id to insert into the CLUSTER_LIST attribute when reflecting routes received by or sent to clients in this scope of this container. The default is the router-id.";
+          type cluster-id-type;
+        }
+      }
+      uses segment-routing;
+      container send-community {
+        if-feature "not srl_nokia-feat:bgp-send-community-leaflist";
+        description
+          "Options for controlling the sending of BGP communities to all peers";
+        leaf standard {
+          type boolean;
+          default "true";
+          description
+            "The false setting causes BGP to strip all standard (4 byte) communities from all outbound routes advertised to peers";
+        }
+        leaf large {
+          type boolean;
+          default "true";
+          description
+            "The false setting causes BGP to strip all large (12 byte) BGP communities from all outbound routes advertised to peers";
+        }
+      }
+      container transport {
+        description
+          "Options related to the TCP transport of BGP sessions";
+        leaf single-hop-connected-check {
+          if-feature "srl_nokia-feat:bgp-single-hop-connected-check";
+          type boolean;
+          default "true";
+          description
+            "Control whether a single-hop BGP session should be allowed to setup if its 'related interface' is down.
+
+             If single-hop-connected-check is false, a single-hop BGP session (EBGP or IBGP) to any IPv4 or IPv6 neighbor address is permitted to establish if there is ANY valid (IPv6 global unicast, IPv4 link-local, or IPv4 global) route to that neighbor address, regardless of whether the 'related interface' is up or down.
+
+             If single-hop-connected-check is true (default value), a single-hop BGP session (EBGP or IBGP) to any IPv4 or IPv6 neighbor address is only permitted to transition from idle to a higher state if the 'related interface' is up.
+
+             The 'related interface' of a single hop peer is the subinterface associated with the IPv6 link local neighbor address or else the subinterface with a primary or secondary IP address and prefix-length that covers the neighbor address.";
+        }
+        leaf mtu-discovery {
+          if-feature "srl_nokia-feat:bgp-mtu-discovery";
+          type boolean;
+          description
+            "Turns path mtu discovery for BGP TCP sessions on (true) or off (false)
+
+             If this is unconfigured then the setting comes from network-instance/mtu/path-mtu-discovery.
+
+             Changing the value of network-instance/mtu/path-mtu-discovery takes effect only for new connections established after the change";
+        }
+        leaf tcp-mss {
+          type uint16 {
+            range "536..9446";
+          }
+          default "1024";
+          description
+            "The maximum segment size of BGP TCP packets
+
+             The actual value used in the transmit direction towards a particular peer should be checked at the neighbor level.";
+        }
+      }
+      uses bgp-group;
+      uses bgp-neighbor;
+    }
+  }
+
+  augment "/srl_nokia-netinst:network-instance/srl_nokia-netinst:protocols" {
+    uses bgp-top;
+  }
+
+  augment "/srl_nokia-system:system/srl_nokia-system-protocols:protocols" {
+    container bgp {
+      presence "Configure system-wide BGP parameters";
+      leaf restart-max-wait {
+        description
+          "The maximum amount of time that BGP will wait to receive End of RIB markers from all peers and for all address families that were up prior to restart.
+
+           After this time elapses BGP declares that convergence has occurred and sends its own EOR markers to its peers.";
+        type uint16 {
+          range "0..3600";
+        }
+        units "seconds";
+        default "600";
+      }
+    }
+  }
+}
