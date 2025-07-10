@@ -1,5 +1,5 @@
 build-otron-image:
-	docker build -t respnet-otron-base -f ../common/Dockerfile.otron .
+	docker build -t respnet-otron-base -f ../common/Dockerfile.otron-base .
 
 licenses/%:
 # Ensure the symlink to the licenses private repo exists in the project root
