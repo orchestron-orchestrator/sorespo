@@ -1,4 +1,4 @@
-TESTENV=respnet-quicklab-crpd
+TESTENV=sorespo-quicklab-crpd
 
 ROUTERS_XR=
 ROUTERS_CRPD=sto-core-1 lju-core-1 ams-core-1 fra-core-1 cust-1 cust-2 cust-3 cust-4

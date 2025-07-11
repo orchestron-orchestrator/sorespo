@@ -29,21 +29,21 @@ Building dependencies:
 ```shell
 $ make test
 # [ more compiler output ]
-Tests - module respnet.cisco_vigenere:
+Tests - module sorespo.cisco_vigenere:
   encrypt:               OK:  292 runs in 50.249ms
   decrypt:               OK:  286 runs in 50.938ms
 
-Tests - module respnet.test_inter:
+Tests - module sorespo.test_inter:
   inter_bblink:          OK:   84 runs in 50.026ms
 
-Tests - module test_respnet:
+Tests - module test_sorespo:
   netinfra1:             OK:    2 runs in 51.708ms
   l3vpn_svc:             OK:    1 runs in 71.408ms
 
 All 5 tests passed (5.589s)
 ```
 
-The result of `make build` is a single binary `out/bin/respnet`. The
+The result of `make build` is a single binary `out/bin/sorespo`. The
 application uses the Orchestron framework to expose a northbound NETCONF /
 RESTCONF interface with the CFS models, RFS transforms and the NETCONF client
 to configure the devices.
@@ -152,7 +152,7 @@ example, check the core routing table on *ams-core-1* (credentials
 
 ```shell
 $ make -C test/quicklab cli-ams-core-1
-docker exec -it respnet-quicklab-ams-core-1 /pkg/bin/xr_cli.sh
+docker exec -it sorespo-quicklab-ams-core-1 /pkg/bin/xr_cli.sh
 
 User Access Verification
 
@@ -198,8 +198,8 @@ Or ping the *cust-4* loopback from *cust-1* (credentials `clab/clab@123`):
 
 ```shell
 $ make -C test/quicklab cli-cust-1
-make: Entering directory '/home/mzagozen/orchestron/respnet/test/quicklab'
-docker exec -it respnet-quicklab-cust-1 /pkg/bin/xr_cli.sh
+make: Entering directory '/home/mzagozen/orchestron/sorespo/test/quicklab'
+docker exec -it sorespo-quicklab-cust-1 /pkg/bin/xr_cli.sh
 
 User Access Verification
 
@@ -222,8 +222,8 @@ testenvs with real containerized routers:
 ```shell
 $ make -C test/quicklab test-ping
 # [ a lot of ping output ]
-make[1]: Entering directory '/home/mzagozen/orchestron/respnet/test/quicklab'
-timeout 10s bash -c "until docker exec -t respnet-quicklab-cust-1 ip netns exec global-vrf ping -c 1 -W 1 10.200.1.2; do sleep 1; done"
+make[1]: Entering directory '/home/mzagozen/orchestron/sorespo/test/quicklab'
+timeout 10s bash -c "until docker exec -t sorespo-quicklab-cust-1 ip netns exec global-vrf ping -c 1 -W 1 10.200.1.2; do sleep 1; done"
 PING 10.200.1.2 (10.200.1.2) 56(84) bytes of data.
 64 bytes from 10.200.1.2: icmp_seq=1 ttl=253 time=4.02 ms
 ```
@@ -244,14 +244,14 @@ $ make build
 $ make -C test/<your-testenv> copy run-and-configure
 ```
 
-This will copy over a fresh version of the orchestron/respnet app and run it in
+This will copy over a fresh version of the orchestron/sorespo app and run it in
 the container part of the quicklab dev environment.
 
 So the typical REPL loop is like:
 - edit code
 - in `test/quicklab`: `(cd ../../ && make build ) && make copy run-and-configure` and see the code run interactively
 
-If you also modified the YANG models in `respnet_gen.act`, then you also need
+If you also modified the YANG models in `sorespo_gen.act`, then you also need
 to regenerate the layer dataclasses with `make gen` and then run `make build`
 and restart the application.
 
