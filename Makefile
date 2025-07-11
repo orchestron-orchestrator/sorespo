@@ -34,3 +34,16 @@ gen-ldep:
 pkg-upgrade:
 	acton pkg upgrade
 	cd gen && acton pkg upgrade
+
+.PHONY: download-release
+download-release:
+	@ARCH=$$(uname -m); \
+	RELEASE_FILE=sorespo-linux-$$ARCH.tar.gz; \
+	echo "Downloading $$RELEASE_FILE from GitHub..."; \
+	mkdir -p out/bin; \
+	curl -L -o /tmp/$$RELEASE_FILE https://github.com/orchestron-orchestrator/sorespo/releases/download/tip/$$RELEASE_FILE; \
+	echo "Extracting binary..."; \
+	tar -xzf /tmp/$$RELEASE_FILE -C out/bin/; \
+	chmod +x out/bin/sorespo; \
+	rm /tmp/$$RELEASE_FILE; \
+	echo "Download complete: out/bin/sorespo"
