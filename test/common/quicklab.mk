@@ -39,6 +39,9 @@ copy:
 	docker cp l3vpn-svc.xml $(TESTENV)-otron:/l3vpn-svc.xml
 	docker cp netinfra.xml $(TESTENV)-otron:/netinfra.xml
 
+copy-otron-binary:
+	docker cp ../../out/bin/respnet $(TESTENV)-otron:/respnet
+
 run:
 	docker exec $(INTERACTIVE) $(TESTENV)-otron /sorespo --rts-bt-dbg
 
