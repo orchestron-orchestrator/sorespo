@@ -36,6 +36,11 @@ jobs:
         with:
           name: sorespo-linux-aarch64
           path: out/bin/sorespo
+      - run: acton build --target aarch64-macos
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sorespo-macos-aarch64
+          path: out/bin/sorespo
 
   release:
     # Only run on the main branch
@@ -54,6 +59,7 @@ jobs:
         run: |
           tar -czf sorespo-linux-x86_64.tar.gz -C sorespo-linux-x86_64 sorespo
           tar -czf sorespo-linux-aarch64.tar.gz -C sorespo-linux-aarch64 sorespo
+          tar -czf sorespo-macos-aarch64.tar.gz -C sorespo-macos-aarch64 sorespo
       - name: "Upload artifacts as release packages"
         uses: ncipollo/release-action@v1
         with:
