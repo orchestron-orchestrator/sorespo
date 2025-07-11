@@ -34,3 +34,23 @@ gen-ldep:
 pkg-upgrade:
 	acton pkg upgrade
 	cd gen && acton pkg upgrade
+
+.PHONY: download-release
+download-release:
+	@if [ "$$(uname -s)" = "Darwin" ]; then \
+		echo "Note: Downloading Linux binary for use in container (e.g., Colima)"; \
+	fi; \
+	ARCH=$$(uname -m); \
+	if [ "$$ARCH" = "arm64" ]; then ARCH="aarch64"; fi; \
+	RELEASE_FILE=sorespo-linux-$$ARCH.tar.gz; \
+	echo "Downloading $$RELEASE_FILE from GitHub..."; \
+	mkdir -p out/bin; \
+	if ! curl -L -f -o /tmp/$$RELEASE_FILE https://github.com/orchestron-orchestrator/sorespo/releases/download/tip/$$RELEASE_FILE; then \
+		echo "Error: Failed to download $$RELEASE_FILE - this platform may not have a pre-built release"; \
+		exit 1; \
+	fi; \
+	echo "Extracting binary..."; \
+	tar -xzf /tmp/$$RELEASE_FILE -C out/bin/; \
+	chmod +x out/bin/sorespo; \
+	rm /tmp/$$RELEASE_FILE; \
+	echo "Download complete: out/bin/sorespo"

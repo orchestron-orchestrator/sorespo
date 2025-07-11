@@ -29,25 +29,60 @@ jobs:
       - run: acton test perf
       - uses: actions/upload-artifact@v4
         with:
-          name: sorespo-amd64
+          name: sorespo-linux-x86_64
           path: out/bin/sorespo
       - run: acton build --target aarch64-linux-gnu.2.27
       - uses: actions/upload-artifact@v4
         with:
-          name: sorespo-aarch64
+          name: sorespo-linux-aarch64
           path: out/bin/sorespo
+      - run: acton build --target aarch64-macos
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sorespo-macos-aarch64
+          path: out/bin/sorespo
+
+  release:
+    # Only run on the main branch
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      # Required for uploading release assets
+      contents: write
+    needs: build-and-test
+    steps:
+      - name: "Download all binary artifacts"
+        uses: actions/download-artifact@v4
+        with:
+          pattern: sorespo-*
+      - name: "Compress binary artifacts"
+        run: |
+          tar -czf sorespo-linux-x86_64.tar.gz -C sorespo-linux-x86_64 sorespo
+          tar -czf sorespo-linux-aarch64.tar.gz -C sorespo-linux-aarch64 sorespo
+          tar -czf sorespo-macos-aarch64.tar.gz -C sorespo-macos-aarch64 sorespo
+      - name: "Upload artifacts as release packages"
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: "sorespo-*.tar.gz"
+          draft: false
+          prerelease: true
+          name: "tip"
+          tag: "tip"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          replacesArtifacts: true
 
   net-test:
     strategy:
       fail-fast: false
       matrix:
         TESTENV: [quicklab, quicklab-crpd, quicklab-notconf, quicklab-srl]
-        ARCH: [amd64, aarch64]
+        ARCH: [linux-x86_64, linux-aarch64]
         exclude:
           # No Cisco IOS XRd support for aarch64 :/
           - TESTENV: quicklab
-            ARCH: aarch64
-    runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
+            ARCH: linux-aarch64
+    runs-on: ${{ matrix.arch == 'linux-x86_64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     env:
       IMAGE_PATH: ${{ secrets.IMAGE_PATH || format('ghcr.io/{0}/', github.repository) }}
     needs: build-and-test
