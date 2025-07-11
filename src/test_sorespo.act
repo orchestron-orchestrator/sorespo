@@ -8,10 +8,10 @@ import yang.gdata as gdata
 import orchestron.ttt
 import orchestron.device as odev
 
-import respnet.layers
-import respnet.layers.y_0 as cfs_layer
-from respnet.devices.CiscoIosXr_24_1_ncs55a1 import root as xr24
-from respnet.devices.JuniperCRPD_23_4R1_9 import root as crpd23
+import sorespo.layers
+import sorespo.layers.y_0 as cfs_layer
+from sorespo.devices.CiscoIosXr_24_1_ncs55a1 import root as xr24
+from sorespo.devices.JuniperCRPD_23_4R1_9 import root as crpd23
 
 def rfs_for_device(dev):
     return gdata.Container({
@@ -59,7 +59,7 @@ actor _test_netinfra1(t: testing.AsyncT):
     input_config = cfs_layer.from_xml(xml_conf)
 
     dev_mgr = odev.DeviceManager(log_handler=t.log_handler)
-    cfs = respnet.layers.get_layers(dev_mgr)
+    cfs = sorespo.layers.get_layers(dev_mgr)
     rfs = cfs.below().below()
     dev_mgr.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
     session = cfs.newsession()
@@ -356,7 +356,7 @@ actor l3vpn_tester(t: testing.AsyncT, output_formatter: mut(gdata.Node) -> str):
     input_config = cfs_layer.from_xml(xml_conf)
 
     dev_mgr = odev.DeviceManager(log_handler=t.log_handler)
-    cfs = respnet.layers.get_layers(dev_mgr)
+    cfs = sorespo.layers.get_layers(dev_mgr)
     rfs = cfs.below().below()
     dev_mgr.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
     session = cfs.newsession()

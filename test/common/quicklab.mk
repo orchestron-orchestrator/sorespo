@@ -1,5 +1,5 @@
 build-otron-image:
-	docker build -t respnet-otron-base -f ../common/Dockerfile.otron .
+	docker build -t sorespo-otron-base -f ../common/Dockerfile.otron .
 
 licenses/%:
 # Ensure the symlink to the licenses private repo exists in the project root
@@ -25,29 +25,29 @@ licenses/%:
 	cp ../../licenses/$* $@
 
 start: build-otron-image
-	$(CLAB_BIN) deploy --topo $(TESTENV:respnet-%=%).clab.yml --log-level debug --reconfigure
+	$(CLAB_BIN) deploy --topo $(TESTENV:sorespo-%=%).clab.yml --log-level debug --reconfigure
 
 stop:
-	$(CLAB_BIN) destroy --topo $(TESTENV:respnet-%=%).clab.yml --log-level debug
+	$(CLAB_BIN) destroy --topo $(TESTENV:sorespo-%=%).clab.yml --log-level debug
 
 .PHONY: wait $(addprefix wait-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 WAIT?=60
 wait: $(addprefix platform-wait-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 
 copy:
-	docker cp ../../out/bin/respnet $(TESTENV)-otron:/respnet
+	docker cp ../../out/bin/sorespo $(TESTENV)-otron:/sorespo
 	docker cp l3vpn-svc.xml $(TESTENV)-otron:/l3vpn-svc.xml
 	docker cp netinfra.xml $(TESTENV)-otron:/netinfra.xml
 
 run:
-	docker exec $(INTERACTIVE) $(TESTENV)-otron /respnet --rts-bt-dbg
+	docker exec $(INTERACTIVE) $(TESTENV)-otron /sorespo --rts-bt-dbg
 
 ifndef CI
 INTERACTIVE=-it
 endif
 
 run-and-configure:
-	docker exec $(INTERACTIVE) -e EXIT_ON_DONE=$(CI) $(TESTENV)-otron /respnet netinfra.xml l3vpn-svc.xml --rts-bt-dbg
+	docker exec $(INTERACTIVE) -e EXIT_ON_DONE=$(CI) $(TESTENV)-otron /sorespo netinfra.xml l3vpn-svc.xml --rts-bt-dbg
 
 configure:
 	$(MAKE) FILE="netinfra.xml" send-config
