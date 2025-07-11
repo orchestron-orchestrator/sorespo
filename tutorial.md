@@ -4,11 +4,12 @@ This lab tutorial demonstrates some of the functionality and capablities of the 
 
 The lab implementation used for this tutorial uses ContainerLab and virtual routers running (freely downloadable) Nokia SR-Linux. The goal here is to provide a self-contained virtualised tutorial to introduce Orchestron and SORESPO which can be downloaded and run without the need for any additional components or software licences. The topology uses BGP EVPN for the signalling protocol with VXLAN for the data plane, as these features are unlicensed.
 
-The lab topology and router configuration was heavily inspired by https://learn.srlinux.dev/tutorials/l3evpn/rt5-only/
+The lab topology and router configurations were heavily inspired by this [Nokia SR-Linux Tutorial](https://learn.srlinux.dev/tutorials/l3evpn/rt5-only)
 
 SORESPO's service automation also contains RFS implementations and device YANG integrations for Juniper JUNOS and Cisco IOS-XR based devices. As virtual Juniper cRPD and Cisco XRv images are not freely available without an active vendor support contract, they cannot be supplied as part of this tutorial. If you have access to cRPD/XRv virtual images, or physical router hardware running JUNOS/IOS-XR, then these can be substituted instead of the SR-Linux routers.
 
 Finally, SORESPO's is being used here to demonstate some of the service functionality of the Orchestron plaform. L3VPN was chosen as a good service for this as it is a common, well understood and overall useful service-provider use-case. But the Orchestron platform is capable of implementing almost any automation use-case for any domain. Over time, we expect that the Orchestron project will be extended with service automation code for many additional use-cases. The goal here is to make Orchestron as useful out-of-the-box to make service automation as simple as possible.
+
 
 
 ## Getting Started
@@ -27,6 +28,7 @@ git switch srl
 ```
 
 
+
 ## Operating the Tutorial
 
 The lab environment uses Makefiles to simplify perform a wide range of functions for the lab, including building, running and configuring the environment, and the execution of some common query and configuration tasks with Orchestron.
@@ -36,11 +38,14 @@ First, build the necessary containers (WILL BE REMOVED)
 ```
 make build
 ```
+
 Then, start the containers:
+
 ```
 make -C test/quicklab-srl start
 # [ a lot of continerlab output ]
 ```
+
 Note: The lab can be shut down with `make -C test/quicklab-srl stop`
 
 Copy the Orchestron binary to the container:
@@ -114,12 +119,14 @@ The resulting lab has three core SR-Linux routers, each with an attached custome
  +-------------------+                                                               
 ```
 
-To test the above topology, you can log dirctly into a core router and run a few commands. For reference, more detail on the SR-Linux CLI can be found at: https://documentation.nokia.com/srlinux/24-3/title/basics.html
+
+To test the above topology, you can log dirctly into a core router and run a few commands. For reference, more detail on the SR-Linux CLI can be found at: [SR-Linux Configuration Basics](https://documentation.nokia.com/srlinux/24-3/title/basics.html)
 
 ```
 make -C test/quicklab-srl cli-ams-core-1 # This logs in to the ams-core-1 cli
 ```
-Then run;
+
+Then run:
 ```
 / show network-instance default protocols bgp neighbor
 / ping network-instance default 10.0.0.2
@@ -157,6 +164,8 @@ SORESPO implments highly abstracted device and service configuration through lay
 
 The Orchestron container implements a RESTCONF interface Northbound interface. For many common queries and tasks, `make` targets are implemented to send the relevant RESTCONF requests. 
 
+
+
 ## Configuration at Layer 0 - Cuustomer Facing Service (CFS)
 
 The Customer Facing Service (top-level) YANG model implemented by SORESPO and defines it's northbound interface for the users, or for BSS/OSS platforms. The YANG modules for layer0 are located in `sorespo/gen/yang/cfs`.
@@ -183,6 +192,7 @@ The resulting output has two top-level containers, `<netinfra>` (the first confi
 ...
 </l3vpn-svc>
 ```
+
 
 ### Core Network Topology Configuration <netinfra>
 
@@ -212,20 +222,19 @@ The `<router>` container defines the router's name and its role in the network t
 The `<backbone-link>` container defines the necessary endpoint paramaters to configure a link between two routers.
 
 
+
 ### L3VPN Service Configuration <ietf-l3vpn-svc>
 
-The configuraiton for two of the top-level containers defined in the IETF's L3VPN Service YANG model, the first `<vpn-services>` defines the customer's VPN and the second `<sites>` is a list of connection points which configure the edge router's links to customer's sites. 
+The configuraiton for two of the top-level containers defined in the IETF's L3VPN Service YANG model, the first `<vpn-services>` defines the customer's VPN and the second `<sites>` is a list of connection points which configure the edge router's links to customer's sites, as follows:
 
 ```
+<l3vpn-svc xmlns="urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc">
   <vpn-services>
     <vpn-service>
       <vpn-id>acme-65501</vpn-id>
       <customer-name>CUSTOMER-1</customer-name>
     </vpn-service>
   </vpn-services>
-```
-
-```
   <sites>
     <site>
       <site-id>SITE-1</site-id>
@@ -274,6 +283,7 @@ The configuraiton for two of the top-level containers defined in the IETF's L3VP
         </site-network-access>
       </site-network-accesses>
     </site>
+</l3vpn-svc>
 ```
 
 
@@ -286,6 +296,7 @@ The layer1 configuration can be retrieved with the following command:
 ```
 make -C test/quicklab-srl get-config1
 ```
+
 This excerpt from the output shows the intermediate layer configuration for the AMS-CORE-1 router. The IPv4 and IPv6 addressing for the loopback interface for the device are added. These have been calculated according to a pre-defined set of addressing rules.
 
 Additionally, there is configuration for the customer's `acme-65501` VPN which has been defined in the layer0 `ietf-l3vpn-svc` configuration.
@@ -361,6 +372,8 @@ At the Intermediate layer, the L3VPN service configuration is re-structured as f
     ...
 </l3vpn>
 ```
+
+
 
 ## Configuration at Layer2 - Resource Facing Service (RFS)
 
@@ -439,6 +452,8 @@ Which gives the following output:
 </rfs>
 ```
 
+
+
 ### Configuration at Layer 3 - The Device Layer
 
 At this layer, we have the vendor's device specific YANG models. 
@@ -449,7 +464,9 @@ make -C test/quicklab-srl get-config3
 
 This returns several hundred lines of XML defining the full configuration of each of the core router devices. We can see from the XML namespaces ( `xmlns="urn:nokia.com:srlinux:`) that these are the vendor's models.
 
-## Adding a new Site to the Topology
+
+
+## Adding a new Core Router to the Topology
 
 In order to add a new router to the network, including provisioning the backbone links and iBGP peering, all we need to do is send in the configuration for that router. The configuration is defined in `test/quicklab-srl/netinfra-add-lju.xml`:
 
@@ -490,10 +507,12 @@ The topology now has four core routers. We can check this by logging in to the n
 ```
 make -C test/quicklab-srl cli-lju-core-1
 ```
+
 And running the following command:
 ```
 / show network-instance default protocols bgp neighbor
 ```
+
 The resulting output shows that iBGP sessions with the other 3 core routers have been established:
 ```
 A:root@LJU-CORE-1# / show network-instance default protocols bgp neighbor
@@ -571,4 +590,5 @@ And finally, we can test the connectivity between all of the customer's routers 
 ```
 make -C test/quicklab-srl test-ping
 ```
+
 NB - THIS BIT DOESN'T WORK
