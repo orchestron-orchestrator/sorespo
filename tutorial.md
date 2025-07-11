@@ -1,19 +1,17 @@
-Orchestron and SORESPO
+# Orchestron and SORESPO
 
-This lab tutorial demonstrates the functionality and capablities of the Orchestron automation platform. To do this, we need a network and services to automate. This is where the SOmewhat REalistic Service Provider Ooohh (SORESPO) comes in. SORESPO is the name given to the service automation for IP core network configuration offering Layer 3 VPN services. The customer facing service model (CFS) is an implmentation of the IETF's 'YANG Model for L3VPN Service Delivery' defined in RFC8299.
+This lab tutorial demonstrates some of the functionality and capablities of the Orchestron automation platform. To do this, we need a network and services to automate. This is where the SOmewhat REalistic Service Provider Ooohh (SORESPO) comes in. SORESPO is the name given to the service automation for IP core network configuration offering Layer 3 VPN services. The customer facing service model (CFS) is an implmentation of the IETF's 'YANG Model for L3VPN Service Delivery' defined in RFC8299.
 
-The lab implementation used for this tutorial uses ContainerLab and virtual routers running (freely downloadable) Nokia SR-Linux. The goal here is to provide a self-contained virtualised tutorial to intoduce Orchestron and SORESPO which can be downloaded and run without the need for any additional components or software licences. The topology uses BGP EVPN for the signalling protocol with VXLAN for the data plane, as these features do not require licenses.
+The lab implementation used for this tutorial uses ContainerLab and virtual routers running (freely downloadable) Nokia SR-Linux. The goal here is to provide a self-contained virtualised tutorial to introduce Orchestron and SORESPO which can be downloaded and run without the need for any additional components or software licences. The topology uses BGP EVPN for the signalling protocol with VXLAN for the data plane, as these features are unlicensed.
 
 The lab topology and router configuration was heavily inspired by https://learn.srlinux.dev/tutorials/l3evpn/rt5-only/
 
-SORESPO's service automation also contains RFS implementations and device YANG integrations for Juniper JUNOS and Cisco IOS-XR based devices. As virtual Juniper cRPD and Cisco XRv images are not freely available without an active vendor support contract, they cannot be supplied as part of this tutorial. If you have access to cRPD/XRv virtual images, or physical router hardware running JUNOS/IOS-XR, then the lab topology configuration can easily be replaced with these.
+SORESPO's service automation also contains RFS implementations and device YANG integrations for Juniper JUNOS and Cisco IOS-XR based devices. As virtual Juniper cRPD and Cisco XRv images are not freely available without an active vendor support contract, they cannot be supplied as part of this tutorial. If you have access to cRPD/XRv virtual images, or physical router hardware running JUNOS/IOS-XR, then these can be substituted instead of the SR-Linux routers.
 
-If you are interested in using Orchestron for automating core networks and L3VPN service provisioning SORESPO is intended
-
-Finally, SORESPO's is being used here to demonstate some of the service functionality of the Orchestron plaform. L3VPN was chosen as a good service for this as it is a common, well understood and overall useful service-provider use-case. But the Orchestron platform is capable of implementing almost any automation use-case for any domain. Over time, ewe expect that the Orchestron project will be extended with service automation code for many additional use-cases. The goal here is to make Orchestron as useful out-of-the-box to make service automation as simple as possible.
+Finally, SORESPO's is being used here to demonstate some of the service functionality of the Orchestron plaform. L3VPN was chosen as a good service for this as it is a common, well understood and overall useful service-provider use-case. But the Orchestron platform is capable of implementing almost any automation use-case for any domain. Over time, we expect that the Orchestron project will be extended with service automation code for many additional use-cases. The goal here is to make Orchestron as useful out-of-the-box to make service automation as simple as possible.
 
 
-Getting Started
+## Getting Started
 
 First, if you haven't already, clone the project:
 
@@ -29,21 +27,20 @@ git switch srl
 ```
 
 
-Operating the Tutorial
+## Operating the Tutorial
 
 The lab environment uses Makefiles to simplify perform a wide range of functions for the lab, including building, running and configuring the environment, and the execution of some common query and configuration tasks with Orchestron.
 
-First, build the neces
+First, build the necessary containers (WILL BE REMOVED)
 
 ```
 make build
 ```
-Then, start up the necessary containers:
+Then, start the containers:
 ```
 make -C test/quicklab-srl start
 # [ a lot of continerlab output ]
 ```
-
 Note: The lab can be shut down with `make -C test/quicklab-srl stop`
 
 Copy the Orchestron binary to the container:
@@ -58,11 +55,11 @@ make -C test/quicklab-srl run
 # [ a lot of continerlab output ]
 ```
 
-The Orchestron process is now running in this shell window, you will need to open a second shell to enter the commands to continue with this tutorial.
+The Orchestron process is now running in this shell window, you will need to open a second shell to enter further commands and continue with the tutorial.
 
-At this stage, we have the lab topology with running router containers. The only configuration they have at this stage are the management access and credentials so that Orchestron can send configuration. Otherwise, they are unconfigures. The Orcheston application is also running, but does not have any network or service intent configuration loaded.
+At this stage, we have the lab topology with running router containers. The only configuration they have is for the management access and credentials so that Orchestron can connect and send configuration. Otherwise, they are unconfigured. The Orcheston application is also running, but does not have any network or service intent configuration loaded.
 
-To configure the underlying routers and links, we load in the top-level XML configuration for the starting core network topology. This file describes the network infrastructure intent, which is all that is needed to configure the core routers, backbone links and routing protocols so that it is ready for service configuration.
+To configure the underlying routers and links, we load in the top-level XML configuration for the starting core network topology. This file describes the network infrastructure intent, which is all that is needed to configure the core routers, backbone links and routing protocols that are ready for customer service configuration.
 
 ```
 FILE="netinfrastart.xml" make -C test/quicklab-srl send-config
@@ -117,23 +114,22 @@ The resulting lab has three core SR-Linux routers, each with an attached custome
  +-------------------+                                                               
 ```
 
-To test the above topology, you can log dirctly into the core routers and run a few commands. For reference, more detail on the SR-Linux CLI can be found at: https://documentation.nokia.com/srlinux/24-3/title/basics.html
+To test the above topology, you can log dirctly into a core router and run a few commands. For reference, more detail on the SR-Linux CLI can be found at: https://documentation.nokia.com/srlinux/24-3/title/basics.html
 
 ```
-make -C test/quicklab-srl cli-ams-core-1 # This logs in to the ams-core-1 cli so we
-/ 
-show network-instance default protocols bgp neighbor
-ping network-instance default 10.0.0.2
+make -C test/quicklab-srl cli-ams-core-1 # This logs in to the ams-core-1 cli
+```
+Then run;
+```
+/ show network-instance default protocols bgp neighbor
+/ ping network-instance default 10.0.0.2
 ```
 
 These commands show that the loopback addresses are reachable and iBGP has been established between of the 3 core routers. Use `ctrl-c` to stop the `ping` command and `quit` to log out of the router.
 
 In the next section, we'll look at the contents of the two XML configuaration files we just loaded, and see how this is  SOPESPO uses layered automation to 
 
-
-
-
-Service Automation Layering In SORESPO
+## Service Automation Layering In SORESPO
 
 SORESPO implments highly abstracted device and service configuration through layers of automation. While SORESPO is implemented using four discrete layers, Orchestron does not place any limitations on the number of layers that can be implemented - as few or many as necessary can be used.
 
@@ -161,7 +157,7 @@ SORESPO implments highly abstracted device and service configuration through lay
 
 The Orchestron container implements a RESTCONF interface Northbound interface. For many common queries and tasks, `make` targets are implemented to send the relevant RESTCONF requests. 
 
-Configuration at Layer 0 - Cuustomer Facing Service (CFS)
+## Configuration at Layer 0 - Cuustomer Facing Service (CFS)
 
 The Customer Facing Service (top-level) YANG model implemented by SORESPO and defines it's northbound interface for the users, or for BSS/OSS platforms. The YANG modules for layer0 are located in `sorespo/gen/yang/cfs`.
 
@@ -188,7 +184,7 @@ The resulting output has two top-level containers, `<netinfra>` (the first confi
 </l3vpn-svc>
 ```
 
-Core Network Topology Configuration <netinfra>
+### Core Network Topology Configuration <netinfra>
 
 `<netinfra>` holds the router and backbone link configuration. At level0, this is highly abstracted with only the essential paramaters being exposed. The other automation layers implement the logic necessary to create the device level configuration (described by vendor supplied YANG modules).
 
@@ -216,7 +212,7 @@ The `<router>` container defines the router's name and its role in the network t
 The `<backbone-link>` container defines the necessary endpoint paramaters to configure a link between two routers.
 
 
-L3VPN Service Configuration <ietf-l3vpn-svc>
+### L3VPN Service Configuration <ietf-l3vpn-svc>
 
 The configuraiton for two of the top-level containers defined in the IETF's L3VPN Service YANG model, the first `<vpn-services>` defines the customer's VPN and the second `<sites>` is a list of connection points which configure the edge router's links to customer's sites. 
 
@@ -281,7 +277,7 @@ The configuraiton for two of the top-level containers defined in the IETF's L3VP
 ```
 
 
-Configuration at Layer1 - Intermediate 
+## Configuration at Layer1 - Intermediate 
 
 In SORESPO, the next layer down is the 'Intermediate' layer. At this layer, the implemented YANG modules are less abstracted than at layer0. Additional parameters are calculated by the service automation. 
 
@@ -364,10 +360,9 @@ At the Intermediate layer, the L3VPN service configuration is re-structured as f
     </endpoint>
     ...
 </l3vpn>
+```
 
-
-
-Configuration at Layer2 - Resource Facing Service (RFS)
+## Configuration at Layer2 - Resource Facing Service (RFS)
 
 Layer2 is the Resource Facing Service (RFS) layer. Once again, configuration at this layer is more explict, with more parameters being generated by the automation. The main role of the RFS layer is to provide a stable vendor-agnostic abstraction to the upper layers. This means that new device types YANG models and versions, or other device management protocol integrations can be added without needing to make any changes to the Intermediate or CFS layers above.
 
@@ -377,7 +372,7 @@ At this stage, there is an instance of `<device>` container per managed device a
 make -C test/quicklab-srl get-config2
 ```
 
-
+Which gives the following output:
 ```
 <rfs>
   <name>AMS-CORE-1</name>
@@ -444,7 +439,7 @@ make -C test/quicklab-srl get-config2
 </rfs>
 ```
 
-Configuration at Layer 3 - The Device Layer
+### Configuration at Layer 3 - The Device Layer
 
 At this layer, we have the vendor's device specific YANG models. 
 
@@ -454,7 +449,7 @@ make -C test/quicklab-srl get-config3
 
 This returns several hundred lines of XML defining the full configuration of each of the core router devices. We can see from the XML namespaces ( `xmlns="urn:nokia.com:srlinux:`) that these are the vendor's models.
 
-Adding a new Site to the Topology
+## Adding a new Site to the Topology
 
 In order to add a new router to the network, including provisioning the backbone links and iBGP peering, all we need to do is send in the configuration for that router. The configuration is defined in `test/quicklab-srl/netinfra-add-lju.xml`:
 
@@ -485,20 +480,19 @@ $ cat test/quicklab-srl/netinfra-add-lju.xml`
 </data>
 ```
 
-We send this configuration, in the same way as above:
+We send this configuration to Orchestron in the same way as we did above:
 
 ```
 FILE="netinfra-add-lju.xml" make -C test/quicklab-srl send-config
 ```
 
-The topology now has four core router. We can check this by logging in to the new router:
+The topology now has four core routers. We can check this by logging in to the new router:
 ```
 make -C test/quicklab-srl cli-lju-core-1
 ```
 And running the following command:
 ```
 / show network-instance default protocols bgp neighbor
-
 ```
 The resulting output shows that iBGP sessions with the other 3 core routers have been established:
 ```
