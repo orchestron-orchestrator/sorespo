@@ -50,7 +50,15 @@ jobs:
       # Required for uploading release assets
       contents: write
     needs: build-and-test
+    env:
+      TAG: tip
     steps:
+      - name: "Check out repository code"
+        uses: actions/checkout@v4
+      - name: Delete tag
+        run: gh release delete ${{ env.TAG }} --cleanup-tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: "Download all binary artifacts"
         uses: actions/download-artifact@v4
         with:
@@ -67,8 +75,8 @@ jobs:
           artifacts: "sorespo-*.tar.gz"
           draft: false
           prerelease: true
-          name: "tip"
-          tag: "tip"
+          name: ${{ env.TAG }}
+          tag: ${{ env.TAG }}
           token: ${{ secrets.GITHUB_TOKEN }}
           replacesArtifacts: true
 
