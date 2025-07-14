@@ -4,20 +4,15 @@ The **SOmewhat REalistic Service Provider Ooohh** (SORESPO) network is a rather
 realistic looking Service Provider network. This repository contains a network
 automation system implementation POC based on [Orchestron](https://github.com/orchestron-orchestrator/orchestron).
 
-
 ## Introduction
 While SORESPO and Orchestron are closely related, they are two distinct
 projects with very different goals:
 * **Orchestron** is a ***platform*** for the development of robust network
 orchestration systems based on model-driven declarative transforms. It does the
 heavy lifting so you can focus on building automation that makes sense.
-* **SORESPO** is an ***example*** network automation system. It is a reference
-implementation of an Orchestron system.
-
-In SORESPO we implement lots of best-practices in network automation. You can
-use it to learn about network automation (development) or use it as a solid
+* **SORESPO** is a **reference implementation** of an Orchestron system. You
+can use it to learn about network automation (development) or use it as a solid
 foundation for your own network automation system design.
-
 
 ## Getting Started
 
