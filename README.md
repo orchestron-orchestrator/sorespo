@@ -1,3 +1,5 @@
+[logo]: https://github.com/adam-p/markdown-here/raw/master/src/common/images/sorespo.png "SORESPO Logo"
+
 # SORESPO
 
 The **SOmewhat REalistic Service Provider Orchestration** (SORESPO) network is
@@ -13,6 +15,8 @@ heavy lifting so you can focus on building automation that makes sense.
 * **SORESPO** is a **reference implementation** of an Orchestron system. You
 can use it to learn about network automation (development) or use it as a solid
 foundation for your own network automation system design.
+
+[orch-sorespo]: https://github.com/adam-p/markdown-here/raw/master/src/common/images/OrchSorespo.png "Orchestron and SORESPO Logo"
 
 ## Getting Started
 

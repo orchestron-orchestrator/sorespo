@@ -1,6 +1,10 @@
 # SORESPO Tutorials
 
-We have several tutorials available, depending on what you would like to get out of SORESPO.
+[logo]: https://github.com/adam-p/markdown-here/raw/master/src/common/images/sorespo.png "SORESPO Logo"
+
+The following tutorials have been written to introduce the Orchestron platform for users and for developers. We have several tutorials available, depending on what you would like to get out of SORESPO.
+
+
 * Start out by learning how to **run and interact** with SORESPO:
   * [Running SORESPO on Linux](run-on-linux.md)
   * [Running SORESPO on macOS](run-on-macos.md)
