@@ -3,13 +3,13 @@
 ## Introduction
 
 The SORESPO network is a combination of a number of (containerized) router labs
-and the network automation system to run the labs.
+and the orchestration system to manage the entire lifecycle of the network.
 
 You will need a Linux host with 4 CPU cores and 8 GB of RAM available to be
 able to start the "Nokia SR Linux" lab used throughout this tutorial.
-CPU virtualization (KVM extensions) are **NOT** required, meaning
-you can run the lab in any Virtual Machine. The tutorial was written and
-validated for Ubuntu / Debian but should work on any modern Linux distribution.
+CPU virtualization (KVM extensions) is **NOT** required. The tutorial was
+written and validated for Ubuntu / Debian but should work on any modern Linux
+distribution.
 
 ## Preparing the Environment
 
@@ -39,7 +39,7 @@ make tutorial
 Orchestron/sorespo running..
 ```
 
-This will first start the entire SR Linux lab and finally run the Orchestron
+This will first start the entire SR Linux lab and finally run the SORESPO
 process interactively in this shell window. You will need to
 **open a second shell** to enter further commands and continue with the
 tutorial.
@@ -48,11 +48,11 @@ tutorial.
 
 At this stage, we have the lab topology with running containerized routers.
 The only configuration they have is for the management access and credentials
-so that Orchestron can connect and send configuration. Otherwise, they are
+so that SORESPO can connect and send configuration. Otherwise, they are
 unconfigured. The Orcheston application is also running, but does not have any
 network or service intent configuration loaded.
 
-## Loading intent configuration into Orchestron
+## Loading intent configuration into SORESPO
 
 To configure the underlying routers and links, we load in the top-level XML
 configuration for the starting core network topology. This file describes the
@@ -175,7 +175,7 @@ implemented - as few or many as necessary can be used.
 ```
 
 
-The Orchestron container implements a RESTCONF interface Northbound interface.
+The SORESPO container implements a RESTCONF northbound interface.
 For many common queries and tasks, `make` targets are implemented to send the
 relevant RESTCONF requests. 
 
@@ -186,7 +186,7 @@ The Customer Facing Service (top-level) YANG model defines SORESPO's northbound
 interface for users and/or BSS/OSS platforms. The YANG modules for `layer0` are
 located in `sorespo/gen/yang/cfs`.
 
-We can retrieve the top-level (CFS) configuration (level 0) from Orchestron
+We can retrieve the top-level (CFS) configuration (level 0) from SORESPO
 using the following command:
 
 ```shell
@@ -425,7 +425,7 @@ integrations can be added without needing to make any changes to the
 Intermediate or CFS layers above.
 
 At this layer, there is an instance of `<device>` container per managed device
-and a corresponding `<rfs>` container defining the devices Orchestron is
+and a corresponding `<rfs>` container defining the devices SORESPO is
 managing and the RFS services that SORESPO defines.
 
 Let's retrieve the configuration for `layer2`:
@@ -548,7 +548,7 @@ configuration for that router. The configuration is defined in
 </data>
 ```
 
-We send this configuration to Orchestron in the same way as we did above:
+We send this configuration to SORESPO in the same way as we did above:
 ```shell
 FILE="tutorial-add-lju.xml" make send-config
 ```
@@ -645,5 +645,5 @@ make test-ping
 *NOTE*: It may take up to a minute for the customer and provider routers to establish a BGP session and exchange routes.
 
 ## What's Next
-Now that you are familiar with running Orchestron and interacting with it,
+Now that you are familiar with running SORESPO and interacting with it,
 continue by learning how to make [changes to the automation code](develop-on-linux.md).

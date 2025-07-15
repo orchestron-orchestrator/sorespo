@@ -1,8 +1,8 @@
 # SORESPO
 
-The **SOmewhat REalistic Service Provider Ooohh** (SORESPO) network is a rather
-realistic looking Service Provider network. This repository contains a network
-automation system implementation POC based on [Orchestron](https://github.com/orchestron-orchestrator/orchestron).
+The **SOmewhat REalistic Service Provider Orchestration** (SORESPO) network is
+a rather realistic looking Service Provider network. This repository contains a
+network automation system based on [Orchestron](https://github.com/orchestron-orchestrator/orchestron).
 
 ## Introduction
 While SORESPO and Orchestron are closely related, they are two distinct

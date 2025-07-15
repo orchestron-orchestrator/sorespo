@@ -6,7 +6,7 @@ it connects to these devices which are actually NOTCONF devices simulating the
 northbound interfaces (YANG models) of those vendors.
 
 NOTCONF does not have a dataplane, nor management plane. Therefor there are no
-actual CPEs in this lab (but the Orchestron CFS input is still structured as if
+actual CPEs in this lab (but the SORESPO CFS input is still structured as if
 there were).
 ```
 +-------------------+                                                                     +-------------------+   

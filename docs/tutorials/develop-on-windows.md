@@ -5,7 +5,7 @@
 This tutorial will guide you through making your first changes to the
 SORESPO automation code and building the application. If you are not yet
 familiar with the basic steps involved in running and interacting with
-Orchestron, you might want to start out with the tutorial on
+SORESPO, you might want to start out with the tutorial on
 [running SORESPO](run-on-windows.md) first.
 
 ## Preparing the Environment
@@ -61,8 +61,8 @@ routers. The current state of the lab is identical to the final step in the
 ----
 
 *Notes*:
-* The Orchestron process runs interactively in this shell window. When you kill
-  it with *Ctrl+C*, Orchestron itself will stop, but the lab and all the
+* The SORESPO process runs interactively in this shell window. When you kill
+  it with *Ctrl+C*, SORESPO itself will stop, but the lab and all the
   routers will continue to run.
 * You will need to **open a second shell** to enter further commands and
   continue with the tutorial.
@@ -105,7 +105,7 @@ Part of the output is the VRF interface:
 ...
 ```
 
-Notice how Orchestron filled in a handy interface description for the
+Notice how SORESPO filled in a handy interface description for the
 subinterface, but there is no description on the main `ethernet-1/3`
 interface. We will now modify the SORESPO code to add one in.
 
@@ -140,9 +140,9 @@ class VrfInterface(base.VrfInterface):
             intf.description = "VRF Interface for customer connections"
 ```
 
-After you have saved the file to disk, you can re-build the Orchestron binary
+After you have saved the file to disk, you can re-build the SORESPO binary
 to incorporate the change. Press *Ctrl+C* in the terminal window where
-Orchestron is running.
+SORESPO is running.
 
 Then in the same terminal window trigger a build:
 ```shell
@@ -153,12 +153,12 @@ two levels up from the current directory, saving us the hassle of moving around 
 the directory structure.
 
 After the build has completed you can copy your updated binary into the lab and
-re-run/configure Orchestron:
+re-run and re-configure SORESPO:
 ```shell
 make copy run-and-configure
 ```
 
-Wait a few seconds for Orchestron to apply your changes to the routers and
+Wait a few seconds for SORESPO to apply your changes to the routers and
 repeat the steps above to validate your change was successful.
 ```shell
 make get-dev-config-ams-core-1 | sed -n '/<interface xmlns="urn:nokia.com:srlinux:chassis:interfaces">/,/<\/interface>/p'
@@ -309,12 +309,12 @@ class L3Vpn(base.L3Vpn):
 ```
 
 
-After you have saved the files to disk, you can re-build the Orchestron binary
+After you have saved the files to disk, you can re-build the SORESPO binary
 to incorporate the change. Once again, press *Ctrl+C* in the terminal window
-where Orchestron is running.
+where SORESPO is running.
 
-Then in the same terminal window first trigger a re-generation of the
-Orchestron YANG framework:
+Then, in the same terminal window, request the Orchestron build system and
+Acton YANG parser to re-generate the codebase from the SORESPO YANG modules:
 ```shell
 make -C ../../ gen
 ```
@@ -325,12 +325,12 @@ make -C ../../ build-linux
 ```
 
 After the build has completed you can copy your updated binary into the lab and
-re-run/configure Orchestron:
+re-run and re-configure SORESPO:
 ```shell
 make copy run-and-configure
 ```
 
-Wait a few seconds for Orchestron to start and retrieve the configuration for
+Wait a few seconds for SORESPO to start and retrieve the configuration for
 `layer2`.
 ```shell
 make get-config2
@@ -357,6 +357,6 @@ from the CFS intent all the way down to the device configuration. But the
 development process from here on out is always the same.
 
 ## What's Next
-Now that you are familiar with running and developing for Orchestron, continue
+Now that you are familiar with running and developing for SORESPO, continue
 to explore the [other labs](../../test/README.md) we have available, including
 more router vendors etc..
