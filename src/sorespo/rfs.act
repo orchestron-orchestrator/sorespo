@@ -436,10 +436,12 @@ class VrfInterface(base.VrfInterface):
             # Create the main interface
             intf = dev.interface.create(main_intf)
             intf.admin_state = "enable"
+            intf.vlan_tagging = True
 
             # Create the subinterface
             subif = intf.subinterface.create(int(vlan_id))
             subif.admin_state = "enable"
+            subif.vlan.encap.create_single_tagged().vlan_id = int(vlan_id)
             subif.description = i.description
 
             # Configure IPv4 address if present
