@@ -14,7 +14,11 @@ likely need more CPU cores and memory allocated to Docker than described here.
 
 * Install the following prerequisites:
   * [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-  * [Git](https://git-scm.com/downloads/mac)
+  * [Git](https://git-scm.com/downloads/mac) and *coreutils* , both of which
+    you can install with [Homebrew](https://brew.sh/):
+  ```shell
+  brew install git coreutils
+  ```
 * After the installation has completed, start *Docker Desktop* and open the
   *Settings*. In the *Resources* section, make sure you've allocate at least 4
   CPU cores and 8GB of RAM to Docker.

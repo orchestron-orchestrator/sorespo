@@ -12,7 +12,11 @@ SORESPO, you might want to start out with the tutorial on
 
 * Install the following prerequisites:
   * [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-  * [Git](https://git-scm.com/downloads/mac)
+  * [Git](https://git-scm.com/downloads/mac) and *coreutils* , both of which
+    you can install with [Homebrew](https://brew.sh/):
+  ```shell
+  brew install git coreutils
+  ```
   * [Acton](https://acton.guide/install_tip.html) (*Note:* This is an additional prerequite compared to [running SORESPO](run-on-macos.md))
 * After the installation has completed, start *Docker Desktop* and open the
   *Settings*. In the *Resources* section, make sure you've allocate at least 4
