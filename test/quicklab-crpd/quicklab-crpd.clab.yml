@@ -18,6 +18,9 @@ topology:
       startup-config: crpd-startup.conf
       license: licenses/juniper_crpd24.lic
       image-pull-policy: if-not-present
+    linux:
+      image: quay.io/frrouting/frr:10.3.1
+      image-pull-policy: if-not-present
   nodes:
     ams-core-1:
       kind: crpd
@@ -28,17 +31,45 @@ topology:
     lju-core-1:
       kind: crpd
     cust-1:
-      kind: crpd
-      startup-config: cust-1-junos.conf
+      kind: linux
+      binds:
+        - ../common/cust-1-frr.conf:/etc/frr/frr.conf
+        - ../common/frr-daemons.conf:/etc/frr/daemons
+      exec:
+        - ip link set dev eth1 address 00:C1:AB:00:01:01
+        - ip link add link eth1 name eth1.100 type vlan id 100
+        - ip link set dev eth0 down
+        - touch /etc/frr/vtysh.conf
     cust-2:
-      kind: crpd
-      startup-config: cust-2-junos.conf
+      kind: linux
+      binds:
+        - ../common/cust-2-frr.conf:/etc/frr/frr.conf
+        - ../common/frr-daemons.conf:/etc/frr/daemons
+      exec:
+        - ip link set dev eth1 address 00:C1:AB:00:01:01
+        - ip link add link eth1 name eth1.100 type vlan id 100
+        - ip link set dev eth0 down
+        - touch /etc/frr/vtysh.conf
     cust-3:
-      kind: crpd
-      startup-config: cust-3-junos.conf
+      kind: linux
+      binds:
+        - ../common/cust-3-frr.conf:/etc/frr/frr.conf
+        - ../common/frr-daemons.conf:/etc/frr/daemons
+      exec:
+        - ip link set dev eth1 address 00:C1:AB:00:01:01
+        - ip link add link eth1 name eth1.100 type vlan id 100
+        - ip link set dev eth0 down
+        - touch /etc/frr/vtysh.conf
     cust-4:
-      kind: crpd
-      startup-config: cust-4-junos.conf
+      kind: linux
+      binds:
+        - ../common/cust-4-frr.conf:/etc/frr/frr.conf
+        - ../common/frr-daemons.conf:/etc/frr/daemons
+      exec:
+        - ip link set dev eth1 address 00:C1:AB:00:01:01
+        - ip link add link eth1 name eth1.100 type vlan id 100
+        - ip link set dev eth0 down
+        - touch /etc/frr/vtysh.conf
     otron:
       kind: linux
       image: sorespo-otron-base

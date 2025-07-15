@@ -22,6 +22,9 @@ topology:
       image: ${IMAGE_PATH}crpd:24.4R1.9
       startup-config: crpd-startup.conf
       license: licenses/juniper_crpd24.lic
+    linux:
+      image: quay.io/frrouting/frr:10.3.1
+      image-pull-policy: if-not-present
   nodes:
     ams-core-1:
       kind: xrd
@@ -32,17 +35,45 @@ topology:
     lju-core-1:
       kind: crpd
     cust-1:
-      kind: xrd
-      startup-config: cust-1.conf
+      kind: linux
+      binds:
+        - ../common/cust-1-frr.conf:/etc/frr/frr.conf
+        - ../common/frr-daemons.conf:/etc/frr/daemons
+      exec:
+        - ip link set dev eth1 address 00:C1:AB:00:01:01
+        - ip link add link eth1 name eth1.100 type vlan id 100
+        - ip link set dev eth0 down
+        - touch /etc/frr/vtysh.conf
     cust-2:
-      kind: xrd
-      startup-config: cust-2.conf
+      kind: linux
+      binds:
+        - ../common/cust-2-frr.conf:/etc/frr/frr.conf
+        - ../common/frr-daemons.conf:/etc/frr/daemons
+      exec:
+        - ip link set dev eth1 address 00:C1:AB:00:01:01
+        - ip link add link eth1 name eth1.100 type vlan id 100
+        - ip link set dev eth0 down
+        - touch /etc/frr/vtysh.conf
     cust-3:
-      kind: xrd
-      startup-config: cust-3.conf
+      kind: linux
+      binds:
+        - ../common/cust-3-frr.conf:/etc/frr/frr.conf
+        - ../common/frr-daemons.conf:/etc/frr/daemons
+      exec:
+        - ip link set dev eth1 address 00:C1:AB:00:01:01
+        - ip link add link eth1 name eth1.100 type vlan id 100
+        - ip link set dev eth0 down
+        - touch /etc/frr/vtysh.conf
     cust-4:
-      kind: xrd
-      startup-config: cust-4.conf
+      kind: linux
+      binds:
+        - ../common/cust-4-frr.conf:/etc/frr/frr.conf
+        - ../common/frr-daemons.conf:/etc/frr/daemons
+      exec:
+        - ip link set dev eth1 address 00:C1:AB:00:01:01
+        - ip link add link eth1 name eth1.100 type vlan id 100
+        - ip link set dev eth0 down
+        - touch /etc/frr/vtysh.conf
     otron:
       kind: linux
       image: sorespo-otron-base
@@ -57,7 +88,7 @@ topology:
     - endpoints: ["fra-core-1:Gi0-0-0-1", "sto-core-1:eth2"]
     - endpoints: ["fra-core-1:Gi0-0-0-2", "lju-core-1:eth1"]
     - endpoints: ["sto-core-1:eth3", "lju-core-1:eth2"]
-    - endpoints: ["ams-core-1:Gi0-0-0-2", "cust-1:Gi0-0-0-0"]
-    - endpoints: ["fra-core-1:Gi0-0-0-3", "cust-2:Gi0-0-0-0"]
-    - endpoints: ["sto-core-1:eth4", "cust-3:Gi0-0-0-0"]
-    - endpoints: ["lju-core-1:eth3", "cust-4:Gi0-0-0-0"]
+    - endpoints: ["ams-core-1:Gi0-0-0-2", "cust-1:eth1"]
+    - endpoints: ["fra-core-1:Gi0-0-0-3", "cust-2:eth1"]
+    - endpoints: ["sto-core-1:eth4", "cust-3:eth1"]
+    - endpoints: ["lju-core-1:eth3", "cust-4:eth1"]
