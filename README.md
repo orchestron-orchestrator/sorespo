@@ -1,5 +1,5 @@
 <p align="left">
-  <img src="/docs/images/sorespo.png" width="400"/>
+  <img src="docs/images/sorespo.png" width="400"/>
 </p>
 
 The **SOmewhat REalistic Service Provider Orchestration** (SORESPO) network is
@@ -17,7 +17,7 @@ can use it to learn about network automation (development) or use it as a solid
 foundation for your own network automation system design.
 
 <p align="center">
-  <img src="docs/images/OrchSorespo.png" alt="The relationship between the Orchestron automation platform and the SORESPO service provider L3VPN service implementation" width="800"/>
+  <img src="docs/images/orch_sorespo.png" alt="The relationship between the Orchestron automation platform and the SORESPO service provider L3VPN service implementation" width="800"/>
 </p>
 
 ## Getting Started
