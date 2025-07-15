@@ -5,7 +5,7 @@
 The following tutorials have been written to introduce the Orchestron platform for users and for developers. We have several tutorials available, depending on what you would like to get out of SORESPO.
 
 
-* Start out by learning how to **run and interact** with SORESPO:
+* See what Orchestron and SORESPO can do by learning how to **run and interact** with SORESPO:
   * [Running SORESPO on Linux](run-on-linux.md)
   * [Running SORESPO on macOS](run-on-macos.md)
   * [Running SORESPO on Windows](run-on-windows.md)
