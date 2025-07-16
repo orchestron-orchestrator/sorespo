@@ -1,0 +1,166 @@
+module srl_nokia-interfaces-vlans {
+  yang-version 1.1;
+  namespace "urn:nokia.com:srlinux:chassis:interfaces-vlans";
+  prefix srl_nokia-if-vlan;
+
+  import srl_nokia-extensions {
+    prefix srl_nokia-ext;
+  }
+  import srl_nokia-features {
+    prefix srl_nokia-feat;
+  }
+  import srl_nokia-interfaces {
+    prefix srl_nokia-if;
+  }
+
+  organization
+    "Nokia";
+  contact
+    "Nokia SR Linux Support
+     Web: <http://www.nokia.com>";
+  description
+    "Model for managing VLANs
+
+     This model describes management of VLAN parameters under SRL Interfaces";
+
+  revision 2025-03-31 {
+    description
+      "SRLinux 2025.3.1";
+  }
+  revision 2024-10-31 {
+    description
+      "SRLinux 24.10.1";
+  }
+  revision 2024-07-31 {
+    description
+      "SRLinux 24.7.1";
+  }
+  revision 2024-03-31 {
+    description
+      "SRLinux 24.3.1";
+  }
+  revision 2023-10-31 {
+    description
+      "SRLinux 23.10.1";
+  }
+  revision 2023-03-31 {
+    description
+      "SRLinux 23.3.1";
+  }
+  revision 2022-11-30 {
+    description
+      "SRLinux 22.11.1";
+  }
+  revision 2022-06-30 {
+    description
+      "SRLinux 22.6.1";
+  }
+  revision 2022-03-31 {
+    description
+      "SRLinux 22.3.1";
+  }
+  revision 2021-11-30 {
+    description
+      "SRLinux 21.11.1";
+  }
+  revision 2021-06-30 {
+    description
+      "SRLinux 21.6.1";
+  }
+  revision 2021-03-31 {
+    description
+      "SRLinux 21.3.1";
+  }
+  revision 2019-11-30 {
+    description
+      "SRLinux 19.11.1";
+  }
+
+  typedef vlan-id {
+    type uint16 {
+      range "1..4094";
+    }
+    description
+      "Type definition representing a single-tagged VLAN";
+  }
+
+    grouping vlan-single-tagged-params {
+    description
+      "match criteria for a single tag";
+    leaf vlan-id {
+      type union {
+        type vlan-id;
+        type enumeration {
+          enum optional {
+            if-feature "srl_nokia-feat:vlan-id-optional";
+          }
+          enum any {
+            if-feature "srl_nokia-feat:vlan-id-any";
+          }
+        }
+      }
+      description
+        "VLAN identifier for single-tagged packets";
+      must '(../../../../../vlan-tagging = true())' {
+        error-message "vlan-id only configurable if vlan-tagging enabled on parent interface";
+      }
+      must "string(.) != 'optional' or (../../../../srl_nokia-if:type = 'srl_nokia-if:bridged')" {
+        error-message "vlan-id optional only configurable on bridged subinterface";
+      }
+      must "string(.) != 'any' or (../../../../srl_nokia-if:type = 'srl_nokia-if:bridged')" {
+        error-message "vlan-id any only configurable on bridged subinterface";
+      }
+    }
+  }
+
+  grouping vlan-match-top {
+    description
+      "Top-level configuration and state for VLAN parameters";
+    container encap {
+      description
+        "VLAN match parmeters for the associated subinterface";
+      container single-tagged {
+        presence "Match single-tagged packets with a specific vlan-id.";
+        description
+          "When present, tagged frames with a specific, non-zero, outer VLAN ID are associated to the subinterface
+
+           The outer VLAN-ID tag is considered service delimiting and it is by default stripped at ingress and restored/added on egress.";
+        uses vlan-single-tagged-params;
+      }
+    }
+  }
+
+  grouping vlan-subinterface-top {
+    description
+      "Top-level configuration and state for VLAN parameters per subinterface";
+    container vlan {
+      description
+        "Parameters for VLAN definition under SRL interfaces";
+      uses vlan-match-top;
+    }
+  }
+
+  grouping vlan-interface-top {
+    description
+      "Top-level configuration and state for VLAN parameters per port";
+    leaf vlan-tagging {
+      description
+        "When set to true the interface is allowed to accept frames with one or more VLAN tags";
+      type boolean;
+      must "starts-with(../srl_nokia-if:name, 'ethernet') or starts-with(../srl_nokia-if:name, 'lag') or starts-with(../srl_nokia-if:name, 'lif') or starts-with(../srl_nokia-if:name, 'enp') or starts-with(../srl_nokia-if:name, 'vhn')" {
+        error-message "vlan-tagging not configurable on this interface";
+      }
+      must 'not(../srl_nokia-if:breakout-mode)' {
+        error-message "vlan-tagging not configurable when breakout-mode is enabled";
+      }
+    }
+  }
+
+  augment "/srl_nokia-if:interface/srl_nokia-if:subinterface" {
+    uses vlan-subinterface-top;
+  }
+
+  augment "/srl_nokia-if:interface" {
+    uses vlan-interface-top;
+  }
+}

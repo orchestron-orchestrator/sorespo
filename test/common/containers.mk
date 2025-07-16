@@ -32,16 +32,9 @@ $(addprefix platform-cli-,$(ROUTERS_FRR)):
 
 test:: test-ping
 
-# These test-ping-% recipes will "install" themselves for all PE routers too.
-# Pretty sure pinging the customer loopback from the default VRF in core does
-# not work, but these are internal helpers anyway ...
-$(addprefix test-ping-,$(ROUTERS_CRPD) $(ROUTERS_FRR)):
+$(addprefix test-ping-,$(ROUTERS_FRR)):
 # brew install coreutils on MacOS
-	timeout --foreground 10s bash -c "until docker exec -t $(TESTENV)-$(@:test-ping-%=%) ping -c 1 -W 1 $(IP); do sleep 1; done"
-
-$(addprefix test-ping-,$(ROUTERS_XR)):
-# brew install coreutils on MacOS
-	timeout --foreground 10s bash -c "until docker exec -t $(TESTENV)-$(@:test-ping-%=%) ip netns exec global-vrf ping -c 1 -W 1 $(IP); do sleep 1; done"
+	timeout --foreground 10s bash -c "until docker exec -t $(TESTENV)-$(@:test-ping-%=%) ping -c 1 -W 1 -I $(SRC) $(IP); do sleep 1; done"
 
 .PHONY: test-ping
 test-ping:
@@ -49,7 +42,7 @@ test-ping:
 	@set -e; for i in 1 2 3 4; do \
 		for j in 1 2 3 4; do \
 			if [ $$i -ne $$j ]; then \
-				$(MAKE) test-ping-cust-$$i IP=10.200.1.$$j; \
+				$(MAKE) test-ping-cust-$$i SRC=10.200.1.$$i IP=10.200.1.$$j; \
 			fi; \
 		done; \
 	done
