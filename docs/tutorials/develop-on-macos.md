@@ -66,8 +66,8 @@ modify the output configuration and optionally modifying the models.
 
 Let's first retrieve the current configuration on the `ams-core-1` router, we
 will do so by connecting to the router directly over NETCONF.
-In a new shell navigate to the `sorespo/test/quicklab-srl` directory and get
-the configuration:
+In a new shell navigate to the `sorespo/test/quicklab-srl`
+directory and get the configuration:
 ```shell
 cd sorespo/test/quicklab-srl
 make get-dev-config-ams-core-1 | sed -n '/<interface xmlns="urn:nokia.com:srlinux:chassis:interfaces">/,/<\/interface>/p'
@@ -125,8 +125,9 @@ class VrfInterface(base.VrfInterface):
             intf.vlan_tagging = True
 ```
 
-Now, modify `sorespo/src/sorespo/rfs.act` to set an interface description on VRF interfaces:
-```python
+Now, modify `sorespo/src/sorespo/rfs.act` to set an interface description on
+VRF interfaces:
+```diff
 class VrfInterface(base.VrfInterface):
     def transform(self, i, di):
         ...
@@ -138,7 +139,7 @@ class VrfInterface(base.VrfInterface):
             intf = dev.interface.create(main_intf)
             intf.admin_state = "enable"
             intf.vlan_tagging = True
-            intf.description = "VRF Interface for customer connections"
++           intf.description = "VRF Interface for customer connections"
 ```
 
 After you have saved the file to disk, you can re-build the SORESPO binary
@@ -172,11 +173,11 @@ make get-dev-config-ams-core-1 | sed -n '/<interface xmlns="urn:nokia.com:srlinu
 
 We can now see the interface description has been applied to each of the VRF
 interfaces on our routers:
-```xml
+```diff
 ...
 <interface xmlns="urn:nokia.com:srlinux:chassis:interfaces">
     <name>ethernet-1/3</name>
-    <description>VRF Interface for customer connections</description>
++   <description>VRF Interface for customer connections</description>
     <admin-state>enable</admin-state>
     <vlan-tagging xmlns="urn:nokia.com:srlinux:chassis:interfaces-vlans">true</vlan-tagging>
     <subinterface>
@@ -259,7 +260,7 @@ list vrf-interface {
 ```
 
 Modify the YANG module to add in the `mtu` leaf:
-```yang
+```diff
 ...
 list vrf-interface {
     key "name";
@@ -285,11 +286,11 @@ list vrf-interface {
         }
         default "30";
     }
-    leaf mtu {
-        type uint16 {
-            range "..9000";
-        }
-    }
++   leaf mtu {
++       type uint16 {
++           range "..9000";
++       }
++   }
 }
 ```
 
@@ -309,7 +310,7 @@ class L3Vpn(base.L3Vpn):
 ```
 
 Now, modify `sorespo/src/sorespo/inter.act` to set an MTU on VRF interfaces:
-```python
+```diff
 ...
 class L3Vpn(base.L3Vpn):
     def transform(self, i):
@@ -319,7 +320,7 @@ class L3Vpn(base.L3Vpn):
             vi.ipv4_address = ep.provider_ipv4_address
             vi.ipv4_prefix_length = ep.ipv4_prefix_length
             vi.vrf = i.name
-            vi.mtu = 1500
++           vi.mtu = 1500
 ```
 
 
@@ -357,7 +358,7 @@ make get-config2
 
 Part of the output will be a configuration instance for the `vrf-interface` on
 `ams-core-1`:
-```xml
+```diff
 ...
   <vrf-interface>
     <name>ethernet-1/3.100</name>
@@ -365,7 +366,7 @@ Part of the output will be a configuration instance for the `vrf-interface` on
     <vrf>acme-65501</vrf>
     <ipv4-address>10.201.1.1</ipv4-address>
     <ipv4-prefix-length>30</ipv4-prefix-length>
-    <mtu>1500</mtu>
++   <mtu>1500</mtu>
   </vrf-interface>
 ...
 ```
