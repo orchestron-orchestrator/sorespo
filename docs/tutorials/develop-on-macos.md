@@ -81,6 +81,7 @@ Part of the output is the VRF interface:
 <interface xmlns="urn:nokia.com:srlinux:chassis:interfaces">
     <name>ethernet-1/3</name>
     <admin-state>enable</admin-state>
+    <vlan-tagging xmlns="urn:nokia.com:srlinux:chassis:interfaces-vlans">true</vlan-tagging>
     <subinterface>
         <index>100</index>
         <description>Customer VPN access SITE-1 [SNA-1-1] in VPN acme-65501</description>
@@ -91,6 +92,13 @@ Part of the output is the VRF interface:
                 <ip-prefix>10.201.1.1/30</ip-prefix>
             </address>
         </ipv4>
+        <vlan xmlns="urn:nokia.com:srlinux:chassis:interfaces-vlans">
+            <encap>
+                <single-tagged>
+                    <vlan-id>100</vlan-id>
+                </single-tagged>
+            </encap>
+        </vlan>
     </subinterface>
 </interface>
 ...
@@ -114,6 +122,7 @@ class VrfInterface(base.VrfInterface):
             # Create the main interface
             intf = dev.interface.create(main_intf)
             intf.admin_state = "enable"
+            intf.vlan_tagging = True
 ```
 
 Now, modify `sorespo/src/sorespo/rfs.act` to set an interface description on VRF interfaces:
@@ -128,6 +137,7 @@ class VrfInterface(base.VrfInterface):
             # Create the main interface
             intf = dev.interface.create(main_intf)
             intf.admin_state = "enable"
+            intf.vlan_tagging = True
             intf.description = "VRF Interface for customer connections"
 ```
 
@@ -166,8 +176,9 @@ interfaces on our routers:
 ...
 <interface xmlns="urn:nokia.com:srlinux:chassis:interfaces">
     <name>ethernet-1/3</name>
-    <admin-state>enable</admin-state>
     <description>VRF Interface for customer connections</description>
+    <admin-state>enable</admin-state>
+    <vlan-tagging xmlns="urn:nokia.com:srlinux:chassis:interfaces-vlans">true</vlan-tagging>
     <subinterface>
         <index>100</index>
         <description>Customer VPN access SITE-1 [SNA-1-1] in VPN acme-65501</description>
@@ -178,6 +189,13 @@ interfaces on our routers:
                 <ip-prefix>10.201.1.1/30</ip-prefix>
             </address>
         </ipv4>
+        <vlan xmlns="urn:nokia.com:srlinux:chassis:interfaces-vlans">
+            <encap>
+                <single-tagged>
+                    <vlan-id>100</vlan-id>
+                </single-tagged>
+            </encap>
+        </vlan>
     </subinterface>
 </interface>
 ...
