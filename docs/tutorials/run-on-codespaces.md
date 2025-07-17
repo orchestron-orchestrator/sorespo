@@ -512,7 +512,7 @@ this layer vendor proprietary and locaed in per-device/version directories:
 
 * For Cisco IOS-XR: `sorespo/gen/yang/CiscoIosXr_24_1_ncs55a1`
 * For Jupiper JUNOS: `JuniperCRPD_23_4R1_9`
-* For Nokia SR-Linux `NokiaSRLinux_25_3_2`
+* For Nokia SR-Linux: `NokiaSRLinux_25_3_2`
 
 ```
 make get-config3
