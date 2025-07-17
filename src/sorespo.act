@@ -30,9 +30,6 @@ import sorespo.sysspec
 
 import testing
 
-def optional_str[T](v: ?T, default: str = "None") -> str:
-    return str(v) if v is not None else default
-
 def rfs_for_device(dev):
     return yang.gdata.Container({
         'rfs': yang.gdata.List(["name"], [
@@ -58,7 +55,7 @@ def adata_for_layer(layer, gdata):
         # manager or the device configuration. Here we return the device manager tree.
         return sorespo.layers.y_3_loose.root.from_gdata(gdata)
     else:
-        raise ValueError("Invalid layer: %d" % layer)
+        raise ValueError("Invalid layer: {layer}")
 
 actor main(env):
     rfcap = file.ReadFileCap(file.FileCap(env.cap))
@@ -120,7 +117,7 @@ actor main(env):
                             respond(404, {}, "Not found")
                             return
                     except Exception as e:
-                        respond(400, {}, "Error getting service order: %s" % str(e))
+                        respond(400, {}, "Error getting service order: {e}")
                         return
 
             # POST /tmf-api/serviceOrdering/v4/serviceOrder
@@ -135,7 +132,7 @@ actor main(env):
                             session.edit_config(sr_diff, config_done)
                         return
                     except Exception as e:
-                        respond(400, {}, "Error creating service order: %s" % str(e))
+                        respond(400, {}, "Error creating service order: {e}")
                         return
 
             # no more tmf-api
@@ -156,7 +153,7 @@ actor main(env):
                         txt = r"{"
                         modset, modset_id = dev.get_modules()
                         for mod in modset.values():
-                            txt += r'{"name": %s, "namespace": %s, "revision": %s, "feature": %s}, ' % (mod.name, mod.namespace, optional_str(mod.revision), optional_str(mod.feature))
+                            txt += '{{"name": {mod.name}, "namespace": {mod.namespace}, "revision": {mod.revision}, "feature": {mod.feature}}}, '
                         txt += r"}"
                         respond(200, {}, txt)
                         return
@@ -259,7 +256,7 @@ actor main(env):
                         xml_in = xml.decode(request.body.decode())
                         input_config = cfs_layer.from_xml(xml_in)
                     except Exception as e:
-                        respond(400, {}, "Error parsing XML: %s" % str(e))
+                        respond(400, {}, "Error parsing XML: {e}")
                         return
                 else:
                     respond(415, {}, "Unsupported media type")
@@ -282,7 +279,7 @@ actor main(env):
             return
 
     def _on_http_server_error(server, error):
-        print("Error: %s" % error)
+        print("Error: {error}")
 
     server = http.Listener(tcpl_cap, "0.0.0.0", 80, _on_http_accept, log_handler=logh_http)
 
@@ -326,7 +323,7 @@ actor main(env):
                 try:
                     configs.append((filename=filename, config=xml.decode(nb_input.decode())))
                 except Exception as e:
-                    print("Error reading config file %s: %s" % (filename, str(e)))
+                    print("Error reading config file {filename}: {e}")
                     env.exit(1)
 
         # start to apply..
