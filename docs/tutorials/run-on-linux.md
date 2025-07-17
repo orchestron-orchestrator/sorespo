@@ -322,7 +322,8 @@ links to customer's sites, as follows:
 
 In SORESPO, the next layer down is the *Intermediate* layer. At this layer,
 the implemented YANG modules are less abstracted than at `layer0`. Additional
-parameters are calculated by the service automation. 
+parameters are calculated by the service automation. The YANG modules for `layer1` are
+located in `sorespo/gen/yang/inter`.
 
 The `layer1` configuration can be retrieved with the following command:
 
@@ -424,6 +425,8 @@ type's YANG models and versions, or other device management protocol
 integrations can be added without needing to make any changes to the
 Intermediate or CFS layers above.
 
+The YANG modules for `layer2` are located in `sorespo/gen/yang/rfs`.
+
 At this layer, there is an instance of `<device>` container per managed device
 and a corresponding `<rfs>` container defining the devices SORESPO is
 managing and the RFS services that SORESPO defines.
@@ -504,7 +507,12 @@ Which gives the following output:
 
 #### Configuration at Layer 3 - The Device Layer
 
-At this layer, we have the vendor's device specific YANG models. 
+At this layer, we have the vendor's device specific YANG models. The YANG modules for 
+this layer vendor proprietary and locaed in per-device/version directories:
+
+* For Cisco IOS-XR: `sorespo/gen/yang/CiscoIosXr_24_1_ncs55a1`
+* For Jupiper JUNOS: `JuniperCRPD_23_4R1_9`
+* For Nokia SR-Linux `NokiaSRLinux_25_3_2`
 
 ```
 make get-config3
