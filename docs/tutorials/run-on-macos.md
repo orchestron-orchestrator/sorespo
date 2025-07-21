@@ -181,7 +181,7 @@ For many common queries and tasks, `make` targets are implemented to send the
 relevant RESTCONF requests. 
 
 
-### Configuration at Layer 0 - Cuustomer Facing Service (CFS)
+### Configuration at Layer 0 - Customer Facing Service (CFS)
 
 The Customer Facing Service (top-level) YANG model defines SORESPO's northbound
 interface for users and/or BSS/OSS platforms. The YANG modules for `layer0` are
