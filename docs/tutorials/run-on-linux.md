@@ -131,7 +131,7 @@ make cli-ams-core-1
 On the SR Linux CLI issue the following commands:
 ```
 / show network-instance default protocols bgp neighbor
-/ ping network-instance default 10.0.0.2
+ping network-instance default 10.0.0.2
 ```
 
 These commands show that the loopback addresses are reachable and iBGP has been
