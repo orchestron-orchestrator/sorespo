@@ -244,29 +244,37 @@ actor main(env):
                 return
             respond(404, {}, "")
             return
+
         elif request.method in {"POST", "PUT"}:
             path_segments = request.path.split("/")
             if len(path_segments) >= 1 and path_segments[1] == "restconf":
+                input_config = None
+
                 if request.headers.get("content-type") == "application/yang-data+json":
                     json_in = json.decode(request.body.decode())
                     p = split_restconf_path(request.path)[1:]
                     input_config = sorespo.layers.y_0.from_json_path(json_in, p)
-                    session = cfs.newsession()
-                    session.edit_config(input_config, config_done)
-                    return
                 elif request.headers.get("content-type") == "application/yang-data+xml":
                     try:
                         xml_in = xml.decode(request.body.decode())
                         input_config = cfs_layer.from_xml(xml_in)
-                        session = cfs.newsession()
-                        session.edit_config(input_config, config_done)
-                        return
                     except Exception as e:
                         respond(400, {}, "Error parsing XML: %s" % str(e))
                         return
                 else:
                     respond(415, {}, "Unsupported media type")
                     return
+
+                if input_config is not None:
+                    session = cfs.newsession()
+                    if bool(request.headers.get_def("await-device", "false")):
+                        log.info("Client wants to await device config push")
+                        session.edit_config(input_config, None, config_done)
+                    else:
+                        log.info("Client does not want to await device config push")
+                        session.edit_config(input_config, config_done)
+                    return
+
             respond(404, {}, "")
             return
         else:
@@ -284,24 +292,24 @@ actor main(env):
 
     def _conf_file(session):
 
-        def _conf_file_done(result):
+        def _conf_file_done(config, result):
             if isinstance(result, str):
-                print("Config file applied, waiting 3 seconds before applying the next..")
-                after 3: _conf_file(session)
+                log.info("Config file successfully applied", {"config_file": config.filename})
+                _conf_file(session)
             else:
-                print("Config file error", )
+                log.error("Error applying config file", {"config_file": config.filename})
 
-        # Grab te first config
-        print("Applying config file..")
         try:
-            xml_in = configs.pop(0)
-            input_config = cfs_layer.from_xml(xml_in)
-            session.edit_config(input_config, _conf_file_done)
+            config = configs.pop(0)
+            # Grab the first config
+            log.info("Applying config file...", {"config_file": config.filename})
+            input_config = cfs_layer.from_xml(config.config)
+            session.edit_config(input_config, None, lambda result: _conf_file_done(config, result))
         except IndexError:
-            print("All config files applied")
+            log.info("All config files applied")
             # TODO: exit_on_done.lower() once Acton bug is fixed!?
             if exit_on_done in ["1", "true", "yes"]:
-                print("No more config files to apply, exiting..")
+                log.info("No more config files to apply, exiting..")
                 after 3: _exit()
 
     def _exit():
@@ -316,7 +324,7 @@ actor main(env):
                 nb_input = await async f.read()
                 f.close()
                 try:
-                    configs.append(xml.decode(nb_input.decode()))
+                    configs.append((filename=filename, config=xml.decode(nb_input.decode())))
                 except Exception as e:
                     print("Error reading config file %s: %s" % (filename, str(e)))
                     env.exit(1)
