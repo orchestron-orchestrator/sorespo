@@ -39,6 +39,9 @@ make tutorial
 Orchestron/sorespo running..
 ```
 
+**It may take some time for everything to start up. Please wait until you 
+see the `Orchestron/sorespo running..` message before proceeding.**
+
 This will first start the entire SR Linux lab and finally run the SORESPO
 process interactively in this shell window. You will need to
 **open a second shell** to enter further commands and continue with the
@@ -67,6 +70,10 @@ cd sorespo/test/quicklab-srl
 FILE="tutorial-netinfra.xml" make send-config
 ```
 
+You will see a lot of configuration and other information scrolling past in 
+the main Orchestron window. Once the scrolling stops, the configuration is applied
+and you can proceed.
+
 Next we load in the top-level XML configuration for the customer's L3VPN
 service. This file describes the intent, which is all that is needed to
 configure a customer's VPN across all three core routers, and the access links
@@ -75,6 +82,9 @@ to the customer's sites.
 ```shell
 FILE="tutorial-l3vpn-svc.xml" make send-config 
 ```
+
+Once the configuration messages in the main Orchestron window stop scrolling, 
+you can proceed. 
 
 The resulting lab has three core SR Linux routers, each with an attached
 customer edge running FRRouting. This diagram shows the topology:
