@@ -7,13 +7,17 @@ build:
 build-ldep:
 	$(MAKE) build DEP_OVERRIDES="--dep netconf=../netconf --dep orchestron=../orchestron --dep yang=../acton-yang"
 
-.PHONY: build-linux
-build-linux:
+.PHONY: build-linux-x86_64
+build-linux-x86_64:
 	$(MAKE) build TARGET="--target x86_64-linux-gnu.2.27"
 
-.PHONY: build-aarch64
-build-aarch64:
+.PHONY: build-linux-aarch64
+build-linux-aarch64:
 	$(MAKE) build TARGET="--target aarch64-linux-gnu.2.27"
+
+.PHONY: build-macos-aarch64
+build-macos-aarch64:
+	$(MAKE) build TARGET="--target aarch64-macos"
 
 .PHONY: test
 test:

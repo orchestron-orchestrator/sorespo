@@ -149,11 +149,11 @@ SORESPO is running.
 Then in the same terminal window trigger a build.
 * If you are running macOS on Apple Silicon use:
 ```shell
-make -C ../../ build-aarch64
+make -C ../../ build-linux-aarch64
 ```
 * If you are running macOS on Intel use:
 ```shell
-make -C ../../ build-linux
+make -C ../../ build-linux-x86_64
 ```
 *NOTE*: With `-C ../../` we instruct `make` to run the `build-<arch>` recipe
 two levels up from the current directory, saving us the hassle of moving around in
@@ -337,11 +337,11 @@ make -C ../../ gen
 Then in the same terminal window trigger a build.
 * If you are running macOS on Apple Silicon use:
 ```shell
-make -C ../../ build-aarch64
+make -C ../../ build-linux-aarch64
 ```
 * If you are running macOS on Intel use:
 ```shell
-make -C ../../ build-linux
+make -C ../../ build-linux-x86_64
 ```
 
 After the build has completed you can copy your updated binary into the lab and

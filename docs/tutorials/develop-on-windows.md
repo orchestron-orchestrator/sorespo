@@ -157,9 +157,9 @@ SORESPO is running.
 
 Then in the same terminal window trigger a build:
 ```shell
-make -C ../../ build-linux
+make -C ../../ build-linux-x86_64
 ```
-*NOTE*: With `-C ../../` we instruct `make` to run the `build-linux` recipe
+*NOTE*: With `-C ../../` we instruct `make` to run the `build-linux-x86_64` recipe
 two levels up from the current directory, saving us the hassle of moving around in
 the directory structure.
 
@@ -340,7 +340,7 @@ make -C ../../ gen
 
 Then in the same terminal window trigger a build:
 ```shell
-make -C ../../ build-linux
+make -C ../../ build-linux-x86_64
 ```
 
 After the build has completed you can copy your updated binary into the lab and
