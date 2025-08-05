@@ -1,10 +1,13 @@
 import yang.adata
-from yang.common import Identityref
 import orchestron.ttt
 
 from sorespo.conf import IGBP_AUTHENTICATION_KEY
 import sorespo.layers.base_0 as base
 import sorespo.layers.y_1_loose
+import sorespo.layers.y_0 as y_0
+# TODO: this import is required by the compiler, maybe related to
+# https://github.com/actonlang/acton/issues/2390
+import yang.identityref
 
 class Router(base.Router):
     def transform(self, i):
@@ -71,7 +74,7 @@ class L3VpnSite(base.L3VpnSite):
                 o_ep.ipv4_prefix_length = ipv4_len
 
                 for rp in sna.routing_protocols.routing_protocol.elements:
-                    if rp.type == Identityref("bgp"):
+                    if rp.type == y_0.ietf_l3vpn_svc_bgp:
                         bgp = rp.bgp
                         if bgp is not None:
                             o_bgp = o_ep.create_bgp()
