@@ -3,14 +3,167 @@ import json
 import xml
 import yang.adata
 import yang.gdata
-from yang.common import Identityref
+from yang.identity import complete_and_validate_identityref
+from yang.identityref import Identityref, PartialIdentityref
+from yang.schema import DIdentity
 
 # == This file is generated ==
 
 
-mod_to_ns = {'srl_nokia-extensions':'urn:nokia.com:srlinux:general:extensions', 'srl_nokia-features':'urn:nokia.com:srlinux:general:features', 'srl_nokia-common':'urn:nokia.com:srlinux:general:common', 'srl_nokia-tunnel':'urn:nokia.com:srlinux:vxlan:tunnel', 'srl_nokia-system':'urn:nokia.com:srlinux:general:system', 'srl_nokia-if-ip':'urn:nokia.com:srlinux:chassis:if-ip', 'srl_nokia-interfaces':'urn:nokia.com:srlinux:chassis:interfaces', 'srl_nokia-network-instance':'urn:nokia.com:srlinux:net-inst:network-instance', 'srl_nokia-tunnel-interfaces':'urn:nokia.com:srlinux:vxlan:tunnel-interfaces', 'srl_nokia-system-protocols':'urn:nokia.com:srlinux:general:system-protocols', 'srl_nokia-system-name':'urn:nokia.com:srlinux:chassis:system-name', 'srl_nokia-policy-types':'urn:nokia.com:srlinux:general:policy-types', 'srl_nokia-isis-types':'urn:nokia.com:srlinux:general:isis-types', 'ietf-yang-types':'urn:ietf:params:xml:ns:yang:ietf-yang-types', 'srl_nokia-isis':'urn:nokia.com:srlinux:isis:isis', 'srl_nokia-interfaces-vlans':'urn:nokia.com:srlinux:chassis:interfaces-vlans', 'srl_nokia-bgp':'urn:nokia.com:srlinux:bgp:bgp', 'srl_nokia-bgp-vpn':'urn:nokia.com:srlinux:bgp:bgp-vpn', 'srl_nokia-bgp-evpn':'urn:nokia.com:srlinux:net-inst:bgp-evpn'}
-ns_to_mod = {'urn:nokia.com:srlinux:general:extensions':'srl_nokia-extensions', 'urn:nokia.com:srlinux:general:features':'srl_nokia-features', 'urn:nokia.com:srlinux:general:common':'srl_nokia-common', 'urn:nokia.com:srlinux:vxlan:tunnel':'srl_nokia-tunnel', 'urn:nokia.com:srlinux:general:system':'srl_nokia-system', 'urn:nokia.com:srlinux:chassis:if-ip':'srl_nokia-if-ip', 'urn:nokia.com:srlinux:chassis:interfaces':'srl_nokia-interfaces', 'urn:nokia.com:srlinux:net-inst:network-instance':'srl_nokia-network-instance', 'urn:nokia.com:srlinux:vxlan:tunnel-interfaces':'srl_nokia-tunnel-interfaces', 'urn:nokia.com:srlinux:general:system-protocols':'srl_nokia-system-protocols', 'urn:nokia.com:srlinux:chassis:system-name':'srl_nokia-system-name', 'urn:nokia.com:srlinux:general:policy-types':'srl_nokia-policy-types', 'urn:nokia.com:srlinux:general:isis-types':'srl_nokia-isis-types', 'urn:ietf:params:xml:ns:yang:ietf-yang-types':'ietf-yang-types', 'urn:nokia.com:srlinux:isis:isis':'srl_nokia-isis', 'urn:nokia.com:srlinux:chassis:interfaces-vlans':'srl_nokia-interfaces-vlans', 'urn:nokia.com:srlinux:bgp:bgp':'srl_nokia-bgp', 'urn:nokia.com:srlinux:bgp:bgp-vpn':'srl_nokia-bgp-vpn', 'urn:nokia.com:srlinux:net-inst:bgp-evpn':'srl_nokia-bgp-evpn'}
-prefix_to_mod = {'srl_nokia-ext':'srl_nokia-extensions', 'srl_nokia-feat':'srl_nokia-features', 'srl_nokia-comm':'srl_nokia-common', 'srl_nokia-tunnel':'srl_nokia-tunnel', 'srl_nokia-system':'srl_nokia-system', 'srl_nokia-if-ip':'srl_nokia-if-ip', 'srl_nokia-if':'srl_nokia-interfaces', 'srl_nokia-netinst':'srl_nokia-network-instance', 'srl_nokia-tunnel-if':'srl_nokia-tunnel-interfaces', 'srl_nokia-system-protocols':'srl_nokia-system-protocols', 'srl_nokia-system-name':'srl_nokia-system-name', 'srl_nokia-pol-types':'srl_nokia-policy-types', 'srl_nokia-isis-types':'srl_nokia-isis-types', 'yang':'ietf-yang-types', 'srl_nokia-isis':'srl_nokia-isis', 'srl_nokia-if-vlan':'srl_nokia-interfaces-vlans', 'srl_nokia-bgp':'srl_nokia-bgp', 'srl_nokia-bgp-vpn':'srl_nokia-bgp-vpn', 'srl_nokia-bgp-evpn':'srl_nokia-bgp-evpn'}
+_base_srl_nokia_common_ip_route_type = DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='ip-route-type', base=[])
+_base_srl_nokia_common_mpls_label_entry_type = DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='mpls-label-entry-type', base=[])
+_base_srl_nokia_common_tunnel_type = DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='tunnel-type', base=[])
+_base_srl_nokia_common_bgp_next_hop_resolution_tunnel_type = DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='bgp-next-hop-resolution-tunnel-type', base=[])
+_base_srl_nokia_common_routing_policy_protocol_match_type = DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='routing-policy-protocol-match-type', base=[])
+_base_srl_nokia_common_table_connection_protocol = DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='table-connection-protocol', base=[])
+_base_srl_nokia_common_bgp_address_family = DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='bgp-address-family', base=[])
+_base_srl_nokia_interfaces_si_type = DIdentity(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='si-type', base=[])
+_base_srl_nokia_interfaces_transceiver_functional_type = DIdentity(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='transceiver-functional-type', base=[])
+_base_srl_nokia_network_instance_ni_type = DIdentity(module='srl_nokia-network-instance', namespace='urn:nokia.com:srlinux:net-inst:network-instance', prefix='srl_nokia-netinst', name='ni-type', base=[])
+_base_srl_nokia_policy_types_bgp_well_known_community = DIdentity(module='srl_nokia-policy-types', namespace='urn:nokia.com:srlinux:general:policy-types', prefix='srl_nokia-pol-types', name='bgp-well-known-community', base=[])
+_identities = [
+    _base_srl_nokia_common_ip_route_type,
+    _base_srl_nokia_common_mpls_label_entry_type,
+    _base_srl_nokia_common_tunnel_type,
+    _base_srl_nokia_common_bgp_next_hop_resolution_tunnel_type,
+    _base_srl_nokia_common_routing_policy_protocol_match_type,
+    _base_srl_nokia_common_table_connection_protocol,
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='aggregate', base=[_base_srl_nokia_common_ip_route_type, _base_srl_nokia_common_routing_policy_protocol_match_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='arp-nd', base=[_base_srl_nokia_common_ip_route_type, _base_srl_nokia_common_routing_policy_protocol_match_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='bgp', base=[_base_srl_nokia_common_ip_route_type, _base_srl_nokia_common_mpls_label_entry_type, _base_srl_nokia_common_tunnel_type, _base_srl_nokia_common_bgp_next_hop_resolution_tunnel_type, _base_srl_nokia_common_routing_policy_protocol_match_type, _base_srl_nokia_common_table_connection_protocol]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='bgp-evpn', base=[_base_srl_nokia_common_ip_route_type, _base_srl_nokia_common_routing_policy_protocol_match_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='bgp-evpn-ifl-host', base=[_base_srl_nokia_common_ip_route_type, _base_srl_nokia_common_routing_policy_protocol_match_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='bgp-ipvpn', base=[_base_srl_nokia_common_ip_route_type, _base_srl_nokia_common_routing_policy_protocol_match_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='bgp-label', base=[_base_srl_nokia_common_ip_route_type, _base_srl_nokia_common_routing_policy_protocol_match_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='dhcp', base=[_base_srl_nokia_common_ip_route_type, _base_srl_nokia_common_routing_policy_protocol_match_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='esi', base=[_base_srl_nokia_common_mpls_label_entry_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='pseudowire', base=[_base_srl_nokia_common_mpls_label_entry_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='gribi', base=[_base_srl_nokia_common_ip_route_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='host', base=[_base_srl_nokia_common_ip_route_type, _base_srl_nokia_common_routing_policy_protocol_match_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='ip-in-ip', base=[_base_srl_nokia_common_tunnel_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='gre', base=[_base_srl_nokia_common_tunnel_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='isis', base=[_base_srl_nokia_common_ip_route_type, _base_srl_nokia_common_routing_policy_protocol_match_type, _base_srl_nokia_common_table_connection_protocol]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='local', base=[_base_srl_nokia_common_ip_route_type, _base_srl_nokia_common_routing_policy_protocol_match_type, _base_srl_nokia_common_table_connection_protocol]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='ldp', base=[_base_srl_nokia_common_mpls_label_entry_type, _base_srl_nokia_common_tunnel_type, _base_srl_nokia_common_bgp_next_hop_resolution_tunnel_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='linux', base=[_base_srl_nokia_common_ip_route_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='ndk1', base=[_base_srl_nokia_common_ip_route_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='ndk2', base=[_base_srl_nokia_common_ip_route_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='network-instance', base=[_base_srl_nokia_common_mpls_label_entry_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='ospfv2', base=[_base_srl_nokia_common_ip_route_type, _base_srl_nokia_common_routing_policy_protocol_match_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='ospfv3', base=[_base_srl_nokia_common_ip_route_type, _base_srl_nokia_common_routing_policy_protocol_match_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='sr-isis', base=[_base_srl_nokia_common_tunnel_type, _base_srl_nokia_common_bgp_next_hop_resolution_tunnel_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='sr-ospfv2', base=[_base_srl_nokia_common_tunnel_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='sr-ospfv3', base=[_base_srl_nokia_common_tunnel_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='sr-mpls', base=[_base_srl_nokia_common_mpls_label_entry_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='sr-submgmt', base=[_base_srl_nokia_common_ip_route_type, _base_srl_nokia_common_routing_policy_protocol_match_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='te-policy-sr-mpls-colored', base=[_base_srl_nokia_common_tunnel_type, _base_srl_nokia_common_bgp_next_hop_resolution_tunnel_type, _base_srl_nokia_common_mpls_label_entry_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='te-policy-sr-mpls-uncolored', base=[_base_srl_nokia_common_tunnel_type, _base_srl_nokia_common_bgp_next_hop_resolution_tunnel_type, _base_srl_nokia_common_mpls_label_entry_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='static', base=[_base_srl_nokia_common_ip_route_type, _base_srl_nokia_common_routing_policy_protocol_match_type, _base_srl_nokia_common_table_connection_protocol]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='static-mpls', base=[_base_srl_nokia_common_mpls_label_entry_type]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='vxlan', base=[_base_srl_nokia_common_tunnel_type]),
+    _base_srl_nokia_common_bgp_address_family,
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='ipv4-unicast', base=[_base_srl_nokia_common_bgp_address_family]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='ipv6-unicast', base=[_base_srl_nokia_common_bgp_address_family]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='l3vpn-ipv4-unicast', base=[_base_srl_nokia_common_bgp_address_family]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='l3vpn-ipv6-unicast', base=[_base_srl_nokia_common_bgp_address_family]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='ipv4-labeled-unicast', base=[_base_srl_nokia_common_bgp_address_family]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='ipv6-labeled-unicast', base=[_base_srl_nokia_common_bgp_address_family]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='evpn', base=[_base_srl_nokia_common_bgp_address_family]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='route-target', base=[_base_srl_nokia_common_bgp_address_family]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='srte-policy-ipv4', base=[_base_srl_nokia_common_bgp_address_family]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='srte-policy-ipv6', base=[_base_srl_nokia_common_bgp_address_family]),
+    DIdentity(module='srl_nokia-common', namespace='urn:nokia.com:srlinux:general:common', prefix='srl_nokia-comm', name='link-state', base=[_base_srl_nokia_common_bgp_address_family]),
+    _base_srl_nokia_interfaces_si_type,
+    DIdentity(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='routed', base=[_base_srl_nokia_interfaces_si_type]),
+    DIdentity(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='bridged', base=[_base_srl_nokia_interfaces_si_type]),
+    DIdentity(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='local-mirror-dest', base=[_base_srl_nokia_interfaces_si_type]),
+    _base_srl_nokia_interfaces_transceiver_functional_type,
+    DIdentity(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='standard', base=[_base_srl_nokia_interfaces_transceiver_functional_type]),
+    DIdentity(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='digital-coherent-optics', base=[_base_srl_nokia_interfaces_transceiver_functional_type]),
+    DIdentity(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='optical-line-system', base=[_base_srl_nokia_interfaces_transceiver_functional_type]),
+    _base_srl_nokia_network_instance_ni_type,
+    DIdentity(module='srl_nokia-network-instance', namespace='urn:nokia.com:srlinux:net-inst:network-instance', prefix='srl_nokia-netinst', name='host', base=[_base_srl_nokia_network_instance_ni_type]),
+    DIdentity(module='srl_nokia-network-instance', namespace='urn:nokia.com:srlinux:net-inst:network-instance', prefix='srl_nokia-netinst', name='default', base=[_base_srl_nokia_network_instance_ni_type]),
+    DIdentity(module='srl_nokia-network-instance', namespace='urn:nokia.com:srlinux:net-inst:network-instance', prefix='srl_nokia-netinst', name='ip-vrf', base=[_base_srl_nokia_network_instance_ni_type]),
+    DIdentity(module='srl_nokia-network-instance', namespace='urn:nokia.com:srlinux:net-inst:network-instance', prefix='srl_nokia-netinst', name='mac-vrf', base=[_base_srl_nokia_network_instance_ni_type]),
+    DIdentity(module='srl_nokia-network-instance', namespace='urn:nokia.com:srlinux:net-inst:network-instance', prefix='srl_nokia-netinst', name='vpws', base=[_base_srl_nokia_network_instance_ni_type]),
+    _base_srl_nokia_policy_types_bgp_well_known_community,
+    DIdentity(module='srl_nokia-policy-types', namespace='urn:nokia.com:srlinux:general:policy-types', prefix='srl_nokia-pol-types', name='no-export', base=[_base_srl_nokia_policy_types_bgp_well_known_community]),
+    DIdentity(module='srl_nokia-policy-types', namespace='urn:nokia.com:srlinux:general:policy-types', prefix='srl_nokia-pol-types', name='no-advertise', base=[_base_srl_nokia_policy_types_bgp_well_known_community]),
+    DIdentity(module='srl_nokia-policy-types', namespace='urn:nokia.com:srlinux:general:policy-types', prefix='srl_nokia-pol-types', name='no-export-subconfed', base=[_base_srl_nokia_policy_types_bgp_well_known_community]),
+]
+
+
+# Identityref constants
+srl_nokia_common_ip_route_type = Identityref('ip-route-type', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_mpls_label_entry_type = Identityref('mpls-label-entry-type', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_tunnel_type = Identityref('tunnel-type', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_bgp_next_hop_resolution_tunnel_type = Identityref('bgp-next-hop-resolution-tunnel-type', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_routing_policy_protocol_match_type = Identityref('routing-policy-protocol-match-type', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_table_connection_protocol = Identityref('table-connection-protocol', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_aggregate = Identityref('aggregate', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_arp_nd = Identityref('arp-nd', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_bgp = Identityref('bgp', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_bgp_evpn = Identityref('bgp-evpn', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_bgp_evpn_ifl_host = Identityref('bgp-evpn-ifl-host', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_bgp_ipvpn = Identityref('bgp-ipvpn', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_bgp_label = Identityref('bgp-label', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_dhcp = Identityref('dhcp', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_esi = Identityref('esi', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_pseudowire = Identityref('pseudowire', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_gribi = Identityref('gribi', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_host = Identityref('host', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_ip_in_ip = Identityref('ip-in-ip', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_gre = Identityref('gre', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_isis = Identityref('isis', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_local = Identityref('local', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_ldp = Identityref('ldp', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_linux = Identityref('linux', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_ndk1 = Identityref('ndk1', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_ndk2 = Identityref('ndk2', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_network_instance = Identityref('network-instance', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_ospfv2 = Identityref('ospfv2', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_ospfv3 = Identityref('ospfv3', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_sr_isis = Identityref('sr-isis', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_sr_ospfv2 = Identityref('sr-ospfv2', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_sr_ospfv3 = Identityref('sr-ospfv3', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_sr_mpls = Identityref('sr-mpls', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_sr_submgmt = Identityref('sr-submgmt', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_te_policy_sr_mpls_colored = Identityref('te-policy-sr-mpls-colored', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_te_policy_sr_mpls_uncolored = Identityref('te-policy-sr-mpls-uncolored', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_static = Identityref('static', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_static_mpls = Identityref('static-mpls', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_vxlan = Identityref('vxlan', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_bgp_address_family = Identityref('bgp-address-family', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_ipv4_unicast = Identityref('ipv4-unicast', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_ipv6_unicast = Identityref('ipv6-unicast', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_l3vpn_ipv4_unicast = Identityref('l3vpn-ipv4-unicast', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_l3vpn_ipv6_unicast = Identityref('l3vpn-ipv6-unicast', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_ipv4_labeled_unicast = Identityref('ipv4-labeled-unicast', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_ipv6_labeled_unicast = Identityref('ipv6-labeled-unicast', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_evpn = Identityref('evpn', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_route_target = Identityref('route-target', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_srte_policy_ipv4 = Identityref('srte-policy-ipv4', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_srte_policy_ipv6 = Identityref('srte-policy-ipv6', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_common_link_state = Identityref('link-state', ns='urn:nokia.com:srlinux:general:common', mod='srl_nokia-common', pfx='srl_nokia-comm')
+srl_nokia_interfaces_si_type = Identityref('si-type', ns='urn:nokia.com:srlinux:chassis:interfaces', mod='srl_nokia-interfaces', pfx='srl_nokia-if')
+srl_nokia_interfaces_routed = Identityref('routed', ns='urn:nokia.com:srlinux:chassis:interfaces', mod='srl_nokia-interfaces', pfx='srl_nokia-if')
+srl_nokia_interfaces_bridged = Identityref('bridged', ns='urn:nokia.com:srlinux:chassis:interfaces', mod='srl_nokia-interfaces', pfx='srl_nokia-if')
+srl_nokia_interfaces_local_mirror_dest = Identityref('local-mirror-dest', ns='urn:nokia.com:srlinux:chassis:interfaces', mod='srl_nokia-interfaces', pfx='srl_nokia-if')
+srl_nokia_interfaces_transceiver_functional_type = Identityref('transceiver-functional-type', ns='urn:nokia.com:srlinux:chassis:interfaces', mod='srl_nokia-interfaces', pfx='srl_nokia-if')
+srl_nokia_interfaces_standard = Identityref('standard', ns='urn:nokia.com:srlinux:chassis:interfaces', mod='srl_nokia-interfaces', pfx='srl_nokia-if')
+srl_nokia_interfaces_digital_coherent_optics = Identityref('digital-coherent-optics', ns='urn:nokia.com:srlinux:chassis:interfaces', mod='srl_nokia-interfaces', pfx='srl_nokia-if')
+srl_nokia_interfaces_optical_line_system = Identityref('optical-line-system', ns='urn:nokia.com:srlinux:chassis:interfaces', mod='srl_nokia-interfaces', pfx='srl_nokia-if')
+srl_nokia_network_instance_ni_type = Identityref('ni-type', ns='urn:nokia.com:srlinux:net-inst:network-instance', mod='srl_nokia-network-instance', pfx='srl_nokia-netinst')
+srl_nokia_network_instance_host = Identityref('host', ns='urn:nokia.com:srlinux:net-inst:network-instance', mod='srl_nokia-network-instance', pfx='srl_nokia-netinst')
+srl_nokia_network_instance_default = Identityref('default', ns='urn:nokia.com:srlinux:net-inst:network-instance', mod='srl_nokia-network-instance', pfx='srl_nokia-netinst')
+srl_nokia_network_instance_ip_vrf = Identityref('ip-vrf', ns='urn:nokia.com:srlinux:net-inst:network-instance', mod='srl_nokia-network-instance', pfx='srl_nokia-netinst')
+srl_nokia_network_instance_mac_vrf = Identityref('mac-vrf', ns='urn:nokia.com:srlinux:net-inst:network-instance', mod='srl_nokia-network-instance', pfx='srl_nokia-netinst')
+srl_nokia_network_instance_vpws = Identityref('vpws', ns='urn:nokia.com:srlinux:net-inst:network-instance', mod='srl_nokia-network-instance', pfx='srl_nokia-netinst')
+srl_nokia_policy_types_bgp_well_known_community = Identityref('bgp-well-known-community', ns='urn:nokia.com:srlinux:general:policy-types', mod='srl_nokia-policy-types', pfx='srl_nokia-pol-types')
+srl_nokia_policy_types_no_export = Identityref('no-export', ns='urn:nokia.com:srlinux:general:policy-types', mod='srl_nokia-policy-types', pfx='srl_nokia-pol-types')
+srl_nokia_policy_types_no_advertise = Identityref('no-advertise', ns='urn:nokia.com:srlinux:general:policy-types', mod='srl_nokia-policy-types', pfx='srl_nokia-pol-types')
+srl_nokia_policy_types_no_export_subconfed = Identityref('no-export-subconfed', ns='urn:nokia.com:srlinux:general:policy-types', mod='srl_nokia-policy-types', pfx='srl_nokia-pol-types')
 
 
 class srl_nokia_tunnel__tunnel(yang.adata.MNode):
@@ -378,7 +531,9 @@ class srl_nokia_system__system(yang.adata.MNode):
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
-        children['trace-options'] = yang.gdata.LeafList('enumeration', self.trace_options)
+        _trace_options = self.trace_options
+        if _trace_options is not None:
+            children['trace-options'] = yang.gdata.LeafList('enumeration', _trace_options)
         _management = self.management
         if _management is not None:
             children['management'] = _management.to_gdata()
@@ -457,9 +612,12 @@ mut def from_xml_srl_nokia_interfaces__interface__mtu(val: value) -> yang.gdata.
 mut def from_xml_srl_nokia_interfaces__interface__subinterface__index(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('uint32', val)
 
-mut def from_xml_srl_nokia_interfaces__interface__subinterface__type(val: Identityref) -> yang.gdata.Leaf:
-    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
-    return yang.gdata.Leaf('identityref', new_val)
+mut def from_xml_srl_nokia_interfaces__interface__subinterface__type(val: PartialIdentityref) -> yang.gdata.Leaf:
+    new_val, error = complete_and_validate_identityref(val, _identities, ['srl_nokia-if:si-type'], 'srl_nokia-interfaces')
+    if new_val is not None:
+        return yang.gdata.Leaf('identityref', new_val)
+    else:
+        raise ValueError('Invalid value for identityref leaf type: {error}')
 
 mut def from_xml_srl_nokia_interfaces__interface__subinterface__description(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
@@ -1073,6 +1231,11 @@ class srl_nokia_interfaces__interface__subinterface_entry(yang.adata.MNode):
             children['index'] = yang.gdata.Leaf('uint32', _index)
         _type = self.type
         if _type is not None:
+            _identityref_type, error = complete_and_validate_identityref(_type, _identities, ['srl_nokia-if:si-type'], 'srl_nokia-interfaces')
+            if _identityref_type is not None:
+                _type = _identityref_type
+            else:
+                raise ValueError('Invalid value for identityref leaf type: {error}')
             children['type'] = yang.gdata.Leaf('identityref', _type)
         _description = self.description
         if _description is not None:
@@ -1343,9 +1506,12 @@ mut def from_xml_srl_nokia_interfaces__interface(nodes: list[xml.Node]) -> yang.
 mut def from_xml_srl_nokia_network_instance__network_instance__name(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__type(val: Identityref) -> yang.gdata.Leaf:
-    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
-    return yang.gdata.Leaf('identityref', new_val)
+mut def from_xml_srl_nokia_network_instance__network_instance__type(val: PartialIdentityref) -> yang.gdata.Leaf:
+    new_val, error = complete_and_validate_identityref(val, _identities, ['srl_nokia-netinst:ni-type'], 'srl_nokia-network-instance')
+    if new_val is not None:
+        return yang.gdata.Leaf('identityref', new_val)
+    else:
+        raise ValueError('Invalid value for identityref leaf type: {error}')
 
 mut def from_xml_srl_nokia_network_instance__network_instance__admin_state(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('enumeration', val)
@@ -4040,7 +4206,9 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance_en
         _instance_id = self.instance_id
         if _instance_id is not None:
             children['instance-id'] = yang.gdata.Leaf('uint32', _instance_id)
-        children['net'] = yang.gdata.LeafList('string', self.net)
+        _net = self.net
+        if _net is not None:
+            children['net'] = yang.gdata.LeafList('string', _net)
         _level_capability = self.level_capability
         if _level_capability is not None:
             children['level-capability'] = yang.gdata.Leaf('enumeration', _level_capability)
@@ -4561,9 +4729,12 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__e
     yang.gdata.maybe_add(children, 'export-reject-all', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__ebgp_default_policy__export_reject_all, child_export_reject_all)
     return yang.gdata.Container(children)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__afi_safi_name(val: Identityref) -> yang.gdata.Leaf:
-    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
-    return yang.gdata.Leaf('identityref', new_val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__afi_safi_name(val: PartialIdentityref) -> yang.gdata.Leaf:
+    new_val, error = complete_and_validate_identityref(val, _identities, ['srl_nokia-comm:bgp-address-family'], 'srl_nokia-bgp')
+    if new_val is not None:
+        return yang.gdata.Leaf('identityref', new_val)
+    else:
+        raise ValueError('Invalid value for identityref leaf afi-safi-name: {error}')
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi__admin_state(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('enumeration', val)
@@ -4581,6 +4752,11 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_ent
         children = {}
         _afi_safi_name = self.afi_safi_name
         if _afi_safi_name is not None:
+            _identityref_afi_safi_name, error = complete_and_validate_identityref(_afi_safi_name, _identities, ['srl_nokia-comm:bgp-address-family'], 'srl_nokia-bgp')
+            if _identityref_afi_safi_name is not None:
+                _afi_safi_name = _identityref_afi_safi_name
+            else:
+                raise ValueError('Invalid value for identityref leaf afi-safi-name: {error}')
             children['afi-safi-name'] = yang.gdata.Leaf('identityref', _afi_safi_name)
         _admin_state = self.admin_state
         if _admin_state is not None:
@@ -4713,9 +4889,12 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__p
     yang.gdata.maybe_add(children, 'ibgp', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__preference__ibgp, child_ibgp)
     return yang.gdata.Container(children)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__rib_management__table__address_family(val: Identityref) -> yang.gdata.Leaf:
-    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
-    return yang.gdata.Leaf('identityref', new_val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__rib_management__table__address_family(val: PartialIdentityref) -> yang.gdata.Leaf:
+    new_val, error = complete_and_validate_identityref(val, _identities, ['srl_nokia-comm:bgp-address-family'], 'srl_nokia-bgp')
+    if new_val is not None:
+        return yang.gdata.Leaf('identityref', new_val)
+    else:
+        raise ValueError('Invalid value for identityref leaf address-family: {error}')
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__rib_management__table__route_table_import(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('leafref', val)
@@ -4733,6 +4912,11 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__rib_manageme
         children = {}
         _address_family = self.address_family
         if _address_family is not None:
+            _identityref_address_family, error = complete_and_validate_identityref(_address_family, _identities, ['srl_nokia-comm:bgp-address-family'], 'srl_nokia-bgp')
+            if _identityref_address_family is not None:
+                _address_family = _identityref_address_family
+            else:
+                raise ValueError('Invalid value for identityref leaf address-family: {error}')
             children['address-family'] = yang.gdata.Leaf('identityref', _address_family)
         _route_table_import = self.route_table_import
         if _route_table_import is not None:
@@ -5577,9 +5761,12 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__g
     yang.gdata.maybe_add(children, 'maximum-hops', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__group__multihop__maximum_hops, child_maximum_hops)
     return yang.gdata.Container(children)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__afi_safi_name(val: Identityref) -> yang.gdata.Leaf:
-    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
-    return yang.gdata.Leaf('identityref', new_val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__afi_safi_name(val: PartialIdentityref) -> yang.gdata.Leaf:
+    new_val, error = complete_and_validate_identityref(val, _identities, ['srl_nokia-comm:bgp-address-family'], 'srl_nokia-bgp')
+    if new_val is not None:
+        return yang.gdata.Leaf('identityref', new_val)
+    else:
+        raise ValueError('Invalid value for identityref leaf afi-safi-name: {error}')
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi__admin_state(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('enumeration', val)
@@ -5597,6 +5784,11 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_s
         children = {}
         _afi_safi_name = self.afi_safi_name
         if _afi_safi_name is not None:
+            _identityref_afi_safi_name, error = complete_and_validate_identityref(_afi_safi_name, _identities, ['srl_nokia-comm:bgp-address-family'], 'srl_nokia-bgp')
+            if _identityref_afi_safi_name is not None:
+                _afi_safi_name = _identityref_afi_safi_name
+            else:
+                raise ValueError('Invalid value for identityref leaf afi-safi-name: {error}')
             children['afi-safi-name'] = yang.gdata.Leaf('identityref', _afi_safi_name)
         _admin_state = self.admin_state
         if _admin_state is not None:
@@ -6584,9 +6776,12 @@ mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__n
     yang.gdata.maybe_add(children, 'maximum-hops', from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__multihop__maximum_hops, child_maximum_hops)
     return yang.gdata.Container(children)
 
-mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__afi_safi_name(val: Identityref) -> yang.gdata.Leaf:
-    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
-    return yang.gdata.Leaf('identityref', new_val)
+mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__afi_safi_name(val: PartialIdentityref) -> yang.gdata.Leaf:
+    new_val, error = complete_and_validate_identityref(val, _identities, ['srl_nokia-comm:bgp-address-family'], 'srl_nokia-bgp')
+    if new_val is not None:
+        return yang.gdata.Leaf('identityref', new_val)
+    else:
+        raise ValueError('Invalid value for identityref leaf afi-safi-name: {error}')
 
 mut def from_xml_srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi__admin_state(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('enumeration', val)
@@ -6604,6 +6799,11 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__af
         children = {}
         _afi_safi_name = self.afi_safi_name
         if _afi_safi_name is not None:
+            _identityref_afi_safi_name, error = complete_and_validate_identityref(_afi_safi_name, _identities, ['srl_nokia-comm:bgp-address-family'], 'srl_nokia-bgp')
+            if _identityref_afi_safi_name is not None:
+                _afi_safi_name = _identityref_afi_safi_name
+            else:
+                raise ValueError('Invalid value for identityref leaf afi-safi-name: {error}')
             children['afi-safi-name'] = yang.gdata.Leaf('identityref', _afi_safi_name)
         _admin_state = self.admin_state
         if _admin_state is not None:
@@ -8032,6 +8232,11 @@ class srl_nokia_network_instance__network_instance_entry(yang.adata.MNode):
             children['name'] = yang.gdata.Leaf('string', _name)
         _type = self.type
         if _type is not None:
+            _identityref_type, error = complete_and_validate_identityref(_type, _identities, ['srl_nokia-netinst:ni-type'], 'srl_nokia-network-instance')
+            if _identityref_type is not None:
+                _type = _identityref_type
+            else:
+                raise ValueError('Invalid value for identityref leaf type: {error}')
             children['type'] = yang.gdata.Leaf('identityref', _type)
         _admin_state = self.admin_state
         if _admin_state is not None:
@@ -8164,9 +8369,12 @@ mut def from_xml_srl_nokia_tunnel_interfaces__tunnel_interface__name(val: value)
 mut def from_xml_srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__index(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('uint32', val)
 
-mut def from_xml_srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__type(val: Identityref) -> yang.gdata.Leaf:
-    new_val = Identityref.complete(val, ns_to_mod, mod_to_ns)
-    return yang.gdata.Leaf('identityref', new_val)
+mut def from_xml_srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__type(val: PartialIdentityref) -> yang.gdata.Leaf:
+    new_val, error = complete_and_validate_identityref(val, _identities, ['srl_nokia-if:si-type'], 'srl_nokia-tunnel-interfaces')
+    if new_val is not None:
+        return yang.gdata.Leaf('identityref', new_val)
+    else:
+        raise ValueError('Invalid value for identityref leaf type: {error}')
 
 mut def from_xml_srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress__vni(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('uint32', val)
@@ -8232,6 +8440,11 @@ class srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry(yang.
             children['index'] = yang.gdata.Leaf('uint32', _index)
         _type = self.type
         if _type is not None:
+            _identityref_type, error = complete_and_validate_identityref(_type, _identities, ['srl_nokia-if:si-type'], 'srl_nokia-tunnel-interfaces')
+            if _identityref_type is not None:
+                _type = _identityref_type
+            else:
+                raise ValueError('Invalid value for identityref leaf type: {error}')
             children['type'] = yang.gdata.Leaf('identityref', _type)
         _ingress = self.ingress
         if _ingress is not None:
