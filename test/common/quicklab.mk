@@ -139,8 +139,16 @@ $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL) $(ROUTERS_FRR)): c
 $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 	docker run $(INTERACTIVE) --rm --network container:$(TESTENV)-otron ghcr.io/notconf/notconf:debug netconf-console2 --host $(@:get-dev-config-%=%) --port 830 --user clab --pass clab@123 --get-config
 
-.phony: test
-test::
+.PHONY: test
+test:
+	$(MAKE) test-ping
+	$(MAKE) test-get-config
+
+.PHONY: test-ping
+test-ping::
+
+.PHONY: test-get-config
+test-get-config:
 	$(MAKE) $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 
 .PHONY: save-logs

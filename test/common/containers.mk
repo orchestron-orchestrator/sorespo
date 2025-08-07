@@ -30,14 +30,12 @@ $(addprefix platform-cli-,$(ROUTERS_FRR)):
 	docker exec -it $(TESTENV)-$(subst platform-cli-,,$@) vtysh
 
 
-test:: test-ping
-
 $(addprefix test-ping-,$(ROUTERS_FRR)):
 # brew install coreutils on MacOS
 	timeout --foreground 10s bash -c "until docker exec -t $(TESTENV)-$(@:test-ping-%=%) ping -c 1 -W 1 -I $(SRC) $(IP); do sleep 1; done"
 
 .PHONY: test-ping
-test-ping:
+test-ping::
 # Do a full mesh of ping between all cust-X routers loopbacks
 	@set -e; for i in 1 2 3 4; do \
 		for j in 1 2 3 4; do \
