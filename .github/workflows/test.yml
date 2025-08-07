@@ -95,6 +95,10 @@ jobs:
       IMAGE_PATH: ${{ secrets.IMAGE_PATH || format('ghcr.io/{0}/', github.repository) }}
     needs: build-and-test
     steps:
+      # Pre-fetch the notconf:debug image so that we can use netconf-console later for get-config
+      - name: Pre-fetch ghcr.io/notconf/notconf:debug image
+        run: |
+          docker pull ghcr.io/notconf/notconf:debug &
       - name: Set up env for containers
         run: |
           # IOS XRd
@@ -128,12 +132,12 @@ jobs:
       - name: "Configure quicklab"
         run: |
           make -C test/${{ matrix.TESTENV }} copy run-and-configure
-      - name: "Run quicklab tests"
-        run: |
-          timeout 120 bash -c 'until make -C test/${{ matrix.TESTENV }} test-ping; do echo "Retrying..."; sleep 2; done'
       - name: "Get device configs"
         run: |
           make -C test/${{ matrix.TESTENV }} test-get-config
+      - name: "Run quicklab tests"
+        run: |
+          timeout 120 bash -c 'until make -C test/${{ matrix.TESTENV }} test-ping; do echo "Retrying..."; sleep 2; done'
       - run: |
           make -C test/${{ matrix.TESTENV }} save-logs
         if: ${{ always() }}
