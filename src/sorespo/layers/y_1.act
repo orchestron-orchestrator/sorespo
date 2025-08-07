@@ -25,6 +25,12 @@ mut def from_json_netinfra_inter__netinfra__router__id(val: value) -> yang.gdata
 mut def from_xml_netinfra_inter__netinfra__router__id(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('uint32', val)
 
+mut def from_json_netinfra_inter__netinfra__router__type(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('string', val)
+
+mut def from_xml_netinfra_inter__netinfra__router__type(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('string', val)
+
 mut def from_json_netinfra_inter__netinfra__router__role(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
 
@@ -81,7 +87,7 @@ class netinfra_inter__netinfra__router__base_config(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> netinfra_inter__netinfra__router__base_config:
-        if n != None:
+        if n is not None:
             return netinfra_inter__netinfra__router__base_config(asn=n.get_int('asn'), ipv4_address=n.get_str('ipv4-address'), ipv6_address=n.get_str('ipv6-address'))
         raise ValueError('Missing required subtree netinfra_inter__netinfra__router__base_config')
 
@@ -297,15 +303,17 @@ mut def from_json_netinfra_inter__netinfra__router__l3vpn_vrf(jd: list[dict[str,
 class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
     name: str
     id: int
+    type: ?str
     role: ?str
     mock: ?str
     base_config: netinfra_inter__netinfra__router__base_config
     l3vpn_vrf: netinfra_inter__netinfra__router__l3vpn_vrf
 
-    mut def __init__(self, name: str, id: int, base_config: netinfra_inter__netinfra__router__base_config, role: ?str, mock: ?str, l3vpn_vrf: list[netinfra_inter__netinfra__router__l3vpn_vrf_entry]=[]):
+    mut def __init__(self, name: str, id: int, base_config: netinfra_inter__netinfra__router__base_config, type: ?str, role: ?str, mock: ?str, l3vpn_vrf: list[netinfra_inter__netinfra__router__l3vpn_vrf_entry]=[]):
         self._ns = 'http://example.com/netinfra-inter'
         self.name = name
         self.id = id
+        self.type = type
         self.role = role
         self.mock = mock
         self.base_config = base_config
@@ -319,6 +327,9 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
         _id = self.id
         if _id is not None:
             children['id'] = yang.gdata.Leaf('uint32', _id)
+        _type = self.type
+        if _type is not None:
+            children['type'] = yang.gdata.Leaf('string', _type)
         _role = self.role
         if _role is not None:
             children['role'] = yang.gdata.Leaf('string', _role)
@@ -335,7 +346,7 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra_inter__netinfra__router_entry:
-        return netinfra_inter__netinfra__router_entry(name=n.get_str('name'), id=n.get_int('id'), role=n.get_opt_str('role'), mock=n.get_opt_str('mock'), base_config=netinfra_inter__netinfra__router__base_config.from_gdata(n.get_cnt('base-config')), l3vpn_vrf=netinfra_inter__netinfra__router__l3vpn_vrf.from_gdata(n.get_opt_list('l3vpn-vrf')))
+        return netinfra_inter__netinfra__router_entry(name=n.get_str('name'), id=n.get_int('id'), type=n.get_opt_str('type'), role=n.get_opt_str('role'), mock=n.get_opt_str('mock'), base_config=netinfra_inter__netinfra__router__base_config.from_gdata(n.get_cnt('base-config')), l3vpn_vrf=netinfra_inter__netinfra__router__l3vpn_vrf.from_gdata(n.get_opt_list('l3vpn-vrf')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -344,6 +355,9 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
             res.append('self_base_config = netinfra_inter__netinfra__router__base_config({repr(self.base_config.asn)}, {repr(self.base_config.ipv4_address)}, {repr(self.base_config.ipv6_address)})')
             res.append('{self_name} = netinfra_inter__netinfra__router({repr(self.name)}, {repr(self.id)}, self_base_config)')
         leaves = []
+        _type = self.type
+        if _type is not None:
+            leaves.append('{self_name}.type = {repr(_type)}')
         _role = self.role
         if _role is not None:
             leaves.append('{self_name}.role = {repr(_role)}')
@@ -408,6 +422,8 @@ mut def from_xml_netinfra_inter__netinfra__router_element(node: xml.Node) -> yan
     yang.gdata.maybe_add(children, 'name', from_xml_netinfra_inter__netinfra__router__name, child_name)
     child_id = yang.gdata.from_xml_int(node, 'id')
     yang.gdata.maybe_add(children, 'id', from_xml_netinfra_inter__netinfra__router__id, child_id)
+    child_type = yang.gdata.from_xml_opt_str(node, 'type')
+    yang.gdata.maybe_add(children, 'type', from_xml_netinfra_inter__netinfra__router__type, child_type)
     child_role = yang.gdata.from_xml_opt_str(node, 'role')
     yang.gdata.maybe_add(children, 'role', from_xml_netinfra_inter__netinfra__router__role, child_role)
     child_mock = yang.gdata.from_xml_opt_str(node, 'mock')
@@ -440,6 +456,8 @@ mut def from_json_path_netinfra_inter__netinfra__router_element(jd: value, path:
         children: dict[str, yang.gdata.Node] = {}
         children['name'] = from_json_netinfra_inter__netinfra__router__name(keys[0])
         if point == 'id':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'type':
             raise ValueError("Invalid json path to non-inner node")
         if point == 'role':
             raise ValueError("Invalid json path to non-inner node")
@@ -483,6 +501,8 @@ mut def from_json_netinfra_inter__netinfra__router_element(jd: dict[str, ?value]
     yang.gdata.maybe_add(children, 'name', from_json_netinfra_inter__netinfra__router__name, child_name)
     child_id = yang.gdata.take_json_int(jd, 'id')
     yang.gdata.maybe_add(children, 'id', from_json_netinfra_inter__netinfra__router__id, child_id)
+    child_type = yang.gdata.take_json_opt_str(jd, 'type')
+    yang.gdata.maybe_add(children, 'type', from_json_netinfra_inter__netinfra__router__type, child_type)
     child_role = yang.gdata.take_json_opt_str(jd, 'role')
     yang.gdata.maybe_add(children, 'role', from_json_netinfra_inter__netinfra__router__role, child_role)
     child_mock = yang.gdata.take_json_opt_str(jd, 'mock')
@@ -1043,7 +1063,7 @@ class netinfra_inter__netinfra(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> netinfra_inter__netinfra:
-        if n != None:
+        if n is not None:
             return netinfra_inter__netinfra(router=netinfra_inter__netinfra__router.from_gdata(n.get_opt_list('router')), backbone_link=netinfra_inter__netinfra__backbone_link.from_gdata(n.get_opt_list('backbone-link')), ibgp_fullmesh=netinfra_inter__netinfra__ibgp_fullmesh.from_gdata(n.get_opt_list('ibgp-fullmesh')))
         return netinfra_inter__netinfra()
 
@@ -1202,7 +1222,7 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ?l3vpn_inter__l3vpns__l3vpn__endpoint__bgp:
-        if n != None:
+        if n is not None:
             return l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(as_number=n.get_int('as-number'))
         return None
 
@@ -1651,7 +1671,7 @@ class l3vpn_inter__l3vpns(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> l3vpn_inter__l3vpns:
-        if n != None:
+        if n is not None:
             return l3vpn_inter__l3vpns(l3vpn=l3vpn_inter__l3vpns__l3vpn.from_gdata(n.get_opt_list('l3vpn')))
         return l3vpn_inter__l3vpns()
 
@@ -1726,7 +1746,7 @@ class root(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> root:
-        if n != None:
+        if n is not None:
             return root(netinfra=netinfra_inter__netinfra.from_gdata(n.get_opt_cnt('netinfra')), l3vpns=l3vpn_inter__l3vpns.from_gdata(n.get_opt_cnt('l3vpns')))
         return root()
 
