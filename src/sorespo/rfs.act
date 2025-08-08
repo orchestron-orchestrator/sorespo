@@ -176,7 +176,7 @@ class BBInterface(base.BBInterface):
             intf.description = "Link to {i.remote.device} [{i.remote.interface}]"
             intf.shutdown = False
             ipv4_address = i.ipv4_address
-            if ipv4_address != None:
+            if ipv4_address is not None:
                 intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(i.ipv4_prefix_length))
 
             # IS-IS config for this interface
@@ -201,7 +201,7 @@ class BBInterface(base.BBInterface):
             unit = dev.configuration.interfaces.interface.create(i.name).unit.create("0")
             unit.description = "Link to {i.remote.device} [{i.remote.interface}]"
             ipv4_address = i.ipv4_address
-            if ipv4_address != None:
+            if ipv4_address is not None:
                 unit.family.create_inet().address.create("{ipv4_address}/{i.ipv4_prefix_length}")
 
             # IS-IS config for this interface
@@ -237,7 +237,7 @@ class BBInterface(base.BBInterface):
             subif.description = "Link to {i.remote.device} [{i.remote.interface}]"
             subif.ipv4.admin_state = "enable"
             ipv4_address = i.ipv4_address
-            if ipv4_address != None:
+            if ipv4_address is not None:
                 subif.ipv4.address.create("%s/%s" % (ipv4_address, str(i.ipv4_prefix_length)))
 
             # Add interface to network-instance
@@ -401,7 +401,7 @@ class VrfInterface(base.VrfInterface):
             sub_intf.description = i.description
             sub_intf.shutdown = False
             ipv4_address = i.ipv4_address
-            if ipv4_address != None:
+            if ipv4_address is not None:
                 sub_intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(i.ipv4_prefix_length))
             sub_intf.vrf = i.vrf
             sub_intf.um_l2_ethernet_cfg_encapsulation.dot1q.vlan_id = int(vlan_id)
@@ -423,7 +423,7 @@ class VrfInterface(base.VrfInterface):
             unit.vlan_id = vlan_id
 
             ipv4_address = i.ipv4_address
-            if ipv4_address != None:
+            if ipv4_address is not None:
                 unit.family.create_inet().address.create("%s/%s" % (ipv4_address, str(i.ipv4_prefix_length)))
             ri = dev.configuration.routing_instances.instance.create(i.vrf)
             ri.interface.create(i.name)
@@ -446,7 +446,7 @@ class VrfInterface(base.VrfInterface):
 
             # Configure IPv4 address if present
             ipv4_address = i.ipv4_address
-            if ipv4_address != None:
+            if ipv4_address is not None:
                 subif.ipv4.admin_state = "enable"
                 subif.ipv4.address.create("%s/%s" % (ipv4_address, str(i.ipv4_prefix_length)))
 
