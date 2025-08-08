@@ -25,6 +25,12 @@ mut def from_json_netinfra__netinfra__router__id(val: value) -> yang.gdata.Leaf:
 mut def from_xml_netinfra__netinfra__router__id(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('uint32', val)
 
+mut def from_json_netinfra__netinfra__router__type(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('string', val)
+
+mut def from_xml_netinfra__netinfra__router__type(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('string', val)
+
 mut def from_json_netinfra__netinfra__router__role(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
 
@@ -46,14 +52,16 @@ mut def from_xml_netinfra__netinfra__router__mock(val: value) -> yang.gdata.Leaf
 class netinfra__netinfra__router_entry(yang.adata.MNode):
     name: str
     id: int
+    type: ?str
     role: ?str
     asn: int
     mock: ?str
 
-    mut def __init__(self, name: str, id: int, asn: int, role: ?str, mock: ?str):
+    mut def __init__(self, name: str, id: int, asn: int, type: ?str, role: ?str, mock: ?str):
         self._ns = 'http://example.com/netinfra'
         self.name = name
         self.id = id
+        self.type = type
         self.role = role
         self.asn = asn
         self.mock = mock
@@ -66,6 +74,9 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
         _id = self.id
         if _id is not None:
             children['id'] = yang.gdata.Leaf('uint32', _id)
+        _type = self.type
+        if _type is not None:
+            children['type'] = yang.gdata.Leaf('string', _type)
         _role = self.role
         if _role is not None:
             children['role'] = yang.gdata.Leaf('string', _role)
@@ -79,7 +90,7 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra__netinfra__router_entry:
-        return netinfra__netinfra__router_entry(name=n.get_str('name'), id=n.get_int('id'), role=n.get_opt_str('role'), asn=n.get_int('asn'), mock=n.get_opt_str('mock'))
+        return netinfra__netinfra__router_entry(name=n.get_str('name'), id=n.get_int('id'), type=n.get_opt_str('type'), role=n.get_opt_str('role'), asn=n.get_int('asn'), mock=n.get_opt_str('mock'))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -87,6 +98,9 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
             res.append('# Top node: /netinfra/router')
             res.append('{self_name} = netinfra__netinfra__router({repr(self.name)}, {repr(self.id)}, {repr(self.asn)})')
         leaves = []
+        _type = self.type
+        if _type is not None:
+            leaves.append('{self_name}.type = {repr(_type)}')
         _role = self.role
         if _role is not None:
             leaves.append('{self_name}.role = {repr(_role)}')
@@ -141,6 +155,8 @@ mut def from_xml_netinfra__netinfra__router_element(node: xml.Node) -> yang.gdat
     yang.gdata.maybe_add(children, 'name', from_xml_netinfra__netinfra__router__name, child_name)
     child_id = yang.gdata.from_xml_int(node, 'id')
     yang.gdata.maybe_add(children, 'id', from_xml_netinfra__netinfra__router__id, child_id)
+    child_type = yang.gdata.from_xml_opt_str(node, 'type')
+    yang.gdata.maybe_add(children, 'type', from_xml_netinfra__netinfra__router__type, child_type)
     child_role = yang.gdata.from_xml_opt_str(node, 'role')
     yang.gdata.maybe_add(children, 'role', from_xml_netinfra__netinfra__router__role, child_role)
     child_asn = yang.gdata.from_xml_int(node, 'asn')
@@ -171,6 +187,8 @@ mut def from_json_path_netinfra__netinfra__router_element(jd: value, path: list[
         children: dict[str, yang.gdata.Node] = {}
         children['name'] = from_json_netinfra__netinfra__router__name(keys[0])
         if point == 'id':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'type':
             raise ValueError("Invalid json path to non-inner node")
         if point == 'role':
             raise ValueError("Invalid json path to non-inner node")
@@ -212,6 +230,8 @@ mut def from_json_netinfra__netinfra__router_element(jd: dict[str, ?value]) -> y
     yang.gdata.maybe_add(children, 'name', from_json_netinfra__netinfra__router__name, child_name)
     child_id = yang.gdata.take_json_int(jd, 'id')
     yang.gdata.maybe_add(children, 'id', from_json_netinfra__netinfra__router__id, child_id)
+    child_type = yang.gdata.take_json_opt_str(jd, 'type')
+    yang.gdata.maybe_add(children, 'type', from_json_netinfra__netinfra__router__type, child_type)
     child_role = yang.gdata.take_json_opt_str(jd, 'role')
     yang.gdata.maybe_add(children, 'role', from_json_netinfra__netinfra__router__role, child_role)
     child_asn = yang.gdata.take_json_int(jd, 'asn')
@@ -439,7 +459,7 @@ class netinfra__netinfra(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> netinfra__netinfra:
-        if n != None:
+        if n is not None:
             return netinfra__netinfra(router=netinfra__netinfra__router.from_gdata(n.get_opt_list('router')), backbone_link=netinfra__netinfra__backbone_link.from_gdata(n.get_opt_list('backbone-link')))
         return netinfra__netinfra()
 
@@ -1086,7 +1106,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers(yang.a
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers(cloud_identifier=ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier.from_gdata(n.get_opt_list('cloud-identifier')), encryption_profile_identifier=ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier.from_gdata(n.get_opt_list('encryption-profile-identifier')), qos_profile_identifier=ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier.from_gdata(n.get_opt_list('qos-profile-identifier')), bfd_profile_identifier=ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier.from_gdata(n.get_opt_list('bfd-profile-identifier')))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers()
 
@@ -1198,7 +1218,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_profiles:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__vpn_profiles(valid_provider_identifiers=ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers.from_gdata(n.get_opt_cnt('valid-provider-identifiers')))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_profiles()
 
@@ -1325,7 +1345,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__clou
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access__address_translation__nat44:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access__address_translation__nat44(enabled=n.get_opt_bool('enabled'), nat44_customer_address=n.get_opt_str('nat44-customer-address'))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access__address_translation__nat44()
 
@@ -1399,7 +1419,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__clou
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access__address_translation:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access__address_translation(nat44=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access__address_translation__nat44.from_gdata(n.get_opt_cnt('nat44')))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access__address_translation()
 
@@ -1648,7 +1668,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses(yang.
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses(cloud_access=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access.from_gdata(n.get_opt_list('cloud-access')))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses()
 
@@ -1730,7 +1750,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors(tree_flavor=n.get_opt_Identityrefs('tree-flavor'))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors()
 
@@ -1829,7 +1849,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__provider_managed:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__provider_managed(enabled=n.get_opt_bool('enabled'), rp_redundancy=n.get_opt_bool('rp-redundancy'), optimal_traffic_delivery=n.get_opt_bool('optimal-traffic-delivery'))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__provider_managed()
 
@@ -2115,7 +2135,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups(group=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group.from_gdata(n.get_opt_list('group')))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups()
 
@@ -2355,7 +2375,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings(rp_group_mapping=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping.from_gdata(n.get_opt_list('rp-group-mapping')))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings()
 
@@ -2437,7 +2457,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_di
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__bsr_candidates:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__bsr_candidates(bsr_candidate_address=n.get_opt_strs('bsr-candidate-address'))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__bsr_candidates()
 
@@ -2507,7 +2527,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_di
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery(rp_discovery_type=n.get_opt_Identityref('rp-discovery-type'), bsr_candidates=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__bsr_candidates.from_gdata(n.get_opt_cnt('bsr-candidates')))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery()
 
@@ -2587,7 +2607,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp(yang.a
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp(rp_group_mappings=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings.from_gdata(n.get_opt_cnt('rp-group-mappings')), rp_discovery=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery.from_gdata(n.get_opt_cnt('rp-discovery')))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp()
 
@@ -2673,7 +2693,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast(yang.adata
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast(enabled=n.get_opt_bool('enabled'), customer_tree_flavors=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors.from_gdata(n.get_opt_cnt('customer-tree-flavors')), rp=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp.from_gdata(n.get_opt_cnt('rp')))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast()
 
@@ -2923,7 +2943,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns(yang.a
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns(extranet_vpn=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn.from_gdata(n.get_opt_list('extranet-vpn')))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns()
 
@@ -3208,7 +3228,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__vpn_services:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__vpn_services(vpn_service=ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service.from_gdata(n.get_opt_list('vpn-service')))
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services()
 
@@ -3533,7 +3553,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__locations(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__locations:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__locations(location=ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location.from_gdata(n.get_opt_list('location')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__locations()
 
@@ -3632,7 +3652,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device__management(yang.a
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device__management:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device__management(address_family=n.get_opt_str('address-family'), address=n.get_str('address'))
         raise ValueError('Missing required subtree ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device__management')
 
@@ -3860,7 +3880,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__devices(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__devices:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__devices(device=ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device.from_gdata(n.get_opt_list('device')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__devices()
 
@@ -4068,7 +4088,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups(yang.adata.
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups(group=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group.from_gdata(n.get_opt_list('group')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups()
 
@@ -4138,7 +4158,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity(groups=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups.from_gdata(n.get_opt_cnt('groups')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity()
 
@@ -4212,7 +4232,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__management(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__management:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__management(type=n.get_Identityref('type'))
         raise ValueError('Missing required subtree ietf_l3vpn_svc__l3vpn_svc__sites__site__management')
 
@@ -4479,7 +4499,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters(filter=ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter.from_gdata(n.get_opt_list('filter')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters()
 
@@ -5020,7 +5040,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies(vpn_policy=ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy.from_gdata(n.get_opt_list('vpn-policy')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies()
 
@@ -5255,7 +5275,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes(address_family=ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family.from_gdata(n.get_opt_list('address-family')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes()
 
@@ -5321,7 +5341,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__security__authentication(yang.adat
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__security__authentication:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__security__authentication()
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__security__authentication()
 
@@ -5417,7 +5437,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__security__encryption__encryption_p
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__security__encryption__encryption_profile:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__security__encryption__encryption_profile(profile_name=n.get_opt_str('profile-name'), algorithm=n.get_opt_str('algorithm'), preshared_key=n.get_opt_str('preshared-key'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__security__encryption__encryption_profile()
 
@@ -5510,7 +5530,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__security__encryption(yang.adata.MN
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__security__encryption:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__security__encryption(enabled=n.get_opt_bool('enabled'), layer=n.get_opt_str('layer'), encryption_profile=ietf_l3vpn_svc__l3vpn_svc__sites__site__security__encryption__encryption_profile.from_gdata(n.get_opt_cnt('encryption-profile')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__security__encryption()
 
@@ -5599,7 +5619,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__security(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__security:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__security(authentication=ietf_l3vpn_svc__l3vpn_svc__sites__site__security__authentication.from_gdata(n.get_opt_cnt('authentication')), encryption=ietf_l3vpn_svc__l3vpn_svc__sites__site__security__encryption.from_gdata(n.get_opt_cnt('encryption')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__security()
 
@@ -5746,7 +5766,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_p
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow__l4_src_port_range:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow__l4_src_port_range(lower_port=n.get_opt_int('lower-port'), upper_port=n.get_opt_int('upper-port'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow__l4_src_port_range()
 
@@ -5843,7 +5863,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_p
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow__l4_dst_port_range:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow__l4_dst_port_range(lower_port=n.get_opt_int('lower-port'), upper_port=n.get_opt_int('upper-port'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow__l4_dst_port_range()
 
@@ -5976,7 +5996,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_p
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow(dscp=n.get_opt_int('dscp'), dot1p=n.get_opt_int('dot1p'), ipv4_src_prefix=n.get_opt_str('ipv4-src-prefix'), ipv6_src_prefix=n.get_opt_str('ipv6-src-prefix'), ipv4_dst_prefix=n.get_opt_str('ipv4-dst-prefix'), ipv6_dst_prefix=n.get_opt_str('ipv6-dst-prefix'), l4_src_port=n.get_opt_int('l4-src-port'), target_sites=n.get_opt_strs('target-sites'), l4_src_port_range=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow__l4_src_port_range.from_gdata(n.get_opt_cnt('l4-src-port-range')), l4_dst_port=n.get_opt_int('l4-dst-port'), l4_dst_port_range=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow__l4_dst_port_range.from_gdata(n.get_opt_cnt('l4-dst-port-range')), protocol_field=n.get_opt_value('protocol-field'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow()
 
@@ -6329,7 +6349,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_p
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy(rule=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule.from_gdata(n.get_opt_list('rule')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy()
 
@@ -6442,7 +6462,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__latency:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__latency(use_lowest_latency=n.get_opt_empty('use-lowest-latency'), latency_boundary=n.get_opt_int('latency-boundary'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__latency()
 
@@ -6533,7 +6553,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__jitter:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__jitter(use_lowest_jitter=n.get_opt_empty('use-lowest-jitter'), latency_boundary=n.get_opt_int('latency-boundary'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__jitter()
 
@@ -6624,7 +6644,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__bandwidth:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__bandwidth(guaranteed_bw_percent=n.get_float('guaranteed-bw-percent'), end_to_end=n.get_opt_empty('end-to-end'))
         raise ValueError('Missing required subtree ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__bandwidth')
 
@@ -6897,7 +6917,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes(class_=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class.from_gdata(n.get_opt_list('class')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes()
 
@@ -6973,7 +6993,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile(yang.ada
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile(profile=n.get_opt_str('profile'), classes=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes.from_gdata(n.get_opt_cnt('classes')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile()
 
@@ -7053,7 +7073,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos(qos_classification_policy=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy.from_gdata(n.get_opt_cnt('qos-classification-policy')), qos_profile=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile.from_gdata(n.get_opt_cnt('qos-profile')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos()
 
@@ -7135,7 +7155,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__carrierscarrier(yang.adat
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__carrierscarrier:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__carrierscarrier(signalling_type=n.get_opt_str('signalling-type'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__carrierscarrier()
 
@@ -7223,7 +7243,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__multicast__multicast_addr
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__multicast__multicast_address_family:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__multicast__multicast_address_family(ipv4=n.get_opt_bool('ipv4'), ipv6=n.get_opt_bool('ipv6'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__multicast__multicast_address_family()
 
@@ -7313,7 +7333,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__multicast(yang.adata.MNod
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service__multicast:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__multicast(multicast_site_type=n.get_opt_str('multicast-site-type'), multicast_address_family=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__multicast__multicast_address_family.from_gdata(n.get_opt_cnt('multicast-address-family')), protocol_type=n.get_opt_str('protocol-type'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__multicast()
 
@@ -7407,7 +7427,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__service:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__service(qos=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos.from_gdata(n.get_opt_cnt('qos')), carrierscarrier=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__carrierscarrier.from_gdata(n.get_opt_cnt('carrierscarrier')), multicast=ietf_l3vpn_svc__l3vpn_svc__sites__site__service__multicast.from_gdata(n.get_opt_cnt('multicast')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__service()
 
@@ -7499,7 +7519,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection(yang.adata.MNod
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection(enabled=n.get_opt_bool('enabled'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection()
 
@@ -7747,7 +7767,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links(sham_link=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link.from_gdata(n.get_opt_list('sham-link')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links()
 
@@ -7830,7 +7850,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf(address_family=n.get_strs('address-family'), area_address=n.get_str('area-address'), metric=n.get_opt_int('metric'), sham_links=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links.from_gdata(n.get_opt_cnt('sham-links')))
         return None
 
@@ -7932,7 +7952,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__bgp:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__bgp(autonomous_system=n.get_int('autonomous-system'), address_family=n.get_strs('address-family'))
         return None
 
@@ -8357,7 +8377,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes(ipv4_lan_prefixes=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes.from_gdata(n.get_opt_list('ipv4-lan-prefixes')), ipv6_lan_prefixes=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes.from_gdata(n.get_opt_list('ipv6-lan-prefixes')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes()
 
@@ -8441,7 +8461,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static(cascaded_lan_prefixes=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes.from_gdata(n.get_opt_cnt('cascaded-lan-prefixes')))
         return None
 
@@ -8511,7 +8531,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__rip:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__rip(address_family=n.get_strs('address-family'))
         return None
 
@@ -8577,7 +8597,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ?ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__vrrp:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__vrrp(address_family=n.get_strs('address-family'))
         return None
 
@@ -8880,7 +8900,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols(yang.adata.MNode
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols(routing_protocol=ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol.from_gdata(n.get_opt_list('routing-protocol')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols()
 
@@ -9113,7 +9133,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups(group=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group.from_gdata(n.get_opt_list('group')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups()
 
@@ -9350,7 +9370,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target(group=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group.from_gdata(n.get_opt_list('group')), all_other_accesses=n.get_opt_empty('all-other-accesses'), all_other_groups=n.get_opt_empty('all-other-groups'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target()
 
@@ -9583,7 +9603,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints(constraint=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint.from_gdata(n.get_opt_list('constraint')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints()
 
@@ -9658,7 +9678,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity(groups=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups.from_gdata(n.get_opt_cnt('groups')), constraints=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints.from_gdata(n.get_opt_cnt('constraints')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity()
 
@@ -9751,7 +9771,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__bearer__requested_type:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__bearer__requested_type(requested_type=n.get_opt_str('requested-type'), strict=n.get_opt_bool('strict'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__bearer__requested_type()
 
@@ -9847,7 +9867,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__bearer:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__bearer(requested_type=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__bearer__requested_type.from_gdata(n.get_opt_cnt('requested-type')), always_on=n.get_opt_bool('always-on'), bearer_reference=n.get_opt_str('bearer-reference'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__bearer()
 
@@ -10134,7 +10154,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses(address_group=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group.from_gdata(n.get_opt_list('address-group')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses()
 
@@ -10219,7 +10239,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp(provider_address=n.get_opt_str('provider-address'), prefix_length=n.get_opt_int('prefix-length'), number_of_dynamic_address=n.get_opt_int('number-of-dynamic-address'), customer_addresses=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses.from_gdata(n.get_opt_cnt('customer-addresses')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp()
 
@@ -10328,7 +10348,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__dhcp_relay__customer_dhcp_servers:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__dhcp_relay__customer_dhcp_servers(server_ip_address=n.get_opt_strs('server-ip-address'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__dhcp_relay__customer_dhcp_servers()
 
@@ -10403,7 +10423,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__dhcp_relay:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__dhcp_relay(provider_address=n.get_opt_str('provider-address'), prefix_length=n.get_opt_int('prefix-length'), customer_dhcp_servers=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__dhcp_relay__customer_dhcp_servers.from_gdata(n.get_opt_cnt('customer-dhcp-servers')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__dhcp_relay()
 
@@ -10515,7 +10535,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__addresses:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__addresses(provider_address=n.get_opt_str('provider-address'), customer_address=n.get_opt_str('customer-address'), prefix_length=n.get_opt_int('prefix-length'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__addresses()
 
@@ -10613,7 +10633,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4(address_allocation_type=n.get_opt_Identityref('address-allocation-type'), provider_dhcp=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp.from_gdata(n.get_opt_cnt('provider-dhcp')), dhcp_relay=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__dhcp_relay.from_gdata(n.get_opt_cnt('dhcp-relay')), addresses=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__addresses.from_gdata(n.get_opt_cnt('addresses')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4()
 
@@ -10911,7 +10931,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses(address_group=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group.from_gdata(n.get_opt_list('address-group')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses()
 
@@ -10996,7 +11016,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp(provider_address=n.get_opt_str('provider-address'), prefix_length=n.get_opt_int('prefix-length'), number_of_dynamic_address=n.get_opt_int('number-of-dynamic-address'), customer_addresses=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses.from_gdata(n.get_opt_cnt('customer-addresses')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp()
 
@@ -11105,7 +11125,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__dhcp_relay__customer_dhcp_servers:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__dhcp_relay__customer_dhcp_servers(server_ip_address=n.get_opt_strs('server-ip-address'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__dhcp_relay__customer_dhcp_servers()
 
@@ -11180,7 +11200,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__dhcp_relay:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__dhcp_relay(provider_address=n.get_opt_str('provider-address'), prefix_length=n.get_opt_int('prefix-length'), customer_dhcp_servers=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__dhcp_relay__customer_dhcp_servers.from_gdata(n.get_opt_cnt('customer-dhcp-servers')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__dhcp_relay()
 
@@ -11292,7 +11312,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__addresses:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__addresses(provider_address=n.get_opt_str('provider-address'), customer_address=n.get_opt_str('customer-address'), prefix_length=n.get_opt_int('prefix-length'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__addresses()
 
@@ -11390,7 +11410,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6(address_allocation_type=n.get_opt_Identityref('address-allocation-type'), provider_dhcp=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp.from_gdata(n.get_opt_cnt('provider-dhcp')), dhcp_relay=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__dhcp_relay.from_gdata(n.get_opt_cnt('dhcp-relay')), addresses=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__addresses.from_gdata(n.get_opt_cnt('addresses')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6()
 
@@ -11513,7 +11533,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__oam__bfd:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__oam__bfd(enabled=n.get_opt_bool('enabled'), fixed_value=n.get_opt_int('fixed-value'), profile_name=n.get_opt_str('profile-name'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__oam__bfd()
 
@@ -11596,7 +11616,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__oam:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__oam(bfd=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__oam__bfd.from_gdata(n.get_opt_cnt('bfd')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__oam()
 
@@ -11672,7 +11692,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection(ipv4=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4.from_gdata(n.get_opt_cnt('ipv4')), ipv6=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6.from_gdata(n.get_opt_cnt('ipv6')), oam=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__oam.from_gdata(n.get_opt_cnt('oam')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection()
 
@@ -11754,7 +11774,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__authentication:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__authentication()
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__authentication()
 
@@ -11850,7 +11870,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__encryption__encryption_profile:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__encryption__encryption_profile(profile_name=n.get_opt_str('profile-name'), algorithm=n.get_opt_str('algorithm'), preshared_key=n.get_opt_str('preshared-key'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__encryption__encryption_profile()
 
@@ -11943,7 +11963,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__encryption:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__encryption(enabled=n.get_opt_bool('enabled'), layer=n.get_opt_str('layer'), encryption_profile=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__encryption__encryption_profile.from_gdata(n.get_opt_cnt('encryption-profile')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__encryption()
 
@@ -12032,7 +12052,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security(authentication=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__authentication.from_gdata(n.get_opt_cnt('authentication')), encryption=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__encryption.from_gdata(n.get_opt_cnt('encryption')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security()
 
@@ -12197,7 +12217,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow__l4_src_port_range:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow__l4_src_port_range(lower_port=n.get_opt_int('lower-port'), upper_port=n.get_opt_int('upper-port'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow__l4_src_port_range()
 
@@ -12294,7 +12314,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow__l4_dst_port_range:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow__l4_dst_port_range(lower_port=n.get_opt_int('lower-port'), upper_port=n.get_opt_int('upper-port'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow__l4_dst_port_range()
 
@@ -12427,7 +12447,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow(dscp=n.get_opt_int('dscp'), dot1p=n.get_opt_int('dot1p'), ipv4_src_prefix=n.get_opt_str('ipv4-src-prefix'), ipv6_src_prefix=n.get_opt_str('ipv6-src-prefix'), ipv4_dst_prefix=n.get_opt_str('ipv4-dst-prefix'), ipv6_dst_prefix=n.get_opt_str('ipv6-dst-prefix'), l4_src_port=n.get_opt_int('l4-src-port'), target_sites=n.get_opt_strs('target-sites'), l4_src_port_range=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow__l4_src_port_range.from_gdata(n.get_opt_cnt('l4-src-port-range')), l4_dst_port=n.get_opt_int('l4-dst-port'), l4_dst_port_range=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow__l4_dst_port_range.from_gdata(n.get_opt_cnt('l4-dst-port-range')), protocol_field=n.get_opt_value('protocol-field'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow()
 
@@ -12780,7 +12800,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy(rule=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule.from_gdata(n.get_opt_list('rule')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy()
 
@@ -12893,7 +12913,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__latency:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__latency(use_lowest_latency=n.get_opt_empty('use-lowest-latency'), latency_boundary=n.get_opt_int('latency-boundary'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__latency()
 
@@ -12984,7 +13004,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__jitter:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__jitter(use_lowest_jitter=n.get_opt_empty('use-lowest-jitter'), latency_boundary=n.get_opt_int('latency-boundary'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__jitter()
 
@@ -13075,7 +13095,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__bandwidth:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__bandwidth(guaranteed_bw_percent=n.get_float('guaranteed-bw-percent'), end_to_end=n.get_opt_empty('end-to-end'))
         raise ValueError('Missing required subtree ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__bandwidth')
 
@@ -13348,7 +13368,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes(class_=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class.from_gdata(n.get_opt_list('class')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes()
 
@@ -13424,7 +13444,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile(profile=n.get_opt_str('profile'), classes=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes.from_gdata(n.get_opt_cnt('classes')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile()
 
@@ -13504,7 +13524,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos(qos_classification_policy=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy.from_gdata(n.get_opt_cnt('qos-classification-policy')), qos_profile=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile.from_gdata(n.get_opt_cnt('qos-profile')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos()
 
@@ -13586,7 +13606,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__carrierscarrier:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__carrierscarrier(signalling_type=n.get_opt_str('signalling-type'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__carrierscarrier()
 
@@ -13674,7 +13694,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__multicast__multicast_address_family:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__multicast__multicast_address_family(ipv4=n.get_opt_bool('ipv4'), ipv6=n.get_opt_bool('ipv6'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__multicast__multicast_address_family()
 
@@ -13764,7 +13784,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__multicast:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__multicast(multicast_site_type=n.get_opt_str('multicast-site-type'), multicast_address_family=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__multicast__multicast_address_family.from_gdata(n.get_opt_cnt('multicast-address-family')), protocol_type=n.get_opt_str('protocol-type'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__multicast()
 
@@ -13873,7 +13893,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service(svc_input_bandwidth=n.get_int('svc-input-bandwidth'), svc_output_bandwidth=n.get_int('svc-output-bandwidth'), svc_mtu=n.get_int('svc-mtu'), qos=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos.from_gdata(n.get_opt_cnt('qos')), carrierscarrier=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__carrierscarrier.from_gdata(n.get_opt_cnt('carrierscarrier')), multicast=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__multicast.from_gdata(n.get_opt_cnt('multicast')))
         raise ValueError('Missing required subtree ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service')
 
@@ -14160,7 +14180,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links(sham_link=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link.from_gdata(n.get_opt_list('sham-link')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links()
 
@@ -14243,7 +14263,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf(address_family=n.get_strs('address-family'), area_address=n.get_str('area-address'), metric=n.get_opt_int('metric'), sham_links=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links.from_gdata(n.get_opt_cnt('sham-links')))
         return None
 
@@ -14345,7 +14365,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp(autonomous_system=n.get_int('autonomous-system'), address_family=n.get_strs('address-family'))
         return None
 
@@ -14770,7 +14790,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes(ipv4_lan_prefixes=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes.from_gdata(n.get_opt_list('ipv4-lan-prefixes')), ipv6_lan_prefixes=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes.from_gdata(n.get_opt_list('ipv6-lan-prefixes')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes()
 
@@ -14854,7 +14874,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static(cascaded_lan_prefixes=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes.from_gdata(n.get_opt_cnt('cascaded-lan-prefixes')))
         return None
 
@@ -14924,7 +14944,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__rip:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__rip(address_family=n.get_strs('address-family'))
         return None
 
@@ -14990,7 +15010,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__vrrp:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__vrrp(address_family=n.get_strs('address-family'))
         return None
 
@@ -15293,7 +15313,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols(routing_protocol=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol.from_gdata(n.get_opt_list('routing-protocol')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols()
 
@@ -15369,7 +15389,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__availability:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__availability(access_priority=n.get_opt_int('access-priority'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__availability()
 
@@ -15464,7 +15484,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment(vpn_policy_id=n.get_opt_str('vpn-policy-id'), vpn_id=n.get_opt_str('vpn-id'), site_role=n.get_opt_Identityref('site-role'))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment()
 
@@ -15833,7 +15853,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses(yang.adata.M
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses(site_network_access=ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access.from_gdata(n.get_opt_list('site-network-access')))
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses()
 
@@ -16232,7 +16252,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc__sites:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc__sites(site=ietf_l3vpn_svc__l3vpn_svc__sites__site.from_gdata(n.get_opt_list('site')))
         return ietf_l3vpn_svc__l3vpn_svc__sites()
 
@@ -16313,7 +16333,7 @@ class ietf_l3vpn_svc__l3vpn_svc(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> ietf_l3vpn_svc__l3vpn_svc:
-        if n != None:
+        if n is not None:
             return ietf_l3vpn_svc__l3vpn_svc(vpn_profiles=ietf_l3vpn_svc__l3vpn_svc__vpn_profiles.from_gdata(n.get_opt_cnt('vpn-profiles')), vpn_services=ietf_l3vpn_svc__l3vpn_svc__vpn_services.from_gdata(n.get_opt_cnt('vpn-services')), sites=ietf_l3vpn_svc__l3vpn_svc__sites.from_gdata(n.get_opt_cnt('sites')))
         return ietf_l3vpn_svc__l3vpn_svc()
 
@@ -16404,7 +16424,7 @@ class root(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> root:
-        if n != None:
+        if n is not None:
             return root(netinfra=netinfra__netinfra.from_gdata(n.get_opt_cnt('netinfra')), l3vpn_svc=ietf_l3vpn_svc__l3vpn_svc.from_gdata(n.get_opt_cnt('l3vpn-svc')))
         return root()
 
