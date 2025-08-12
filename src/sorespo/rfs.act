@@ -86,6 +86,12 @@ end-policy"""
             print("RFS /rfs{{{di.name}}}/base-config transform for JUNOS", err=True)
             dev = crpd23.root()
             dev.configuration.system.host_name = di.name
+
+            # Enable rfc-compliant mode
+            services = dev.configuration.system.create_services()
+            services.netconf.rfc_compliant = True
+            services.netconf.yang_compliant = True
+
             unit = dev.configuration.interfaces.interface.create("lo0").unit.create("0")
             unit.family.create_inet().address.create("{i.ipv4_address}/32")
             unit.family.create_iso().address.create(net_clns_address)
