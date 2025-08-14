@@ -8,7 +8,7 @@ else ifeq (true,$(CODESPACES))
 CLAB_BIN:=containerlab
 else
 
-CLAB_VERSION?=0.67.0
+CLAB_VERSION?=0.69.3
 CLAB_CONTAINER_IMAGE?=ghcr.io/srl-labs/clab:$(CLAB_VERSION)
 CLAB_BIN:=docker run --rm $(INTERACTIVE) --privileged \
     --network host \
