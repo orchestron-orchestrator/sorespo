@@ -22,24 +22,136 @@ mut def from_xml_junos_conf_root__configuration__version(val: value) -> yang.gda
 mut def from_xml_junos_conf_root__configuration__system__host_name(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
 
+mut def from_xml_junos_conf_root__configuration__system__services__netconf__rfc_compliant(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('empty', val)
+
+mut def from_xml_junos_conf_root__configuration__system__services__netconf__yang_compliant(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('empty', val)
+
+class junos_conf_root__configuration__system__services__netconf(yang.adata.MNode):
+    rfc_compliant: ?bool
+    yang_compliant: ?bool
+
+    mut def __init__(self, rfc_compliant: ?bool, yang_compliant: ?bool):
+        self._ns = 'http://yang.juniper.net/junos/conf/root'
+        self.rfc_compliant = rfc_compliant
+        self.yang_compliant = yang_compliant
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        children = {}
+        _rfc_compliant = self.rfc_compliant
+        if _rfc_compliant is not None:
+            children['rfc-compliant'] = yang.gdata.Leaf('empty', _rfc_compliant)
+        _yang_compliant = self.yang_compliant
+        if _yang_compliant is not None:
+            children['yang-compliant'] = yang.gdata.Leaf('empty', _yang_compliant)
+        return yang.gdata.Container(children)
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__system__services__netconf:
+        if n is not None:
+            return junos_conf_root__configuration__system__services__netconf(rfc_compliant=n.get_opt_empty('rfc-compliant'), yang_compliant=n.get_opt_empty('yang-compliant'))
+        return junos_conf_root__configuration__system__services__netconf()
+
+    def prsrc(self, self_name='ad', top=True, list_element=False):
+        res = []
+        if top:
+            res.append('# Top node: /configuration/system/services/netconf')
+            res.append('{self_name} = junos_conf_root__configuration__system__services__netconf()')
+        leaves = []
+        _rfc_compliant = self.rfc_compliant
+        if _rfc_compliant is not None:
+            leaves.append('{self_name}.rfc_compliant = {repr(_rfc_compliant)}')
+        _yang_compliant = self.yang_compliant
+        if _yang_compliant is not None:
+            leaves.append('{self_name}.yang_compliant = {repr(_yang_compliant)}')
+        if leaves:
+            if not list_element:
+               res = ['', '# Container: /configuration/system/services/netconf'] + leaves + res
+            else:
+                res = leaves + res
+        return '\n'.join(res)
+
+
+mut def from_xml_junos_conf_root__configuration__system__services__netconf(node: xml.Node) -> yang.gdata.Container:
+    children = {}
+    child_rfc_compliant = yang.gdata.from_xml_opt_empty(node, 'rfc-compliant')
+    yang.gdata.maybe_add(children, 'rfc-compliant', from_xml_junos_conf_root__configuration__system__services__netconf__rfc_compliant, child_rfc_compliant)
+    child_yang_compliant = yang.gdata.from_xml_opt_empty(node, 'yang-compliant')
+    yang.gdata.maybe_add(children, 'yang-compliant', from_xml_junos_conf_root__configuration__system__services__netconf__yang_compliant, child_yang_compliant)
+    return yang.gdata.Container(children)
+
+class junos_conf_root__configuration__system__services(yang.adata.MNode):
+    netconf: junos_conf_root__configuration__system__services__netconf
+
+    mut def __init__(self, netconf: ?junos_conf_root__configuration__system__services__netconf=None):
+        self._ns = 'http://yang.juniper.net/junos/conf/root'
+        self.netconf = netconf if netconf is not None else junos_conf_root__configuration__system__services__netconf()
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        children = {}
+        _netconf = self.netconf
+        if _netconf is not None:
+            children['netconf'] = _netconf.to_gdata()
+        return yang.gdata.Container(children, presence=True)
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> ?junos_conf_root__configuration__system__services:
+        if n is not None:
+            return junos_conf_root__configuration__system__services(netconf=junos_conf_root__configuration__system__services__netconf.from_gdata(n.get_opt_cnt('netconf')))
+        return None
+
+    def prsrc(self, self_name='ad', top=True, list_element=False):
+        res = []
+        if top:
+            res.append('# Top node: /configuration/system/services')
+            res.append('{self_name} = junos_conf_root__configuration__system__services()')
+        leaves = []
+        _netconf = self.netconf
+        if _netconf is not None:
+            res.extend(_netconf.prsrc('{self_name}.netconf', False).splitlines())
+        if leaves:
+            if not list_element:
+               res = ['', '# Container: /configuration/system/services'] + leaves + res
+            else:
+                res = leaves + res
+        return '\n'.join(res)
+
+
+mut def from_xml_junos_conf_root__configuration__system__services(node: xml.Node) -> yang.gdata.Container:
+    children = {}
+    child_netconf = yang.gdata.from_xml_opt_cnt(node, 'netconf')
+    yang.gdata.maybe_add(children, 'netconf', from_xml_junos_conf_root__configuration__system__services__netconf, child_netconf)
+    return yang.gdata.Container(children, presence=True)
+
 class junos_conf_root__configuration__system(yang.adata.MNode):
     host_name: ?str
+    services: ?junos_conf_root__configuration__system__services
 
-    mut def __init__(self, host_name: ?str):
+    mut def __init__(self, host_name: ?str, services: ?junos_conf_root__configuration__system__services=None):
         self._ns = 'http://yang.juniper.net/junos/conf/root'
         self.host_name = host_name
+        self.services = services
+
+    mut def create_services(self):
+        res = junos_conf_root__configuration__system__services()
+        self.services = res
+        return res
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
         _host_name = self.host_name
         if _host_name is not None:
             children['host-name'] = yang.gdata.Leaf('string', _host_name)
+        _services = self.services
+        if _services is not None:
+            children['services'] = _services.to_gdata()
         return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__system:
         if n is not None:
-            return junos_conf_root__configuration__system(host_name=n.get_opt_str('host-name'))
+            return junos_conf_root__configuration__system(host_name=n.get_opt_str('host-name'), services=junos_conf_root__configuration__system__services.from_gdata(n.get_opt_cnt('services')))
         return junos_conf_root__configuration__system()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -51,6 +163,12 @@ class junos_conf_root__configuration__system(yang.adata.MNode):
         _host_name = self.host_name
         if _host_name is not None:
             leaves.append('{self_name}.host_name = {repr(_host_name)}')
+        _services = self.services
+        if _services is not None:
+            res.append('')
+            res.append('# P-container: /configuration/system/services')
+            res.append('services = {self_name}.create_services()')
+            res.extend(_services.prsrc('services', False).splitlines())
         if leaves:
             if not list_element:
                res = ['', '# Container: /configuration/system'] + leaves + res
@@ -63,6 +181,8 @@ mut def from_xml_junos_conf_root__configuration__system(node: xml.Node) -> yang.
     children = {}
     child_host_name = yang.gdata.from_xml_opt_str(node, 'host-name')
     yang.gdata.maybe_add(children, 'host-name', from_xml_junos_conf_root__configuration__system__host_name, child_host_name)
+    child_services = yang.gdata.from_xml_opt_cnt(node, 'services')
+    yang.gdata.maybe_add(children, 'services', from_xml_junos_conf_root__configuration__system__services, child_services)
     return yang.gdata.Container(children)
 
 mut def from_xml_junos_conf_root__configuration__interfaces__interface__name(val: value) -> yang.gdata.Leaf:
@@ -2366,24 +2486,136 @@ mut def from_xml_junos_conf_root__configuration__groups__version(val: value) -> 
 mut def from_xml_junos_conf_root__configuration__groups__system__host_name(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
 
+mut def from_xml_junos_conf_root__configuration__groups__system__services__netconf__rfc_compliant(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('empty', val)
+
+mut def from_xml_junos_conf_root__configuration__groups__system__services__netconf__yang_compliant(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('empty', val)
+
+class junos_conf_root__configuration__groups__system__services__netconf(yang.adata.MNode):
+    rfc_compliant: ?bool
+    yang_compliant: ?bool
+
+    mut def __init__(self, rfc_compliant: ?bool, yang_compliant: ?bool):
+        self._ns = 'http://yang.juniper.net/junos/conf/root'
+        self.rfc_compliant = rfc_compliant
+        self.yang_compliant = yang_compliant
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        children = {}
+        _rfc_compliant = self.rfc_compliant
+        if _rfc_compliant is not None:
+            children['rfc-compliant'] = yang.gdata.Leaf('empty', _rfc_compliant)
+        _yang_compliant = self.yang_compliant
+        if _yang_compliant is not None:
+            children['yang-compliant'] = yang.gdata.Leaf('empty', _yang_compliant)
+        return yang.gdata.Container(children)
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__system__services__netconf:
+        if n is not None:
+            return junos_conf_root__configuration__groups__system__services__netconf(rfc_compliant=n.get_opt_empty('rfc-compliant'), yang_compliant=n.get_opt_empty('yang-compliant'))
+        return junos_conf_root__configuration__groups__system__services__netconf()
+
+    def prsrc(self, self_name='ad', top=True, list_element=False):
+        res = []
+        if top:
+            res.append('# Top node: /configuration/groups/system/services/netconf')
+            res.append('{self_name} = junos_conf_root__configuration__groups__system__services__netconf()')
+        leaves = []
+        _rfc_compliant = self.rfc_compliant
+        if _rfc_compliant is not None:
+            leaves.append('{self_name}.rfc_compliant = {repr(_rfc_compliant)}')
+        _yang_compliant = self.yang_compliant
+        if _yang_compliant is not None:
+            leaves.append('{self_name}.yang_compliant = {repr(_yang_compliant)}')
+        if leaves:
+            if not list_element:
+               res = ['', '# Container: /configuration/groups/system/services/netconf'] + leaves + res
+            else:
+                res = leaves + res
+        return '\n'.join(res)
+
+
+mut def from_xml_junos_conf_root__configuration__groups__system__services__netconf(node: xml.Node) -> yang.gdata.Container:
+    children = {}
+    child_rfc_compliant = yang.gdata.from_xml_opt_empty(node, 'rfc-compliant')
+    yang.gdata.maybe_add(children, 'rfc-compliant', from_xml_junos_conf_root__configuration__groups__system__services__netconf__rfc_compliant, child_rfc_compliant)
+    child_yang_compliant = yang.gdata.from_xml_opt_empty(node, 'yang-compliant')
+    yang.gdata.maybe_add(children, 'yang-compliant', from_xml_junos_conf_root__configuration__groups__system__services__netconf__yang_compliant, child_yang_compliant)
+    return yang.gdata.Container(children)
+
+class junos_conf_root__configuration__groups__system__services(yang.adata.MNode):
+    netconf: junos_conf_root__configuration__groups__system__services__netconf
+
+    mut def __init__(self, netconf: ?junos_conf_root__configuration__groups__system__services__netconf=None):
+        self._ns = 'http://yang.juniper.net/junos/conf/root'
+        self.netconf = netconf if netconf is not None else junos_conf_root__configuration__groups__system__services__netconf()
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        children = {}
+        _netconf = self.netconf
+        if _netconf is not None:
+            children['netconf'] = _netconf.to_gdata()
+        return yang.gdata.Container(children, presence=True)
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> ?junos_conf_root__configuration__groups__system__services:
+        if n is not None:
+            return junos_conf_root__configuration__groups__system__services(netconf=junos_conf_root__configuration__groups__system__services__netconf.from_gdata(n.get_opt_cnt('netconf')))
+        return None
+
+    def prsrc(self, self_name='ad', top=True, list_element=False):
+        res = []
+        if top:
+            res.append('# Top node: /configuration/groups/system/services')
+            res.append('{self_name} = junos_conf_root__configuration__groups__system__services()')
+        leaves = []
+        _netconf = self.netconf
+        if _netconf is not None:
+            res.extend(_netconf.prsrc('{self_name}.netconf', False).splitlines())
+        if leaves:
+            if not list_element:
+               res = ['', '# Container: /configuration/groups/system/services'] + leaves + res
+            else:
+                res = leaves + res
+        return '\n'.join(res)
+
+
+mut def from_xml_junos_conf_root__configuration__groups__system__services(node: xml.Node) -> yang.gdata.Container:
+    children = {}
+    child_netconf = yang.gdata.from_xml_opt_cnt(node, 'netconf')
+    yang.gdata.maybe_add(children, 'netconf', from_xml_junos_conf_root__configuration__groups__system__services__netconf, child_netconf)
+    return yang.gdata.Container(children, presence=True)
+
 class junos_conf_root__configuration__groups__system(yang.adata.MNode):
     host_name: ?str
+    services: ?junos_conf_root__configuration__groups__system__services
 
-    mut def __init__(self, host_name: ?str):
+    mut def __init__(self, host_name: ?str, services: ?junos_conf_root__configuration__groups__system__services=None):
         self._ns = 'http://yang.juniper.net/junos/conf/root'
         self.host_name = host_name
+        self.services = services
+
+    mut def create_services(self):
+        res = junos_conf_root__configuration__groups__system__services()
+        self.services = res
+        return res
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
         _host_name = self.host_name
         if _host_name is not None:
             children['host-name'] = yang.gdata.Leaf('string', _host_name)
+        _services = self.services
+        if _services is not None:
+            children['services'] = _services.to_gdata()
         return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> junos_conf_root__configuration__groups__system:
         if n is not None:
-            return junos_conf_root__configuration__groups__system(host_name=n.get_opt_str('host-name'))
+            return junos_conf_root__configuration__groups__system(host_name=n.get_opt_str('host-name'), services=junos_conf_root__configuration__groups__system__services.from_gdata(n.get_opt_cnt('services')))
         return junos_conf_root__configuration__groups__system()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -2395,6 +2627,12 @@ class junos_conf_root__configuration__groups__system(yang.adata.MNode):
         _host_name = self.host_name
         if _host_name is not None:
             leaves.append('{self_name}.host_name = {repr(_host_name)}')
+        _services = self.services
+        if _services is not None:
+            res.append('')
+            res.append('# P-container: /configuration/groups/system/services')
+            res.append('services = {self_name}.create_services()')
+            res.extend(_services.prsrc('services', False).splitlines())
         if leaves:
             if not list_element:
                res = ['', '# Container: /configuration/groups/system'] + leaves + res
@@ -2407,6 +2645,8 @@ mut def from_xml_junos_conf_root__configuration__groups__system(node: xml.Node) 
     children = {}
     child_host_name = yang.gdata.from_xml_opt_str(node, 'host-name')
     yang.gdata.maybe_add(children, 'host-name', from_xml_junos_conf_root__configuration__groups__system__host_name, child_host_name)
+    child_services = yang.gdata.from_xml_opt_cnt(node, 'services')
+    yang.gdata.maybe_add(children, 'services', from_xml_junos_conf_root__configuration__groups__system__services, child_services)
     return yang.gdata.Container(children)
 
 mut def from_xml_junos_conf_root__configuration__groups__interfaces__interface__name(val: value) -> yang.gdata.Leaf:
