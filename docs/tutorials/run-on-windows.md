@@ -74,14 +74,14 @@ shell, navigate to the `sorespo/test/quicklab-srl`
 directory and load the configuration intent:
 ```shell
 cd sorespo/test/quicklab-srl
-make send-config FILE="tutorial-netinfra.xml" 
+make send-config-wait FILE="tutorial-netinfra.xml" 
 ```
 
 `tutorial-l3vpn-svc.xml`  describes the intent for the customer's L3VPN service.
 Load the configuration intent to create a customer VPN across all three
 core routers, and the access links to the customer's sites:
 ```shell
-make send-config FILE="tutorial-l3vpn-svc.xml" 
+make send-config-wait FILE="tutorial-l3vpn-svc.xml" 
 ```
 
 The resulting network lab has three core SR Linux routers, each with an attached
@@ -568,7 +568,7 @@ configuration for that router. The configuration is defined in
 
 Send this configuration to SORESPO:
 ```shell
-make send-config FILE="tutorial-add-lju.xml"
+make send-config-wait FILE="tutorial-add-lju.xml"
 ```
 
 The topology now has four core routers.
@@ -614,7 +614,7 @@ added as per the updated intent (4 routers) as well.
 Connect a customer site to the new router:
 
 ```shell
-make send-config FILE="tutorial-add-cust-4.xml"
+make send-config-wait FILE="tutorial-add-cust-4.xml"
 ```
 
 The resulting topology is as follows:
@@ -664,6 +664,12 @@ Test the connectivity between all of the customer's routers with this command:
 make test-ping
 ```
 *NOTE*: It may take up to a minute for the customer and provider routers to establish a BGP session and exchange routes.
+
+Throughout this tutorial you have used the `send-config-wait` target to apply
+intent configuration. This synchronous method waits for Orchestron to apply the
+configuration to the device(s) before it returns. Usually, asynchronous
+operations are preferred. Try using the `send-config` target instead and notice
+how your terminal returns as soon as the intent was accepted by SORESPO.
 
 ## What's Next
 Now that you are familiar with running SORESPO and interacting with it,
