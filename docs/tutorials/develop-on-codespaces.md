@@ -53,9 +53,8 @@ routers. The current state of the lab is identical to the final step in the
 * The SORESPO process runs interactively in this Terminal window. When you
   kill it with *Ctrl+C*, SORESPO itself will stop, but the lab and all the
   routers will continue to run.
-* You will need to **open a second Terminal** to enter further commands and
-  continue with the tutorial. Click the *+* button in the top right of the VS
-  Code Terminal window to do so.
+* **Open a second Terminal** to continue with the tutorial.
+Click the *+* button in the top right of the VS Code Terminal window to do so.
 * The lab can be shut down with `make stop`.
 
 ## Modifying the SORESPO application
@@ -63,16 +62,15 @@ routers. The current state of the lab is identical to the final step in the
 Changing the application typically involves modifying the RFS transforms to
 modify the output configuration and optionally modifying the models.
 
-Let's first retrieve the current configuration on the `ams-core-1` router, we
-will do so by connecting to the router directly over NETCONF.
+Retrieve the current configuration on the `ams-core-1` router, by connecting to
+the router directly over NETCONF.
 In a new Terminal navigate to the `/workspaces/sorespo/test/quicklab-srl`
 directory and get the configuration:
 ```shell
 cd test/quicklab-srl
 make get-dev-config-ams-core-1 | sed -n '/<interface xmlns="urn:nokia.com:srlinux:chassis:interfaces">/,/<\/interface>/p'
 ```
-*NOTE*: The `sed` command filters the output down to the section we are
-interested in for the purpose of this tutorial.
+*NOTE*: The `sed` command filters the output down to the interface section.
 
 Part of the output is the VRF interface:
 ```xml
@@ -105,7 +103,7 @@ Part of the output is the VRF interface:
 
 Notice how SORESPO filled in a handy interface description for the
 subinterface, but there is no description on the main `ethernet-1/3`
-interface. We will now modify the SORESPO code to add one in.
+interface. Modify the SORESPO code to add in a description.
 
 Open `sorespo/src/sorespo/rfs.act` in your favorite editor and find the
 following section of the code:
@@ -124,7 +122,7 @@ class VrfInterface(base.VrfInterface):
             intf.vlan_tagging = True
 ```
 
-Now, modify `sorespo/src/sorespo/rfs.act` to set an interface description on
+Modify `sorespo/src/sorespo/rfs.act` to set an interface description on
 VRF interfaces:
 ```diff
 class VrfInterface(base.VrfInterface):
@@ -141,19 +139,19 @@ class VrfInterface(base.VrfInterface):
 +           intf.description = "VRF Interface for customer connections"
 ```
 
-After you have saved the file to disk, you can re-build the SORESPO binary
+After you have saved the file to disk, re-build the SORESPO binary
 to incorporate the change. Press *Ctrl+C* in the terminal window where
 SORESPO is running.
 
-Then in the same terminal window trigger a build:
+In the same terminal window trigger a build:
 ```shell
 make -C ../../ build
 ```
-*NOTE*: With `-C ../../` we instruct `make` to run the `build` recipe two
+*NOTE*: With `-C ../../` `make` runs the `build` recipe two
 levels up from the current directory, saving us the hassle of moving around in
 the directory structure.
 
-After the build has completed you can copy your updated binary into the lab and
+After the build has completed copy your updated binary into the lab and
 re-run and re-configure SORESPO:
 ```shell
 make copy run-and-configure
@@ -165,8 +163,7 @@ repeat the steps above to validate your change was successful.
 make get-dev-config-ams-core-1 | sed -n '/<interface xmlns="urn:nokia.com:srlinux:chassis:interfaces">/,/<\/interface>/p'
 ```
 
-We can now see the interface description has been applied to each of the VRF
-interfaces on our routers:
+The interface description has been applied to each of the VRF interfaces:
 ```diff
 ...
 <interface xmlns="urn:nokia.com:srlinux:chassis:interfaces">
@@ -220,10 +217,8 @@ Part of the output will be a configuration instance for the `vrf-interface` on `
 ...
 ```
 
-This RFS instance at present does not have an input for MTU configuration. We
-can also see this by reviewing the YANG model for this layer in
-`sorespo/gen/yang/rfs/sorespo-rfs.yang`.
-
+This RFS instance at present does not have an input for MTU configuration.
+Review the YANG model for this layer in `sorespo/gen/yang/rfs/sorespo-rfs.yang`.
 ```yang
 ...
 list vrf-interface {
@@ -303,7 +298,7 @@ class L3Vpn(base.L3Vpn):
             vi.vrf = i.name
 ```
 
-Now, modify `sorespo/src/sorespo/inter.act` to set an MTU on VRF interfaces:
+Modify `sorespo/src/sorespo/inter.act` to set an MTU on VRF interfaces:
 ```diff
 ...
 class L3Vpn(base.L3Vpn):
@@ -319,21 +314,21 @@ class L3Vpn(base.L3Vpn):
 
 
 After you have saved the files to disk, you can re-build the SORESPO binary
-to incorporate the change. Once again, press *Ctrl+C* in the terminal window
+to incorporate the change. Press *Ctrl+C* in the terminal window
 where SORESPO is running.
 
-Then, in the same terminal window, request the Orchestron build system and
+In the same terminal window, request the Orchestron build system and
 Acton YANG parser to re-generate the codebase from the SORESPO YANG modules:
 ```shell
 make -C ../../ gen
 ```
 
-Then in the same terminal window trigger a build:
+In the same terminal window trigger a build:
 ```shell
 make -C ../../ build
 ```
 
-After the build has completed you can copy your updated binary into the lab and
+After the build has completed copy your updated binary into the lab and
 re-run and re-configure SORESPO:
 ```shell
 make copy run-and-configure
