@@ -48,7 +48,7 @@ Orchestron/sorespo running..
 ```
 
 This will first start the entire SR Linux network lab and finally run the
-SORESPO system as an foreground in this shell window, which will show log 
+SORESPO system in the foreground in this shell window, which will show log 
 output from SORESPO as it is working. You will need to **open a second shell**
 to enter further commands and continue with the tutorial.
 
@@ -69,8 +69,8 @@ describes the intent for the network infrastructure, including the list of
 core routers and backbone links between them. Once provisioned, the network 
 will be ready for customer service configuration.
 
-In a new shell, navigate to the `sorespo/test/quicklab-srl` directory and load
-the configuration intent:
+In a new shell, navigate to the `sorespo/test/quicklab-srl`
+directory and load the configuration intent:
 ```shell
 cd sorespo/test/quicklab-srl
 make send-config FILE="tutorial-netinfra.xml" 
@@ -197,14 +197,12 @@ The Customer Facing Service (top-level) YANG model defines SORESPO's northbound
 interface for users and/or BSS/OSS platforms. The YANG modules for `layer0` are
 located in `sorespo/gen/yang/cfs`.
 
-We can retrieve the top-level (CFS) configuration (level 0) from SORESPO
+We can retrieve the top-level (CFS) configuration (`layer0`) from SORESPO
 using the following command:
 
 ```shell
 make get-config0
 ```
-
-This `make` target fetches XXX, which
 
 *Note*: XML is used for all of the examples throughout this tutorial, but if
 you prefer JSON format, use:
@@ -621,7 +619,7 @@ added as per the updated intent (4 routers).
 Finally, let's connect a customer site to the new router:
 
 ```shell
-FILE="tutorial-add-cust-4.xml" make send-config
+make send-config FILE="tutorial-add-cust-4.xml"
 ```
 
 The resulting topology is as follows:
