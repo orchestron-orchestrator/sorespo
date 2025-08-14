@@ -2,8 +2,16 @@
 
 ## Introduction
 
-The SORESPO network is a combination of a number of (containerized) router labs
-and the orchestration system to manage the entire lifecycle of the network.
+SORESPO is a network automation system based on the Orchestron platform that
+support configuring an IP network with L3VPN network services and manage the
+full life cycle of the network, including core network infrastructure 
+configuration. As part of the SORESPO git repository, there are a number of
+*test environments*, offering virtual network topologies, based on 
+containerized routers, for testing, development and demoing.
+
+This document will take you through starting the virtual network lab based on
+Nokia SR Linux devices and provisioning it with the SORESPO network 
+automation system. 
 
 You will need a Linux host with 4 CPU cores and 8 GB of RAM available to be
 able to start the "Nokia SR Linux" lab used throughout this tutorial.
@@ -39,45 +47,45 @@ make tutorial
 Orchestron/sorespo running..
 ```
 
-This will first start the entire SR Linux lab and finally run the SORESPO
-process interactively in this shell window. You will need to
-**open a second shell** to enter further commands and continue with the
-tutorial.
+This will first start the entire SR Linux network lab and finally run the
+SORESPO system in the foreground in this shell window, which will show log 
+output from SORESPO as it is working. You will need to **open a second shell**
+to enter further commands and continue with the tutorial.
 
 *Note*: The lab can be shut down with `make stop`
 
-At this stage, we have the lab topology with running containerized routers.
-The only configuration they have is for the management access and credentials
-so that SORESPO can connect and send configuration. Otherwise, they are
-unconfigured. The Orcheston application is also running, but does not have any
-network or service intent configuration loaded.
+At this stage, we have the lab topology with containerized routers running.
+The only configuration loaded on the routers is for the management access and
+credentials so that SORESPO can connect and send configuration. Otherwise, they
+are unconfigured. The SORESPO system is also running but does not have any 
+network or service intent configuration loaded, nor even any knowledge of the
+devices themselves and thus has not communicated with them.
 
 ## Loading intent configuration into SORESPO
 
-To configure the underlying routers and links, we load in the top-level XML
-configuration for the starting core network topology. This file describes the
-network infrastructure intent, which is all that is needed to configure the
-core routers, backbone links and routing protocols that are ready forcustomer
-service configuration.
+To configure the underlying routers and links, we load the configuration for
+the initial core network topology. We use an XML configuration file that 
+describes the intent for the network infrastructure, including the list of 
+core routers and backbone links between them. Once provisioned, the network 
+will be ready for customer service configuration.
 
-In a new shell navigate to the `sorespo/test/quicklab-srl` directory and load
-the intent:
+In a new shell, navigate to the `sorespo/test/quicklab-srl`
+directory and load the configuration intent:
 ```shell
 cd sorespo/test/quicklab-srl
-FILE="tutorial-netinfra.xml" make send-config
+make send-config FILE="tutorial-netinfra.xml" 
 ```
 
-Next we load in the top-level XML configuration for the customer's L3VPN
-service. This file describes the intent, which is all that is needed to
-configure a customer's VPN across all three core routers, and the access links
-to the customer's sites.
+Next we load the XML configuration for the customer's L3VPN service. This file
+describes the intent, which is all that is needed to configure a customer's 
+VPN across all three core routers, and the access links to the customer's sites.
 
 ```shell
-FILE="tutorial-l3vpn-svc.xml" make send-config 
+make send-config FILE="tutorial-l3vpn-svc.xml" 
 ```
 
-The resulting lab has three core SR Linux routers, each with an attached
-customer edge running FRRouting. This diagram shows the topology:
+The resulting network lab has three core SR Linux routers, each with an attached
+customer edge device running FRRouting. This diagram shows the topology:
 
 ```
 +-------------------+                                                                     +-------------------+   
@@ -141,10 +149,10 @@ and `quit` to log out of the router.
 *Note*: The [SR Linux Configuration Basics](https://documentation.nokia.com/srlinux/24-3/title/basics.html)
 are a great introduction to the Nokia SR Linux CLI.
 
-In the next section, we'll look at the contents of the two XML configuration
-files we just loaded. And we'll review step-by-step how layered automation
-enables SOPESPO to configure a complete Service Provider network from a
-high-level intent.  
+In the next section, we will look at the contents of the two XML configuration
+files we just loaded. We will review step-by-step how layered automation
+enables SORESPO to configure a complete Service Provider network from a
+high-level intent.
 
 ## Service Automation Layering In SORESPO
 
@@ -175,7 +183,10 @@ implemented - as few or many as necessary can be used.
 ```
 
 
-The SORESPO container implements a RESTCONF northbound interface.
+The SORESPO system implements a RESTCONF northbound interface, which is
+model-driven by Orchestron based on the top-level CFS YANG model of the SORESPO
+system.
+
 For many common queries and tasks, `make` targets are implemented to send the
 relevant RESTCONF requests. 
 
@@ -186,7 +197,7 @@ The Customer Facing Service (top-level) YANG model defines SORESPO's northbound
 interface for users and/or BSS/OSS platforms. The YANG modules for `layer0` are
 located in `sorespo/gen/yang/cfs`.
 
-We can retrieve the top-level (CFS) configuration (level 0) from SORESPO
+We can retrieve the top-level (CFS) configuration (`layer0`) from SORESPO
 using the following command:
 
 ```shell
@@ -204,7 +215,7 @@ configuration file we loaded above), which describes the configuration of the
 network devices and topology, and `<l3vpn-svc>` (the second loaded
 configuration file) which is an implementation of `ietf-l3vpn-svc.yang` defined
 in RFC8299. This is used to define the VPNs, customer attachment points and
-other paramteres necessary for provisioning customer L3VPN services. 
+other parameters necessary for provisioning customer L3VPN services.
 
 ```xml
 <netinfra xmlns="http://example.com/netinfra">
@@ -219,7 +230,7 @@ other paramteres necessary for provisioning customer L3VPN services.
 #### Core Network Topology Configuration `<netinfra>`
 
 `<netinfra>` holds the router and backbone link configuration. At `layer0`,
-this is highly abstracted with only the essential paramaters being exposed.
+this is highly abstracted with only the essential parameters being exposed.
 The other automation layers implement the logic necessary to create the device
 level configuration (described by vendor supplied YANG modules).
 
@@ -243,7 +254,7 @@ level configuration (described by vendor supplied YANG modules).
 ```
 
 The `<router>` container defines the router's name and its role in the network
-topology (core or edge).
+topology (`core` / `edge`).
 
 The `<backbone-link>` container defines the necessary endpoint paramaters to
 configure a link between two routers.
@@ -359,12 +370,14 @@ has been defined in the layer0 `ietf-l3vpn-svc` configuration.
 
 At the Intermediate layer, we also introduce a new container for configuring
 iBGP between the core routers. As the configuration for this is entirely
-deterministic, we don't need to expose it at `layer0`. All of the necessary
-configuration is created through SORESPO's automation.
+deterministic, we don't need to expose it at `layer0`. All of the iBGP
+configuration is created through SORESPO's automation, derived from the CFS
+intent. The logic is simple, all core routers will form an iBGP full-mesh.
 
-As there are no BGP route reflectors in the topology, we are building an iBGP
-full-mesh. At this layer, we define the BGP authentication and calculate the
-IPv4 address for each of the peering routers.
+*Note*: it would be trivial to add route-reflectors, suitable for larger networks
+
+The Intermediate layer calculates the IPv4 addresses used for each
+of the peering routers and configures authentication.
 
 ```xml
 <netinfra xmlns="http://example.com/netinfra-inter">
@@ -418,12 +431,14 @@ follows:
 ### Configuration at Layer 2 - Resource Facing Service (RFS)
 
 `layer2` is the Resource Facing Service (RFS) layer. Once again, configuration
-at this layer is more explict, with more parameters being generated by the
-automation. The main role of the RFS layer is to provide a stable
-vendor-agnostic abstraction to the upper layers. This means that new device
-type's YANG models and versions, or other device management protocol
+at this layer is more explicit and concrete, with more parameters being 
+filled-in by the automation. The main role of the RFS layer is to provide a 
+stable vendor-agnostic abstraction to the upper layers. This means that new 
+device type's YANG models and versions, or other device management protocol
 integrations can be added without needing to make any changes to the
-Intermediate or CFS layers above.
+Intermediate or CFS layers above. All RFS transforms are written per device,
+that is, a single RFS transform only writes to a single device. This enables
+RFS transforms to be re-run in order to react to changes on the device.
 
 The YANG modules for `layer2` are located in `sorespo/gen/yang/rfs`.
 
@@ -507,8 +522,8 @@ Which gives the following output:
 
 #### Configuration at Layer 3 - The Device Layer
 
-At this layer, we have the vendor's device specific YANG models. The YANG modules for 
-this layer vendor proprietary and locaed in per-device/version directories:
+At this layer, we have the vendor proprietary device YANG models. The YANG
+modules are organized in directories by device and software version:
 
 * For Cisco IOS-XR: `sorespo/gen/yang/CiscoIosXr_24_1_ncs55a1`
 * For Jupiper JUNOS: `JuniperCRPD_23_4R1_9`
@@ -520,7 +535,7 @@ make get-config3
 
 This returns several hundred lines of XML defining the full configuration of
 each of the core router devices. We can see from the XML namespaces
-( `xmlns="urn:nokia.com:srlinux:`) that these are the vendor's models.
+( `xmlns="urn:nokia.com:srlinux:`) that these are the vendor models.
 
 
 ## Adding a new Core Router to the Topology
@@ -558,7 +573,7 @@ configuration for that router. The configuration is defined in
 
 We send this configuration to SORESPO in the same way as we did above:
 ```shell
-FILE="tutorial-add-lju.xml" make send-config
+make send-config FILE="tutorial-add-lju.xml"
 ```
 
 The topology now has four core routers. We can check this by logging in to the
@@ -597,10 +612,14 @@ Summary:
 0 dynamic peers
 ```
 
+Not only did we configure the new LJU-CORE-1 router but the necessary
+configuration, iBGP neighbors, on all the other routers was automatically
+added as per the updated intent (4 routers).
+
 Finally, let's connect a customer site to the new router:
 
 ```shell
-FILE="tutorial-add-cust-4.xml" make send-config
+make send-config FILE="tutorial-add-cust-4.xml"
 ```
 
 The resulting topology is as follows:
