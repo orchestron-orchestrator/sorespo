@@ -32,8 +32,7 @@ available in your browser.
 
 ## Starting the SORESPO Network
 
-In the Terminal window go into the `/workspaces/sorespo/test/quicklab-srl`
-directory and start the tutorial:
+Go into the `/workspaces/sorespo/test/quicklab-srl` directory and start the tutorial:
 ```shell
 cd test/quicklab-srl
 make tutorial
@@ -42,51 +41,41 @@ make tutorial
 ...
 Orchestron/sorespo running..
 ```
-
 *NOTE*: Accept any browser pop-up that may appear the first time you try to
 paste text into the in-browser VS Code.
 
-
-This will first start the entire SR Linux network lab and finally run the
-SORESPO system in the foreground in this shell window, which will show log 
-output from SORESPO as it is working. You will need to **open a second
-Teminal** to enter further commands and continue with the tutorial. Click the
-*+* button in the top right of the VS Code Terminal window to do so.
+This will start the entire SR Linux network lab and run the SORESPO system in
+the foreground in this shell window. It will show log output from SORESPO as
+it is working. **Open a second Teminal** to continue with the tutorial.
+Click the *+* button in the top right of the VS Code Terminal window to do so.
 
 *Note*: The lab can be shut down with `make stop`
 
-At this stage, we have the lab topology with containerized routers running.
-The only configuration loaded on the routers is for the management access and
-credentials so that SORESPO can connect and send configuration. Otherwise, they
-are unconfigured. The SORESPO system is also running but does not have any 
-network or service intent configuration loaded, nor even any knowledge of the
-devices themselves and thus has not communicated with them.
+At this point, your containerized routers are running with only management
+access configured, allowing SORESPO to connect and push configuration. The
+SORESPO system is also running but has no network or service intent
+configuration loaded.
 
 ## Loading intent configuration into SORESPO
 
-To configure the underlying routers and links, we load the configuration for
-the initial core network topology. We use an XML configuration file that 
-describes the intent for the network infrastructure, including the list of 
-core routers and backbone links between them. Once provisioned, the network 
-will be ready for customer service configuration.
-
-In a new Terminal navigate to the `/workspaces/sorespo/test/quicklab-srl`
+`tutorial-netinfra.xml` describes the intent for the network infrastructure,
+including the list of core routers and backbone links between them. In a new
+Terminal navigate to the `/workspaces/sorespo/test/quicklab-srl`
 directory and load the configuration intent:
 ```shell
 cd test/quicklab-srl
 make send-config FILE="tutorial-netinfra.xml" 
 ```
 
-Next we load the XML configuration for the customer's L3VPN service. This file
-describes the intent, which is all that is needed to configure a customer's 
-VPN across all three core routers, and the access links to the customer's sites.
-
+`tutorial-l3vpn-svc.xml`  describes the intent for the customer's L3VPN service.
+Load the configuration intent to create a customer VPN across all three
+core routers, and the access links to the customer's sites:
 ```shell
 make send-config FILE="tutorial-l3vpn-svc.xml" 
 ```
 
-The resulting lab has three core SR Linux routers, each with an attached
-customer edge running FRRouting. This diagram shows the topology:
+The resulting network lab has three core SR Linux routers, each with an attached
+customer edge device running FRRouting. This diagram shows the topology:
 
 ```
 +-------------------+                                                                     +-------------------+   
@@ -150,11 +139,6 @@ and `quit` to log out of the router.
 *Note*: The [SR Linux Configuration Basics](https://documentation.nokia.com/srlinux/24-3/title/basics.html)
 are a great introduction to the Nokia SR Linux CLI.
 
-In the next section, we will look at the contents of the two XML configuration
-files we just loaded. We will review step-by-step how layered automation
-enables SORESPO to configure a complete Service Provider network from a
-high-level intent.
-
 ## Service Automation Layering In SORESPO
 
 SORESPO implements highly abstracted device and service configuration through
@@ -198,8 +182,7 @@ The Customer Facing Service (top-level) YANG model defines SORESPO's northbound
 interface for users and/or BSS/OSS platforms. The YANG modules for `layer0` are
 located in `sorespo/gen/yang/cfs`.
 
-We can retrieve the top-level (CFS) configuration (`layer0`) from SORESPO
-using the following command:
+Retrieve the top-level (CFS) configuration (`layer0`) from SORESPO:
 
 ```shell
 make get-config0
@@ -212,11 +195,12 @@ make get-config-json0
 ```
 
 The resulting output has two top-level containers, `<netinfra>` (the first
-configuration file we loaded above), which describes the configuration of the
-network devices and topology, and `<l3vpn-svc>` (the second loaded
-configuration file) which is an implementation of `ietf-l3vpn-svc.yang` defined
-in RFC8299. This is used to define the VPNs, customer attachment points and
-other parameters necessary for provisioning customer L3VPN services.
+ configuration file you loaded), which describes the configuration of the
+network devices and topology, and `<l3vpn-svc>` (the second configuration file
+you loaded) which is an implementation of `ietf-l3vpn-svc.yang` defined
+in [RFC8299](https://datatracker.ietf.org/doc/html/rfc8299). The L3VPN Service
+Model is used to define the VPNs, customer attachment points and other
+parameters necessary for provisioning customer L3VPN services.
 
 ```xml
 <netinfra xmlns="http://example.com/netinfra">
@@ -447,8 +431,7 @@ At this layer, there is an instance of `<device>` container per managed device
 and a corresponding `<rfs>` container defining the devices SORESPO is
 managing and the RFS services that SORESPO defines.
 
-Let's retrieve the configuration for `layer2`:
-
+Retrieve the configuration for `layer2`:
 ```shell
 make get-config2
 ```
@@ -523,20 +506,21 @@ Which gives the following output:
 
 #### Configuration at Layer 3 - The Device Layer
 
-At this layer, we have the vendor proprietary device YANG models. The YANG
+The vendor proprietary device YANG models are located on this layer. The YANG
 modules are organized in directories by device and software version:
 
 * For Cisco IOS-XR: `sorespo/gen/yang/CiscoIosXr_24_1_ncs55a1`
 * For Jupiper JUNOS: `JuniperCRPD_23_4R1_9`
 * For Nokia SR-Linux: `NokiaSRLinux_25_3_2`
 
+Retrieve the configuration for `layer2`:
 ```
 make get-config3
 ```
 
-This returns several hundred lines of XML defining the full configuration of
-each of the core router devices. We can see from the XML namespaces
-( `xmlns="urn:nokia.com:srlinux:`) that these are the vendor models.
+The output is several hundred lines of XML defining the full configuration of
+each of the core router devices. The XML namespaces
+( `xmlns="urn:nokia.com:srlinux:`) indicate that these are the vendor models.
 
 
 ## Adding a new Core Router to the Topology
@@ -572,18 +556,18 @@ configuration for that router. The configuration is defined in
 </data>
 ```
 
-We send this configuration to SORESPO in the same way as we did above:
+Send this configuration to SORESPO:
 ```shell
 make send-config FILE="tutorial-add-lju.xml"
 ```
 
-The topology now has four core routers. We can check this by logging in to the
-new router:
+The topology now has four core routers.
+Log in to the new router:
 ```shell
 make cli-lju-core-1
 ```
 
-And running the following command:
+Run the following command to review the BGP neighbor state:
 ```shell
 / show network-instance default protocols bgp neighbor
 ```
@@ -613,11 +597,11 @@ Summary:
 0 dynamic peers
 ```
 
-Not only did we configure the new LJU-CORE-1 router but the necessary
+The new LJU-CORE-1 router has been configured and the necessary
 configuration, iBGP neighbors, on all the other routers was automatically
-added as per the updated intent (4 routers).
+added as per the updated intent (4 routers) as well.
 
-Finally, let's connect a customer site to the new router:
+Connect a customer site to the new router:
 
 ```shell
 make send-config FILE="tutorial-add-cust-4.xml"
@@ -665,8 +649,7 @@ The resulting topology is as follows:
  +-------------------+                                                                       +-------------------+
 ```
 
-And finally, we can test the connectivity between all of the customer's
-routers with the following command:
+Test the connectivity between all of the customer's routers with this command:
 ```shell
 make test-ping
 ```
