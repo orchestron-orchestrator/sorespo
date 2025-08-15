@@ -83,9 +83,17 @@ shell:
 send-config:
 	curl -X PUT -H "Content-Type: application/yang-data+xml" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf
 
+.PHONY: send-config-wait
+send-config-wait:
+	curl -X PUT -H "Content-Type: application/yang-data+xml" -H "Await-Device: true" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf
+
 .PHONY: send-config-json
 send-config-json:
 	curl -X PUT -H "Content-Type: application/yang-data+json" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf
+
+.PHONY: send-config-json-wait
+send-config-json-wait:
+	curl -X PUT -H "Content-Type: application/yang-data+json" -H "Await-Device: true" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf
 
 .PHONY: send-config-tmf
 send-config-tmf:
