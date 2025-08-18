@@ -58,10 +58,10 @@ actor _test_netinfra1(t: testing.AsyncT):
     xml_conf = xml.decode(netinfra1_in)
     input_config = cfs_layer.from_xml(xml_conf)
 
-    dev_mgr = odev.DeviceManager(log_handler=t.log_handler)
-    cfs = sorespo.layers.get_layers(dev_mgr)
+    dev_registry = odev.DeviceRegistry(log_handler=t.log_handler)
+    cfs = sorespo.layers.get_layers(dev_registry)
     rfs = cfs.below().below()
-    dev_mgr.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
+    dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
     session = cfs.newsession()
 
     def cont(_r: value):
@@ -355,10 +355,10 @@ actor l3vpn_tester(t: testing.AsyncT, output_formatter: mut(gdata.Node) -> str):
     xml_conf = xml.decode(l3vpn_in)
     input_config = cfs_layer.from_xml(xml_conf)
 
-    dev_mgr = odev.DeviceManager(log_handler=t.log_handler)
-    cfs = sorespo.layers.get_layers(dev_mgr)
+    dev_registry = odev.DeviceRegistry(log_handler=t.log_handler)
+    cfs = sorespo.layers.get_layers(dev_registry)
     rfs = cfs.below().below()
-    dev_mgr.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
+    dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
     session = cfs.newsession()
 
     def cont(_r: value):

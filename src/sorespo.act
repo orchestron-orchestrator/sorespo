@@ -81,10 +81,10 @@ actor main(env):
 
     log = logging.Logger(logh)
 
-    dev_mgr = odev.DeviceManager(sorespo.sysspec.device_types, env.cap, logh_dev)
-    cfs = sorespo.layers.get_layers(dev_mgr, logh_ttt)
+    dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, env.cap, logh_dev)
+    cfs = sorespo.layers.get_layers(dev_registry, logh_ttt)
     rfs = cfs.below().below()
-    dev_mgr.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
+    dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
 
     tcpl_cap = net.TCPListenCap(net.TCPCap(net.NetCap(env.cap)))
 
@@ -166,7 +166,7 @@ actor main(env):
                     # We use upper case for device names in our configs
                     # TODO: maybe we should somehow normalize that?!
                     dev_name = path_elements[2].upper()
-                    dev = dev_mgr.get(dev_name)
+                    dev = dev_registry.get(dev_name)
                     if path_elements[3] == "capabilities":
                         respond(200, {}, str(dev.get_capabilities()))
                         return
@@ -186,7 +186,7 @@ actor main(env):
                         respond_with_data(config_gd, dev.get_schema(), request.headers.get("accept"))
                         return
                     if path_elements[3] == 'running':
-                        config_gd = dev.get_running_config()
+                        config_gd = dev.get_config()
                         respond_with_data(config_gd, dev.get_schema(), request.headers.get("accept"))
                         return
 
