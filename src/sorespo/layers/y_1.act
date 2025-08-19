@@ -3,14 +3,11 @@ import json
 import xml
 import yang.adata
 import yang.gdata
-from yang.common import Identityref
+from yang.identity import complete_and_validate_identityref
+from yang.identityref import Identityref, PartialIdentityref
+from yang.schema import DIdentity
 
 # == This file is generated ==
-
-
-mod_to_ns = {'ietf-inet-types':'urn:ietf:params:xml:ns:yang:ietf-inet-types', 'netinfra-inter':'http://example.com/netinfra-inter', 'l3vpn-inter':'http://example.com/l3vpn-inter'}
-ns_to_mod = {'urn:ietf:params:xml:ns:yang:ietf-inet-types':'ietf-inet-types', 'http://example.com/netinfra-inter':'netinfra-inter', 'http://example.com/l3vpn-inter':'l3vpn-inter'}
-prefix_to_mod = {'inet':'ietf-inet-types', 'netinfra-inter':'netinfra-inter', 'l3vpn-inter':'l3vpn-inter'}
 
 
 mut def from_json_netinfra_inter__netinfra__router__name(val: value) -> yang.gdata.Leaf:
@@ -171,7 +168,9 @@ class netinfra_inter__netinfra__router__l3vpn_vrf_entry(yang.adata.MNode):
         _vpn_id = self.vpn_id
         if _vpn_id is not None:
             children['vpn-id'] = yang.gdata.Leaf('string', _vpn_id)
-        children['ebgp-customer-address'] = yang.gdata.LeafList('union', self.ebgp_customer_address)
+        _ebgp_customer_address = self.ebgp_customer_address
+        if _ebgp_customer_address is not None:
+            children['ebgp-customer-address'] = yang.gdata.LeafList('union', _ebgp_customer_address)
         return yang.gdata.Container(children)
 
     @staticmethod

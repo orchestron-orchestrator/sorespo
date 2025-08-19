@@ -1,5 +1,4 @@
 import yang.adata
-from yang.common import Identityref
 import orchestron.ttt
 from orchestron import UnsupportedDevice
 
@@ -155,9 +154,9 @@ end-policy"""
             bgp = ni.protocols.create_bgp()
             bgp.autonomous_system = i.asn
             bgp.router_id = i.ipv4_address
-            ipv4_afi = bgp.afi_safi.create(Identityref("ipv4-unicast", "urn:nokia.com:srlinux:general:common", "srl_nokia-common"))
+            ipv4_afi = bgp.afi_safi.create(srl25.srl_nokia_common_ipv4_unicast)
             ipv4_afi.admin_state = "enable"
-            evpn_afi = bgp.afi_safi.create(Identityref("evpn", "urn:nokia.com:srlinux:general:common", "srl_nokia-common"))
+            evpn_afi = bgp.afi_safi.create(srl25.srl_nokia_common_evpn)
             evpn_afi.admin_state = "enable"
 
             # Create neighbor-group: IPV4-IBGP
@@ -349,13 +348,13 @@ class Vrf(base.Vrf):
 
             # Create the VRF
             ni = dev.network_instance.create(i.name)
-            ni.type = Identityref("ip-vrf", "urn:nokia.com:srlinux:net-inst:network-instance", "srl_nokia-network-instance")
+            ni.type = srl25.srl_nokia_network_instance_ip_vrf
             ni.admin_state = "enable"
 
             # VXLAN interface
             tunnel_if = dev.tunnel_interface.create("vxlan1")
             vxlan_if = tunnel_if.vxlan_interface.create(i.id)
-            vxlan_if.type = Identityref("routed", "urn:nokia.com:srlinux:chassis:interfaces", "srl_nokia-interfaces")
+            vxlan_if.type = srl25.srl_nokia_interfaces_routed
             vxlan_if.ingress.vni = i.id
             vxlan_if_name = "vxlan1.{i.id}"
             ni.vxlan_interface.create(vxlan_if_name)
@@ -379,7 +378,7 @@ class Vrf(base.Vrf):
             bgp.autonomous_system = i.asn
             bgp.ebgp_default_policy.import_reject_all = False
             bgp.ebgp_default_policy.export_reject_all = False
-            afi = bgp.afi_safi.create(Identityref("ipv4-unicast", "urn:nokia.com:srlinux:general:common", "srl_nokia-common"))
+            afi = bgp.afi_safi.create(srl25.srl_nokia_common_ipv4_unicast)
             afi.admin_state = "enable"
             group = bgp.group.create("customer")
             group.send_default_route.ipv4_unicast = True
