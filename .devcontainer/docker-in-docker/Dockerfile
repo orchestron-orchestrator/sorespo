@@ -1,4 +1,4 @@
-FROM ghcr.io/srl-labs/containerlab/devcontainer-dind-slim:0.67.0
+FROM ghcr.io/srl-labs/containerlab/devcontainer-dind-slim:0.69.3
 
 RUN sudo apt-get update \
  && sudo apt-get install -qy git-lfs gdb
