@@ -30,9 +30,10 @@ $(addprefix platform-cli-,$(ROUTERS_FRR)):
 	docker exec -it $(TESTENV)-$(subst platform-cli-,,$@) vtysh
 
 
+$(addprefix test-ping-,$(ROUTERS_FRR)): WAIT ?= 120s
 $(addprefix test-ping-,$(ROUTERS_FRR)):
 # brew install coreutils on MacOS
-	timeout --foreground 10s bash -c "until docker exec -t $(TESTENV)-$(@:test-ping-%=%) ping -c 1 -W 1 -I $(SRC) $(IP); do sleep 1; done"
+	timeout --foreground $(WAIT) bash -c "until docker exec -t $(TESTENV)-$(@:test-ping-%=%) ping -c 1 -W 1 -I $(SRC) $(IP); do sleep 1; done"
 
 .PHONY: test-ping
 test-ping::
