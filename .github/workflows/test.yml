@@ -19,7 +19,11 @@ jobs:
           path: |
             ~/.cache/acton
             out
-          key: acton-${{ hashFiles('**/build.act.json') }}-${{ steps.setup-acton.outputs.version }}
+          # Hacky cache update:
+          # https://github.com/actions/cache/blob/main/tips-and-workarounds.md#update-a-cache
+          key: acton-${{ github.run_id }}
+          restore-keys: |
+            acton
       - name: "Ensure generated code is up to date"
         run: |
           make gen
