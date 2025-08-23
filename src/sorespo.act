@@ -178,6 +178,17 @@ actor main(env):
                         txt += r"}"
                         respond(200, {}, txt)
                         return
+                    if path_elements[3] == 'diff':
+                        running_config_gd = dev.get_config()
+                        session = cfs.newsession()
+                        device_layer = session.below().below().below().get()
+                        device_entry = device_layer.get_cnt("devices").get_list("device").get_list_entry(dev_name)
+                        target_config_gd = device_entry.get_cnt("config")
+                        config_diff = None
+                        if running_config_gd is not None and target_config_gd is not None:
+                            config_diff = yang.gdata.diff(running_config_gd, target_config_gd)
+                        respond_with_data(config_diff, dev.get_schema(), request.headers.get("accept"))
+                        return
                     if path_elements[3] == 'target':
                         session = cfs.newsession()
                         device_layer = session.below().below().below().get()
