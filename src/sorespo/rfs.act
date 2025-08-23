@@ -81,6 +81,7 @@ end-policy"""
             rp = dev.routing_policy.route_policies.route_policy.create("ACCEPT", rpl)
 
             return dev
+
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
             print("RFS /rfs{{{di.name}}}/base-config transform for JUNOS", err=True)
             dev = crpd23.root()
@@ -129,6 +130,20 @@ end-policy"""
             index = dev.interface.create("system0").subinterface.create(0)
             index.ipv4.admin_state = "enable"
             index.ipv4.address.create("{i.ipv4_address}/32")
+
+            intf_mgmt = dev.interface.create("mgmt0")
+            intf_mgmt.admin_state = "enable"
+            intf_mgmt0 = intf_mgmt.subinterface.create(0)
+            intf_mgmt0.admin_state = "enable"
+            intf_mgmt0.ipv4.admin_state = "enable"
+            intf_mgmt0.ipv6.admin_state = "enable"
+
+            # mgmt network-instance is required
+            ni_mgmt = dev.network_instance.create("mgmt")
+            ni_mgmt.type = srl25.srl_nokia_network_instance_ip_vrf
+            ni_mgmt.admin_state = "enable"
+            ni_mgmt.description = "Management network instance"
+            ni_mgmt.interface.create("mgmt0.0")
 
             # IS-IS global config
             ni = dev.network_instance.create("default")
@@ -237,6 +252,7 @@ class BBInterface(base.BBInterface):
             ni = dev.network_instance.create("default")
             intf = dev.interface.create(i.name)
             intf.description = "Link to {i.remote.device} [{i.remote.interface}]"
+            intf.admin_state = "enable"
             subif = intf.subinterface.create(0)
             subif.admin_state = "enable"
             subif.description = "Link to {i.remote.device} [{i.remote.interface}]"
@@ -276,7 +292,7 @@ class IbgpNeighbor(base.IbgpNeighbor):
         print("RFS /rfs{{{di.name}}}/ibgp-neighbor transform running {i.address}", err=True)
 
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
-            print("RFS /rfs{{di.name}}/ibgp-neighbor transform running {i.address} for Cisco IOS XR", err=True)
+            print("RFS /rfs{{{di.name}}}/ibgp-neighbor transform running {i.address} for Cisco IOS XR", err=True)
             dev = xr24.root()
             bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(str(i.asn))
             nb = bgp_as.neighbors.neighbor.create(i.address)
@@ -284,7 +300,7 @@ class IbgpNeighbor(base.IbgpNeighbor):
             nb.description = i.description
             return dev
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
-            print("RFS /rfs{{di.name}}/ibgp-neighbor transform running {i.address} for JUNOS", err=True)
+            print("RFS /rfs{{{di.name}}}/ibgp-neighbor transform running {i.address} for JUNOS", err=True)
             dev = crpd23.root()
             bgp = dev.configuration.protocols.bgp
             g = bgp.group.create("IPV4-IBGP")
@@ -293,7 +309,7 @@ class IbgpNeighbor(base.IbgpNeighbor):
             return dev
 
         elif "srl_nokia-system" in di.modules:
-            print("RFS /rfs{{di.name}}/ibgp-neighbor transform running {i.address} for Nokia SRLinux", err=True)
+            print("RFS /rfs{{{di.name}}}/ibgp-neighbor transform running {i.address} for Nokia SRLinux", err=True)
             dev = srl25.root()
             bgp = dev.network_instance.create("default").protocols.create_bgp()
             group = bgp.group.create("IPV4-IBGP")
