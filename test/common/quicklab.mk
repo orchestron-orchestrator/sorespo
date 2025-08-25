@@ -143,6 +143,10 @@ $(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 $(addprefix get-running-diff-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 	@curl $(HEADERS) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/device/$(subst get-running-diff-,,$@)/diff
 
+.PHONY: $(addprefix reconfigure-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
+$(addprefix reconfigure-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
+	@curl $(HEADERS) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/device/$(subst reconfigure-,,$@)/reconfigure
+
 .PHONY: delete-config
 delete-config:
 	curl -X DELETE http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/netinfra:netinfra/routers=STO-CORE-1
