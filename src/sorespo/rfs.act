@@ -1,10 +1,15 @@
 import yang.adata
+import orchestron.device as odev
 import orchestron.ttt
 from orchestron import UnsupportedDevice
 
 import sorespo.cisco_vigenere
 
 import sorespo.layers.base_2 as base
+
+from sorespo.layers.y_2 import orchestron_rfs__rfs__backbone_interface_entry
+from sorespo.layers.y_2 import orchestron_rfs__rfs__backbone_interface__memory
+from sorespo.layers.y_2 import orchestron_rfs__rfs__backbone_interface__dynstate
 
 import sorespo.devices.CiscoIosXr_24_1_ncs55a1 as xr24
 import sorespo.devices.JuniperCRPD_23_4R1_9 as crpd23
@@ -183,8 +188,12 @@ end-policy"""
         raise UnsupportedDevice()
 
 
+actor BBInterfaceTransform(update_dynstate: proc(?orchestron_rfs__rfs__backbone_interface__dynstate) -> None, dev: odev.DeviceMgr):
+    def on_conf(conf: orchestron_rfs__rfs__backbone_interface_entry, memory: ?orchestron_rfs__rfs__backbone_interface__memory):
+        print("BBInterfaceTransform:\n{conf.to_gdata().to_xmlstr()}")
+
 class BBInterface(base.BBInterface):
-    def transform(self, i, di):
+    def transform(self, i, di, memory, dynstate):
         print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}]", err=True)
 
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
@@ -212,7 +221,7 @@ class BBInterface(base.BBInterface):
             ldp.interfaces.interface.create(i.name)
             ldp.address_families.address_family.create("ipv4")
 
-            return dev
+            return dev, memory
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
             print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}] for JUNOS", err=True)
             dev = crpd23.root()
@@ -242,7 +251,7 @@ class BBInterface(base.BBInterface):
             dev.configuration.protocols.mpls.interface.create(interface)
             dev.configuration.protocols.ldp.interface.create(interface)
 
-            return dev
+            return dev, memory
 
         elif "srl_nokia-system" in di.modules:
             print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}] for Nokia SRLinux", err=True)
@@ -282,7 +291,7 @@ class BBInterface(base.BBInterface):
             il2 = isis_intf.level.create(2)
             il2.metric = 5000
 
-            return dev
+            return dev, memory
 
         raise UnsupportedDevice()
 

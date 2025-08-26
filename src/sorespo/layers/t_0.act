@@ -11,7 +11,17 @@ import yang.gdata
 
 import sorespo.cfs
 
+from sorespo.layers.y_0 import netinfra__netinfra__router__memory
+from sorespo.layers.y_0 import netinfra__netinfra__router_entry
+from sorespo.layers.y_0 import netinfra__netinfra__router__dynstate
 
 def get_ttt(lower: ?ttt.Layer, dev_registry: odev.DeviceRegistry, log_handler: ?logging.Handler=None) -> proc(list[str],?ttt.Layer)->ttt.Node:
-    r = ttt.Container({"netinfra": ttt.Container({"router": ttt.List(ttt.Transform(sorespo.cfs.Router, None, lower, log_handler), ['name'], ['string']), "backbone-link": ttt.List(ttt.Transform(sorespo.cfs.BBLink, None, lower, log_handler), ['left-router', 'left-interface', 'right-router', 'right-interface'], ['string', 'string', 'string', 'string'])}, ns='http://example.com/netinfra', module='netinfra'), "l3vpn-svc": ttt.Container({"vpn-profiles": ttt.Container({"valid-provider-identifiers": ttt.Container({"cloud-identifier": ttt.List(ttt.Container({}), ['id'], ['string']), "encryption-profile-identifier": ttt.List(ttt.Container({}), ['id'], ['string']), "qos-profile-identifier": ttt.List(ttt.Container({}), ['id'], ['string']), "bfd-profile-identifier": ttt.List(ttt.Container({}), ['id'], ['string'])})}), "vpn-services": ttt.Container({"vpn-service": ttt.List(ttt.Transform(sorespo.cfs.L3VpnVpnService, None, lower, log_handler), ['vpn-id'], ['string'])}), "sites": ttt.Container({"site": ttt.List(ttt.Transform(sorespo.cfs.L3VpnSite, None, lower, log_handler), ['site-id'], ['string'])})}, ns='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', module='ietf-l3vpn-svc')})
+    r = ttt.Container({"netinfra": ttt.Container({"router": ttt.List(ttt.Transform(sorespo.cfs.Router, RouterTransformCtor, lower, log_handler), ['name'], ['string']), "backbone-link": ttt.List(ttt.Transform(sorespo.cfs.BBLink, None, lower, log_handler), ['left-router', 'left-interface', 'right-router', 'right-interface'], ['string', 'string', 'string', 'string'])}, ns='http://example.com/netinfra', module='netinfra'), "l3vpn-svc": ttt.Container({"vpn-profiles": ttt.Container({"valid-provider-identifiers": ttt.Container({"cloud-identifier": ttt.List(ttt.Container({}), ['id'], ['string']), "encryption-profile-identifier": ttt.List(ttt.Container({}), ['id'], ['string']), "qos-profile-identifier": ttt.List(ttt.Container({}), ['id'], ['string']), "bfd-profile-identifier": ttt.List(ttt.Container({}), ['id'], ['string'])})}), "vpn-services": ttt.Container({"vpn-service": ttt.List(ttt.Transform(sorespo.cfs.L3VpnVpnService, None, lower, log_handler), ['vpn-id'], ['string'])}), "sites": ttt.Container({"site": ttt.List(ttt.Transform(sorespo.cfs.L3VpnSite, None, lower, log_handler), ['site-id'], ['string'])})}, ns='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', module='ietf-l3vpn-svc')})
     return r
+
+def RouterTransformCtor(params: ttt.TransformActorParams) -> ?proc(yang.gdata.Node, ?yang.gdata.Node) -> None:
+    _update_dynstate = params.update_dynstate
+    def update_dynstate_type_wrapper(dynstate: ?netinfra__netinfra__router__dynstate):
+        _update_dynstate(dynstate)
+    act = sorespo.cfs.RouterTransform(update_dynstate_type_wrapper)
+    return proc lambda c, m: act.on_conf(netinfra__netinfra__router_entry.from_gdata(c), netinfra__netinfra__router__memory.from_gdata(m) if m is not None else None)

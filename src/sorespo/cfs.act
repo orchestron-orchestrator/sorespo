@@ -9,8 +9,16 @@ import sorespo.layers.y_0 as y_0
 # https://github.com/actonlang/acton/issues/2390
 import yang.identityref
 
+from sorespo.layers.y_0 import netinfra__netinfra__router_entry
+from sorespo.layers.y_0 import netinfra__netinfra__router__memory
+from sorespo.layers.y_0 import netinfra__netinfra__router__dynstate
+
+actor RouterTransform(update_dynstate: proc(?netinfra__netinfra__router__dynstate) -> None):
+    def on_conf(conf: netinfra__netinfra__router_entry, memory: ?netinfra__netinfra__router__memory):
+        print("RouterTransform:\n{conf.to_gdata().to_xmlstr()}")
+
 class Router(base.Router):
-    def transform(self, i):
+    def transform(self, i, memory, dynstate):
         o = base.o_root()
         print("CFS router transform running", i.name, i.id)
         o_router = o.netinfra.router.create(i.name)
@@ -28,8 +36,71 @@ class Router(base.Router):
         fm = o.netinfra.ibgp_fullmesh.create(i.asn, IGBP_AUTHENTICATION_KEY)
         fmr = fm.router.create(i.name, bc.ipv4_address)
 
-        return o
+        return o, None
 
+# actor RouterTransform(update_dynstate: proc(?yang.adata.MNode) -> None):
+#     def on_conf(conf: yang.gdata.Node):
+#         pass
+
+# class Router(base.Router):
+#     def transform(self, i, dynstate):
+#         o = base.o_root()
+#         print("CFS router transform running", i.name, i.id)
+#         o_router = o.netinfra.router.create(i.name)
+#         o_router.id = i.id
+#         o_router.role = i.role
+#         o_router.mock = i.mock
+
+#         # Assign the loopback interface addresses
+#         bc = o_router.base_config
+#         bc.ipv4_address = "10.0.0.%d" % i.id
+#         bc.ipv6_address = "2001:db8:0:0::%d" % i.id
+#         bc.asn = i.asn
+
+#         fm = o.netinfra.ibgp_fullmesh.create(i.asn, IGBP_AUTHENTICATION_KEY)
+#         fmr = fm.router.create(i.name, bc.ipv4_address)
+
+#         return o
+
+# class Router(base.Router):
+#     def transform(self, i, memory):
+#         o = base.o_root()
+#         print("CFS router transform running", i.name, i.id)
+#         o_router = o.netinfra.router.create(i.name)
+#         o_router.id = i.id
+#         o_router.role = i.role
+#         o_router.mock = i.mock
+
+#         # Assign the loopback interface addresses
+#         bc = o_router.base_config
+#         bc.ipv4_address = "10.0.0.%d" % i.id
+#         bc.ipv6_address = "2001:db8:0:0::%d" % i.id
+#         bc.asn = i.asn
+
+#         fm = o.netinfra.ibgp_fullmesh.create(i.asn, IGBP_AUTHENTICATION_KEY)
+#         fmr = fm.router.create(i.name, bc.ipv4_address)
+
+#         return o, None
+
+# class Router(base.Router):
+#     def transform(self, i):
+#         o = base.o_root()
+#         print("CFS router transform running", i.name, i.id)
+#         o_router = o.netinfra.router.create(i.name)
+#         o_router.id = i.id
+#         o_router.role = i.role
+#         o_router.mock = i.mock
+
+#         # Assign the loopback interface addresses
+#         bc = o_router.base_config
+#         bc.ipv4_address = "10.0.0.%d" % i.id
+#         bc.ipv6_address = "2001:db8:0:0::%d" % i.id
+#         bc.asn = i.asn
+
+#         fm = o.netinfra.ibgp_fullmesh.create(i.asn, IGBP_AUTHENTICATION_KEY)
+#         fmr = fm.router.create(i.name, bc.ipv4_address)
+
+#         return o
 
 class BBLink(base.BBLink):
     def transform(self, i):

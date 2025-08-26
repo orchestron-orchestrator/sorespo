@@ -3516,6 +3516,20 @@ identity urllc {
           enum juniper-junos;
         }
       }
+      container memory {
+        orchestron:memory;
+
+        leaf test1 {
+          type string;
+        }
+      }
+      container dynstate {
+        orchestron:dynstate;
+
+        leaf test2 {
+          type string;
+        }
+      }
     }
 
     list backbone-link {
@@ -4037,6 +4051,148 @@ mut def from_json_netinfra__netinfra__router__mock(val: value) -> yang.gdata.Lea
 mut def from_xml_netinfra__netinfra__router__mock(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('enumeration', val)
 
+mut def from_json_netinfra__netinfra__router__memory__test1(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('string', val)
+
+mut def from_xml_netinfra__netinfra__router__memory__test1(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('string', val)
+
+class netinfra__netinfra__router__memory(yang.adata.MNode):
+    test1: ?str
+
+    mut def __init__(self, test1: ?str):
+        self._ns = 'http://example.com/netinfra'
+        self.test1 = test1
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        children = {}
+        _test1 = self.test1
+        if _test1 is not None:
+            children['test1'] = yang.gdata.Leaf('string', _test1)
+        return yang.gdata.Container(children)
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> netinfra__netinfra__router__memory:
+        if n is not None:
+            return netinfra__netinfra__router__memory(test1=n.get_opt_str('test1'))
+        return netinfra__netinfra__router__memory()
+
+    def prsrc(self, self_name='ad', top=True, list_element=False):
+        res = []
+        if top:
+            res.append('# Top node: /netinfra/router/memory')
+            res.append('{self_name} = netinfra__netinfra__router__memory()')
+        leaves = []
+        _test1 = self.test1
+        if _test1 is not None:
+            leaves.append('{self_name}.test1 = {repr(_test1)}')
+        if leaves:
+            if not list_element:
+               res = ['', '# Container: /netinfra/router/memory'] + leaves + res
+            else:
+                res = leaves + res
+        return '\n'.join(res)
+
+
+mut def from_xml_netinfra__netinfra__router__memory(node: xml.Node) -> yang.gdata.Container:
+    children = {}
+    child_test1 = yang.gdata.from_xml_opt_str(node, 'test1')
+    yang.gdata.maybe_add(children, 'test1', from_xml_netinfra__netinfra__router__memory__test1, child_test1)
+    return yang.gdata.Container(children)
+
+mut def from_json_path_netinfra__netinfra__router__memory(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'test1':
+            raise ValueError("Invalid json path to non-inner node")
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_netinfra__netinfra__router__memory(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_netinfra__netinfra__router__memory(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_test1 = yang.gdata.take_json_opt_str(jd, 'test1')
+    yang.gdata.maybe_add(children, 'test1', from_json_netinfra__netinfra__router__memory__test1, child_test1)
+    return yang.gdata.Container(children)
+
+mut def from_json_netinfra__netinfra__router__dynstate__test2(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('string', val)
+
+mut def from_xml_netinfra__netinfra__router__dynstate__test2(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('string', val)
+
+class netinfra__netinfra__router__dynstate(yang.adata.MNode):
+    test2: ?str
+
+    mut def __init__(self, test2: ?str):
+        self._ns = 'http://example.com/netinfra'
+        self.test2 = test2
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        children = {}
+        _test2 = self.test2
+        if _test2 is not None:
+            children['test2'] = yang.gdata.Leaf('string', _test2)
+        return yang.gdata.Container(children)
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> netinfra__netinfra__router__dynstate:
+        if n is not None:
+            return netinfra__netinfra__router__dynstate(test2=n.get_opt_str('test2'))
+        return netinfra__netinfra__router__dynstate()
+
+    def prsrc(self, self_name='ad', top=True, list_element=False):
+        res = []
+        if top:
+            res.append('# Top node: /netinfra/router/dynstate')
+            res.append('{self_name} = netinfra__netinfra__router__dynstate()')
+        leaves = []
+        _test2 = self.test2
+        if _test2 is not None:
+            leaves.append('{self_name}.test2 = {repr(_test2)}')
+        if leaves:
+            if not list_element:
+               res = ['', '# Container: /netinfra/router/dynstate'] + leaves + res
+            else:
+                res = leaves + res
+        return '\n'.join(res)
+
+
+mut def from_xml_netinfra__netinfra__router__dynstate(node: xml.Node) -> yang.gdata.Container:
+    children = {}
+    child_test2 = yang.gdata.from_xml_opt_str(node, 'test2')
+    yang.gdata.maybe_add(children, 'test2', from_xml_netinfra__netinfra__router__dynstate__test2, child_test2)
+    return yang.gdata.Container(children)
+
+mut def from_json_path_netinfra__netinfra__router__dynstate(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'test2':
+            raise ValueError("Invalid json path to non-inner node")
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_netinfra__netinfra__router__dynstate(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_netinfra__netinfra__router__dynstate(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_test2 = yang.gdata.take_json_opt_str(jd, 'test2')
+    yang.gdata.maybe_add(children, 'test2', from_json_netinfra__netinfra__router__dynstate__test2, child_test2)
+    return yang.gdata.Container(children)
+
 class netinfra__netinfra__router_entry(yang.adata.MNode):
     name: str
     id: ?int
@@ -4044,8 +4200,10 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
     role: ?str
     asn: ?int
     mock: ?str
+    memory: netinfra__netinfra__router__memory
+    dynstate: netinfra__netinfra__router__dynstate
 
-    mut def __init__(self, name: str, id: ?int, type: ?str, role: ?str, asn: ?int, mock: ?str):
+    mut def __init__(self, name: str, id: ?int, type: ?str, role: ?str, asn: ?int, mock: ?str, memory: ?netinfra__netinfra__router__memory=None, dynstate: ?netinfra__netinfra__router__dynstate=None):
         self._ns = 'http://example.com/netinfra'
         self.name = name
         self.id = id
@@ -4053,6 +4211,8 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
         self.role = role
         self.asn = asn
         self.mock = mock
+        self.memory = memory if memory is not None else netinfra__netinfra__router__memory()
+        self.dynstate = dynstate if dynstate is not None else netinfra__netinfra__router__dynstate()
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -4074,11 +4234,17 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
         _mock = self.mock
         if _mock is not None:
             children['mock'] = yang.gdata.Leaf('enumeration', _mock)
+        _memory = self.memory
+        if _memory is not None:
+            children['memory'] = _memory.to_gdata()
+        _dynstate = self.dynstate
+        if _dynstate is not None:
+            children['dynstate'] = _dynstate.to_gdata()
         return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra__netinfra__router_entry:
-        return netinfra__netinfra__router_entry(name=n.get_str('name'), id=n.get_opt_int('id'), type=n.get_opt_str('type'), role=n.get_opt_str('role'), asn=n.get_opt_int('asn'), mock=n.get_opt_str('mock'))
+        return netinfra__netinfra__router_entry(name=n.get_str('name'), id=n.get_opt_int('id'), type=n.get_opt_str('type'), role=n.get_opt_str('role'), asn=n.get_opt_int('asn'), mock=n.get_opt_str('mock'), memory=netinfra__netinfra__router__memory.from_gdata(n.get_opt_cnt('memory')), dynstate=netinfra__netinfra__router__dynstate.from_gdata(n.get_opt_cnt('dynstate')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -4101,6 +4267,12 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
         _mock = self.mock
         if _mock is not None:
             leaves.append('{self_name}.mock = {repr(_mock)}')
+        _memory = self.memory
+        if _memory is not None:
+            res.extend(_memory.prsrc('{self_name}.memory', False).splitlines())
+        _dynstate = self.dynstate
+        if _dynstate is not None:
+            res.extend(_dynstate.prsrc('{self_name}.dynstate', False).splitlines())
         if leaves:
             if not list_element:
                res = ['', '# Container: /netinfra/router'] + leaves + res
@@ -4157,6 +4329,10 @@ mut def from_xml_netinfra__netinfra__router_element(node: xml.Node) -> yang.gdat
     yang.gdata.maybe_add(children, 'asn', from_xml_netinfra__netinfra__router__asn, child_asn)
     child_mock = yang.gdata.from_xml_opt_str(node, 'mock')
     yang.gdata.maybe_add(children, 'mock', from_xml_netinfra__netinfra__router__mock, child_mock)
+    child_memory = yang.gdata.from_xml_opt_cnt(node, 'memory')
+    yang.gdata.maybe_add(children, 'memory', from_xml_netinfra__netinfra__router__memory, child_memory)
+    child_dynstate = yang.gdata.from_xml_opt_cnt(node, 'dynstate')
+    yang.gdata.maybe_add(children, 'dynstate', from_xml_netinfra__netinfra__router__dynstate, child_dynstate)
     return yang.gdata.Container(children)
 
 mut def from_xml_netinfra__netinfra__router(nodes: list[xml.Node]) -> yang.gdata.List:
@@ -4190,6 +4366,10 @@ mut def from_json_path_netinfra__netinfra__router_element(jd: value, path: list[
             raise ValueError("Invalid json path to non-inner node")
         if point == 'mock':
             raise ValueError("Invalid json path to non-inner node")
+        if point == 'memory':
+            children['memory'] = from_json_path_netinfra__netinfra__router__memory(jd, rest_path, op)
+        if point == 'dynstate':
+            children['dynstate'] = from_json_path_netinfra__netinfra__router__dynstate(jd, rest_path, op)
         return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
@@ -4232,6 +4412,10 @@ mut def from_json_netinfra__netinfra__router_element(jd: dict[str, ?value]) -> y
     yang.gdata.maybe_add(children, 'asn', from_json_netinfra__netinfra__router__asn, child_asn)
     child_mock = yang.gdata.take_json_opt_str(jd, 'mock')
     yang.gdata.maybe_add(children, 'mock', from_json_netinfra__netinfra__router__mock, child_mock)
+    child_memory = yang.gdata.take_json_opt_cnt(jd, 'memory')
+    yang.gdata.maybe_add(children, 'memory', from_json_netinfra__netinfra__router__memory, child_memory)
+    child_dynstate = yang.gdata.take_json_opt_cnt(jd, 'dynstate')
+    yang.gdata.maybe_add(children, 'dynstate', from_json_netinfra__netinfra__router__dynstate, child_dynstate)
     return yang.gdata.Container(children)
 
 mut def from_json_netinfra__netinfra__router(jd: list[dict[str, ?value]]) -> yang.gdata.List:
