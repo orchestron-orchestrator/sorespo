@@ -1,10 +1,14 @@
 import yang.adata
+import orchestron.device as odev
 import orchestron.ttt
 from orchestron import UnsupportedDevice
 
 import sorespo.cisco_vigenere
 
 import sorespo.layers.base_2 as base
+
+from sorespo.layers.y_2 import orchestron_rfs__rfs__backbone_interface_entry
+from sorespo.layers.y_2 import orchestron_rfs__rfs__backbone_interface__dynstate
 
 import sorespo.devices.CiscoIosXr_24_1_ncs55a1 as xr24
 import sorespo.devices.JuniperCRPD_23_4R1_9 as crpd23
@@ -183,8 +187,35 @@ end-policy"""
         raise UnsupportedDevice()
 
 
+actor BBInterfaceTransform(update_dynstate: proc(?orchestron_rfs__rfs__backbone_interface__dynstate) -> None, dev: odev.DeviceMgr):
+    rpc_root = crpd23.rpc_root(odev.DeviceTreeProvider(dev))
+    var polly_enabled = False
+
+    def do_polly():
+        if not polly_enabled:
+            return
+
+        def response(output: ?crpd23.junos_rpc_isis__get_isis_adjacency_information__output, error):
+            if output is not None:
+                print("BBInterfaceTransform.do_polly.response: {output.to_gdata().to_xmlstr()}, {error}")
+                # search for interface
+                # update_dynstate(xxx)
+            after 3: do_polly()
+
+        rpc_root.get_isis_adjacency_information(response)
+
+    def on_conf(conf: orchestron_rfs__rfs__backbone_interface_entry):
+        print("BBInterfaceTransform.on_conf:\n{conf.to_gdata().to_xmlstr()}")
+        if conf.do_polly and not polly_enabled:
+            polly_enabled = True
+            do_polly()
+        else:
+            polly_enabled = False
+
+    print("BBInterfaceTransform started")
+
 class BBInterface(base.BBInterface):
-    def transform(self, i, di):
+    def transform(self, i, di, dynstate):
         print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}]", err=True)
 
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
