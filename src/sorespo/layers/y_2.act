@@ -107,6 +107,20 @@ def src_yang():
                     mandatory true;
                 }
             }
+
+            leaf do-polly {
+                type boolean;
+                default false;
+            }
+
+            container dynstate {
+                orchestron:dynstate;
+
+                leaf polly-success {
+                    type boolean;
+                    default false;
+                }
+            }
         }
 
         list ibgp-neighbor {
@@ -2572,6 +2586,83 @@ mut def from_json_orchestron_rfs__rfs__backbone_interface__local(jd: dict[str, ?
     yang.gdata.maybe_add(children, 'device', from_json_orchestron_rfs__rfs__backbone_interface__local__device, child_device)
     return yang.gdata.Container(children)
 
+mut def from_json_orchestron_rfs__rfs__backbone_interface__do_polly(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('boolean', val)
+
+mut def from_xml_orchestron_rfs__rfs__backbone_interface__do_polly(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('boolean', val)
+
+mut def from_json_orchestron_rfs__rfs__backbone_interface__dynstate__polly_success(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('boolean', val)
+
+mut def from_xml_orchestron_rfs__rfs__backbone_interface__dynstate__polly_success(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('boolean', val)
+
+class orchestron_rfs__rfs__backbone_interface__dynstate(yang.adata.MNode):
+    polly_success: bool
+
+    mut def __init__(self, polly_success: ?bool=None):
+        self._ns = 'http://example.com/sorespo-rfs'
+        self.polly_success = polly_success if polly_success is not None else False
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        children = {}
+        _polly_success = self.polly_success
+        if _polly_success is not None:
+            children['polly-success'] = yang.gdata.Leaf('boolean', _polly_success)
+        return yang.gdata.Container(children)
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> orchestron_rfs__rfs__backbone_interface__dynstate:
+        if n is not None:
+            return orchestron_rfs__rfs__backbone_interface__dynstate(polly_success=n.get_opt_bool('polly-success'))
+        return orchestron_rfs__rfs__backbone_interface__dynstate()
+
+    def prsrc(self, self_name='ad', top=True, list_element=False):
+        res = []
+        if top:
+            res.append('# Top node: /rfs/backbone-interface/dynstate')
+            res.append('{self_name} = orchestron_rfs__rfs__backbone_interface__dynstate()')
+        leaves = []
+        _polly_success = self.polly_success
+        if _polly_success is not None:
+            leaves.append('{self_name}.polly_success = {repr(_polly_success)}')
+        if leaves:
+            if not list_element:
+               res = ['', '# Container: /rfs/backbone-interface/dynstate'] + leaves + res
+            else:
+                res = leaves + res
+        return '\n'.join(res)
+
+
+mut def from_xml_orchestron_rfs__rfs__backbone_interface__dynstate(node: xml.Node) -> yang.gdata.Container:
+    children = {}
+    child_polly_success = yang.gdata.from_xml_opt_bool(node, 'polly-success')
+    yang.gdata.maybe_add(children, 'polly-success', from_xml_orchestron_rfs__rfs__backbone_interface__dynstate__polly_success, child_polly_success)
+    return yang.gdata.Container(children)
+
+mut def from_json_path_orchestron_rfs__rfs__backbone_interface__dynstate(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'polly-success':
+            raise ValueError("Invalid json path to non-inner node")
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_orchestron_rfs__rfs__backbone_interface__dynstate(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_orchestron_rfs__rfs__backbone_interface__dynstate(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_polly_success = yang.gdata.take_json_opt_bool(jd, 'polly-success')
+    yang.gdata.maybe_add(children, 'polly-success', from_json_orchestron_rfs__rfs__backbone_interface__dynstate__polly_success, child_polly_success)
+    return yang.gdata.Container(children)
+
 class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
     name: str
     ipv4_address: ?str
@@ -2580,8 +2671,10 @@ class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
     ipv6_prefix_length: ?int
     remote: orchestron_rfs__rfs__backbone_interface__remote
     local: orchestron_rfs__rfs__backbone_interface__local
+    do_polly: bool
+    dynstate: orchestron_rfs__rfs__backbone_interface__dynstate
 
-    mut def __init__(self, name: str, remote: orchestron_rfs__rfs__backbone_interface__remote, local: orchestron_rfs__rfs__backbone_interface__local, ipv4_address: ?str, ipv4_prefix_length: ?int=None, ipv6_address: ?str, ipv6_prefix_length: ?int):
+    mut def __init__(self, name: str, remote: orchestron_rfs__rfs__backbone_interface__remote, local: orchestron_rfs__rfs__backbone_interface__local, ipv4_address: ?str, ipv4_prefix_length: ?int=None, ipv6_address: ?str, ipv6_prefix_length: ?int, do_polly: ?bool=None, dynstate: ?orchestron_rfs__rfs__backbone_interface__dynstate=None):
         self._ns = 'http://example.com/sorespo-rfs'
         self.name = name
         self.ipv4_address = ipv4_address
@@ -2590,6 +2683,8 @@ class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
         self.ipv6_prefix_length = ipv6_prefix_length
         self.remote = remote
         self.local = local
+        self.do_polly = do_polly if do_polly is not None else False
+        self.dynstate = dynstate if dynstate is not None else orchestron_rfs__rfs__backbone_interface__dynstate()
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -2614,11 +2709,17 @@ class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
         _local = self.local
         if _local is not None:
             children['local'] = _local.to_gdata()
+        _do_polly = self.do_polly
+        if _do_polly is not None:
+            children['do-polly'] = yang.gdata.Leaf('boolean', _do_polly)
+        _dynstate = self.dynstate
+        if _dynstate is not None:
+            children['dynstate'] = _dynstate.to_gdata()
         return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__backbone_interface_entry:
-        return orchestron_rfs__rfs__backbone_interface_entry(name=n.get_str('name'), ipv4_address=n.get_opt_str('ipv4-address'), ipv4_prefix_length=n.get_opt_int('ipv4-prefix-length'), ipv6_address=n.get_opt_str('ipv6-address'), ipv6_prefix_length=n.get_opt_int('ipv6-prefix-length'), remote=orchestron_rfs__rfs__backbone_interface__remote.from_gdata(n.get_cnt('remote')), local=orchestron_rfs__rfs__backbone_interface__local.from_gdata(n.get_cnt('local')))
+        return orchestron_rfs__rfs__backbone_interface_entry(name=n.get_str('name'), ipv4_address=n.get_opt_str('ipv4-address'), ipv4_prefix_length=n.get_opt_int('ipv4-prefix-length'), ipv6_address=n.get_opt_str('ipv6-address'), ipv6_prefix_length=n.get_opt_int('ipv6-prefix-length'), remote=orchestron_rfs__rfs__backbone_interface__remote.from_gdata(n.get_cnt('remote')), local=orchestron_rfs__rfs__backbone_interface__local.from_gdata(n.get_cnt('local')), do_polly=n.get_opt_bool('do-polly'), dynstate=orchestron_rfs__rfs__backbone_interface__dynstate.from_gdata(n.get_opt_cnt('dynstate')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -2646,6 +2747,12 @@ class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
         _local = self.local
         if _local is not None:
             res.extend(_local.prsrc('{self_name}.local', False).splitlines())
+        _do_polly = self.do_polly
+        if _do_polly is not None:
+            leaves.append('{self_name}.do_polly = {repr(_do_polly)}')
+        _dynstate = self.dynstate
+        if _dynstate is not None:
+            res.extend(_dynstate.prsrc('{self_name}.dynstate', False).splitlines())
         if leaves:
             if not list_element:
                res = ['', '# Container: /rfs/backbone-interface'] + leaves + res
@@ -2709,6 +2816,10 @@ mut def from_xml_orchestron_rfs__rfs__backbone_interface_element(node: xml.Node)
     yang.gdata.maybe_add(children, 'remote', from_xml_orchestron_rfs__rfs__backbone_interface__remote, child_remote)
     child_local = yang.gdata.from_xml_cnt(node, 'local')
     yang.gdata.maybe_add(children, 'local', from_xml_orchestron_rfs__rfs__backbone_interface__local, child_local)
+    child_do_polly = yang.gdata.from_xml_opt_bool(node, 'do-polly')
+    yang.gdata.maybe_add(children, 'do-polly', from_xml_orchestron_rfs__rfs__backbone_interface__do_polly, child_do_polly)
+    child_dynstate = yang.gdata.from_xml_opt_cnt(node, 'dynstate')
+    yang.gdata.maybe_add(children, 'dynstate', from_xml_orchestron_rfs__rfs__backbone_interface__dynstate, child_dynstate)
     return yang.gdata.Container(children)
 
 mut def from_xml_orchestron_rfs__rfs__backbone_interface(nodes: list[xml.Node]) -> yang.gdata.List:
@@ -2744,6 +2855,10 @@ mut def from_json_path_orchestron_rfs__rfs__backbone_interface_element(jd: value
             children['remote'] = from_json_path_orchestron_rfs__rfs__backbone_interface__remote(jd, rest_path, op)
         if point == 'local':
             children['local'] = from_json_path_orchestron_rfs__rfs__backbone_interface__local(jd, rest_path, op)
+        if point == 'do-polly':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'dynstate':
+            children['dynstate'] = from_json_path_orchestron_rfs__rfs__backbone_interface__dynstate(jd, rest_path, op)
         return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
@@ -2788,6 +2903,10 @@ mut def from_json_orchestron_rfs__rfs__backbone_interface_element(jd: dict[str, 
     yang.gdata.maybe_add(children, 'remote', from_json_orchestron_rfs__rfs__backbone_interface__remote, child_remote)
     child_local = yang.gdata.take_json_cnt(jd, 'local')
     yang.gdata.maybe_add(children, 'local', from_json_orchestron_rfs__rfs__backbone_interface__local, child_local)
+    child_do_polly = yang.gdata.take_json_opt_bool(jd, 'do-polly')
+    yang.gdata.maybe_add(children, 'do-polly', from_json_orchestron_rfs__rfs__backbone_interface__do_polly, child_do_polly)
+    child_dynstate = yang.gdata.take_json_opt_cnt(jd, 'dynstate')
+    yang.gdata.maybe_add(children, 'dynstate', from_json_orchestron_rfs__rfs__backbone_interface__dynstate, child_dynstate)
     return yang.gdata.Container(children)
 
 mut def from_json_orchestron_rfs__rfs__backbone_interface(jd: list[dict[str, ?value]]) -> yang.gdata.List:
