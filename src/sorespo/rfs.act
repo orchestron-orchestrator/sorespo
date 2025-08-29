@@ -189,28 +189,34 @@ end-policy"""
 
 actor BBInterfaceTransform(update_dynstate: proc(?orchestron_rfs__rfs__backbone_interface__dynstate) -> None, dev: odev.DeviceMgr):
     rpc_root = crpd23.rpc_root(odev.DeviceTreeProvider(dev))
-    var polly_enabled = False
+    var healthcheck_enabled = False
+    var health_state = None
 
-    def do_polly():
-        if not polly_enabled:
+    def do_healthcheck():
+        if not healthcheck_enabled:
+            health_state = None
             return
+        healthcheck_running = True
 
         def response(output: ?crpd23.junos_rpc_isis__get_isis_adjacency_information__output, error):
             if output is not None:
-                print("BBInterfaceTransform.do_polly.response: {output.to_gdata().to_xmlstr()}, {error}")
+                print("BBInterfaceTransform.do_healthcheck.response: {output.to_gdata().to_xmlstr()}, {error}")
                 # search for interface
-                # update_dynstate(xxx)
-            after 3: do_polly()
+                current_state = "all-ok"
+                if health_state != current_state:
+                    health_state = current_state
+                    dynstate = orchestron_rfs__rfs__backbone_interface__dynstate()
+                    dynstate.health_state = health_state
+                    update_dynstate(dynstate)
+            after 3: do_healthcheck()
 
         rpc_root.get_isis_adjacency_information(response)
 
     def on_conf(conf: orchestron_rfs__rfs__backbone_interface_entry):
         print("BBInterfaceTransform.on_conf:\n{conf.to_gdata().to_xmlstr()}")
-        if conf.do_polly and not polly_enabled:
-            polly_enabled = True
-            do_polly()
-        else:
-            polly_enabled = False
+        healthcheck_enabled = conf.monitor_health
+        if health_state is None:
+            do_healthcheck()
 
     print("BBInterfaceTransform started")
 
@@ -251,6 +257,11 @@ class BBInterface(base.BBInterface):
             # Create the interface
             unit = dev.configuration.interfaces.interface.create(i.name).unit.create("0")
             unit.description = "Link to {i.remote.device} [{i.remote.interface}]"
+            if i.monitor_health:
+                if dynstate is not None:
+                    unit.description += " - Health: {dynstate.health_state}"
+                else:
+                    unit.description += " - Health: unknown"
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 unit.family.create_inet().address.create("{ipv4_address}/{i.ipv4_prefix_length}")
