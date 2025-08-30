@@ -192,6 +192,7 @@ actor BBInterfaceTransform(update_dynstate: proc(?orchestron_rfs__rfs__backbone_
     var interface_name = None
     var healthcheck_enabled = False
     var health_state = None
+    var isis_healthy = True
 
     def do_healthcheck():
         if not healthcheck_enabled:
@@ -199,6 +200,17 @@ actor BBInterfaceTransform(update_dynstate: proc(?orchestron_rfs__rfs__backbone_
             return
         healthcheck_running = True
 
+        def update_health_state():
+            current_state = "init"
+            if isis_healthy:
+                current_state = "all-ok"
+
+            if health_state != current_state:
+                health_state = current_state
+                dynstate = orchestron_rfs__rfs__backbone_interface__dynstate()
+                dynstate.health_state = health_state
+                update_dynstate(dynstate)
+                
         def response(output: ?crpd23.junos_rpc_isis__get_isis_adjacency_information__output, error):
             if output is not None:
                 print("BBInterfaceTransform.do_healthcheck.response: {output.to_gdata().to_xmlstr()}, {error}")
@@ -209,14 +221,9 @@ actor BBInterfaceTransform(update_dynstate: proc(?orchestron_rfs__rfs__backbone_
                         n = ia.interface_name
                         s = ia.adjacency_state
                         if n == interface_name:
-                            if s == "Up":
-                                current_state = "all-ok"
+                            isis_healthy = (s == "Up")
+                            update_health_state()
                             break
-                    if health_state != current_state:
-                        health_state = current_state
-                        dynstate = orchestron_rfs__rfs__backbone_interface__dynstate()
-                        dynstate.health_state = health_state
-                        update_dynstate(dynstate)
             after 3: do_healthcheck()
 
         rpc_root.get_isis_adjacency_information(response)
