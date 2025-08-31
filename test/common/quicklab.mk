@@ -113,7 +113,7 @@ get-config-json0 get-config-json1 get-config-json2 get-config-json3:
 
 .PHONY: get-config-adata0 get-config-adata1 get-config-adata2 get-config-adata3
 get-config-adata0 get-config-adata1 get-config-adata2 get-config-adata3:
-	@curl -H "Accept: application/adata+text" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/layer/$(subst get-config-adata,,$@)
+	@curl -H "Accept: application/yang-data+acton-adata" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/layer/$(subst get-config-adata,,$@)
 
 # Default headers for XML configuration
 HEADERS?=-H "Accept: application/yang-data+xml"
@@ -127,7 +127,7 @@ $(addprefix get-target-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 
 .PHONY: $(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
-	@$(MAKE) HEADERS="-H \"Accept: application/adata+text\"" $(subst adata-,,$@)
+	@$(MAKE) HEADERS="-H \"Accept: application/yang-data+acton-adata\"" $(subst adata-,,$@)
 
 # "running" is the currently running configuration on the device, which in
 # NMDA-speak is the "intended configuration".
@@ -137,7 +137,7 @@ $(addprefix get-running-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 
 .PHONY: $(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
-	@$(MAKE) HEADERS="-H \"Accept: application/adata+text\"" $(subst adata-,,$@)
+	@$(MAKE) HEADERS="-H \"Accept: application/yang-data+acton-adata\"" $(subst adata-,,$@)
 
 .PHONY: $(addprefix get-running-diff-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-running-diff-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
