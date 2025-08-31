@@ -70533,6 +70533,78 @@ def src_yang():
  * Copyright (c) 2025 Juniper Networks, Inc.
  * All rights reserved.
  */
+ module junos-rpc-interfaces {
+   namespace "http://yang.juniper.net/junos/rpc/interfaces";
+
+   prefix interfaces;
+
+   import junos-common-types {
+     prefix jt;
+     revision-date 2024-01-01;
+   }
+
+   organization "Juniper Networks, Inc.";
+
+   contact "yang-support@juniper.net";
+
+   description "Junos RPC YANG module for interfaces command(s)";
+
+   revision 2024-01-01 {
+     description "Junos: 20241218.202301_builder.r1463698";
+   }
+
+   rpc get-interface-information {
+     description "Show interface information";
+     input {
+       leaf level {
+         type enumeration {
+           enum "extensive" {
+             description "Display extensive output";
+           }
+           enum "statistics" {
+             description "Display statistics and detailed output";
+           }
+           enum "media" {
+             description "Display media information";
+           }
+         }
+       }
+       leaf level-extra {
+         type enumeration {
+           enum "detail" {
+             description "Display detailed output";
+           }
+           enum "terse" {
+             description "Display terse output";
+           }
+           enum "brief" {
+             description "Display brief output";
+           }
+           enum "descriptions" {
+             description "Display interface description strings";
+           }
+           enum "prbs-stats" {
+             description "Display PRBS Stats";
+           }
+         }
+       }
+       leaf interface-name {
+         description "Name of physical or logical interface";
+         type string;
+       }
+     }
+     output {
+       leaf output {
+         type string;
+       }
+     }
+   }
+ }""")
+    res.append(r"""
+/*
+ * Copyright (c) 2025 Juniper Networks, Inc.
+ * All rights reserved.
+ */
  module junos-rpc-isis {
    namespace "http://yang.juniper.net/junos/rpc/isis";
 
@@ -80915,6 +80987,124 @@ mut def from_xml_junos_rpc_isis__get_isis_adjacency_information__output(node: xm
     yang.gdata.maybe_add(children, 'isis-adjacency-information', from_xml_junos_rpc_isis__get_isis_adjacency_information__output__isis_adjacency_information, child_isis_adjacency_information)
     return yang.gdata.Container(children, ns='http://yang.juniper.net/junos/rpc/isis', module='junos-rpc-isis')
 
+mut def from_xml_junos_rpc_interfaces__get_interface_information__input__level(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('enumeration', val)
+
+mut def from_xml_junos_rpc_interfaces__get_interface_information__input__level_extra(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('enumeration', val)
+
+mut def from_xml_junos_rpc_interfaces__get_interface_information__input__interface_name(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('string', val)
+
+class junos_rpc_interfaces__get_interface_information__input(yang.adata.MNode):
+    level: ?str
+    level_extra: ?str
+    interface_name: ?str
+
+    mut def __init__(self, level: ?str, level_extra: ?str, interface_name: ?str):
+        self._ns = 'http://yang.juniper.net/junos/rpc/interfaces'
+        self.level = level
+        self.level_extra = level_extra
+        self.interface_name = interface_name
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        children = {}
+        _level = self.level
+        if _level is not None:
+            children['level'] = yang.gdata.Leaf('enumeration', _level)
+        _level_extra = self.level_extra
+        if _level_extra is not None:
+            children['level-extra'] = yang.gdata.Leaf('enumeration', _level_extra)
+        _interface_name = self.interface_name
+        if _interface_name is not None:
+            children['interface-name'] = yang.gdata.Leaf('string', _interface_name)
+        return yang.gdata.Container(children, ns='http://yang.juniper.net/junos/rpc/interfaces', module='junos-rpc-interfaces')
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> junos_rpc_interfaces__get_interface_information__input:
+        if n is not None:
+            return junos_rpc_interfaces__get_interface_information__input(level=n.get_opt_str('level'), level_extra=n.get_opt_str('level-extra'), interface_name=n.get_opt_str('interface-name'))
+        return junos_rpc_interfaces__get_interface_information__input()
+
+    def prsrc(self, self_name='ad', top=True, list_element=False):
+        res = []
+        if top:
+            res.append('# Top node: /get-interface-information/input')
+            res.append('{self_name} = junos_rpc_interfaces__get_interface_information__input()')
+        leaves = []
+        _level = self.level
+        if _level is not None:
+            leaves.append('{self_name}.level = {repr(_level)}')
+        _level_extra = self.level_extra
+        if _level_extra is not None:
+            leaves.append('{self_name}.level_extra = {repr(_level_extra)}')
+        _interface_name = self.interface_name
+        if _interface_name is not None:
+            leaves.append('{self_name}.interface_name = {repr(_interface_name)}')
+        if leaves:
+            if not list_element:
+               res = ['', '# Container: /get-interface-information/input'] + leaves + res
+            else:
+                res = leaves + res
+        return '\n'.join(res)
+
+
+mut def from_xml_junos_rpc_interfaces__get_interface_information__input(node: xml.Node) -> yang.gdata.Container:
+    children = {}
+    child_level = yang.gdata.from_xml_opt_str(node, 'level')
+    yang.gdata.maybe_add(children, 'level', from_xml_junos_rpc_interfaces__get_interface_information__input__level, child_level)
+    child_level_extra = yang.gdata.from_xml_opt_str(node, 'level-extra')
+    yang.gdata.maybe_add(children, 'level-extra', from_xml_junos_rpc_interfaces__get_interface_information__input__level_extra, child_level_extra)
+    child_interface_name = yang.gdata.from_xml_opt_str(node, 'interface-name')
+    yang.gdata.maybe_add(children, 'interface-name', from_xml_junos_rpc_interfaces__get_interface_information__input__interface_name, child_interface_name)
+    return yang.gdata.Container(children, ns='http://yang.juniper.net/junos/rpc/interfaces', module='junos-rpc-interfaces')
+
+mut def from_xml_junos_rpc_interfaces__get_interface_information__output__output(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('string', val)
+
+class junos_rpc_interfaces__get_interface_information__output(yang.adata.MNode):
+    output: ?str
+
+    mut def __init__(self, output: ?str):
+        self._ns = 'http://yang.juniper.net/junos/rpc/interfaces'
+        self.output = output
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        children = {}
+        _output = self.output
+        if _output is not None:
+            children['output'] = yang.gdata.Leaf('string', _output)
+        return yang.gdata.Container(children, ns='http://yang.juniper.net/junos/rpc/interfaces', module='junos-rpc-interfaces')
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> junos_rpc_interfaces__get_interface_information__output:
+        if n is not None:
+            return junos_rpc_interfaces__get_interface_information__output(output=n.get_opt_str('output'))
+        return junos_rpc_interfaces__get_interface_information__output()
+
+    def prsrc(self, self_name='ad', top=True, list_element=False):
+        res = []
+        if top:
+            res.append('# Top node: /get-interface-information/output')
+            res.append('{self_name} = junos_rpc_interfaces__get_interface_information__output()')
+        leaves = []
+        _output = self.output
+        if _output is not None:
+            leaves.append('{self_name}.output = {repr(_output)}')
+        if leaves:
+            if not list_element:
+               res = ['', '# Container: /get-interface-information/output'] + leaves + res
+            else:
+                res = leaves + res
+        return '\n'.join(res)
+
+
+mut def from_xml_junos_rpc_interfaces__get_interface_information__output(node: xml.Node) -> yang.gdata.Container:
+    children = {}
+    child_output = yang.gdata.from_xml_opt_str(node, 'output')
+    yang.gdata.maybe_add(children, 'output', from_xml_junos_rpc_interfaces__get_interface_information__output__output, child_output)
+    return yang.gdata.Container(children, ns='http://yang.juniper.net/junos/rpc/interfaces', module='junos-rpc-interfaces')
+
 actor rpc_handler(tp: yang.gdata.TreeProvider):
     def get_ldp_neighbor_information(cb: action(?junos_rpc_ldp__get_ldp_neighbor_information__output, ?Exception) -> None, inp: ?junos_rpc_ldp__get_ldp_neighbor_information__input, gen3: bool=False):
         def cb_wrap(res: ?xml.Node, err: ?Exception):
@@ -80952,6 +81142,24 @@ actor rpc_handler(tp: yang.gdata.TreeProvider):
             xmlstr = '<get-isis-adjacency-information xmlns="http://yang.juniper.net/junos/rpc/isis" />'
         tp.rpc_xml(cb_wrap, xml.decode(xmlstr))
 
+    def get_interface_information(cb: action(?junos_rpc_interfaces__get_interface_information__output, ?Exception) -> None, inp: ?junos_rpc_interfaces__get_interface_information__input, gen3: bool=False):
+        def cb_wrap(res: ?xml.Node, err: ?Exception):
+            if res is not None:
+                if gen3:
+                    gdata_res = from_xml_gen3(res, ["junos-rpc-interfaces:get-interface-information", "output"])
+                else:
+                    gdata_res = from_xml_junos_rpc_interfaces__get_interface_information__output(res)
+                adata_res = junos_rpc_interfaces__get_interface_information__output.from_gdata(gdata_res)
+                cb(adata_res, err)
+            else:
+                cb(None, err)
+
+        if inp is not None:
+            xmlstr = '<get-interface-information xmlns="http://yang.juniper.net/junos/rpc/interfaces">{inp.to_gdata().to_xmlstr()}</get-interface-information>'
+        else:
+            xmlstr = '<get-interface-information xmlns="http://yang.juniper.net/junos/rpc/interfaces" />'
+        tp.rpc_xml(cb_wrap, xml.decode(xmlstr))
+
 
 class rpc_root(yang.adata.RpcRoot):
     _handler: rpc_handler
@@ -80966,9 +81174,13 @@ class rpc_root(yang.adata.RpcRoot):
     proc def get_isis_adjacency_information(self, cb: action(?junos_rpc_isis__get_isis_adjacency_information__output, ?Exception) -> None, inp: ?junos_rpc_isis__get_isis_adjacency_information__input, gen3: bool=False) -> None:
         self._handler.get_isis_adjacency_information(cb, inp, gen3)
 
+    proc def get_interface_information(self, cb: action(?junos_rpc_interfaces__get_interface_information__output, ?Exception) -> None, inp: ?junos_rpc_interfaces__get_interface_information__input, gen3: bool=False) -> None:
+        self._handler.get_interface_information(cb, inp, gen3)
+
 
 schema_namespaces: set[str] = {
     'http://yang.juniper.net/junos/conf/root',
+    'http://yang.juniper.net/junos/rpc/interfaces',
     'http://yang.juniper.net/junos/rpc/isis',
     'http://yang.juniper.net/junos/rpc/ldp',
 }

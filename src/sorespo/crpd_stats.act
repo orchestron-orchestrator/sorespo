@@ -1,0 +1,32 @@
+import json
+import yang.adata
+
+
+import sorespo.devices.JuniperCRPD_23_4R1_9 as crpd23
+
+def parse(output: crpd23.junos_rpc_interfaces__get_interface_information__output) -> (?int, ?int, ?int, ?int, ?int, ?int):
+    rx_errors = None
+    rx_dropped = None
+    rx_over_errors = None
+    tx_errors = None
+    tx_dropped = None
+    tx_carrier_errors = None
+    o = output.output
+    if o is not None:
+        c = o.strip().lstrip("[").rstrip("]")
+        stats = json.decode(c)
+        if stats is not None:
+            stats64 = stats["stats64"]
+            # print("BBInterfaceTransform.if_stats_response stat64: {stats64}, {error}")
+            if isinstance(stats64, dict):
+                rx = stats64["rx"]
+                tx = stats64["tx"]
+                if isinstance(rx, dict):
+                    rx_errors = rx["errors"]
+                    rx_dropped = rx["dropped"]
+                    rx_over_errors = rx["over_errors"]
+                if isinstance(tx, dict):
+                    tx_errors = tx["errors"]
+                    tx_dropped = tx["dropped"]
+                    tx_carrier_errors = tx["carrier_errors"]
+    return (rx_errors, rx_dropped, rx_over_errors, tx_errors, tx_dropped, tx_carrier_errors)
