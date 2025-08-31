@@ -189,41 +189,74 @@ end-policy"""
 
 
 actor BBInterfaceTransform(update_dynstate: proc(?orchestron_rfs__rfs__backbone_interface__dynstate) -> None, dev: odev.DeviceMgr):
+    IF_STATE_INIT = "init"
+    IF_STATE_INTERFACE_MONITOR = "interface-monitor"
+    IF_STATE_INTERFACE_OK = "interface-ok"
+    IF_STATE_ISIS_OK = "isis-ok"
+    IF_STATE_ALL_OK = "all-ok"
+
     rpc_root = crpd23.rpc_root(odev.DeviceTreeProvider(dev))
     var interface_name = None
     var healthcheck_enabled = False
-    var health_state = None
+    var healthcheck_running = False
+    var health_state = IF_STATE_INIT
+    var interface_healthy = False
     var isis_healthy = False
     var ldp_healthy = False
-    var if_rx_errors: ?int = None
-    var if_rx_dropped: ?int = None
-    var if_rx_over_errors: ?int = None
-    var if_tx_errors: ?int = None
-    var if_tx_dropped: ?int = None
-    var if_tx_carrier_errors: ?int = None
+    var counters_recorded = False
+    var t0_rx_errors = None
+    var t0_rx_dropped = None
+    var t0_rx_over_errors = None
+    var t0_tx_errors = None
+    var t0_tx_dropped = None
+    var t0_tx_carrier_errors = None
 
     def do_healthcheck():
+        healthcheck_running = True
         if not healthcheck_enabled:
-            health_state = None
+            healthcheck_running = False
             return
 
         def update_health_state():
-            current_state = "init"
-            if isis_healthy and ldp_healthy:
-                current_state = "all-ok"
-            elif isis_healthy:
-                current_state = "isis-ok"
+            next_state = IF_STATE_INIT
+            # One-time progression into INTERFACE_OK only so FSM can go INIT <-> INTERFACE_MONITOR -> INTERFACE_OK
+            if health_state == IF_STATE_INIT and counters_recorded:
+                next_state = IF_STATE_INTERFACE_MONITOR
+            if health_state == IF_STATE_INTERFACE_MONITOR:
+                next_state = IF_STATE_INTERFACE_OK if interface_healthy else IF_STATE_INIT
 
-            if health_state != current_state:
-                health_state = current_state
+            # Continuous monitoring, FSM can go INTERFACE_OK <-> ISIS_OK <-> ALL_OK
+            if health_state in [IF_STATE_INTERFACE_OK, IF_STATE_ISIS_OK, IF_STATE_ALL_OK]:
+                next_state = IF_STATE_INTERFACE_OK
+                if isis_healthy:
+                    next_state = IF_STATE_ISIS_OK
+                if isis_healthy and ldp_healthy:
+                    next_state = IF_STATE_ALL_OK
+
+            if health_state != next_state:
+                print("Health state changed for {interface_name}: {health_state} -> {next_state}")
+                health_state = next_state
                 dynstate = orchestron_rfs__rfs__backbone_interface__dynstate()
                 dynstate.health_state = health_state
                 update_dynstate(dynstate)
 
-        def if_stats_response(output: ?crpd23.junos_rpc_interfaces__get_interface_information__output, error):
+        def if_stats_t0_response(output: ?crpd23.junos_rpc_interfaces__get_interface_information__output, error):
             if output is not None:
-                if_rx_errors, if_rx_dropped, if_rx_over_errors, if_tx_errors, if_tx_dropped, if_tx_carrier_errors = sorespo.crpd_stats.parse(output)
-    
+                t0_rx_errors, t0_rx_dropped, t0_rx_over_errors, t0_tx_errors, t0_tx_dropped, t0_tx_carrier_errors = sorespo.crpd_stats.parse(output)
+                counters_recorded = True
+                update_health_state()
+                after 12: do_healthcheck()
+
+        def if_stats_t1_response(output: ?crpd23.junos_rpc_interfaces__get_interface_information__output, error):
+            if output is not None:
+                t1_rx_errors, t1_rx_dropped, t1_rx_over_errors, t1_tx_errors, t1_tx_dropped, t1_tx_carrier_errors = sorespo.crpd_stats.parse(output)
+                if t1_rx_errors == t0_rx_errors and t1_rx_dropped == t0_rx_dropped and t1_rx_over_errors == t0_rx_over_errors and t1_tx_errors == t0_tx_errors and t1_tx_dropped == t0_tx_dropped and t1_tx_carrier_errors == t0_tx_carrier_errors:
+                    interface_healthy = True
+                else:
+                    counters_recorded = False
+                update_health_state()
+                after 3: do_healthcheck()
+
         def isis_response(output: ?crpd23.junos_rpc_isis__get_isis_adjacency_information__output, error):
             if output is not None:
                 # print("BBInterfaceTransform.isis_response: {output.to_gdata().to_xmlstr()}, {error}")
@@ -246,20 +279,22 @@ actor BBInterfaceTransform(update_dynstate: proc(?orchestron_rfs__rfs__backbone_
                             update_health_state()
                             break
 
-        if_input = crpd23.junos_rpc_interfaces__get_interface_information__input()
-        if_input.interface_name = interface_name
-        if_input.level = "statistics"
-        rpc_root.get_interface_information(if_stats_response, if_input)
-        rpc_root.get_isis_adjacency_information(isis_response)
-        rpc_root.get_ldp_neighbor_information(ldp_response)
-        after 3: do_healthcheck()
-
-
+        if interface_name is not None and health_state in [IF_STATE_INIT, IF_STATE_INTERFACE_MONITOR]:
+            print("BBInterfaceTransform for {interface_name}: health_state={health_state}")
+            if_input = crpd23.junos_rpc_interfaces__get_interface_information__input()
+            if_input.interface_name = interface_name
+            if_input.level = "statistics"
+            rpc_root.get_interface_information(if_stats_t0_response if health_state == IF_STATE_INIT else if_stats_t1_response, if_input)
+        else:
+            rpc_root.get_isis_adjacency_information(isis_response)
+            rpc_root.get_ldp_neighbor_information(ldp_response)
+            after 3: do_healthcheck()
+ 
     def on_conf(conf: orchestron_rfs__rfs__backbone_interface_entry):
         print("BBInterfaceTransform.on_conf:{conf.name}")
         interface_name = conf.name
         healthcheck_enabled = conf.monitor_health
-        if health_state is None:
+        if healthcheck_enabled and not healthcheck_running:
             do_healthcheck()
 
     print("BBInterfaceTransform started")
