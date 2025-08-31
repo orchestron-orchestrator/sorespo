@@ -1,0 +1,72 @@
+
+/*
+ * Copyright (c) 2025 Juniper Networks, Inc.
+ * All rights reserved.
+ */
+ module junos-rpc-interfaces {
+   namespace "http://yang.juniper.net/junos/rpc/interfaces";
+
+   prefix interfaces;
+
+   import junos-common-types {
+     prefix jt;
+     revision-date 2024-01-01;
+   }
+
+   organization "Juniper Networks, Inc.";
+
+   contact "yang-support@juniper.net";
+
+   description "Junos RPC YANG module for interfaces command(s)";
+
+   revision 2024-01-01 {
+     description "Junos: 20241218.202301_builder.r1463698";
+   }
+
+   rpc get-interface-information {
+     description "Show interface information";
+     input {
+       leaf level {
+         type enumeration {
+           enum "extensive" {
+             description "Display extensive output";
+           }
+           enum "statistics" {
+             description "Display statistics and detailed output";
+           }
+           enum "media" {
+             description "Display media information";
+           }
+         }
+       }
+       leaf level-extra {
+         type enumeration {
+           enum "detail" {
+             description "Display detailed output";
+           }
+           enum "terse" {
+             description "Display terse output";
+           }
+           enum "brief" {
+             description "Display brief output";
+           }
+           enum "descriptions" {
+             description "Display interface description strings";
+           }
+           enum "prbs-stats" {
+             description "Display PRBS Stats";
+           }
+         }
+       }
+       leaf interface-name {
+         description "Name of physical or logical interface";
+         type string;
+       }
+     }
+     output {
+       leaf output {
+         type string;
+       }
+     }
+   }
+ }
