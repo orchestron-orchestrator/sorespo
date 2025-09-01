@@ -110,7 +110,7 @@ def src_yang():
 
             leaf monitor-health {
                 type boolean;
-                mandatory true;
+                default "false";
             }
 
             container dynstate {
@@ -2673,7 +2673,7 @@ class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
     monitor_health: bool
     dynstate: orchestron_rfs__rfs__backbone_interface__dynstate
 
-    mut def __init__(self, name: str, remote: orchestron_rfs__rfs__backbone_interface__remote, local: orchestron_rfs__rfs__backbone_interface__local, monitor_health: bool, ipv4_address: ?str, ipv4_prefix_length: ?int=None, ipv6_address: ?str, ipv6_prefix_length: ?int, dynstate: ?orchestron_rfs__rfs__backbone_interface__dynstate=None):
+    mut def __init__(self, name: str, remote: orchestron_rfs__rfs__backbone_interface__remote, local: orchestron_rfs__rfs__backbone_interface__local, ipv4_address: ?str, ipv4_prefix_length: ?int=None, ipv6_address: ?str, ipv6_prefix_length: ?int, monitor_health: ?bool=None, dynstate: ?orchestron_rfs__rfs__backbone_interface__dynstate=None):
         self._ns = 'http://example.com/sorespo-rfs'
         self.name = name
         self.ipv4_address = ipv4_address
@@ -2682,7 +2682,7 @@ class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
         self.ipv6_prefix_length = ipv6_prefix_length
         self.remote = remote
         self.local = local
-        self.monitor_health = monitor_health
+        self.monitor_health = monitor_health if monitor_health is not None else False
         self.dynstate = dynstate if dynstate is not None else orchestron_rfs__rfs__backbone_interface__dynstate()
 
     mut def to_gdata(self) -> yang.gdata.Node:
@@ -2718,7 +2718,7 @@ class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__backbone_interface_entry:
-        return orchestron_rfs__rfs__backbone_interface_entry(name=n.get_str('name'), ipv4_address=n.get_opt_str('ipv4-address'), ipv4_prefix_length=n.get_opt_int('ipv4-prefix-length'), ipv6_address=n.get_opt_str('ipv6-address'), ipv6_prefix_length=n.get_opt_int('ipv6-prefix-length'), remote=orchestron_rfs__rfs__backbone_interface__remote.from_gdata(n.get_cnt('remote')), local=orchestron_rfs__rfs__backbone_interface__local.from_gdata(n.get_cnt('local')), monitor_health=n.get_bool('monitor-health'), dynstate=orchestron_rfs__rfs__backbone_interface__dynstate.from_gdata(n.get_opt_cnt('dynstate')))
+        return orchestron_rfs__rfs__backbone_interface_entry(name=n.get_str('name'), ipv4_address=n.get_opt_str('ipv4-address'), ipv4_prefix_length=n.get_opt_int('ipv4-prefix-length'), ipv6_address=n.get_opt_str('ipv6-address'), ipv6_prefix_length=n.get_opt_int('ipv6-prefix-length'), remote=orchestron_rfs__rfs__backbone_interface__remote.from_gdata(n.get_cnt('remote')), local=orchestron_rfs__rfs__backbone_interface__local.from_gdata(n.get_cnt('local')), monitor_health=n.get_opt_bool('monitor-health'), dynstate=orchestron_rfs__rfs__backbone_interface__dynstate.from_gdata(n.get_opt_cnt('dynstate')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -2726,7 +2726,7 @@ class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
             res.append('# Top node: /rfs/backbone-interface')
             res.append('self_local = orchestron_rfs__rfs__backbone_interface__local({repr(self.local.device)})')
             res.append('self_remote = orchestron_rfs__rfs__backbone_interface__remote({repr(self.remote.device)}, {repr(self.remote.interface)})')
-            res.append('{self_name} = orchestron_rfs__rfs__backbone_interface({repr(self.name)}, self_remote, self_local, {repr(self.monitor_health)})')
+            res.append('{self_name} = orchestron_rfs__rfs__backbone_interface({repr(self.name)}, self_remote, self_local)')
         leaves = []
         _ipv4_address = self.ipv4_address
         if _ipv4_address is not None:
@@ -2746,6 +2746,9 @@ class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
         _local = self.local
         if _local is not None:
             res.extend(_local.prsrc('{self_name}.local', False).splitlines())
+        _monitor_health = self.monitor_health
+        if _monitor_health is not None:
+            leaves.append('{self_name}.monitor_health = {repr(_monitor_health)}')
         _dynstate = self.dynstate
         if _dynstate is not None:
             res.extend(_dynstate.prsrc('{self_name}.dynstate', False).splitlines())
@@ -2768,7 +2771,7 @@ class orchestron_rfs__rfs__backbone_interface(yang.adata.MNode):
         self._name = 'backbone-interface'
         self.elements = elements
 
-    mut def create(self, name, remote, local, monitor_health):
+    mut def create(self, name, remote, local):
         for e in self.elements:
             match = True
             if e.name != name:
@@ -2777,7 +2780,7 @@ class orchestron_rfs__rfs__backbone_interface(yang.adata.MNode):
             if match:
                 return e
 
-        res = orchestron_rfs__rfs__backbone_interface_entry(name, remote, local, monitor_health)
+        res = orchestron_rfs__rfs__backbone_interface_entry(name, remote, local)
         self.elements.append(res)
         return res
 
@@ -2812,7 +2815,7 @@ mut def from_xml_orchestron_rfs__rfs__backbone_interface_element(node: xml.Node)
     yang.gdata.maybe_add(children, 'remote', from_xml_orchestron_rfs__rfs__backbone_interface__remote, child_remote)
     child_local = yang.gdata.from_xml_cnt(node, 'local')
     yang.gdata.maybe_add(children, 'local', from_xml_orchestron_rfs__rfs__backbone_interface__local, child_local)
-    child_monitor_health = yang.gdata.from_xml_bool(node, 'monitor-health')
+    child_monitor_health = yang.gdata.from_xml_opt_bool(node, 'monitor-health')
     yang.gdata.maybe_add(children, 'monitor-health', from_xml_orchestron_rfs__rfs__backbone_interface__monitor_health, child_monitor_health)
     child_dynstate = yang.gdata.from_xml_opt_cnt(node, 'dynstate')
     yang.gdata.maybe_add(children, 'dynstate', from_xml_orchestron_rfs__rfs__backbone_interface__dynstate, child_dynstate)
@@ -2899,7 +2902,7 @@ mut def from_json_orchestron_rfs__rfs__backbone_interface_element(jd: dict[str, 
     yang.gdata.maybe_add(children, 'remote', from_json_orchestron_rfs__rfs__backbone_interface__remote, child_remote)
     child_local = yang.gdata.take_json_cnt(jd, 'local')
     yang.gdata.maybe_add(children, 'local', from_json_orchestron_rfs__rfs__backbone_interface__local, child_local)
-    child_monitor_health = yang.gdata.take_json_bool(jd, 'monitor-health')
+    child_monitor_health = yang.gdata.take_json_opt_bool(jd, 'monitor-health')
     yang.gdata.maybe_add(children, 'monitor-health', from_json_orchestron_rfs__rfs__backbone_interface__monitor_health, child_monitor_health)
     child_dynstate = yang.gdata.take_json_opt_cnt(jd, 'dynstate')
     yang.gdata.maybe_add(children, 'dynstate', from_json_orchestron_rfs__rfs__backbone_interface__dynstate, child_dynstate)
@@ -3816,7 +3819,7 @@ class orchestron_rfs__rfs_entry(yang.adata.MNode):
             res.append("# List /rfs/backbone-interface element: {_element.to_gdata().key_str(['name'])}")
             res.append('element_local = orchestron_rfs__rfs__backbone_interface__local({repr(_element.local.device)})')
             res.append('element_remote = orchestron_rfs__rfs__backbone_interface__remote({repr(_element.remote.device)}, {repr(_element.remote.interface)})')
-            list_elem = 'backbone_interface_element = {self_name}.backbone_interface.create({repr(_element.name)}, element_remote, element_local, {repr(_element.monitor_health)})'
+            list_elem = 'backbone_interface_element = {self_name}.backbone_interface.create({repr(_element.name)}, element_remote, element_local)'
             res.append(list_elem)
             res.extend(_element.prsrc('backbone_interface_element', False, list_element=True).splitlines())
         _ibgp_neighbor = self.ibgp_neighbor

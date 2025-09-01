@@ -174,7 +174,7 @@ def src_yang():
       }
       leaf monitor-health {
         type boolean;
-        mandatory true;
+        default false;
       }
     }
 
@@ -1224,13 +1224,13 @@ class netinfra_inter__netinfra__backbone_link_entry(yang.adata.MNode):
     right_interface: str
     monitor_health: bool
 
-    mut def __init__(self, left_router: str, left_interface: str, right_router: str, right_interface: str, monitor_health: bool):
+    mut def __init__(self, left_router: str, left_interface: str, right_router: str, right_interface: str, monitor_health: ?bool=None):
         self._ns = 'http://example.com/netinfra-inter'
         self.left_router = left_router
         self.left_interface = left_interface
         self.right_router = right_router
         self.right_interface = right_interface
-        self.monitor_health = monitor_health
+        self.monitor_health = monitor_health if monitor_health is not None else False
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -1253,14 +1253,17 @@ class netinfra_inter__netinfra__backbone_link_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra_inter__netinfra__backbone_link_entry:
-        return netinfra_inter__netinfra__backbone_link_entry(left_router=n.get_str('left-router'), left_interface=n.get_str('left-interface'), right_router=n.get_str('right-router'), right_interface=n.get_str('right-interface'), monitor_health=n.get_bool('monitor-health'))
+        return netinfra_inter__netinfra__backbone_link_entry(left_router=n.get_str('left-router'), left_interface=n.get_str('left-interface'), right_router=n.get_str('right-router'), right_interface=n.get_str('right-interface'), monitor_health=n.get_opt_bool('monitor-health'))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
         if top:
             res.append('# Top node: /netinfra/backbone-link')
-            res.append('{self_name} = netinfra_inter__netinfra__backbone_link({repr(self.left_router)}, {repr(self.left_interface)}, {repr(self.right_router)}, {repr(self.right_interface)}, {repr(self.monitor_health)})')
+            res.append('{self_name} = netinfra_inter__netinfra__backbone_link({repr(self.left_router)}, {repr(self.left_interface)}, {repr(self.right_router)}, {repr(self.right_interface)})')
         leaves = []
+        _monitor_health = self.monitor_health
+        if _monitor_health is not None:
+            leaves.append('{self_name}.monitor_health = {repr(_monitor_health)}')
         if leaves:
             if not list_element:
                res = ['', '# Container: /netinfra/backbone-link'] + leaves + res
@@ -1280,7 +1283,7 @@ class netinfra_inter__netinfra__backbone_link(yang.adata.MNode):
         self._name = 'backbone-link'
         self.elements = elements
 
-    mut def create(self, left_router, left_interface, right_router, right_interface, monitor_health):
+    mut def create(self, left_router, left_interface, right_router, right_interface):
         for e in self.elements:
             match = True
             if e.left_router != left_router:
@@ -1298,7 +1301,7 @@ class netinfra_inter__netinfra__backbone_link(yang.adata.MNode):
             if match:
                 return e
 
-        res = netinfra_inter__netinfra__backbone_link_entry(left_router, left_interface, right_router, right_interface, monitor_health)
+        res = netinfra_inter__netinfra__backbone_link_entry(left_router, left_interface, right_router, right_interface)
         self.elements.append(res)
         return res
 
@@ -1327,7 +1330,7 @@ mut def from_xml_netinfra_inter__netinfra__backbone_link_element(node: xml.Node)
     yang.gdata.maybe_add(children, 'right-router', from_xml_netinfra_inter__netinfra__backbone_link__right_router, child_right_router)
     child_right_interface = yang.gdata.from_xml_str(node, 'right-interface')
     yang.gdata.maybe_add(children, 'right-interface', from_xml_netinfra_inter__netinfra__backbone_link__right_interface, child_right_interface)
-    child_monitor_health = yang.gdata.from_xml_bool(node, 'monitor-health')
+    child_monitor_health = yang.gdata.from_xml_opt_bool(node, 'monitor-health')
     yang.gdata.maybe_add(children, 'monitor-health', from_xml_netinfra_inter__netinfra__backbone_link__monitor_health, child_monitor_health)
     return yang.gdata.Container(children)
 
@@ -1395,7 +1398,7 @@ mut def from_json_netinfra_inter__netinfra__backbone_link_element(jd: dict[str, 
     yang.gdata.maybe_add(children, 'right-router', from_json_netinfra_inter__netinfra__backbone_link__right_router, child_right_router)
     child_right_interface = yang.gdata.take_json_str(jd, 'right-interface')
     yang.gdata.maybe_add(children, 'right-interface', from_json_netinfra_inter__netinfra__backbone_link__right_interface, child_right_interface)
-    child_monitor_health = yang.gdata.take_json_bool(jd, 'monitor-health')
+    child_monitor_health = yang.gdata.take_json_opt_bool(jd, 'monitor-health')
     yang.gdata.maybe_add(children, 'monitor-health', from_json_netinfra_inter__netinfra__backbone_link__monitor_health, child_monitor_health)
     return yang.gdata.Container(children)
 
@@ -1787,7 +1790,7 @@ class netinfra_inter__netinfra(yang.adata.MNode):
         for _element in _backbone_link.elements:
             res.append('')
             res.append("# List /netinfra/backbone-link element: {_element.to_gdata().key_str(['left-router', 'left-interface', 'right-router', 'right-interface'])}")
-            list_elem = 'backbone_link_element = {self_name}.backbone_link.create({repr(_element.left_router)}, {repr(_element.left_interface)}, {repr(_element.right_router)}, {repr(_element.right_interface)}, {repr(_element.monitor_health)})'
+            list_elem = 'backbone_link_element = {self_name}.backbone_link.create({repr(_element.left_router)}, {repr(_element.left_interface)}, {repr(_element.right_router)}, {repr(_element.right_interface)})'
             res.append(list_elem)
             res.extend(_element.prsrc('backbone_link_element', False, list_element=True).splitlines())
         _ibgp_fullmesh = self.ibgp_fullmesh

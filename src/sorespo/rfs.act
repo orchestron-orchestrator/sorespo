@@ -204,12 +204,7 @@ actor BBInterfaceTransform(update_dynstate: proc(?orchestron_rfs__rfs__backbone_
     var isis_healthy = False
     var ldp_healthy = False
     var counters_recorded = False
-    var t0_rx_errors = None
-    var t0_rx_dropped = None
-    var t0_rx_over_errors = None
-    var t0_tx_errors = None
-    var t0_tx_dropped = None
-    var t0_tx_carrier_errors = None
+    var t0: ?(rx_errors: int, rx_dropped: int, rx_over_errors: int, tx_errors: int, tx_dropped: int, tx_carrier_errors: int) = None
 
     def do_healthcheck():
         healthcheck_running = True
@@ -247,15 +242,15 @@ actor BBInterfaceTransform(update_dynstate: proc(?orchestron_rfs__rfs__backbone_
 
         def if_stats_t0_response(output: ?crpd23.junos_rpc_interfaces__get_interface_information__output, error):
             if output is not None:
-                t0_rx_errors, t0_rx_dropped, t0_rx_over_errors, t0_tx_errors, t0_tx_dropped, t0_tx_carrier_errors = sorespo.crpd_stats.parse(output)
+                t0 = sorespo.crpd_stats.parse(output)
                 counters_recorded = True
                 update_health_state()
                 after 12: do_healthcheck()
 
         def if_stats_t1_response(output: ?crpd23.junos_rpc_interfaces__get_interface_information__output, error):
-            if output is not None:
-                t1_rx_errors, t1_rx_dropped, t1_rx_over_errors, t1_tx_errors, t1_tx_dropped, t1_tx_carrier_errors = sorespo.crpd_stats.parse(output)
-                if t1_rx_errors == t0_rx_errors and t1_rx_dropped == t0_rx_dropped and t1_rx_over_errors == t0_rx_over_errors and t1_tx_errors == t0_tx_errors and t1_tx_dropped == t0_tx_dropped and t1_tx_carrier_errors == t0_tx_carrier_errors:
+            if output is not None and t0 is not None:
+                t1 = sorespo.crpd_stats.parse(output)
+                if t1.rx_errors == t0.rx_errors and t1.rx_dropped == t0.rx_dropped and t1.rx_over_errors == t0.rx_over_errors and t1.tx_errors == t0.tx_errors and t1.tx_dropped == t0.tx_dropped and t1.tx_carrier_errors == t0.tx_carrier_errors:
                     interface_healthy = True
                 else:
                     counters_recorded = False
