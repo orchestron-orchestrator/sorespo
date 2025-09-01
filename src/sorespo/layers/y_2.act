@@ -115,7 +115,9 @@ def src_yang():
 
             container dynstate {
                 orchestron:dynstate;
-
+                leaf protocols-enabled {
+                    type boolean;
+                }
                 leaf health-state {
                     type string;
                 }
@@ -2591,6 +2593,12 @@ mut def from_json_orchestron_rfs__rfs__backbone_interface__monitor_health(val: v
 mut def from_xml_orchestron_rfs__rfs__backbone_interface__monitor_health(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
 
+mut def from_json_orchestron_rfs__rfs__backbone_interface__dynstate__protocols_enabled(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('boolean', val)
+
+mut def from_xml_orchestron_rfs__rfs__backbone_interface__dynstate__protocols_enabled(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('boolean', val)
+
 mut def from_json_orchestron_rfs__rfs__backbone_interface__dynstate__health_state(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
 
@@ -2598,14 +2606,19 @@ mut def from_xml_orchestron_rfs__rfs__backbone_interface__dynstate__health_state
     return yang.gdata.Leaf('string', val)
 
 class orchestron_rfs__rfs__backbone_interface__dynstate(yang.adata.MNode):
+    protocols_enabled: ?bool
     health_state: ?str
 
-    mut def __init__(self, health_state: ?str):
+    mut def __init__(self, protocols_enabled: ?bool, health_state: ?str):
         self._ns = 'http://example.com/sorespo-rfs'
+        self.protocols_enabled = protocols_enabled
         self.health_state = health_state
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
+        _protocols_enabled = self.protocols_enabled
+        if _protocols_enabled is not None:
+            children['protocols-enabled'] = yang.gdata.Leaf('boolean', _protocols_enabled)
         _health_state = self.health_state
         if _health_state is not None:
             children['health-state'] = yang.gdata.Leaf('string', _health_state)
@@ -2614,7 +2627,7 @@ class orchestron_rfs__rfs__backbone_interface__dynstate(yang.adata.MNode):
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> orchestron_rfs__rfs__backbone_interface__dynstate:
         if n is not None:
-            return orchestron_rfs__rfs__backbone_interface__dynstate(health_state=n.get_opt_str('health-state'))
+            return orchestron_rfs__rfs__backbone_interface__dynstate(protocols_enabled=n.get_opt_bool('protocols-enabled'), health_state=n.get_opt_str('health-state'))
         return orchestron_rfs__rfs__backbone_interface__dynstate()
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
@@ -2623,6 +2636,9 @@ class orchestron_rfs__rfs__backbone_interface__dynstate(yang.adata.MNode):
             res.append('# Top node: /rfs/backbone-interface/dynstate')
             res.append('{self_name} = orchestron_rfs__rfs__backbone_interface__dynstate()')
         leaves = []
+        _protocols_enabled = self.protocols_enabled
+        if _protocols_enabled is not None:
+            leaves.append('{self_name}.protocols_enabled = {repr(_protocols_enabled)}')
         _health_state = self.health_state
         if _health_state is not None:
             leaves.append('{self_name}.health_state = {repr(_health_state)}')
@@ -2636,6 +2652,8 @@ class orchestron_rfs__rfs__backbone_interface__dynstate(yang.adata.MNode):
 
 mut def from_xml_orchestron_rfs__rfs__backbone_interface__dynstate(node: xml.Node) -> yang.gdata.Container:
     children = {}
+    child_protocols_enabled = yang.gdata.from_xml_opt_bool(node, 'protocols-enabled')
+    yang.gdata.maybe_add(children, 'protocols-enabled', from_xml_orchestron_rfs__rfs__backbone_interface__dynstate__protocols_enabled, child_protocols_enabled)
     child_health_state = yang.gdata.from_xml_opt_str(node, 'health-state')
     yang.gdata.maybe_add(children, 'health-state', from_xml_orchestron_rfs__rfs__backbone_interface__dynstate__health_state, child_health_state)
     return yang.gdata.Container(children)
@@ -2645,6 +2663,8 @@ mut def from_json_path_orchestron_rfs__rfs__backbone_interface__dynstate(jd: val
     if len(path) > 0:
         point = path[0]
         rest_path = path[1:]
+        if point == 'protocols-enabled':
+            raise ValueError("Invalid json path to non-inner node")
         if point == 'health-state':
             raise ValueError("Invalid json path to non-inner node")
         raise ValueError("Invalid path")
@@ -2658,6 +2678,8 @@ mut def from_json_path_orchestron_rfs__rfs__backbone_interface__dynstate(jd: val
 
 mut def from_json_orchestron_rfs__rfs__backbone_interface__dynstate(jd: dict[str, ?value]) -> yang.gdata.Container:
     children = {}
+    child_protocols_enabled = yang.gdata.take_json_opt_bool(jd, 'protocols-enabled')
+    yang.gdata.maybe_add(children, 'protocols-enabled', from_json_orchestron_rfs__rfs__backbone_interface__dynstate__protocols_enabled, child_protocols_enabled)
     child_health_state = yang.gdata.take_json_opt_str(jd, 'health-state')
     yang.gdata.maybe_add(children, 'health-state', from_json_orchestron_rfs__rfs__backbone_interface__dynstate__health_state, child_health_state)
     return yang.gdata.Container(children)
