@@ -315,6 +315,12 @@ def src_yang():
         }
       }
     }
+    container debug {
+      leaf connection {
+        type boolean;
+        default "false";
+      }
+    }
   }
 
   list rfs {
@@ -1934,6 +1940,82 @@ mut def from_json_orchestron_rfs__device__mock(jd: dict[str, ?value]) -> yang.gd
     yang.gdata.maybe_add(children, 'module', from_json_orchestron_rfs__device__mock__module, child_module)
     return yang.gdata.Container(children)
 
+mut def from_json_orchestron_rfs__device__debug__connection(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('boolean', val)
+
+mut def from_xml_orchestron_rfs__device__debug__connection(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('boolean', val)
+
+class orchestron_rfs__device__debug(yang.adata.MNode):
+    connection: bool
+
+    mut def __init__(self, connection: ?bool=None):
+        self._ns = 'http://orchestron.org/yang/orchestron-rfs.yang'
+        self.connection = connection if connection is not None else False
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        children = {}
+        _connection = self.connection
+        if _connection is not None:
+            children['connection'] = yang.gdata.Leaf('boolean', _connection)
+        return yang.gdata.Container(children)
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> orchestron_rfs__device__debug:
+        if n is not None:
+            return orchestron_rfs__device__debug(connection=n.get_opt_bool('connection'))
+        return orchestron_rfs__device__debug()
+
+    def prsrc(self, self_name='ad', top=True, list_element=False):
+        res = []
+        if top:
+            res.append('# Top node: /device/debug')
+            res.append('{self_name} = orchestron_rfs__device__debug()')
+        leaves = []
+        _connection = self.connection
+        if _connection is not None:
+            leaves.append('{self_name}.connection = {repr(_connection)}')
+        if leaves:
+            if not list_element:
+               res = ['', '# Container: /device/debug'] + leaves + res
+            else:
+                res = leaves + res
+        return '\n'.join(res)
+
+    def prsrc_gen3(self, self_name='ad'):
+        # WARNING: this wrapper for the gen3.pradata schema-driven parser compiles the schema on every call!
+        s = yang.compile(src_yang())
+        return yang.gen3.pradata(s, self.to_gdata(), self_name, loose=False, root_path=['orchestron-rfs:device', 'debug'])
+
+
+mut def from_xml_orchestron_rfs__device__debug(node: xml.Node) -> yang.gdata.Container:
+    children = {}
+    child_connection = yang.gdata.from_xml_opt_bool(node, 'connection')
+    yang.gdata.maybe_add(children, 'connection', from_xml_orchestron_rfs__device__debug__connection, child_connection)
+    return yang.gdata.Container(children)
+
+mut def from_json_path_orchestron_rfs__device__debug(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'connection':
+            raise ValueError("Invalid json path to non-inner node")
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_orchestron_rfs__device__debug(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_orchestron_rfs__device__debug(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_connection = yang.gdata.take_json_opt_bool(jd, 'connection')
+    yang.gdata.maybe_add(children, 'connection', from_json_orchestron_rfs__device__debug__connection, child_connection)
+    return yang.gdata.Container(children)
+
 class orchestron_rfs__device_entry(yang.adata.MNode):
     name: str
     description: ?str
@@ -1942,8 +2024,9 @@ class orchestron_rfs__device_entry(yang.adata.MNode):
     credentials: orchestron_rfs__device__credentials
     initial_credentials: orchestron_rfs__device__initial_credentials
     mock: orchestron_rfs__device__mock
+    debug: orchestron_rfs__device__debug
 
-    mut def __init__(self, name: str, credentials: orchestron_rfs__device__credentials, description: ?str, type: ?str, address: list[orchestron_rfs__device__address_entry]=[], initial_credentials: list[orchestron_rfs__device__initial_credentials_entry]=[], mock: ?orchestron_rfs__device__mock=None):
+    mut def __init__(self, name: str, credentials: orchestron_rfs__device__credentials, description: ?str, type: ?str, address: list[orchestron_rfs__device__address_entry]=[], initial_credentials: list[orchestron_rfs__device__initial_credentials_entry]=[], mock: ?orchestron_rfs__device__mock=None, debug: ?orchestron_rfs__device__debug=None):
         self._ns = 'http://orchestron.org/yang/orchestron-rfs.yang'
         self.name = name
         self.description = description
@@ -1952,6 +2035,7 @@ class orchestron_rfs__device_entry(yang.adata.MNode):
         self.credentials = credentials
         self.initial_credentials = orchestron_rfs__device__initial_credentials(elements=initial_credentials)
         self.mock = mock if mock is not None else orchestron_rfs__device__mock()
+        self.debug = debug if debug is not None else orchestron_rfs__device__debug()
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -1976,11 +2060,14 @@ class orchestron_rfs__device_entry(yang.adata.MNode):
         _mock = self.mock
         if _mock is not None:
             children['mock'] = _mock.to_gdata()
+        _debug = self.debug
+        if _debug is not None:
+            children['debug'] = _debug.to_gdata()
         return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__device_entry:
-        return orchestron_rfs__device_entry(name=n.get_str('name'), description=n.get_opt_str('description'), type=n.get_opt_str('type'), address=orchestron_rfs__device__address.from_gdata(n.get_opt_list('address')), credentials=orchestron_rfs__device__credentials.from_gdata(n.get_cnt('credentials')), initial_credentials=orchestron_rfs__device__initial_credentials.from_gdata(n.get_opt_list('initial-credentials')), mock=orchestron_rfs__device__mock.from_gdata(n.get_opt_cnt('mock')))
+        return orchestron_rfs__device_entry(name=n.get_str('name'), description=n.get_opt_str('description'), type=n.get_opt_str('type'), address=orchestron_rfs__device__address.from_gdata(n.get_opt_list('address')), credentials=orchestron_rfs__device__credentials.from_gdata(n.get_cnt('credentials')), initial_credentials=orchestron_rfs__device__initial_credentials.from_gdata(n.get_opt_list('initial-credentials')), mock=orchestron_rfs__device__mock.from_gdata(n.get_opt_cnt('mock')), debug=orchestron_rfs__device__debug.from_gdata(n.get_opt_cnt('debug')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -2015,6 +2102,9 @@ class orchestron_rfs__device_entry(yang.adata.MNode):
         _mock = self.mock
         if _mock is not None:
             res.extend(_mock.prsrc('{self_name}.mock', False).splitlines())
+        _debug = self.debug
+        if _debug is not None:
+            res.extend(_debug.prsrc('{self_name}.debug', False).splitlines())
         if leaves:
             if not list_element:
                res = ['', '# Container: /device'] + leaves + res
@@ -2078,6 +2168,8 @@ mut def from_xml_orchestron_rfs__device_element(node: xml.Node) -> yang.gdata.No
     yang.gdata.maybe_add(children, 'initial-credentials', from_xml_orchestron_rfs__device__initial_credentials, child_initial_credentials)
     child_mock = yang.gdata.from_xml_opt_cnt(node, 'mock')
     yang.gdata.maybe_add(children, 'mock', from_xml_orchestron_rfs__device__mock, child_mock)
+    child_debug = yang.gdata.from_xml_opt_cnt(node, 'debug')
+    yang.gdata.maybe_add(children, 'debug', from_xml_orchestron_rfs__device__debug, child_debug)
     return yang.gdata.Container(children)
 
 mut def from_xml_orchestron_rfs__device(nodes: list[xml.Node]) -> yang.gdata.List:
@@ -2113,6 +2205,8 @@ mut def from_json_path_orchestron_rfs__device_element(jd: value, path: list[str]
             children['initial-credentials'] = from_json_path_orchestron_rfs__device__initial_credentials(jd, rest_path, op)
         if point == 'mock':
             children['mock'] = from_json_path_orchestron_rfs__device__mock(jd, rest_path, op)
+        if point == 'debug':
+            children['debug'] = from_json_path_orchestron_rfs__device__debug(jd, rest_path, op)
         return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
@@ -2157,6 +2251,8 @@ mut def from_json_orchestron_rfs__device_element(jd: dict[str, ?value]) -> yang.
     yang.gdata.maybe_add(children, 'initial-credentials', from_json_orchestron_rfs__device__initial_credentials, child_initial_credentials)
     child_mock = yang.gdata.take_json_opt_cnt(jd, 'mock')
     yang.gdata.maybe_add(children, 'mock', from_json_orchestron_rfs__device__mock, child_mock)
+    child_debug = yang.gdata.take_json_opt_cnt(jd, 'debug')
+    yang.gdata.maybe_add(children, 'debug', from_json_orchestron_rfs__device__debug, child_debug)
     return yang.gdata.Container(children)
 
 mut def from_json_orchestron_rfs__device(jd: list[dict[str, ?value]]) -> yang.gdata.List:
