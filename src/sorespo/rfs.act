@@ -2,6 +2,8 @@ import yang.adata
 import orchestron.ttt
 from orchestron import UnsupportedDevice
 
+from rtrsecrets.junos import *
+
 import sorespo.cisco_vigenere
 
 import sorespo.layers.base_2 as base
@@ -119,7 +121,7 @@ end-policy"""
             g1.family.inet_vpn.create_unicast()
             g1.family.inet6_vpn.create_unicast()
             g1.family.create_route_target()
-            g1.authentication_key = i.ibgp_authentication_key
+            g1.authentication_key = junos_encrypt(i.ibgp_authentication_key, "4")
 
             return dev
             
@@ -513,7 +515,7 @@ class EbgpCustomer(base.EbgpCustomer):
 
             neighbor = group.neighbor.create(i.address)
             neighbor.description = i.description
-            neighbor.authentication_key = i.authentication_key
+            neighbor.authentication_key = junos_encrypt(i.authentication_key, "4")
             neighbor.peer_as = str(i.peer_asn)
             neighbor.as_override = True
 
