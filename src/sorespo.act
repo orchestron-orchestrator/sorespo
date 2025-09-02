@@ -274,12 +274,11 @@ actor main(env):
 
                 if input_config is not None:
                     session = cfs.newsession()
-                    if request.headers.get_def("await-device", "") == "true":
-                        log.info("Client wants to await device config push")
-                        session.edit_config(input_config, None, config_done)
-                    else:
-                        log.info("Client does not want to await device config push")
+                    if request.headers.get_def("async", "") == "true":
+                        log.info("Client requests async behavior")
                         session.edit_config(input_config, config_done)
+                    else:
+                        session.edit_config(input_config, None, config_done)
                     return
 
             respond(404, {}, "")
