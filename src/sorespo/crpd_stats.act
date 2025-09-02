@@ -1,0 +1,52 @@
+import json
+import testing
+
+import yang.adata
+
+import sorespo.devices.JuniperCRPD_23_4R1_9 as crpd23
+
+def parse(output: crpd23.junos_rpc_interfaces__get_interface_information__output) -> (rx_errors: int, rx_dropped: int, rx_over_errors: int, tx_errors: int, tx_dropped: int, tx_carrier_errors: int):
+    o = output.output
+    if o is not None:
+        c = o.strip().lstrip("[").rstrip("]")
+        stats = json.decode(c)
+        if stats is not None:
+            stats64 = stats["stats64"]
+            # print("BBInterfaceTransform.if_stats_response stat64: {stats64}, {error}")
+            if isinstance(stats64, dict):
+                rx = stats64["rx"]
+                tx = stats64["tx"]
+                if isinstance(rx, dict) and isinstance(tx, dict):
+                    rx_errors = rx["errors"]
+                    rx_dropped = rx["dropped"]
+                    rx_over_errors = rx["over_errors"]
+                    tx_errors = tx["errors"]
+                    tx_dropped = tx["dropped"]
+                    tx_carrier_errors = tx["carrier_errors"]
+                    return (rx_errors=rx_errors, rx_dropped=rx_dropped, rx_over_errors=rx_over_errors, tx_errors=tx_errors, tx_dropped=tx_dropped, tx_carrier_errors=tx_carrier_errors)
+    raise ValueError("Invalid stats64 format from cRPD")
+
+def _test_parse_stats64(t: testing.SyncT):
+    input_data = crpd23.junos_rpc_interfaces__get_interface_information__output(
+        output=json.encode({
+            "stats64": {
+                "rx": {
+                    "errors": 1,
+                    "dropped": 2,
+                    "over_errors": 3
+                },
+                "tx": {
+                    "errors": 4,
+                    "dropped": 5,
+                    "carrier_errors": 6
+                }
+            }
+        })
+    )
+    result = parse(input_data)
+    testing.assertEqual(result.rx_errors, 1)
+    testing.assertEqual(result.rx_dropped, 2)
+    testing.assertEqual(result.rx_over_errors, 3)
+    testing.assertEqual(result.tx_errors, 4)
+    testing.assertEqual(result.tx_dropped, 5)
+    testing.assertEqual(result.tx_carrier_errors, 6)

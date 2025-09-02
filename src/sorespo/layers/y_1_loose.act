@@ -172,6 +172,10 @@ def src_yang():
       leaf right-interface {
         type string;
       }
+      leaf monitor-health {
+        type boolean;
+        default false;
+      }
     }
 
     list ibgp-fullmesh {
@@ -1218,18 +1222,26 @@ mut def from_json_netinfra_inter__netinfra__backbone_link__right_interface(val: 
 mut def from_xml_netinfra_inter__netinfra__backbone_link__right_interface(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
 
+mut def from_json_netinfra_inter__netinfra__backbone_link__monitor_health(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('boolean', val)
+
+mut def from_xml_netinfra_inter__netinfra__backbone_link__monitor_health(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('boolean', val)
+
 class netinfra_inter__netinfra__backbone_link_entry(yang.adata.MNode):
     left_router: str
     left_interface: str
     right_router: str
     right_interface: str
+    monitor_health: ?bool
 
-    mut def __init__(self, left_router: str, left_interface: str, right_router: str, right_interface: str):
+    mut def __init__(self, left_router: str, left_interface: str, right_router: str, right_interface: str, monitor_health: ?bool):
         self._ns = 'http://example.com/netinfra-inter'
         self.left_router = left_router
         self.left_interface = left_interface
         self.right_router = right_router
         self.right_interface = right_interface
+        self.monitor_health = monitor_health
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -1245,11 +1257,14 @@ class netinfra_inter__netinfra__backbone_link_entry(yang.adata.MNode):
         _right_interface = self.right_interface
         if _right_interface is not None:
             children['right-interface'] = yang.gdata.Leaf('string', _right_interface)
+        _monitor_health = self.monitor_health
+        if _monitor_health is not None:
+            children['monitor-health'] = yang.gdata.Leaf('boolean', _monitor_health)
         return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra_inter__netinfra__backbone_link_entry:
-        return netinfra_inter__netinfra__backbone_link_entry(left_router=n.get_str('left-router'), left_interface=n.get_str('left-interface'), right_router=n.get_str('right-router'), right_interface=n.get_str('right-interface'))
+        return netinfra_inter__netinfra__backbone_link_entry(left_router=n.get_str('left-router'), left_interface=n.get_str('left-interface'), right_router=n.get_str('right-router'), right_interface=n.get_str('right-interface'), monitor_health=n.get_opt_bool('monitor-health'))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -1257,6 +1272,9 @@ class netinfra_inter__netinfra__backbone_link_entry(yang.adata.MNode):
             res.append('# Top node: /netinfra/backbone-link')
             res.append('{self_name} = netinfra_inter__netinfra__backbone_link({repr(self.left_router)}, {repr(self.left_interface)}, {repr(self.right_router)}, {repr(self.right_interface)})')
         leaves = []
+        _monitor_health = self.monitor_health
+        if _monitor_health is not None:
+            leaves.append('{self_name}.monitor_health = {repr(_monitor_health)}')
         if leaves:
             if not list_element:
                res = ['', '# Container: /netinfra/backbone-link'] + leaves + res
@@ -1323,6 +1341,8 @@ mut def from_xml_netinfra_inter__netinfra__backbone_link_element(node: xml.Node)
     yang.gdata.maybe_add(children, 'right-router', from_xml_netinfra_inter__netinfra__backbone_link__right_router, child_right_router)
     child_right_interface = yang.gdata.from_xml_str(node, 'right-interface')
     yang.gdata.maybe_add(children, 'right-interface', from_xml_netinfra_inter__netinfra__backbone_link__right_interface, child_right_interface)
+    child_monitor_health = yang.gdata.from_xml_opt_bool(node, 'monitor-health')
+    yang.gdata.maybe_add(children, 'monitor-health', from_xml_netinfra_inter__netinfra__backbone_link__monitor_health, child_monitor_health)
     return yang.gdata.Container(children)
 
 mut def from_xml_netinfra_inter__netinfra__backbone_link(nodes: list[xml.Node]) -> yang.gdata.List:
@@ -1349,6 +1369,8 @@ mut def from_json_path_netinfra_inter__netinfra__backbone_link_element(jd: value
         children['left-interface'] = from_json_netinfra_inter__netinfra__backbone_link__left_interface(keys[1])
         children['right-router'] = from_json_netinfra_inter__netinfra__backbone_link__right_router(keys[2])
         children['right-interface'] = from_json_netinfra_inter__netinfra__backbone_link__right_interface(keys[3])
+        if point == 'monitor-health':
+            raise ValueError("Invalid json path to non-inner node")
         return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
 
@@ -1387,6 +1409,8 @@ mut def from_json_netinfra_inter__netinfra__backbone_link_element(jd: dict[str, 
     yang.gdata.maybe_add(children, 'right-router', from_json_netinfra_inter__netinfra__backbone_link__right_router, child_right_router)
     child_right_interface = yang.gdata.take_json_str(jd, 'right-interface')
     yang.gdata.maybe_add(children, 'right-interface', from_json_netinfra_inter__netinfra__backbone_link__right_interface, child_right_interface)
+    child_monitor_health = yang.gdata.take_json_opt_bool(jd, 'monitor-health')
+    yang.gdata.maybe_add(children, 'monitor-health', from_json_netinfra_inter__netinfra__backbone_link__monitor_health, child_monitor_health)
     return yang.gdata.Container(children)
 
 mut def from_json_netinfra_inter__netinfra__backbone_link(jd: list[dict[str, ?value]]) -> yang.gdata.List:

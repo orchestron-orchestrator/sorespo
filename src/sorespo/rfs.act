@@ -1,12 +1,17 @@
 import yang.adata
+import orchestron.device as odev
 import orchestron.ttt
 from orchestron import UnsupportedDevice
 
 from rtrsecrets.junos import *
 
 import sorespo.cisco_vigenere
+import sorespo.crpd_stats
 
 import sorespo.layers.base_2 as base
+
+from sorespo.layers.y_2 import orchestron_rfs__rfs__backbone_interface_entry
+from sorespo.layers.y_2 import orchestron_rfs__rfs__backbone_interface__dynstate
 
 import sorespo.devices.CiscoIosXr_24_1_ncs55a1 as xr24
 import sorespo.devices.JuniperCRPD_23_4R1_9 as crpd23
@@ -185,8 +190,108 @@ end-policy"""
         raise UnsupportedDevice()
 
 
+actor BBInterfaceTransform(update_dynstate: proc(?orchestron_rfs__rfs__backbone_interface__dynstate) -> None, dev: odev.DeviceMgr):
+    IF_STATE_INTERFACE_MONITOR = "monitor-interface-counters"
+    IF_STATE_PROTOCOLS_ENABLED = "protocols-enabled"
+    IF_STATE_ALL_OK = "all-ok"
+
+    rpc_root = crpd23.rpc_root(odev.DeviceTreeProvider(dev))
+    var interface_name = None
+    var healthcheck_enabled = False
+    var healthcheck_running = False
+    var protocols_enabled = False
+    var health_state = IF_STATE_INTERFACE_MONITOR
+    var isis_healthy = False
+    var ldp_healthy = False
+    var counters: list[(rx_errors: int, rx_dropped: int, rx_over_errors: int, tx_errors: int, tx_dropped: int, tx_carrier_errors: int)] = []
+
+    def do_healthcheck():
+        healthcheck_running = True
+        if not healthcheck_enabled:
+            health_state = IF_STATE_INTERFACE_MONITOR
+            isis_healthy = False
+            ldp_healthy = False
+            healthcheck_running = False
+            protocols_enabled = False
+            return
+
+        def update_health_state():
+            next_state = IF_STATE_PROTOCOLS_ENABLED if protocols_enabled else IF_STATE_INTERFACE_MONITOR
+            if isis_healthy and ldp_healthy:
+                next_state = IF_STATE_ALL_OK
+
+            if health_state != next_state:
+                print("Health state changed for {interface_name}: {health_state} -> {next_state}")
+                health_state = next_state
+                dynstate = orchestron_rfs__rfs__backbone_interface__dynstate()
+                dynstate.health_state = health_state
+                dynstate.protocols_enabled = protocols_enabled
+                update_dynstate(dynstate)
+
+        def on_if_stats_response(output: ?crpd23.junos_rpc_interfaces__get_interface_information__output, error):
+            if output is not None:
+                counters.append(sorespo.crpd_stats.parse(output))
+                if len(counters) > 2:
+                    counters.pop(0)
+
+                if len(counters) == 2:
+                    t0 = counters[0]
+                    t1 = counters[1]
+                    if (t1.rx_errors == t0.rx_errors and
+                        t1.rx_dropped == t0.rx_dropped and
+                        t1.rx_over_errors == t0.rx_over_errors and
+                        t1.tx_errors == t0.tx_errors and
+                        t1.tx_dropped == t0.tx_dropped and
+                        t1.tx_carrier_errors == t0.tx_carrier_errors):
+                        protocols_enabled = True
+                        update_health_state()
+                        after 0: do_healthcheck()
+                        return
+                after 12: do_healthcheck()
+
+        def on_isis_response(output: ?crpd23.junos_rpc_isis__get_isis_adjacency_information__output, error):
+            if output is not None:
+                # print("BBInterfaceTransform.isis_response: {output.to_gdata().to_xmlstr()}, {error}")
+                iai = output.isis_adjacency_information
+                if iai is not None:
+                    for ia in iai.isis_adjacency.elements:
+                        if ia.interface_name == interface_name:
+                            isis_healthy = (ia.adjacency_state == "Up")
+                            update_health_state()
+                            break
+
+        def on_ldp_response(output: ?crpd23.junos_rpc_ldp__get_ldp_neighbor_information__output, error):
+            if output is not None:
+                # print("BBInterfaceTransform.ldp_response: {output.to_gdata().to_xmlstr()}, {error}")
+                lni = output.ldp_neighbor_information
+                if lni is not None:
+                    for ln in lni.ldp_neighbor.elements:
+                        if ln.interface_name == interface_name:
+                            ldp_healthy = (ln.ldp_neighbor_address != "")
+                            update_health_state()
+                            break
+
+        if interface_name is not None and not protocols_enabled:
+            if_input = crpd23.junos_rpc_interfaces__get_interface_information__input()
+            if_input.interface_name = interface_name
+            if_input.level = "statistics"
+            rpc_root.get_interface_information(on_if_stats_response, if_input)
+        else:
+            rpc_root.get_isis_adjacency_information(on_isis_response)
+            rpc_root.get_ldp_neighbor_information(on_ldp_response)
+            after 3: do_healthcheck()
+ 
+    def on_conf(conf: orchestron_rfs__rfs__backbone_interface_entry):
+        print("BBInterfaceTransform.on_conf:{conf.name}")
+        interface_name = conf.name
+        healthcheck_enabled = conf.monitor_health
+        if healthcheck_enabled and not healthcheck_running:
+            do_healthcheck()
+
+    print("BBInterfaceTransform started")
+
 class BBInterface(base.BBInterface):
-    def transform(self, i, di):
+    def transform(self, i, di, dynstate):
         print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}]", err=True)
 
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
@@ -222,27 +327,40 @@ class BBInterface(base.BBInterface):
             # Create the interface
             unit = dev.configuration.interfaces.interface.create(i.name).unit.create("0")
             unit.description = "Link to {i.remote.device} [{i.remote.interface}]"
+            if i.monitor_health:
+                if dynstate is not None:
+                    unit.description += " - Health: {dynstate.health_state}"
+                else:
+                    unit.description += " - Health: monitor-interface-counters"
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 unit.family.create_inet().address.create("{ipv4_address}/{i.ipv4_prefix_length}")
 
-            # IS-IS config for this interface
-            dcpi = dev.configuration.protocols.isis
-            # vMX: ge-0/0/0.0, cRPD: eth0 (must not include unit)
-            if not CRPD:
-                interface = "{i.name}.0"
-            else:
-                interface = i.name
-            isis_intf = dcpi.interface.create(interface)
-            isis_intf.point_to_point = True
-            il1 = isis_intf.level.create(1)
-            il1.disable = True
-            il2 = isis_intf.level.create(2)
-            il2.metric = 5000
+            def configure_protocols():
+                # IS-IS config for this interface
+                dcpi = dev.configuration.protocols.isis
+                # vMX: ge-0/0/0.0, cRPD: eth0 (must not include unit)
+                if not CRPD:
+                    interface = "{i.name}.0"
+                else:
+                    interface = i.name
+                isis_intf = dcpi.interface.create(interface)
+                isis_intf.point_to_point = True
+                il1 = isis_intf.level.create(1)
+                il1.disable = True
+                il2 = isis_intf.level.create(2)
+                il2.metric = 5000
 
-            # MPLS and LDP config for this interface
-            dev.configuration.protocols.mpls.interface.create(interface)
-            dev.configuration.protocols.ldp.interface.create(interface)
+                # MPLS and LDP config for this interface
+                dev.configuration.protocols.mpls.interface.create(interface)
+                dev.configuration.protocols.ldp.interface.create(interface)
+
+            if not i.monitor_health:
+                configure_protocols()
+            if dynstate is not None:
+                pe = dynstate.protocols_enabled
+                if pe is not None and pe == True:
+                    configure_protocols()
 
             return dev
 
