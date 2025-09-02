@@ -661,8 +661,8 @@ make test-ping
 Throughout this tutorial you have used the `send-config-wait` target to apply
 intent configuration. This synchronous method waits for Orchestron to apply the
 configuration to the device(s) before it returns. Usually, asynchronous
-operations are preferred. Try using the `send-config` target instead and notice
-how your terminal returns as soon as the intent was accepted by SORESPO.
+operations are preferred. Try using the `send-config-async` target instead and
+notice how your terminal returns as soon as the intent was accepted by SORESPO.
 
 ## What's Next
 Now that you are familiar with running SORESPO and interacting with it,
