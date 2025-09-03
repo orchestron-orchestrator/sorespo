@@ -163,9 +163,7 @@ actor main(env):
                         respond(500, {}, "No data")
 
                 try:
-                    # We use upper case for device names in our configs
-                    # TODO: maybe we should somehow normalize that?!
-                    dev_name = path_elements[2].upper()
+                    dev_name = path_elements[2]
                     dev = dev_registry.get(dev_name)
                     if path_elements[3] == "capabilities":
                         respond(200, {}, str(dev.get_capabilities()))
@@ -203,6 +201,32 @@ actor main(env):
                     if path_elements[3] == 'resync':
                         respond(200, {}, "OK")
                         return
+
+                    if path_elements[3] == 'q':
+                        log.debug("q len > 3")
+                        if len(path_elements) == 4:
+                            def format_listq(listq):
+                                def format_ci(ci):
+                                    return {"tid": ci.tid}
+
+                                return json.encode({id: format_ci(ci) for id, ci in listq.items()})
+                            respond(200, {}, format_listq(dev.list_confq()))
+                            return
+                        elif len(path_elements) >= 5:
+                            id = path_elements[4]
+                            log.debug("q len >= 5", {"id": id})
+                            if len(path_elements) == 5:
+                                log.debug("q len == 5")
+                                def format_ci(di: (ci: odev.ConfigItem, running_conf: yang.gdata.Node)):
+                                    config_diff = yang.gdata.diff(di.running_conf, di.ci.conf)
+                                    config_diff_xml = config_diff.to_xmlstr() if config_diff is not None else None
+                                    return {
+                                        "tid": di.ci.tid,
+                                        "config_diff": config_diff_xml,
+                                        "device_txid": di.running_conf.txid,
+                                    }
+                                respond(200, {}, json.encode(format_ci(dev.get_confq(id))))
+                                return
 
                     respond(404, {}, "Not found")
                     return
@@ -274,6 +298,45 @@ actor main(env):
                         session.edit_config(input_config, config_done)
                     else:
                         session.edit_config(input_config, None, config_done)
+                    return
+            elif len(path_elements) > 3 and path_elements[1] == "device":
+                try:
+                    dev_name = path_elements[2]
+                    dev = dev_registry.get(dev_name)
+
+                    if path_elements[3] == 'q':
+                        log.debug("q len > 3")
+
+                        if len(path_elements) >= 5:
+                            id = path_elements[4]
+                            log.debug("q len >= 5", {"id": id})
+
+                            if len(path_elements) == 6:
+                                log.debug("q len == 6")
+                                if path_elements[5] == "set_approval":
+                                    log.debug("set_approval", {"body": request.body.decode()})
+                                    def parse_confq_approval_request(request) -> (device_txid: str, approved: bool):
+                                        json_in = json.decode(request.body.decode())
+                                        json_device_txid = json_in.get("device_txid")
+                                        json_approved = json_in.get("approved")
+                                        if isinstance(json_device_txid, str) and isinstance(json_approved, bool):
+                                            return (json_device_txid, json_approved)
+                                        else:
+                                            raise ValueError("Invalid request body")
+
+                                    try:
+                                        req = parse_confq_approval_request(request)
+                                        approval_ok = dev.set_confq_approval(id, req.device_txid, req.approved)
+                                        respond(200, {}, "OK")
+                                        return
+                                    except ValueError as e:
+                                        respond(400, {}, str(e))
+                                        return
+
+                                    raise Unreachable()
+                except Exception as e:
+                    log.error(str(e))
+                    respond(500, {}, "Mep {e}")
                     return
 
             respond(404, {}, "")
