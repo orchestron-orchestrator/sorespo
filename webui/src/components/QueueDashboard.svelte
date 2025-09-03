@@ -1,6 +1,8 @@
 <script>
   import { onMount } from 'svelte';
   import { link } from 'svelte-routing';
+  import { fade, slide } from 'svelte/transition';
+  import { quintOut } from 'svelte/easing';
   import { 
     fetchAllDeviceQueues,
     approveConfigQueueItem,
@@ -10,14 +12,20 @@
   let allQueues = [];
   let loading = true;
   let error = null;
-  let selectedItem = null;
+  let selectedDevice = null;
+  let selectedQueueIndex = 0;
   let itemDetail = null;
   let approvingItem = null;
-  let filter = 'all'; // 'all', 'pending', 'approved'
   let refreshInterval = null;
+  let diffFormat = 'xml'; // 'xml', 'json', or 'adata'
 
-  onMount(() => {
-    loadAllQueues();
+  onMount(async () => {
+    await loadAllQueues();
+    
+    // Auto-select first item if there are any
+    if (allQueues.length > 0) {
+      await selectFirstAvailable();
+    }
     
     // Auto-refresh every 30 seconds
     refreshInterval = setInterval(loadAllQueues, 30000);
@@ -42,29 +50,111 @@
       loading = false;
     }
   }
+  
+  async function selectFirstAvailable() {
+    // Select the first device with pending items
+    if (deviceList && deviceList.length > 0) {
+      const firstDevice = deviceList[0];
+      await selectDevice(firstDevice.deviceId, 0);
+    }
+  }
 
-  async function viewItem(deviceId, queueId) {
+  async function selectDevice(deviceId, index = 0) {
+    selectedDevice = deviceId;
+    selectedQueueIndex = index;
+    const item = deviceGroups[deviceId][index];
+    if (item) {
+      await loadItemDetail(item.deviceId, item.queueId);
+    }
+  }
+  
+  async function loadItemDetail(deviceId, queueId) {
     try {
-      selectedItem = { deviceId, queueId };
-      itemDetail = await fetchConfigQueueItem(deviceId, queueId);
+      const detail = await fetchConfigQueueItem(deviceId, queueId);
+      // Transform backend response to expected format
+      itemDetail = {
+        tid: detail.tid,
+        deviceTxid: detail.device_txid,
+        configDiff: detail.config_diff,
+        approved: false  // Items in queue are pending
+      };
     } catch (err) {
       error = `Failed to load item details: ${err.message}`;
+    }
+  }
+  
+  function navigateQueue(direction) {
+    if (!selectedDevice || !deviceGroups[selectedDevice]) return;
+    
+    const items = deviceGroups[selectedDevice];
+    if (direction === 'next' && selectedQueueIndex < items.length - 1) {
+      selectedQueueIndex++;
+    } else if (direction === 'prev' && selectedQueueIndex > 0) {
+      selectedQueueIndex--;
+    }
+    
+    const item = items[selectedQueueIndex];
+    if (item) {
+      loadItemDetail(item.deviceId, item.queueId);
     }
   }
 
   async function handleApprove(deviceId, queueId) {
     try {
       approvingItem = `${deviceId}-${queueId}`;
-      await approveConfigQueueItem(deviceId, queueId);
       
-      // Clear selected item if it was the one we just approved
-      if (selectedItem?.deviceId === deviceId && selectedItem?.queueId === queueId) {
-        selectedItem = null;
-        itemDetail = null;
+      // Find the item to get its deviceTxid
+      const item = allQueues.find(q => q.deviceId === deviceId && q.queueId === queueId);
+      if (!item) {
+        throw new Error('Queue item not found');
       }
       
-      // Reload all queues to reflect the removed item
+      // Approve with the device_txid
+      await approveConfigQueueItem(deviceId, queueId, item.deviceTxid, true);
+      
+      // Don't clear itemDetail to keep the layout stable
+      // Just reload the queue
       await loadAllQueues();
+      
+      // Auto-select next item
+      if (deviceGroups[deviceId] && deviceGroups[deviceId].length > 0) {
+        // Same device still has items, stay on it
+        // Adjust index if necessary
+        if (selectedQueueIndex >= deviceGroups[deviceId].length) {
+          selectedQueueIndex = deviceGroups[deviceId].length - 1;
+        }
+        await loadItemDetail(deviceGroups[deviceId][selectedQueueIndex].deviceId, 
+                           deviceGroups[deviceId][selectedQueueIndex].queueId);
+      } else {
+        // Current device has no more items, select next available device
+        if (deviceList && deviceList.length > 0) {
+          // Find next device after current one, or wrap to first
+          const currentIndex = deviceList.findIndex(d => d.deviceId === deviceId);
+          let nextIndex = (currentIndex + 1) % deviceList.length;
+          
+          // If we wrapped and there's only one device left, try it
+          if (deviceList.length === 1) {
+            nextIndex = 0;
+          }
+          
+          if (nextIndex < deviceList.length && deviceList[nextIndex]) {
+            await selectDevice(deviceList[nextIndex].deviceId, 0);
+          } else if (deviceList.length > 0) {
+            // Fallback to first device
+            await selectDevice(deviceList[0].deviceId, 0);
+          } else {
+            // No more items at all
+            selectedDevice = null;
+            selectedQueueIndex = 0;
+            itemDetail = null;
+          }
+        } else {
+          // No devices with pending items
+          selectedDevice = null;
+          selectedQueueIndex = 0;
+          itemDetail = null;
+        }
+      }
     } catch (err) {
       error = `Failed to approve: ${err.message}`;
     } finally {
@@ -72,159 +162,210 @@
     }
   }
 
-  $: filteredQueues = allQueues.filter(item => {
-    if (filter === 'pending') return !item.approved;
-    if (filter === 'approved') return item.approved;
-    return true;
-  });
-
-  $: pendingCount = allQueues.filter(item => !item.approved).length;
-  $: approvedCount = allQueues.filter(item => item.approved).length;
+  $: pendingCount = allQueues.length; // All items in queue are pending
+  
+  // Group queue items by device
+  $: deviceGroups = allQueues.reduce((groups, item) => {
+    if (!groups[item.deviceId]) {
+      groups[item.deviceId] = [];
+    }
+    groups[item.deviceId].push(item);
+    return groups;
+  }, {});
+  
+  $: deviceList = Object.entries(deviceGroups).map(([deviceId, items]) => ({
+    deviceId,
+    items,
+    count: items.length
+  }));
+  
+  $: selectedItem = selectedDevice && deviceGroups[selectedDevice] 
+    ? deviceGroups[selectedDevice][selectedQueueIndex]
+    : null;
 </script>
 
-<div class="queue-dashboard">
+<div class="queue-dashboard" class:has-selection={selectedItem}>
   <div class="dashboard-header">
     <h2>Config Queue</h2>
-    <span class="auto-refresh">Auto-refresh: 30s</span>
-  </div>
-
-  <div class="stats-bar">
-    <div class="stat-card" class:alert={pendingCount > 0}>
-      <div class="stat-value">{pendingCount}</div>
-      <div class="stat-label">Pending Approval</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value">{approvedCount}</div>
-      <div class="stat-label">Approved</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value">{allQueues.length}</div>
-      <div class="stat-label">Total Items</div>
+    <div class="header-right">
+      <span class="pending-count" class:alert={pendingCount > 0}>
+        {pendingCount} pending
+      </span>
+      <span class="auto-refresh">Auto-refresh: 30s</span>
     </div>
   </div>
 
-  <div class="filter-tabs">
-    <button 
-      class="tab" 
-      class:active={filter === 'all'}
-      on:click={() => filter = 'all'}
-    >
-      All ({allQueues.length})
-    </button>
-    <button 
-      class="tab" 
-      class:active={filter === 'pending'}
-      on:click={() => filter = 'pending'}
-    >
-      Pending ({pendingCount})
-    </button>
-    <button 
-      class="tab" 
-      class:active={filter === 'approved'}
-      on:click={() => filter = 'approved'}
-    >
-      Approved ({approvedCount})
-    </button>
-  </div>
-
-  {#if loading && allQueues.length === 0}
-    <div class="loading">Loading configuration queues...</div>
-  {:else if error}
-    <div class="error">{error}</div>
-  {:else if filteredQueues.length === 0}
-    <div class="empty">
-      {#if filter === 'pending'}
-        No pending approvals - all caught up! 🎉
-      {:else if filter === 'approved'}
-        No approved items in queue
+  <div class="main-container">
+    <!-- Queue List Sidebar -->
+    <div class="queue-sidebar">
+      {#if loading && allQueues.length === 0}
+        <div class="loading">Loading...</div>
+      {:else if error}
+        <div class="error">{error}</div>
+      {:else if allQueues.length === 0}
+        <div class="empty">
+          No pending approvals! 🎉
+        </div>
       {:else}
-        No configuration changes in queue
+        <div class="queue-list">
+          {#each deviceList as device (device.deviceId)}
+            <div 
+              class="device-card"
+              class:selected={selectedDevice === device.deviceId}
+              on:click={() => selectDevice(device.deviceId, 0)}
+              transition:slide|local={{duration: 300, easing: quintOut}}
+            >
+              <div class="device-card-header">
+                <span class="device-name">{device.deviceId}</span>
+                <span class="queue-count">{device.count}</span>
+              </div>
+              <div class="device-card-body">
+                {#if selectedDevice === device.deviceId}
+                  <div class="queue-items" 
+                    in:slide|local={{duration: 300, delay: 150, easing: quintOut}} 
+                    out:slide|local={{duration: 400, delay: 0, easing: quintOut}}
+                  >
+                    {#each device.items as item, index (item.queueId)}
+                      <div 
+                        class="queue-item-mini"
+                        class:active={selectedQueueIndex === index}
+                        on:click|stopPropagation={() => selectDevice(device.deviceId, index)}
+                        in:fade|local={{duration: 200, delay: 150 + index * 30}}
+                      >
+                        <span class="queue-num">#{item.queueId}</span>
+                        <span class="queue-tid">{item.tid || 'pending'}</span>
+                      </div>
+                    {/each}
+                  </div>
+                {:else}
+                  <div class="device-card-status" 
+                    in:fade|local={{duration: 250, delay: 200}} 
+                    out:fade|local={{duration: 150}}
+                  >
+                    {device.count} pending approval{device.count > 1 ? 's' : ''}
+                  </div>
+                {/if}
+              </div>
+            </div>
+          {/each}
+        </div>
       {/if}
     </div>
-  {:else}
-    <div class="queue-table">
-      <table>
-        <thead>
-          <tr>
-            <th>Device</th>
-            <th>Queue ID</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each filteredQueues as item}
-            <tr class:selected={selectedItem?.deviceId === item.deviceId && selectedItem?.queueId === item.queueId}>
-              <td>
-                <a href="/device/{item.deviceId}" use:link class="device-link">
-                  {item.deviceId}
-                </a>
-              </td>
-              <td>{item.queueId}</td>
-              <td>
-                <span class="status-badge" class:approved={item.approved} class:pending={!item.approved}>
-                  {item.approved ? '✓ Approved' : '⏳ Pending'}
-                </span>
-              </td>
-              <td>
-                <div class="action-buttons">
-                  <button class="btn btn-small" on:click={() => viewItem(item.deviceId, item.queueId)}>
-                    View
-                  </button>
-                  {#if !item.approved}
-                    <button 
-                      class="btn btn-small btn-success"
-                      on:click={() => handleApprove(item.deviceId, item.queueId)}
-                      disabled={approvingItem === `${item.deviceId}-${item.queueId}`}
-                    >
-                      {approvingItem === `${item.deviceId}-${item.queueId}` ? 'Approving...' : 'Approve'}
-                    </button>
-                  {/if}
-                </div>
-              </td>
-            </tr>
-          {/each}
-        </tbody>
-      </table>
-    </div>
-  {/if}
 
-  {#if selectedItem && itemDetail}
-    <div class="detail-panel">
-      <div class="detail-header">
-        <h3>Configuration Details</h3>
-        <button class="close-btn" on:click={() => { selectedItem = null; itemDetail = null; }}>
-          ✕
-        </button>
+    <!-- Detail View -->
+    {#if selectedItem && itemDetail}
+      <div class="detail-view">
+        <div class="detail-header">
+          <div class="header-top">
+            <div class="device-title">
+              <h3>{selectedItem.deviceId}</h3>
+            </div>
+            <div class="nav-controls">
+              <span class="queue-position">Item {selectedQueueIndex + 1} of {deviceGroups[selectedDevice].length}</span>
+              <button 
+                class="btn btn-nav"
+                disabled={!deviceGroups[selectedDevice] || deviceGroups[selectedDevice].length <= 1 || selectedQueueIndex === 0}
+                on:click={() => navigateQueue('prev')}
+              >
+                ← Previous
+              </button>
+              <button 
+                class="btn btn-nav"
+                disabled={!deviceGroups[selectedDevice] || deviceGroups[selectedDevice].length <= 1 || selectedQueueIndex === deviceGroups[selectedDevice].length - 1}
+                on:click={() => navigateQueue('next')}
+              >
+                Next →
+              </button>
+            </div>
+          </div>
+          
+          <div class="header-middle">
+            <div class="detail-meta">
+              <span>Queue #{selectedItem.queueId}</span>
+              <span class="separator">•</span>
+              <span>TID: {itemDetail.tid || 'N/A'}</span>
+              <span class="separator">•</span>
+              <span>Device TxID: {itemDetail.deviceTxid || 'N/A'}</span>
+            </div>
+            <div class="format-selector">
+              <button 
+                class="format-btn"
+                class:active={diffFormat === 'xml'}
+                on:click={() => diffFormat = 'xml'}
+              >
+                XML
+              </button>
+              <button 
+                class="format-btn"
+                class:active={diffFormat === 'json'}
+                on:click={() => diffFormat = 'json'}
+              >
+                JSON
+              </button>
+              <button 
+                class="format-btn"
+                class:active={diffFormat === 'adata'}
+                on:click={() => diffFormat = 'adata'}
+              >
+                AData
+              </button>
+            </div>
+          </div>
+          
+          <div class="header-actions">
+            <button 
+              class="btn btn-danger"
+              on:click={() => { 
+                // TODO: Implement reject functionality
+                selectedDevice = null;
+                selectedQueueIndex = 0;
+                itemDetail = null; 
+              }}
+            >
+              Reject
+            </button>
+            <button 
+              class="btn btn-success"
+              on:click={() => handleApprove(selectedItem.deviceId, selectedItem.queueId)}
+              disabled={approvingItem === `${selectedItem.deviceId}-${selectedItem.queueId}`}
+            >
+              {approvingItem === `${selectedItem.deviceId}-${selectedItem.queueId}` ? 'Approving...' : 'Approve & Apply'}
+            </button>
+          </div>
+        </div>
+        
+        <div class="diff-content">
+          {#key `${selectedItem?.deviceId}-${selectedItem?.queueId}`}
+            {#if itemDetail.configDiff}
+              <pre class="config-diff" in:fade={{duration: 400, delay: 100}} out:fade={{duration: 300}}>{itemDetail.configDiff}</pre>
+            {:else}
+              <div class="no-diff">No configuration diff available</div>
+            {/if}
+          {/key}
+        </div>
       </div>
-      <div class="detail-content">
-        <dl>
-          <dt>Device</dt>
-          <dd>{selectedItem.deviceId}</dd>
-          <dt>Queue ID</dt>
-          <dd>{selectedItem.queueId}</dd>
-          <dt>Status</dt>
-          <dd>{itemDetail.approved ? 'Approved' : 'Pending Approval'}</dd>
-        </dl>
-        {#if itemDetail.config}
-          <h4>Configuration Diff</h4>
-          <pre class="config-diff">{itemDetail.config}</pre>
-        {/if}
+    {:else if allQueues.length > 0}
+      <div class="no-selection">
+        <p>Loading first item for review...</p>
       </div>
-    </div>
-  {/if}
+    {/if}
+  </div>
 </div>
 
 <style>
   .queue-dashboard {
-    padding: 1rem 0;
+    height: calc(100vh - 100px);
+    display: flex;
+    flex-direction: column;
   }
 
   .dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 2px solid #ecf0f1;
+    background: white;
   }
 
   .dashboard-header h2 {
@@ -232,10 +373,23 @@
     color: #2c3e50;
   }
 
-  .header-actions {
+  .header-right {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.5rem;
+  }
+
+  .pending-count {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    background: #ecf0f1;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .pending-count.alert {
+    background: #fff4e6;  /* Light orange background */
+    color: #f39c12;  /* Orange text */
   }
 
   .auto-refresh {
@@ -243,246 +397,248 @@
     font-size: 0.875rem;
   }
 
-  .btn {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-
-  .btn-primary {
-    background-color: #3498db;
-    color: white;
-  }
-
-  .btn-primary:hover {
-    background-color: #2980b9;
-  }
-
-  .btn-small {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-  }
-
-  .btn-success {
-    background-color: #27ae60;
-    color: white;
-  }
-
-  .btn-success:hover:not(:disabled) {
-    background-color: #229954;
-  }
-
-  .btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  .stats-bar {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-
-  .stat-card {
-    background: white;
-    border: 1px solid #ecf0f1;
-    border-radius: 8px;
-    padding: 1.5rem;
-    text-align: center;
-  }
-
-  .stat-card.alert {
-    background: #fff5f5;
-    border-color: #e74c3c;
-  }
-
-  .stat-value {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #2c3e50;
-  }
-
-  .stat-card.alert .stat-value {
-    color: #e74c3c;
-  }
-
-  .stat-label {
-    color: #7f8c8d;
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    margin-top: 0.5rem;
-  }
-
-  .filter-tabs {
+  .main-container {
+    flex: 1;
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid #ecf0f1;
-  }
-
-  .tab {
-    padding: 0.75rem 1.5rem;
-    background: none;
-    border: none;
-    color: #7f8c8d;
-    cursor: pointer;
-    font-size: 1rem;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
-    transition: all 0.2s;
-  }
-
-  .tab:hover {
-    color: #2c3e50;
-  }
-
-  .tab.active {
-    color: #3498db;
-    border-bottom-color: #3498db;
-  }
-
-  .loading, .error, .empty {
-    text-align: center;
-    padding: 3rem;
-    color: #7f8c8d;
-  }
-
-  .error {
-    color: #e74c3c;
-  }
-
-  .queue-table {
-    background: white;
-    border: 1px solid #ecf0f1;
-    border-radius: 8px;
     overflow: hidden;
   }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  thead {
+  .queue-sidebar {
+    width: 320px;
     background: #f8f9fa;
-  }
-
-  th {
-    padding: 1rem;
-    text-align: left;
-    color: #2c3e50;
-    font-weight: 600;
-    border-bottom: 2px solid #ecf0f1;
-  }
-
-  td {
-    padding: 1rem;
-    border-bottom: 1px solid #ecf0f1;
-  }
-
-  tbody tr:hover {
-    background: #f8f9fa;
-  }
-
-  tbody tr.selected {
-    background: #ebf5fb;
-  }
-
-  .device-link {
-    color: #3498db;
-    text-decoration: none;
-    font-weight: 500;
-  }
-
-  .device-link:hover {
-    text-decoration: underline;
-  }
-
-  .status-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.875rem;
-    font-weight: 500;
-  }
-
-  .status-badge.approved {
-    background: #d4edda;
-    color: #155724;
-  }
-
-  .status-badge.pending {
-    background: #fff3cd;
-    color: #856404;
-  }
-
-  .action-buttons {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .detail-panel {
-    position: fixed;
-    right: 0;
-    top: 0;
-    width: 500px;
-    height: 100vh;
-    background: white;
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    border-right: 1px solid #dee2e6;
     overflow-y: auto;
-    z-index: 1000;
   }
 
-  .detail-header {
+  .queue-list {
+    padding: 0.5rem;
+  }
+
+  .device-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s;
+  }
+
+  .device-card:hover {
+    border-color: #3498db;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .device-card.selected {
+    background: #ebf5fb;
+    border-color: #3498db;
+    border-width: 2px;
+    transition: all 0.3s ease;
+  }
+
+  .device-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem;
-    border-bottom: 2px solid #ecf0f1;
+    margin-bottom: 0.5rem;
   }
 
-  .detail-header h3 {
-    margin: 0;
-    color: #2c3e50;
-  }
-
-  .close-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: #7f8c8d;
-    cursor: pointer;
-  }
-
-  .close-btn:hover {
-    color: #2c3e50;
-  }
-
-  .detail-content {
-    padding: 1.5rem;
-  }
-
-  dl {
-    margin: 0 0 1.5rem 0;
-  }
-
-  dt {
+  .device-name {
     font-weight: 600;
     color: #2c3e50;
-    margin-bottom: 0.25rem;
   }
 
-  dd {
-    margin: 0 0 1rem 0;
+  .queue-count {
+    background: #f39c12;  /* Warm orange - attention needed but not urgent */
+    color: white;
+    border-radius: 10px;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .device-card-body {
+    min-height: 1.75rem;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+
+  .device-card.selected .device-card-body {
+    min-height: 3rem;
+    transition-delay: 0.1s;
+  }
+
+  .device-card-status {
+    font-size: 0.875rem;
     color: #7f8c8d;
+    padding: 0.25rem 0;
   }
 
-  .detail-content h4 {
+  .queue-items {
+    padding-top: 0.25rem;
+    transform-origin: top;
+  }
+  
+  /* Smoother list reflow */
+  .queue-list {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .queue-item-mini {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.375rem 0.5rem;
+    margin: 0.25rem 0;
+    border-radius: 4px;
+    background: #f8f9fa;
+    font-size: 0.8125rem;
+    transition: all 0.2s;
+  }
+
+  .queue-item-mini:hover {
+    background: #e9ecef;
+  }
+
+  .queue-item-mini.active {
+    background: #3498db;
+    color: white;
+  }
+
+  .queue-num {
+    font-weight: 500;
+  }
+
+  .queue-tid {
+    font-family: monospace;
+    font-size: 0.75rem;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+  }
+
+  .detail-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+  }
+
+  .detail-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #dee2e6;
+    background: #f8f9fa;
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .device-title h3 {
+    margin: 0;
     color: #2c3e50;
-    margin: 1.5rem 0 0.75rem 0;
+    font-size: 1.5rem;
+  }
+
+  .nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .queue-position {
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-weight: 500;
+    padding-right: 0.5rem;
+  }
+
+  .header-middle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .detail-meta {
+    display: flex;
+    gap: 0.75rem;
+    color: #6c757d;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
+
+  .separator {
+    color: #adb5bd;
+  }
+
+  .format-selector {
+    display: flex;
+    gap: 0;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .format-btn {
+    padding: 0.25rem 0.75rem;
+    border: none;
+    background: white;
+    color: #6c757d;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-right: 1px solid #dee2e6;
+  }
+
+  .format-btn:last-child {
+    border-right: none;
+  }
+
+  .format-btn:hover {
+    background: #f8f9fa;
+  }
+
+  .format-btn.active {
+    background: #3498db;
+    color: white;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+
+  .btn-nav {
+    background: #6c757d;
+    color: white;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .btn-nav:hover:not(:disabled) {
+    background: #5a6268;
+  }
+
+  .btn-nav:disabled {
+    background: #dee2e6;
+    color: #adb5bd;
+  }
+
+  .diff-content {
+    flex: 1;
+    overflow: auto;
+    padding: 1.5rem;
   }
 
   .config-diff {
@@ -491,10 +647,104 @@
     border-radius: 4px;
     padding: 1rem;
     font-family: 'Consolas', 'Monaco', monospace;
-    font-size: 0.85rem;
-    color: #495057;
-    overflow-x: auto;
-    max-height: 400px;
-    overflow-y: auto;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #212529;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .no-selection {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+  }
+
+  .loading, .empty, .error {
+    padding: 2rem;
+    text-align: center;
+    color: #6c757d;
+  }
+
+  .error {
+    color: #dc3545;
+  }
+
+  .btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;  /* Prevent button text from wrapping */
+  }
+
+  .btn-success {
+    background-color: #28a745;
+    color: white;
+  }
+
+  .btn-success:hover:not(:disabled) {
+    background-color: #218838;
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background-color: #c82333;
+  }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .no-diff {
+    padding: 3rem;
+    text-align: center;
+    color: #6c757d;
+  }
+
+  /* Smooth animations for queue updates */
+  .queue-count {
+    transition: all 0.3s ease;
+  }
+  
+  .device-card {
+    overflow: hidden;
+  }
+  
+  .queue-items {
+    overflow: hidden;
+  }
+  
+  /* Clean fade transitions */
+  .detail-view {
+    position: relative;
+  }
+  
+  .diff-content {
+    position: relative;
+    min-height: 200px;
+  }
+  
+  .config-diff {
+    animation: gentleFadeIn 0.5s ease;
+  }
+  
+  @keyframes gentleFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 </style>

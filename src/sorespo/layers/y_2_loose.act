@@ -37,6 +37,10 @@ def src_yang():
                 type string;
             }
 
+            leaf role {
+                type string;
+            }
+
             leaf ipv4-address {
                 type string;
                 mandatory true;
@@ -2325,6 +2329,12 @@ mut def from_json_orchestron_rfs__rfs__base_config__name(val: value) -> yang.gda
 mut def from_xml_orchestron_rfs__rfs__base_config__name(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
 
+mut def from_json_orchestron_rfs__rfs__base_config__role(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('string', val)
+
+mut def from_xml_orchestron_rfs__rfs__base_config__role(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('string', val)
+
 mut def from_json_orchestron_rfs__rfs__base_config__ipv4_address(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('string', val)
 
@@ -2351,14 +2361,16 @@ mut def from_xml_orchestron_rfs__rfs__base_config__ibgp_authentication_key(val: 
 
 class orchestron_rfs__rfs__base_config_entry(yang.adata.MNode):
     name: str
+    role: ?str
     ipv4_address: ?str
     ipv6_address: ?str
     asn: ?int
     ibgp_authentication_key: ?str
 
-    mut def __init__(self, name: str, ipv4_address: ?str, ipv6_address: ?str, asn: ?int, ibgp_authentication_key: ?str):
+    mut def __init__(self, name: str, role: ?str, ipv4_address: ?str, ipv6_address: ?str, asn: ?int, ibgp_authentication_key: ?str):
         self._ns = 'http://example.com/sorespo-rfs'
         self.name = name
+        self.role = role
         self.ipv4_address = ipv4_address
         self.ipv6_address = ipv6_address
         self.asn = asn
@@ -2369,6 +2381,9 @@ class orchestron_rfs__rfs__base_config_entry(yang.adata.MNode):
         _name = self.name
         if _name is not None:
             children['name'] = yang.gdata.Leaf('string', _name)
+        _role = self.role
+        if _role is not None:
+            children['role'] = yang.gdata.Leaf('string', _role)
         _ipv4_address = self.ipv4_address
         if _ipv4_address is not None:
             children['ipv4-address'] = yang.gdata.Leaf('string', _ipv4_address)
@@ -2385,7 +2400,7 @@ class orchestron_rfs__rfs__base_config_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__base_config_entry:
-        return orchestron_rfs__rfs__base_config_entry(name=n.get_str('name'), ipv4_address=n.get_opt_str('ipv4-address'), ipv6_address=n.get_opt_str('ipv6-address'), asn=n.get_opt_int('asn'), ibgp_authentication_key=n.get_opt_str('ibgp-authentication-key'))
+        return orchestron_rfs__rfs__base_config_entry(name=n.get_str('name'), role=n.get_opt_str('role'), ipv4_address=n.get_opt_str('ipv4-address'), ipv6_address=n.get_opt_str('ipv6-address'), asn=n.get_opt_int('asn'), ibgp_authentication_key=n.get_opt_str('ibgp-authentication-key'))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -2393,6 +2408,9 @@ class orchestron_rfs__rfs__base_config_entry(yang.adata.MNode):
             res.append('# Top node: /rfs/base-config')
             res.append('{self_name} = orchestron_rfs__rfs__base_config({repr(self.name)})')
         leaves = []
+        _role = self.role
+        if _role is not None:
+            leaves.append('{self_name}.role = {repr(_role)}')
         _ipv4_address = self.ipv4_address
         if _ipv4_address is not None:
             leaves.append('{self_name}.ipv4_address = {repr(_ipv4_address)}')
@@ -2456,6 +2474,8 @@ mut def from_xml_orchestron_rfs__rfs__base_config_element(node: xml.Node) -> yan
     children = {}
     child_name = yang.gdata.from_xml_str(node, 'name')
     yang.gdata.maybe_add(children, 'name', from_xml_orchestron_rfs__rfs__base_config__name, child_name)
+    child_role = yang.gdata.from_xml_opt_str(node, 'role')
+    yang.gdata.maybe_add(children, 'role', from_xml_orchestron_rfs__rfs__base_config__role, child_role)
     child_ipv4_address = yang.gdata.from_xml_opt_str(node, 'ipv4-address')
     yang.gdata.maybe_add(children, 'ipv4-address', from_xml_orchestron_rfs__rfs__base_config__ipv4_address, child_ipv4_address)
     child_ipv6_address = yang.gdata.from_xml_opt_str(node, 'ipv6-address')
@@ -2487,6 +2507,8 @@ mut def from_json_path_orchestron_rfs__rfs__base_config_element(jd: value, path:
         rest_path = path[2:]
         children: dict[str, yang.gdata.Node] = {}
         children['name'] = from_json_orchestron_rfs__rfs__base_config__name(keys[0])
+        if point == 'role':
+            raise ValueError("Invalid json path to non-inner node")
         if point == 'ipv4-address':
             raise ValueError("Invalid json path to non-inner node")
         if point == 'ipv6-address':
@@ -2527,6 +2549,8 @@ mut def from_json_orchestron_rfs__rfs__base_config_element(jd: dict[str, ?value]
     children = {}
     child_name = yang.gdata.take_json_str(jd, 'name')
     yang.gdata.maybe_add(children, 'name', from_json_orchestron_rfs__rfs__base_config__name, child_name)
+    child_role = yang.gdata.take_json_opt_str(jd, 'role')
+    yang.gdata.maybe_add(children, 'role', from_json_orchestron_rfs__rfs__base_config__role, child_role)
     child_ipv4_address = yang.gdata.take_json_opt_str(jd, 'ipv4-address')
     yang.gdata.maybe_add(children, 'ipv4-address', from_json_orchestron_rfs__rfs__base_config__ipv4_address, child_ipv4_address)
     child_ipv6_address = yang.gdata.take_json_opt_str(jd, 'ipv6-address')

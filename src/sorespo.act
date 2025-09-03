@@ -97,11 +97,54 @@ actor main(env):
 
         def config_done(result):
             if isinstance(result, Exception):
-                respond(400, {}, str(result))
+                respond(400, {}, json.encode({"status": "error", "message": str(result)}))
             else:
-                respond(200, {}, "OK")
+                respond(200, {}, json.encode({"status": "ok"}))
 
         path_elements = request.path.split("/")
+
+        if len(path_elements) > 1 and path_elements[1] == "config-queue":
+            if request.method == "GET":
+                if len(path_elements) == 2:
+                    # GET /config-queue - return all devices with pending config queue items
+                    try:
+                        devices_with_queues = []
+
+                        # Get only devices that have pending approvals
+                        devices_needing_approval = dev_registry.get_devices_needing_approval()
+
+                        for dev_name, dev in devices_needing_approval.items():
+                            # Get pending approval items for this device
+                            pending_items = dev.get_pending_approvals()
+
+                            if len(pending_items) > 0:
+                                # Format queue items for response
+                                formatted_items = []
+                                for item in pending_items:
+                                    formatted_items.append({
+                                        "queue_id": item.id,
+                                        "tid": item.ci.tid,
+                                        "device_txid": dev.get_device_txid(),
+                                        "approved": item.ci.approved
+                                    })
+
+                                devices_with_queues.append({
+                                    "device_id": dev_name,
+                                    "pending_count": len(pending_items),
+                                    "items": formatted_items
+                                })
+
+                        respond(200, {}, json.encode({"devices": devices_with_queues}))
+                        return
+                    except Exception as e:
+                        log.error("Failed to get config queues", {"error": str(e)})
+                        respond(500, {}, "Failed to get config queues: {e}")
+                        return
+
+            # Other /config-queue operations could go here
+            respond(404, {}, "Not found")
+            return
+
         if len(path_elements) > 1 and path_elements[1] == "tmf-api":
             # GET /tmf-api/serviceOrdering/v4/serviceOrder/{id}
             if request.method == "GET":
@@ -203,7 +246,6 @@ actor main(env):
                         return
 
                     if path_elements[3] == 'q':
-                        log.debug("q len > 3")
                         if len(path_elements) == 4:
                             def format_listq(listq):
                                 def format_ci(ci):
@@ -214,9 +256,7 @@ actor main(env):
                             return
                         elif len(path_elements) >= 5:
                             id = path_elements[4]
-                            log.debug("q len >= 5", {"id": id})
                             if len(path_elements) == 5:
-                                log.debug("q len == 5")
                                 def format_ci(di: (ci: odev.ConfigItem, running_conf: yang.gdata.Node)):
                                     config_diff = yang.gdata.diff(di.running_conf, di.ci.conf)
                                     config_diff_xml = config_diff.to_xmlstr() if config_diff is not None else None
@@ -305,14 +345,11 @@ actor main(env):
                     dev = dev_registry.get(dev_name)
 
                     if path_elements[3] == 'q':
-                        log.debug("q len > 3")
 
                         if len(path_elements) >= 5:
                             id = path_elements[4]
-                            log.debug("q len >= 5", {"id": id})
 
                             if len(path_elements) == 6:
-                                log.debug("q len == 6")
                                 if path_elements[5] == "set_approval":
                                     log.debug("set_approval", {"body": request.body.decode()})
                                     def parse_confq_approval_request(request) -> (device_txid: str, approved: bool):
@@ -327,7 +364,7 @@ actor main(env):
                                     try:
                                         req = parse_confq_approval_request(request)
                                         approval_ok = dev.set_confq_approval(id, req.device_txid, req.approved)
-                                        respond(200, {}, "OK")
+                                        respond(200, {}, json.encode({"status": "ok", "approved": req.approved}))
                                         return
                                     except ValueError as e:
                                         respond(400, {}, str(e))

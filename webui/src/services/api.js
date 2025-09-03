@@ -99,48 +99,53 @@ export async function fetchDeviceConfigQueue(deviceId) {
 
 export async function fetchConfigQueueItem(deviceId, queueId) {
   const upperId = deviceId.toUpperCase();
+  // Backend returns: {tid, config_diff, device_txid}
   return fetchJSON(`${API_BASE}/device/${upperId}/q/${queueId}`);
 }
 
-export async function approveConfigQueueItem(deviceId, queueId) {
+export async function approveConfigQueueItem(deviceId, queueId, deviceTxid, approved = true) {
   const upperId = deviceId.toUpperCase();
-  return fetchJSON(`${API_BASE}/device/${upperId}/q/${queueId}/approve`);
+  return fetchJSON(`${API_BASE}/device/${upperId}/q/${queueId}/set_approval`, {
+    method: 'POST',
+    body: JSON.stringify({
+      device_txid: deviceTxid,
+      approved: approved
+    })
+  });
 }
 
 export async function fetchAllDeviceQueues() {
-  // Get all devices first
-  const devices = await fetchDevices();
-  
-  // Fetch queue for each device in parallel
-  const queuePromises = devices.map(async device => {
-    try {
-      const queue = await fetchDeviceConfigQueue(device.id);
-      // Transform queue object into array with device context
-      return Object.entries(queue).map(([queueId, item]) => ({
-        deviceId: device.id,
-        queueId,
-        approved: item.approved
-      }));
-    } catch (err) {
-      console.error(`Failed to fetch queue for ${device.id}:`, err);
-      return [];
+  try {
+    // Use the new /config-queue endpoint that only returns devices with pending approvals
+    const response = await fetchJSON(`${API_BASE}/config-queue`);
+    
+    // Transform the response into flat list of queue items for the dashboard
+    const allQueues = [];
+    
+    if (response.devices) {
+      response.devices.forEach(device => {
+        device.items.forEach(item => {
+          allQueues.push({
+            deviceId: device.device_id,
+            queueId: item.queue_id,
+            tid: item.tid,
+            deviceTxid: item.device_txid,
+            configDiff: item.config_diff,
+            approved: item.approved || false
+          });
+        });
+      });
     }
-  });
-  
-  const allQueues = await Promise.all(queuePromises);
-  // Flatten array of arrays and sort by pending first, then by device and queue ID
-  return allQueues
-    .flat()
-    .sort((a, b) => {
-      // Pending items first
-      if (a.approved !== b.approved) {
-        return a.approved ? 1 : -1;
-      }
-      // Then by device
+    
+    // Sort by device and queue ID
+    return allQueues.sort((a, b) => {
       if (a.deviceId !== b.deviceId) {
         return a.deviceId.localeCompare(b.deviceId);
       }
-      // Then by queue ID
-      return parseInt(a.queueId) - parseInt(b.queueId);
+      return a.queueId.localeCompare(b.queueId);
     });
+  } catch (err) {
+    console.error('Failed to fetch config queues:', err);
+    return [];
+  }
 }
