@@ -114,18 +114,18 @@ actor main(env):
                         devices_needing_approval = dev_registry.get_devices_needing_approval()
 
                         for dev_name, dev in devices_needing_approval.items():
-                            # Get pending approval items for this device
+                            # Get pending approval items for this device (now returns dict[str, ConfigItem])
                             pending_items = dev.get_pending_approvals()
 
                             if len(pending_items) > 0:
                                 # Format queue items for response
                                 formatted_items = []
-                                for item in pending_items:
+                                for queue_id, config_item in pending_items.items():
                                     formatted_items.append({
-                                        "queue_id": item.id,
-                                        "tid": item.ci.tid,
+                                        "queue_id": queue_id,
+                                        "tid": config_item.tid,
                                         "device_txid": dev.get_device_txid(),
-                                        "approved": item.ci.approved
+                                        "approved": config_item.approved
                                     })
 
                                 devices_with_queues.append({

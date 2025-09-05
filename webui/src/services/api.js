@@ -137,13 +137,8 @@ export async function fetchAllDeviceQueues() {
       });
     }
     
-    // Sort by device and queue ID
-    return allQueues.sort((a, b) => {
-      if (a.deviceId !== b.deviceId) {
-        return a.deviceId.localeCompare(b.deviceId);
-      }
-      return a.queueId.localeCompare(b.queueId);
-    });
+    // Don't sort - maintain the order from the backend which is the actual queue order
+    return allQueues;
   } catch (err) {
     console.error('Failed to fetch config queues:', err);
     return [];

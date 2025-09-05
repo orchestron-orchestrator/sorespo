@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { link } from 'svelte-routing';
   import { fade, slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
@@ -27,8 +27,8 @@
       await selectFirstAvailable();
     }
     
-    // Auto-refresh every 30 seconds
-    refreshInterval = setInterval(loadAllQueues, 30000);
+    // Auto-refresh every second
+    refreshInterval = setInterval(loadAllQueues, 1000);
     
     // Listen for global refresh events
     const handleRefresh = () => loadAllQueues();
@@ -60,11 +60,26 @@
   }
 
   async function selectDevice(deviceId, index = 0) {
+    // If switching to a different device, refresh data and start at index 0
+    if (selectedDevice !== deviceId) {
+      index = 0;
+      // Refresh queue data when switching devices
+      await loadAllQueues();
+    }
+    
+    // Set the selected device and index
     selectedDevice = deviceId;
     selectedQueueIndex = index;
-    const item = deviceGroups[deviceId][index];
-    if (item) {
-      await loadItemDetail(item.deviceId, item.queueId);
+    
+    // Use the current deviceGroups data (which should now be fresh)
+    const deviceItems = deviceGroups[deviceId];
+    if (deviceItems && deviceItems.length > 0) {
+      const itemIndex = Math.min(index, deviceItems.length - 1);
+      selectedQueueIndex = itemIndex;
+      const item = deviceItems[itemIndex];
+      if (item) {
+        await loadItemDetail(item.deviceId, item.queueId);
+      }
     }
   }
   
@@ -162,6 +177,43 @@
     }
   }
 
+  async function handleReject(deviceId, queueId) {
+    try {
+      approvingItem = `${deviceId}-${queueId}`;
+      
+      // Find the item to get its deviceTxid
+      const item = allQueues.find(q => q.deviceId === deviceId && q.queueId === queueId);
+      if (!item) {
+        throw new Error('Queue item not found');
+      }
+      
+      // Reject by calling with approved: false
+      await approveConfigQueueItem(deviceId, queueId, item.deviceTxid, false);
+      
+      // Reload the queue
+      await loadAllQueues();
+      
+      // Auto-select next item if available
+      if (deviceGroups[deviceId] && deviceGroups[deviceId].length > 0) {
+        // Same device still has items, select first one
+        selectedQueueIndex = 0;
+        await loadItemDetail(deviceGroups[deviceId][0].deviceId, deviceGroups[deviceId][0].queueId);
+      } else if (deviceList && deviceList.length > 0) {
+        // Current device has no more items, select first available device
+        await selectDevice(deviceList[0].deviceId, 0);
+      } else {
+        // No more items at all
+        selectedDevice = null;
+        selectedQueueIndex = 0;
+        itemDetail = null;
+      }
+    } catch (err) {
+      error = `Failed to reject: ${err.message}`;
+    } finally {
+      approvingItem = null;
+    }
+  }
+
   $: pendingCount = allQueues.length; // All items in queue are pending
   
   // Group queue items by device
@@ -191,7 +243,7 @@
       <span class="pending-count" class:alert={pendingCount > 0}>
         {pendingCount} pending
       </span>
-      <span class="auto-refresh">Auto-refresh: 30s</span>
+      <span class="auto-refresh">Auto-refresh: 1s</span>
     </div>
   </div>
 
@@ -315,19 +367,17 @@
           <div class="header-actions">
             <button 
               class="btn btn-danger"
-              on:click={() => { 
-                // TODO: Implement reject functionality
-                selectedDevice = null;
-                selectedQueueIndex = 0;
-                itemDetail = null; 
-              }}
+              on:click={() => handleReject(selectedItem.deviceId, selectedItem.queueId)}
+              disabled={approvingItem === `${selectedItem.deviceId}-${selectedItem.queueId}` || selectedQueueIndex !== 0}
+              title={selectedQueueIndex !== 0 ? 'Only the first item in the queue can be approved/rejected' : ''}
             >
-              Reject
+              {approvingItem === `${selectedItem.deviceId}-${selectedItem.queueId}` ? 'Rejecting...' : 'Reject'}
             </button>
             <button 
               class="btn btn-success"
               on:click={() => handleApprove(selectedItem.deviceId, selectedItem.queueId)}
-              disabled={approvingItem === `${selectedItem.deviceId}-${selectedItem.queueId}`}
+              disabled={approvingItem === `${selectedItem.deviceId}-${selectedItem.queueId}` || selectedQueueIndex !== 0}
+              title={selectedQueueIndex !== 0 ? 'Only the first item in the queue can be approved/rejected' : ''}
             >
               {approvingItem === `${selectedItem.deviceId}-${selectedItem.queueId}` ? 'Approving...' : 'Approve & Apply'}
             </button>
