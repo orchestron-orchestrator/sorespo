@@ -42,13 +42,11 @@ echo "Generating batch of config changes..."
 
 # Change AMS-CORE-1 role
 send_config "core"
-sleep 1
 
 # Change it back
 send_config "edge"
-sleep 1
 
-# And again
-send_config "core"
+## And again
+#send_config "core"
 
 echo "Done! Check the approval queue in the web UI"
