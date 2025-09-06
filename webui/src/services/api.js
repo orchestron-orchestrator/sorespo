@@ -97,10 +97,10 @@ export async function fetchDeviceConfigQueue(deviceId) {
   return fetchJSON(`${API_BASE}/device/${upperId}/q`);
 }
 
-export async function fetchConfigQueueItem(deviceId, queueId) {
+export async function fetchConfigQueueItem(deviceId, queueId, format = 'xml') {
   const upperId = deviceId.toUpperCase();
-  // Backend returns: {tid, config_diff, device_txid}
-  return fetchJSON(`${API_BASE}/device/${upperId}/q/${queueId}`);
+  // Backend returns: {tid, config_diff, device_txid, format}
+  return fetchJSON(`${API_BASE}/device/${upperId}/q/${queueId}?format=${format}`);
 }
 
 export async function approveConfigQueueItem(deviceId, queueId, deviceTxid, approved = true) {

@@ -255,15 +255,41 @@ actor main(env):
                             respond(200, {}, format_listq(dev.list_confq()))
                             return
                         elif len(path_elements) >= 5:
-                            id = path_elements[4]
+                            pe = path_elements[4].split('?', 1)
+                            id: str = pe[0]
                             if len(path_elements) == 5:
+                                format_type = "xml"  # default
+                                query_params = {}
+                                if len(pe) > 1:
+                                    for param in pe[1].split("&"):
+                                        if "=" in param:
+                                            kv = param.split("=", 1)
+                                            query_params[kv[0]] = kv[1]
+                                log.debug("qp", {"query_params": query_params, "split": request.path.split('&')})
+                                format_type = query_params.get_def("format", "xml")
+                                
                                 def format_ci(di: (ci: odev.ConfigItem, running_conf: yang.gdata.Node)):
                                     config_diff = yang.gdata.diff(di.running_conf, di.ci.conf)
-                                    config_diff_xml = config_diff.to_xmlstr() if config_diff is not None else None
+                                    
+                                    config_diff_str = None
+                                    if config_diff is not None:
+                                        if format_type == "json":
+                                            #config_diff_str = config_diff.to_json()
+                                            config_diff_str = "# JSON diff not available"
+                                        elif format_type == "adata":
+                                            #config_diff_str = str(config_diff.to_adata())
+                                            config_diff_str = "# Adata diff not available"
+                                        elif format_type == "gdata":
+                                            #config_diff_str = str(config_diff.to_adata())
+                                            config_diff_str = config_diff.prsrc()
+                                        else:  # xml is default
+                                            config_diff_str = config_diff.to_xmlstr()
+                                    
                                     return {
                                         "tid": di.ci.tid,
-                                        "config_diff": config_diff_xml,
+                                        "config_diff": config_diff_str,
                                         "device_txid": di.running_conf.txid,
+                                        "format": format_type,
                                     }
                                 respond(200, {}, json.encode(format_ci(dev.get_confq(id))))
                                 return

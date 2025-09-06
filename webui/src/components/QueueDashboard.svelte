@@ -40,14 +40,35 @@
     };
   });
 
+  let isInitialLoad = true;
+  
   async function loadAllQueues() {
     try {
-      loading = true;
-      allQueues = await fetchAllDeviceQueues();
+      // Only show loading spinner on initial load
+      if (isInitialLoad) {
+        loading = true;
+      }
+      
+      const newQueues = await fetchAllDeviceQueues();
+      
+      // Only update if data has actually changed to prevent flicker
+      // Special case: if both old and new are empty, don't update to prevent flicker
+      if (allQueues.length === 0 && newQueues.length === 0 && !isInitialLoad) {
+        // Both empty, no need to update
+        return;
+      }
+      
+      const hasChanged = JSON.stringify(newQueues) !== JSON.stringify(allQueues);
+      if (hasChanged || isInitialLoad) {
+        allQueues = newQueues;
+      }
+      
       loading = false;
+      isInitialLoad = false;
     } catch (err) {
       error = err.message;
       loading = false;
+      isInitialLoad = false;
     }
   }
   
@@ -85,12 +106,13 @@
   
   async function loadItemDetail(deviceId, queueId) {
     try {
-      const detail = await fetchConfigQueueItem(deviceId, queueId);
+      const detail = await fetchConfigQueueItem(deviceId, queueId, diffFormat);
       // Transform backend response to expected format
       itemDetail = {
         tid: detail.tid,
         deviceTxid: detail.device_txid,
         configDiff: detail.config_diff,
+        format: detail.format || diffFormat,
         approved: false  // Items in queue are pending
       };
     } catch (err) {
@@ -214,7 +236,7 @@
     }
   }
 
-  $: pendingCount = allQueues.length; // All items in queue are pending
+  $: pendingCount = allQueues.filter(item => item.approved !== false && item.approved !== true).length;
   
   // Group queue items by device
   $: deviceGroups = allQueues.reduce((groups, item) => {
@@ -255,9 +277,11 @@
       {:else if error}
         <div class="error">{error}</div>
       {:else if allQueues.length === 0}
-        <div class="empty">
-          No pending approvals! 🎉
-        </div>
+        {#key 'empty'}
+          <div class="empty">
+            No pending approvals! 🎉
+          </div>
+        {/key}
       {:else}
         <div class="queue-list">
           {#each deviceList as device (device.deviceId)}
@@ -362,23 +386,50 @@
               <button 
                 class="format-btn"
                 class:active={diffFormat === 'xml'}
-                on:click={() => diffFormat = 'xml'}
+                on:click={() => {
+                  diffFormat = 'xml';
+                  if (selectedItem) {
+                    loadItemDetail(selectedItem.deviceId, selectedItem.queueId);
+                  }
+                }}
               >
                 XML
               </button>
               <button 
                 class="format-btn"
                 class:active={diffFormat === 'json'}
-                on:click={() => diffFormat = 'json'}
+                on:click={() => {
+                  diffFormat = 'json';
+                  if (selectedItem) {
+                    loadItemDetail(selectedItem.deviceId, selectedItem.queueId);
+                  }
+                }}
               >
                 JSON
               </button>
               <button 
                 class="format-btn"
                 class:active={diffFormat === 'adata'}
-                on:click={() => diffFormat = 'adata'}
+                on:click={() => {
+                  diffFormat = 'adata';
+                  if (selectedItem) {
+                    loadItemDetail(selectedItem.deviceId, selectedItem.queueId);
+                  }
+                }}
               >
                 AData
+              </button>
+              <button 
+                class="format-btn"
+                class:active={diffFormat === 'gdata'}
+                on:click={() => {
+                  diffFormat = 'gdata';
+                  if (selectedItem) {
+                    loadItemDetail(selectedItem.deviceId, selectedItem.queueId);
+                  }
+                }}
+              >
+                GData
               </button>
             </div>
           </div>
