@@ -131,7 +131,7 @@ export async function fetchAllDeviceQueues() {
             tid: item.tid,
             deviceTxid: item.device_txid,
             configDiff: item.config_diff,
-            approved: item.approved || false
+            approved: item.approved
           });
         });
       });

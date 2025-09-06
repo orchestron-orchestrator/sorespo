@@ -228,7 +228,7 @@
   $: deviceList = Object.entries(deviceGroups).map(([deviceId, items]) => ({
     deviceId,
     items,
-    count: items.length
+    count: items.filter(item => item.approved !== false && item.approved !== true).length
   }));
   
   $: selectedItem = selectedDevice && deviceGroups[selectedDevice] 
@@ -285,7 +285,15 @@
                         in:fade|local={{duration: 200, delay: 150 + index * 30}}
                       >
                         <span class="queue-num">#{item.queueId}</span>
-                        <span class="queue-tid">{item.tid || 'pending'}</span>
+                        <span class="queue-status">
+                          {#if item.approved === true}
+                            <span class="status-icon approved" title="Approved">✓</span>
+                          {:else if item.approved === false}
+                            <span class="status-icon rejected" title="Rejected">✕</span>
+                          {:else}
+                            <span class="status-icon pending" title="Pending">●</span>
+                          {/if}
+                        </span>
                       </div>
                     {/each}
                   </div>
@@ -338,6 +346,17 @@
               <span>TID: {itemDetail.tid || 'N/A'}</span>
               <span class="separator">•</span>
               <span>Device TxID: {itemDetail.deviceTxid || 'N/A'}</span>
+              <span class="separator">•</span>
+              <span class="status-display">
+                Status: 
+                {#if selectedItem.approved === true}
+                  <span class="status-icon approved">✓</span> Approved
+                {:else if selectedItem.approved === false}
+                  <span class="status-icon rejected">✕</span> Rejected
+                {:else}
+                  <span class="status-icon pending">●</span> Pending
+                {/if}
+              </span>
             </div>
             <div class="format-selector">
               <button 
@@ -562,14 +581,31 @@
     font-weight: 500;
   }
 
-  .queue-tid {
-    font-family: monospace;
-    font-size: 0.75rem;
-    opacity: 0.8;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 150px;
+  .queue-status {
+    display: flex;
+    align-items: center;
+  }
+
+  .status-icon {
+    font-size: 0.875rem;
+    font-weight: bold;
+  }
+
+  .status-icon.approved {
+    color: #27ae60;
+  }
+
+  .status-icon.rejected {
+    color: #dc3545;
+  }
+
+  .status-icon.pending {
+    color: #ff9500;
+    font-size: 0.625rem;
+  }
+
+  .queue-item-mini.active .status-icon {
+    color: white;
   }
 
   .detail-view {
@@ -624,6 +660,16 @@
     color: #6c757d;
     font-size: 0.8125rem;
     white-space: nowrap;
+  }
+  
+  .status-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .status-display .status-icon {
+    font-size: 0.875rem;
   }
 
   .separator {
