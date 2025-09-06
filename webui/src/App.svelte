@@ -2,6 +2,8 @@
   import { Router, Link, Route } from "svelte-routing";
   import DeviceList from "./components/DeviceList.svelte";
   import DeviceDetail from "./components/DeviceDetail.svelte";
+  import DeviceConfig from "./components/DeviceConfig.svelte";
+  import DeviceConfigLog from "./components/DeviceConfigLog.svelte";
   import QueueDashboard from "./components/QueueDashboard.svelte";
 
   export let url = "";
@@ -33,6 +35,12 @@
   </nav>
 
   <main>
+    <Route path="device/:id/log" let:params>
+      <DeviceConfigLog deviceId={params.id} />
+    </Route>
+    <Route path="device/:id/config" let:params>
+      <DeviceConfig deviceId={params.id} />
+    </Route>
     <Route path="device/:id" let:params>
       <DeviceDetail deviceId={params.id} />
     </Route>

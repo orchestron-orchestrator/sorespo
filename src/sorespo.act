@@ -101,7 +101,9 @@ actor main(env):
             else:
                 respond(200, {}, json.encode({"status": "ok"}))
 
-        path_elements = request.path.split("/")
+        # Strip query string from path before splitting
+        path_without_query = request.path.split("?")[0] if "?" in request.path else request.path
+        path_elements = path_without_query.split("/")
 
         if len(path_elements) > 1 and path_elements[1] == "config-queue":
             if request.method == "GET":
@@ -125,7 +127,7 @@ actor main(env):
                                         "queue_id": queue_id,
                                         "tid": config_item.tid,
                                         "device_txid": dev.get_device_txid(),
-                                        "approved": config_item.approved
+                                        "approved": str(config_item.approved) if config_item.approved is not None else "null"
                                     })
 
                                 devices_with_queues.append({
@@ -187,6 +189,19 @@ actor main(env):
             return
 
         if request.method == "GET":
+            # Handle /api/device to list all devices
+            if len(path_elements) == 2 and path_elements[1] == "device":
+                try:
+                    devices = dev_registry.list()
+                    device_names = []
+                    for name in devices:
+                        device_names.append(name)
+                    response_json = json.encode({"devices": device_names})
+                    respond(200, {"Content-Type": "application/json"}, response_json)
+                except Exception as e:
+                    respond(500, {}, f"Error fetching devices: {e}")
+                return
+            
             if len(path_elements) > 3 and path_elements[1] == "device":
                 def respond_with_data(data: ?yang.gdata.Node, schema: odev.DeviceSchema, accept_header: ?str):
                     aheader = accept_header if accept_header is not None else "application/yang-data+json"
@@ -220,26 +235,159 @@ actor main(env):
                         respond(200, {}, txt)
                         return
                     if path_elements[3] == 'diff':
-                        running_config_gd = dev.get_config()
-                        session = cfs.newsession()
-                        device_layer = session.below().below().below().get()
-                        device_entry = device_layer.get_cnt("devices").get_list("device").get_list_entry(dev_name)
-                        target_config_gd = device_entry.get_cnt("config")
-                        config_diff = None
-                        if running_config_gd is not None and target_config_gd is not None:
-                            config_diff = yang.gdata.diff(running_config_gd, target_config_gd)
-                        respond_with_data(config_diff, dev.get_schema(), request.headers.get("accept"))
+                        # Parse query params for format
+                        format_type = "json"  # default
+                        if "?" in request.path:
+                            query_string = request.path.split('?', 1)[1]
+                            for param in query_string.split("&"):
+                                if "=" in param:
+                                    kv = param.split("=", 1)
+                                    if kv[0] == "format":
+                                        format_type = kv[1]
+                        
+                        running_conf = dev.get_running_conf()
+                        target_conf = dev.get_target_conf()
+                        
+                        if running_conf is not None and target_conf is not None:
+                            config_diff = yang.gdata.diff(running_conf, target_conf)
+                            if config_diff is not None:
+                                if format_type == "json":
+                                    diff_str = config_diff.to_json()
+                                elif format_type == "xml":
+                                    diff_str = config_diff.to_xmlstr()
+                                elif format_type == "gdata":
+                                    diff_str = config_diff.prsrc()
+                                elif format_type == "adata":
+                                    # adata conversion would need schema
+                                    diff_str = "# Adata format not available for diff"
+                                else:
+                                    diff_str = config_diff.to_json()  # default to json
+                                respond(200, {"Content-Type": "text/plain"}, diff_str)
+                            else:
+                                respond(200, {"Content-Type": "text/plain"}, "# No differences")
+                        else:
+                            respond(200, {"Content-Type": "text/plain"}, "# Configuration not available")
                         return
                     if path_elements[3] == 'target':
-                        session = cfs.newsession()
-                        device_layer = session.below().below().below().get()
-                        device_entry = device_layer.get_cnt("devices").get_list("device").get_list_entry(dev_name)
-                        config_gd = device_entry.get_cnt("config")
-                        respond_with_data(config_gd, dev.get_schema(), request.headers.get("accept"))
+                        # Parse query params for format
+                        format_type = "json"  # default
+                        if "?" in request.path:
+                            query_string = request.path.split('?', 1)[1]
+                            for param in query_string.split("&"):
+                                if "=" in param:
+                                    kv = param.split("=", 1)
+                                    if kv[0] == "format":
+                                        format_type = kv[1]
+                        
+                        target_conf = dev.get_target_conf()
+                        if target_conf is not None:
+                            if format_type == "json":
+                                conf_str = target_conf.to_json()
+                            elif format_type == "xml":
+                                conf_str = target_conf.to_xmlstr()
+                            elif format_type == "gdata":
+                                conf_str = target_conf.prsrc()
+                            elif format_type == "adata":
+                                # adata conversion would need schema
+                                conf_str = "# Adata format not available"
+                            else:
+                                conf_str = target_conf.to_json()  # default to json
+                            respond(200, {"Content-Type": "text/plain"}, conf_str)
+                        else:
+                            respond(200, {"Content-Type": "text/plain"}, "# No target configuration available")
                         return
                     if path_elements[3] == 'running':
-                        config_gd = dev.get_config()
-                        respond_with_data(config_gd, dev.get_schema(), request.headers.get("accept"))
+                        # Parse query params for format
+                        format_type = "json"  # default
+                        if "?" in request.path:
+                            query_string = request.path.split('?', 1)[1]
+                            for param in query_string.split("&"):
+                                if "=" in param:
+                                    kv = param.split("=", 1)
+                                    if kv[0] == "format":
+                                        format_type = kv[1]
+                        
+                        running_conf = dev.get_running_conf()
+                        if running_conf is not None:
+                            if format_type == "json":
+                                conf_str = running_conf.to_json()
+                            elif format_type == "xml":
+                                conf_str = running_conf.to_xmlstr()
+                            elif format_type == "gdata":
+                                conf_str = running_conf.prsrc()
+                            elif format_type == "adata":
+                                # adata conversion would need schema
+                                conf_str = "# Adata format not available"
+                            else:
+                                conf_str = running_conf.to_json()  # default to json
+                            respond(200, {"Content-Type": "text/plain"}, conf_str)
+                        else:
+                            respond(200, {"Content-Type": "text/plain"}, "# No running configuration available")
+                        return
+                    
+                    if path_elements[3] == 'resync':
+                        # Trigger device resync
+                        dev.resync()
+                        respond(200, {"Content-Type": "application/json"}, json.encode({"status": "ok", "message": "Resync initiated"}))
+                        return
+                    
+                    if path_elements[3] == 'info':
+                        # Get device meta configuration and state
+                        dmc = dev.get_dmc()
+                        dev_state = dev.get_state()
+                        
+                        info = {
+                            "name": dev_name,
+                            "type": dmc.type if dmc.type is not None else "unknown",
+                            "approval_required": dmc.approval_required if dmc.approval_required is not None else False,
+                            "has_running_config": dev_state.has_running_config,
+                            "has_target_config": dev_state.has_target_config,
+                            "queue_length": dev_state.queue_length,
+                            "pending_approvals": dev_state.pending_approvals
+                        }
+                        
+                        # Add credentials info (just username, not password)
+                        if dmc.credentials is not None:
+                            info["username"] = dmc.credentials.username if dmc.credentials.username is not None else ""
+                        
+                        respond(200, {"Content-Type": "application/json"}, json.encode(info))
+                        return
+                    
+                    if path_elements[3] == 'log':
+                        # Get device configuration log
+                        conf_log = dev.get_conf_log()
+                        log_items = []
+                        
+                        # Parse query params for format
+                        format_type = "xml"  # default
+                        query_params = {}
+                        if "?" in request.path:
+                            query_string = request.path.split('?', 1)[1]
+                            for param in query_string.split("&"):
+                                if "=" in param:
+                                    kv = param.split("=", 1)
+                                    query_params[kv[0]] = kv[1]
+                        format_type = query_params.get_def("format", "xml")
+                        
+                        for item in conf_log:
+                            
+                            # Format the config diff based on format type
+                            diff_str = ""
+                            if item.conf_diff is not None:
+                                if format_type == "json":
+                                    diff_str = item.conf_diff.to_json()
+                                elif format_type == "xml":
+                                    diff_str = item.conf_diff.to_xmlstr()
+                                elif format_type == "gdata":
+                                    diff_str = item.conf_diff.prsrc()
+
+                            log_items.append({
+                                "timestamp": str(item.ts),
+                                "event": item.event,
+                                "conf_diff": diff_str
+                            })
+                        
+                        respond(200, {"Content-Type": "application/json"}, json.encode({"log": log_items}))
                         return
                     if path_elements[3] == 'resync':
                         respond(200, {}, "OK")

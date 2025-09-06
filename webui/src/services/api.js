@@ -26,10 +26,7 @@ export async function fetchDevices() {
     
     return deviceNames.map(name => ({
       id: name,
-      name: name,
-      type: 'router',
-      address: 'Via NETCONF',
-      status: 'connected'
+      name: name
     }));
   } catch (err) {
     console.error('Failed to fetch devices:', err);
@@ -42,22 +39,20 @@ export async function fetchDevice(deviceId) {
   // Ensure device ID is uppercase
   const upperId = deviceId.toUpperCase();
   
-  // Try to get capabilities to verify device exists
+  // Get device info from the new endpoint
   try {
-    const response = await fetch(`${API_BASE}/device/${upperId}/capabilities`);
-    if (!response.ok) {
-      throw new Error('Device not found');
-    }
-    
+    const info = await fetchJSON(`${API_BASE}/device/${upperId}/info`);
     return {
       id: upperId,
-      name: upperId,
-      type: 'router',
-      address: 'Via NETCONF',
-      status: 'connected',
-      connectionType: 'NETCONF',
-      port: 830,
-      lastSeen: new Date().toISOString()
+      name: info.name || upperId,
+      type: info.type,
+      approvalRequired: info.approval_required,
+      addresses: info.addresses || [],
+      username: info.username,
+      hasRunningConfig: info.has_running_config,
+      hasTargetConfig: info.has_target_config,
+      queueLength: info.queue_length,
+      pendingApprovals: info.pending_approvals
     };
   } catch (err) {
     throw new Error(`Device ${upperId} not found or offline`);
@@ -86,10 +81,10 @@ export async function fetchDeviceConfig(deviceId) {
   }
 }
 
-export async function reconfigureDevice(deviceId) {
-  // Trigger reconfiguration via GET request (as seen in sorespo.act)
+export async function resyncDevice(deviceId) {
+  // Trigger resync via GET request
   const upperId = deviceId.toUpperCase();
-  return fetchJSON(`${API_BASE}/device/${upperId}/reconfigure`);
+  return fetchJSON(`${API_BASE}/device/${upperId}/resync`);
 }
 
 export async function fetchDeviceConfigQueue(deviceId) {
@@ -143,4 +138,42 @@ export async function fetchAllDeviceQueues() {
     console.error('Failed to fetch config queues:', err);
     return [];
   }
+}
+
+export async function fetchDeviceRunningConfig(deviceId, format = 'json') {
+  const upperId = deviceId.toUpperCase();
+  const response = await fetch(`${API_BASE}/device/${upperId}/running?format=${format}`);
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch running config');
+  }
+  
+  return response.text();
+}
+
+export async function fetchDeviceTargetConfig(deviceId, format = 'json') {
+  const upperId = deviceId.toUpperCase();
+  const response = await fetch(`${API_BASE}/device/${upperId}/target?format=${format}`);
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch target config');
+  }
+  
+  return response.text();
+}
+
+export async function fetchDeviceConfigDiff(deviceId, format = 'json') {
+  const upperId = deviceId.toUpperCase();
+  const response = await fetch(`${API_BASE}/device/${upperId}/diff?format=${format}`);
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch config diff');
+  }
+  
+  return response.text();
+}
+
+export async function fetchDeviceConfigLog(deviceId, format = 'json') {
+  const upperId = deviceId.toUpperCase();
+  return fetchJSON(`${API_BASE}/device/${upperId}/log?format=${format}`);
 }

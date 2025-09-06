@@ -57,13 +57,8 @@
         <a href="/device/{device.id}" use:link class="device-card">
           <div class="device-header">
             <h3>{device.name || device.id}</h3>
-            <span class="status" style="background-color: {getStatusColor(device.status)}">
-              {device.status || 'unknown'}
-            </span>
           </div>
           <div class="device-info">
-            <p><strong>Type:</strong> {device.type || 'Unknown'}</p>
-            <p><strong>Address:</strong> {device.address || 'N/A'}</p>
             {#if device.version}
               <p><strong>Version:</strong> {device.version}</p>
             {/if}

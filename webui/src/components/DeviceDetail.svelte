@@ -3,8 +3,7 @@
   import { link } from 'svelte-routing';
   import { 
     fetchDevice, 
-    reconfigureDevice, 
-    fetchDeviceConfig,
+    resyncDevice,
     fetchDeviceConfigQueue,
     fetchConfigQueueItem,
     approveConfigQueueItem
@@ -13,13 +12,12 @@
   export let deviceId;
 
   let device = null;
-  let config = null;
   let configQueue = {};
   let selectedQueueItem = null;
   let queueItemDetail = null;
   let loading = true;
   let error = null;
-  let reconfiguring = false;
+  let resyncing = false;
   let message = null;
   let loadingQueue = false;
   let approvingItem = null;
@@ -40,7 +38,6 @@
     try {
       loading = true;
       device = await fetchDevice(deviceId);
-      config = await fetchDeviceConfig(deviceId);
       await loadConfigQueue();
       loading = false;
     } catch (err) {
@@ -91,17 +88,17 @@
     }
   }
 
-  async function handleReconfigure() {
+  async function handleResync() {
     try {
-      reconfiguring = true;
+      resyncing = true;
       message = null;
-      await reconfigureDevice(deviceId);
-      message = { type: 'success', text: 'Device reconfigured successfully' };
+      await resyncDevice(deviceId);
+      message = { type: 'success', text: 'Device resynced successfully' };
       await loadDevice();
     } catch (err) {
-      message = { type: 'error', text: `Failed to reconfigure: ${err.message}` };
+      message = { type: 'error', text: `Failed to resync: ${err.message}` };
     } finally {
-      reconfiguring = false;
+      resyncing = false;
     }
   }
 
@@ -128,9 +125,9 @@
     <div class="device-container">
       <div class="device-header">
         <h2>{device.name || device.id}</h2>
-        <span class="status" style="background-color: {getStatusColor(device.status)}">
-          {device.status || 'unknown'}
-        </span>
+        {#if device.approvalRequired}
+          <span class="approval-badge">Approval Required</span>
+        {/if}
       </div>
 
       {#if message}
@@ -142,11 +139,25 @@
       <div class="actions">
         <button 
           class="btn btn-primary" 
-          on:click={handleReconfigure}
-          disabled={reconfiguring}
+          on:click={handleResync}
+          disabled={resyncing}
         >
-          {reconfiguring ? 'Reconfiguring...' : 'Reconfigure'}
+          {resyncing ? 'Resyncing...' : 'Resync'}
         </button>
+        <a 
+          href="/device/{deviceId}/config" 
+          use:link 
+          class="btn btn-secondary"
+        >
+          View Configuration
+        </a>
+        <a 
+          href="/device/{deviceId}/log" 
+          use:link 
+          class="btn btn-secondary"
+        >
+          Configuration Log
+        </a>
       </div>
 
       <div class="info-grid">
@@ -156,11 +167,27 @@
             <dt>ID</dt>
             <dd>{device.id}</dd>
             
-            <dt>Type</dt>
+            <dt>Device Type</dt>
             <dd>{device.type || 'Unknown'}</dd>
             
-            <dt>Address</dt>
-            <dd>{device.address || 'N/A'}</dd>
+            {#if device.username}
+              <dt>Username</dt>
+              <dd>{device.username}</dd>
+            {/if}
+            
+            {#if device.addresses && device.addresses.length > 0}
+              <dt>Addresses</dt>
+              <dd>
+                {#each device.addresses as addr}
+                  <div class="address-item">
+                    <strong>{addr.name}:</strong> {addr.address}:{addr.port}
+                  </div>
+                {/each}
+              </dd>
+            {/if}
+            
+            <dt>Approval Required</dt>
+            <dd>{device.approvalRequired ? 'Yes' : 'No'}</dd>
             
             {#if device.version}
               <dt>Version</dt>
@@ -175,21 +202,22 @@
         </div>
 
         <div class="info-section">
-          <h3>Connection Details</h3>
+          <h3>Device Status</h3>
           <dl>
-            {#if device.lastSeen}
-              <dt>Last Seen</dt>
-              <dd>{new Date(device.lastSeen).toLocaleString()}</dd>
+            <dt>Has Running Config</dt>
+            <dd>{device.hasRunningConfig ? 'Yes' : 'No'}</dd>
+            
+            <dt>Has Target Config</dt>
+            <dd>{device.hasTargetConfig ? 'Yes' : 'No'}</dd>
+            
+            {#if device.queueLength > 0}
+              <dt>Queue Length</dt>
+              <dd>{device.queueLength}</dd>
             {/if}
             
-            {#if device.connectionType}
-              <dt>Connection Type</dt>
-              <dd>{device.connectionType}</dd>
-            {/if}
-            
-            {#if device.port}
-              <dt>Port</dt>
-              <dd>{device.port}</dd>
+            {#if device.pendingApprovals > 0}
+              <dt>Pending Approvals</dt>
+              <dd class="pending-approvals">{device.pendingApprovals}</dd>
             {/if}
           </dl>
         </div>
@@ -244,12 +272,6 @@
         {/if}
       </div>
 
-      {#if config}
-        <div class="config-section">
-          <h3>Current Configuration</h3>
-          <pre class="config-display">{JSON.stringify(config, null, 2)}</pre>
-        </div>
-      {/if}
     </div>
   {/if}
 </div>
@@ -311,6 +333,52 @@
     font-weight: 500;
   }
 
+  .approval-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    background-color: #f39c12;
+    color: white;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  .address-item {
+    margin: 0.25rem 0;
+    padding: 0.25rem 0;
+  }
+
+  .connection-state {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+
+  .connection-state.connected {
+    background-color: #d4edda;
+    color: #155724;
+  }
+
+  .connection-state.disconnected {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+
+  .connection-state.connecting {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+
+  .connection-state.transaction {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  }
+
+  .pending-approvals {
+    color: #f39c12;
+    font-weight: 600;
+  }
+
   .message {
     padding: 1rem;
     border-radius: 4px;
@@ -361,6 +429,8 @@
   .btn-secondary {
     background-color: #95a5a6;
     color: white;
+    text-decoration: none;
+    display: inline-block;
   }
 
   .btn-secondary:hover:not(:disabled) {
@@ -522,25 +592,5 @@
     color: #495057;
     max-height: 400px;
     overflow-y: auto;
-  }
-
-  .config-section {
-    margin-top: 2rem;
-  }
-
-  .config-section h3 {
-    color: #2c3e50;
-    margin-bottom: 1rem;
-  }
-
-  .config-display {
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    padding: 1rem;
-    overflow-x: auto;
-    font-family: 'Consolas', 'Monaco', monospace;
-    font-size: 0.9rem;
-    color: #495057;
   }
 </style>
