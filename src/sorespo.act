@@ -346,6 +346,18 @@ actor main(env):
                             "pending_approvals": dev_state.pending_approvals
                         }
                         
+                        # Add address information
+                        addresses = []
+                        for addr_entry in dmc.address.elements:
+                            addr_info = {
+                                "name": addr_entry.name,
+                                "address": addr_entry.address
+                            }
+                            if addr_entry.port is not None:
+                                addr_info["port"] = addr_entry.port
+                            addresses.append(addr_info)
+                        info["addresses"] = addresses
+                        
                         # Add credentials info (just username, not password)
                         if dmc.credentials is not None:
                             info["username"] = dmc.credentials.username if dmc.credentials.username is not None else ""
@@ -373,13 +385,14 @@ actor main(env):
                             
                             # Format the config diff based on format type
                             diff_str = ""
-                            if item.conf_diff is not None:
+                            conf_diff = item.conf_diff
+                            if conf_diff is not None:
                                 if format_type == "json":
-                                    diff_str = item.conf_diff.to_json()
+                                    diff_str = conf_diff.to_json()
                                 elif format_type == "xml":
-                                    diff_str = item.conf_diff.to_xmlstr()
+                                    diff_str = conf_diff.to_xmlstr()
                                 elif format_type == "gdata":
-                                    diff_str = item.conf_diff.prsrc()
+                                    diff_str = conf_diff.prsrc()
 
                             log_items.append({
                                 "timestamp": str(item.ts),

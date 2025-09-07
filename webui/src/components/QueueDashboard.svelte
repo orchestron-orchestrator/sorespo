@@ -1,5 +1,5 @@
 <script>
-  import { onMount, tick } from 'svelte';
+  import { onMount, onDestroy, tick } from 'svelte';
   import { link } from 'svelte-routing';
   import { fade, slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
