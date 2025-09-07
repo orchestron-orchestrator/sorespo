@@ -1,17 +1,46 @@
 <script>
   import { Router, Link, Route } from "svelte-routing";
+  import { onMount, onDestroy } from 'svelte';
   import DeviceList from "./components/DeviceList.svelte";
   import DeviceDetail from "./components/DeviceDetail.svelte";
   import DeviceConfig from "./components/DeviceConfig.svelte";
   import DeviceConfigLog from "./components/DeviceConfigLog.svelte";
   import QueueDashboard from "./components/QueueDashboard.svelte";
+  import { fetchAllDeviceQueues } from './services/api.js';
 
   export let url = "";
+  
+  let totalPendingCount = 0;
+  let pollInterval = null;
   
   // Create a custom event for refresh that components can listen to
   function handleRefresh() {
     window.dispatchEvent(new CustomEvent('global-refresh'));
   }
+  
+  async function checkPendingQueues() {
+    try {
+      const queueItems = await fetchAllDeviceQueues();
+      // The API returns a flat array of queue items that need approval
+      totalPendingCount = queueItems.length;
+    } catch (error) {
+      console.error('Failed to fetch queue counts:', error);
+    }
+  }
+  
+  onMount(() => {
+    // Initial check
+    checkPendingQueues();
+    
+    // Poll every second
+    pollInterval = setInterval(checkPendingQueues, 1000);
+  });
+  
+  onDestroy(() => {
+    if (pollInterval) {
+      clearInterval(pollInterval);
+    }
+  });
 </script>
 
 <Router {url}>
@@ -23,8 +52,13 @@
           <li>
             <Link to="/">Devices</Link>
           </li>
-          <li>
-            <Link to="/config-queue">Config Queue</Link>
+          <li class="config-queue-nav">
+            <Link to="/config-queue">
+              Config Queue
+              {#if totalPendingCount > 0}
+                <span class="notification-bubble">{totalPendingCount}</span>
+              {/if}
+            </Link>
           </li>
         </ul>
       </div>
@@ -95,10 +129,40 @@
     padding: 0.5rem 1rem;
     border-radius: 4px;
     transition: background-color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   li :global(a:hover) {
     background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .config-queue-nav {
+    position: relative;
+  }
+  
+  .notification-bubble {
+    background-color: #f39c12;
+    color: white;
+    border-radius: 10px;
+    padding: 0.125rem 0.375rem;
+    font-size: 0.75rem;
+    font-weight: bold;
+    min-width: 1.2rem;
+    text-align: center;
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.9;
+      transform: scale(1.05);
+    }
   }
 
   .refresh-btn {

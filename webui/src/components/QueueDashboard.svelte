@@ -33,11 +33,15 @@
     // Listen for global refresh events
     const handleRefresh = () => loadAllQueues();
     window.addEventListener('global-refresh', handleRefresh);
-    
-    return () => {
-      if (refreshInterval) clearInterval(refreshInterval);
-      window.removeEventListener('global-refresh', handleRefresh);
-    };
+  });
+
+  onDestroy(() => {
+    // Clean up interval and event listener when component is destroyed
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+      refreshInterval = null;
+    }
+    window.removeEventListener('global-refresh', loadAllQueues);
   });
 
   let isInitialLoad = true;
