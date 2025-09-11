@@ -6,6 +6,11 @@
   let devices = [];
   let loading = true;
   let error = null;
+  let searchQuery = '';
+  
+  $: filteredDevices = devices.filter(device => 
+    device.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   async function loadDevices() {
     try {
@@ -43,6 +48,17 @@
 <div class="device-list">
   <div class="header">
     <h2>Devices</h2>
+    <div class="search-box">
+      <input 
+        type="text" 
+        placeholder="Search devices..." 
+        bind:value={searchQuery}
+        class="search-input"
+      />
+      {#if searchQuery}
+        <button class="clear-btn" on:click={() => searchQuery = ''}>✕</button>
+      {/if}
+    </div>
   </div>
 
   {#if loading}
@@ -51,9 +67,11 @@
     <div class="error">Error: {error}</div>
   {:else if devices.length === 0}
     <div class="empty">No devices found</div>
+  {:else if filteredDevices.length === 0}
+    <div class="empty">No devices match "{searchQuery}"</div>
   {:else}
     <div class="grid">
-      {#each devices as device}
+      {#each filteredDevices as device}
         <a href="/device/{device.id}" use:link class="device-card">
           <div class="device-header">
             <h3>{device.name || device.id}</h3>
@@ -84,6 +102,43 @@
   h2 {
     margin: 0;
     color: #2c3e50;
+  }
+  
+  .search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .search-input {
+    padding: 0.5rem 2.5rem 0.5rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 250px;
+    transition: border-color 0.2s;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: #3498db;
+  }
+  
+  .clear-btn {
+    position: absolute;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    color: #95a5a6;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0.25rem;
+    transition: color 0.2s;
+  }
+  
+  .clear-btn:hover {
+    color: #7f8c8d;
   }
 
   .refresh-btn {

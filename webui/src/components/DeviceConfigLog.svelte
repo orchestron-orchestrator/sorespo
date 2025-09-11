@@ -166,9 +166,6 @@
       <div class="sidebar">
         <div class="sidebar-header">
           <h3>Configuration History</h3>
-          <span class="auto-refresh-indicator" title="Auto-refreshing every second">
-            ↻ Live
-          </span>
         </div>
         
         <div class="log-list">
@@ -329,34 +326,12 @@
   .sidebar-header {
     padding: 1rem;
     border-bottom: 2px solid #ecf0f1;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
   }
 
   .sidebar-header h3 {
     margin: 0;
     color: #2c3e50;
     font-size: 1.1rem;
-  }
-
-  .auto-refresh-indicator {
-    padding: 0.25rem 0.75rem;
-    background: #27ae60;
-    color: white;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.7;
-    }
   }
 
   .log-list {
