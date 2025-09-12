@@ -200,13 +200,8 @@ actor main(env):
                         config_gd = dev.get_config()
                         respond_with_data(config_gd, dev.get_schema(), request.headers.get("accept"))
                         return
-                    if path_elements[3] == 'reconfigure':
-                        def reconf_done(error: ?Exception):
-                            if error is None:
-                                respond(200, {}, "OK")
-                            else:
-                                respond(500, {}, str(error))
-                        dev.reconfigure(reconf_done)
+                    if path_elements[3] == 'resync':
+                        respond(200, {}, "OK")
                         return
 
                     respond(404, {}, "Not found")
