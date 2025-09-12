@@ -3516,6 +3516,10 @@ identity urllc {
           enum juniper-junos;
         }
       }
+      leaf approval-required {
+        type boolean;
+        default false;
+      }
     }
 
     list backbone-link {
@@ -4041,6 +4045,12 @@ mut def from_json_netinfra__netinfra__router__mock(val: value) -> yang.gdata.Lea
 mut def from_xml_netinfra__netinfra__router__mock(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('enumeration', val)
 
+mut def from_json_netinfra__netinfra__router__approval_required(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('boolean', val)
+
+mut def from_xml_netinfra__netinfra__router__approval_required(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('boolean', val)
+
 class netinfra__netinfra__router_entry(yang.adata.MNode):
     name: str
     id: int
@@ -4048,8 +4058,9 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
     role: ?str
     asn: int
     mock: ?str
+    approval_required: bool
 
-    mut def __init__(self, name: str, id: int, asn: int, type: ?str, role: ?str, mock: ?str):
+    mut def __init__(self, name: str, id: int, asn: int, type: ?str, role: ?str, mock: ?str, approval_required: ?bool=None):
         self._ns = 'http://example.com/netinfra'
         self.name = name
         self.id = id
@@ -4057,6 +4068,7 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
         self.role = role
         self.asn = asn
         self.mock = mock
+        self.approval_required = approval_required if approval_required is not None else False
 
     mut def to_gdata(self) -> yang.gdata.Node:
         children = {}
@@ -4078,11 +4090,14 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
         _mock = self.mock
         if _mock is not None:
             children['mock'] = yang.gdata.Leaf('enumeration', _mock)
+        _approval_required = self.approval_required
+        if _approval_required is not None:
+            children['approval-required'] = yang.gdata.Leaf('boolean', _approval_required)
         return yang.gdata.Container(children)
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra__netinfra__router_entry:
-        return netinfra__netinfra__router_entry(name=n.get_str('name'), id=n.get_int('id'), type=n.get_opt_str('type'), role=n.get_opt_str('role'), asn=n.get_int('asn'), mock=n.get_opt_str('mock'))
+        return netinfra__netinfra__router_entry(name=n.get_str('name'), id=n.get_int('id'), type=n.get_opt_str('type'), role=n.get_opt_str('role'), asn=n.get_int('asn'), mock=n.get_opt_str('mock'), approval_required=n.get_opt_bool('approval-required'))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -4099,6 +4114,9 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
         _mock = self.mock
         if _mock is not None:
             leaves.append('{self_name}.mock = {repr(_mock)}')
+        _approval_required = self.approval_required
+        if _approval_required is not None:
+            leaves.append('{self_name}.approval_required = {repr(_approval_required)}')
         if leaves:
             if not list_element:
                res = ['', '# Container: /netinfra/router'] + leaves + res
@@ -4160,6 +4178,8 @@ mut def from_xml_netinfra__netinfra__router_element(node: xml.Node) -> yang.gdat
     yang.gdata.maybe_add(children, 'asn', from_xml_netinfra__netinfra__router__asn, child_asn)
     child_mock = yang.gdata.from_xml_opt_str(node, 'mock')
     yang.gdata.maybe_add(children, 'mock', from_xml_netinfra__netinfra__router__mock, child_mock)
+    child_approval_required = yang.gdata.from_xml_opt_bool(node, 'approval-required')
+    yang.gdata.maybe_add(children, 'approval-required', from_xml_netinfra__netinfra__router__approval_required, child_approval_required)
     return yang.gdata.Container(children)
 
 mut def from_xml_netinfra__netinfra__router(nodes: list[xml.Node]) -> yang.gdata.List:
@@ -4192,6 +4212,8 @@ mut def from_json_path_netinfra__netinfra__router_element(jd: value, path: list[
         if point == 'asn':
             raise ValueError("Invalid json path to non-inner node")
         if point == 'mock':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'approval-required':
             raise ValueError("Invalid json path to non-inner node")
         return yang.gdata.Container(children)
     raise ValueError("unreachable - no keys to list element")
@@ -4235,6 +4257,8 @@ mut def from_json_netinfra__netinfra__router_element(jd: dict[str, ?value]) -> y
     yang.gdata.maybe_add(children, 'asn', from_json_netinfra__netinfra__router__asn, child_asn)
     child_mock = yang.gdata.take_json_opt_str(jd, 'mock')
     yang.gdata.maybe_add(children, 'mock', from_json_netinfra__netinfra__router__mock, child_mock)
+    child_approval_required = yang.gdata.take_json_opt_bool(jd, 'approval-required')
+    yang.gdata.maybe_add(children, 'approval-required', from_json_netinfra__netinfra__router__approval_required, child_approval_required)
     return yang.gdata.Container(children)
 
 mut def from_json_netinfra__netinfra__router(jd: list[dict[str, ?value]]) -> yang.gdata.List:

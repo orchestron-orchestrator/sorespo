@@ -119,6 +119,10 @@ def src_yang():
           enum juniper-junos;
         }
       }
+      leaf approval-required {
+        type boolean;
+        default false;
+      }
       container base-config {
         leaf asn {
           type inet:as-number;
@@ -696,6 +700,12 @@ mut def from_json_netinfra_inter__netinfra__router__mock(val: value) -> yang.gda
 mut def from_xml_netinfra_inter__netinfra__router__mock(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('enumeration', val)
 
+mut def from_json_netinfra_inter__netinfra__router__approval_required(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('boolean', val)
+
+mut def from_xml_netinfra_inter__netinfra__router__approval_required(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('boolean', val)
+
 mut def from_json_netinfra_inter__netinfra__router__base_config__asn(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('uint32', val)
 
@@ -980,16 +990,18 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
     type: ?str
     role: ?str
     mock: ?str
+    approval_required: ?bool
     base_config: netinfra_inter__netinfra__router__base_config
     l3vpn_vrf: netinfra_inter__netinfra__router__l3vpn_vrf
 
-    mut def __init__(self, name: str, id: ?int, type: ?str, role: ?str, mock: ?str, base_config: ?netinfra_inter__netinfra__router__base_config=None, l3vpn_vrf: list[netinfra_inter__netinfra__router__l3vpn_vrf_entry]=[]):
+    mut def __init__(self, name: str, id: ?int, type: ?str, role: ?str, mock: ?str, approval_required: ?bool, base_config: ?netinfra_inter__netinfra__router__base_config=None, l3vpn_vrf: list[netinfra_inter__netinfra__router__l3vpn_vrf_entry]=[]):
         self._ns = 'http://example.com/netinfra-inter'
         self.name = name
         self.id = id
         self.type = type
         self.role = role
         self.mock = mock
+        self.approval_required = approval_required
         self.base_config = base_config if base_config is not None else netinfra_inter__netinfra__router__base_config()
         self.l3vpn_vrf = netinfra_inter__netinfra__router__l3vpn_vrf(elements=l3vpn_vrf)
 
@@ -1010,6 +1022,9 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
         _mock = self.mock
         if _mock is not None:
             children['mock'] = yang.gdata.Leaf('enumeration', _mock)
+        _approval_required = self.approval_required
+        if _approval_required is not None:
+            children['approval-required'] = yang.gdata.Leaf('boolean', _approval_required)
         _base_config = self.base_config
         if _base_config is not None:
             children['base-config'] = _base_config.to_gdata()
@@ -1020,7 +1035,7 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra_inter__netinfra__router_entry:
-        return netinfra_inter__netinfra__router_entry(name=n.get_str('name'), id=n.get_opt_int('id'), type=n.get_opt_str('type'), role=n.get_opt_str('role'), mock=n.get_opt_str('mock'), base_config=netinfra_inter__netinfra__router__base_config.from_gdata(n.get_opt_cnt('base-config')), l3vpn_vrf=netinfra_inter__netinfra__router__l3vpn_vrf.from_gdata(n.get_opt_list('l3vpn-vrf')))
+        return netinfra_inter__netinfra__router_entry(name=n.get_str('name'), id=n.get_opt_int('id'), type=n.get_opt_str('type'), role=n.get_opt_str('role'), mock=n.get_opt_str('mock'), approval_required=n.get_opt_bool('approval-required'), base_config=netinfra_inter__netinfra__router__base_config.from_gdata(n.get_opt_cnt('base-config')), l3vpn_vrf=netinfra_inter__netinfra__router__l3vpn_vrf.from_gdata(n.get_opt_list('l3vpn-vrf')))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
@@ -1040,6 +1055,9 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
         _mock = self.mock
         if _mock is not None:
             leaves.append('{self_name}.mock = {repr(_mock)}')
+        _approval_required = self.approval_required
+        if _approval_required is not None:
+            leaves.append('{self_name}.approval_required = {repr(_approval_required)}')
         _base_config = self.base_config
         if _base_config is not None:
             res.extend(_base_config.prsrc('{self_name}.base_config', False).splitlines())
@@ -1109,6 +1127,8 @@ mut def from_xml_netinfra_inter__netinfra__router_element(node: xml.Node) -> yan
     yang.gdata.maybe_add(children, 'role', from_xml_netinfra_inter__netinfra__router__role, child_role)
     child_mock = yang.gdata.from_xml_opt_str(node, 'mock')
     yang.gdata.maybe_add(children, 'mock', from_xml_netinfra_inter__netinfra__router__mock, child_mock)
+    child_approval_required = yang.gdata.from_xml_opt_bool(node, 'approval-required')
+    yang.gdata.maybe_add(children, 'approval-required', from_xml_netinfra_inter__netinfra__router__approval_required, child_approval_required)
     child_base_config = yang.gdata.from_xml_opt_cnt(node, 'base-config')
     yang.gdata.maybe_add(children, 'base-config', from_xml_netinfra_inter__netinfra__router__base_config, child_base_config)
     child_l3vpn_vrf = yang.gdata.from_xml_opt_list(node, 'l3vpn-vrf')
@@ -1143,6 +1163,8 @@ mut def from_json_path_netinfra_inter__netinfra__router_element(jd: value, path:
         if point == 'role':
             raise ValueError("Invalid json path to non-inner node")
         if point == 'mock':
+            raise ValueError("Invalid json path to non-inner node")
+        if point == 'approval-required':
             raise ValueError("Invalid json path to non-inner node")
         if point == 'base-config':
             children['base-config'] = from_json_path_netinfra_inter__netinfra__router__base_config(jd, rest_path, op)
@@ -1188,6 +1210,8 @@ mut def from_json_netinfra_inter__netinfra__router_element(jd: dict[str, ?value]
     yang.gdata.maybe_add(children, 'role', from_json_netinfra_inter__netinfra__router__role, child_role)
     child_mock = yang.gdata.take_json_opt_str(jd, 'mock')
     yang.gdata.maybe_add(children, 'mock', from_json_netinfra_inter__netinfra__router__mock, child_mock)
+    child_approval_required = yang.gdata.take_json_opt_bool(jd, 'approval-required')
+    yang.gdata.maybe_add(children, 'approval-required', from_json_netinfra_inter__netinfra__router__approval_required, child_approval_required)
     child_base_config = yang.gdata.take_json_opt_cnt(jd, 'base-config')
     yang.gdata.maybe_add(children, 'base-config', from_json_netinfra_inter__netinfra__router__base_config, child_base_config)
     child_l3vpn_vrf = yang.gdata.take_json_opt_list(jd, 'l3vpn-vrf')
