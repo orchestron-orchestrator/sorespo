@@ -3502,6 +3502,7 @@ identity urllc {
       }
       leaf type {
         type string;
+        mandatory true;
       }
       leaf role {
         type string;
@@ -4054,13 +4055,13 @@ mut def from_xml_netinfra__netinfra__router__approval_required(val: value) -> ya
 class netinfra__netinfra__router_entry(yang.adata.MNode):
     name: str
     id: int
-    type: ?str
+    type: str
     role: ?str
     asn: int
     mock: ?str
     approval_required: bool
 
-    mut def __init__(self, name: str, id: int, asn: int, type: ?str, role: ?str, mock: ?str, approval_required: ?bool=None):
+    mut def __init__(self, name: str, id: int, type: str, asn: int, role: ?str, mock: ?str, approval_required: ?bool=None):
         self._ns = 'http://example.com/netinfra'
         self.name = name
         self.id = id
@@ -4097,17 +4098,14 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra__netinfra__router_entry:
-        return netinfra__netinfra__router_entry(name=n.get_str('name'), id=n.get_int('id'), type=n.get_opt_str('type'), role=n.get_opt_str('role'), asn=n.get_int('asn'), mock=n.get_opt_str('mock'), approval_required=n.get_opt_bool('approval-required'))
+        return netinfra__netinfra__router_entry(name=n.get_str('name'), id=n.get_int('id'), type=n.get_str('type'), role=n.get_opt_str('role'), asn=n.get_int('asn'), mock=n.get_opt_str('mock'), approval_required=n.get_opt_bool('approval-required'))
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
         if top:
             res.append('# Top node: /netinfra/router')
-            res.append('{self_name} = netinfra__netinfra__router({repr(self.name)}, {repr(self.id)}, {repr(self.asn)})')
+            res.append('{self_name} = netinfra__netinfra__router({repr(self.name)}, {repr(self.id)}, {repr(self.type)}, {repr(self.asn)})')
         leaves = []
-        _type = self.type
-        if _type is not None:
-            leaves.append('{self_name}.type = {repr(_type)}')
         _role = self.role
         if _role is not None:
             leaves.append('{self_name}.role = {repr(_role)}')
@@ -4136,7 +4134,7 @@ class netinfra__netinfra__router(yang.adata.MNode):
         self._name = 'router'
         self.elements = elements
 
-    mut def create(self, name, id, asn):
+    mut def create(self, name, id, type, asn):
         for e in self.elements:
             match = True
             if e.name != name:
@@ -4145,7 +4143,7 @@ class netinfra__netinfra__router(yang.adata.MNode):
             if match:
                 return e
 
-        res = netinfra__netinfra__router_entry(name, id, asn)
+        res = netinfra__netinfra__router_entry(name, id, type, asn)
         self.elements.append(res)
         return res
 
@@ -4170,7 +4168,7 @@ mut def from_xml_netinfra__netinfra__router_element(node: xml.Node) -> yang.gdat
     yang.gdata.maybe_add(children, 'name', from_xml_netinfra__netinfra__router__name, child_name)
     child_id = yang.gdata.from_xml_int(node, 'id')
     yang.gdata.maybe_add(children, 'id', from_xml_netinfra__netinfra__router__id, child_id)
-    child_type = yang.gdata.from_xml_opt_str(node, 'type')
+    child_type = yang.gdata.from_xml_str(node, 'type')
     yang.gdata.maybe_add(children, 'type', from_xml_netinfra__netinfra__router__type, child_type)
     child_role = yang.gdata.from_xml_opt_str(node, 'role')
     yang.gdata.maybe_add(children, 'role', from_xml_netinfra__netinfra__router__role, child_role)
@@ -4249,7 +4247,7 @@ mut def from_json_netinfra__netinfra__router_element(jd: dict[str, ?value]) -> y
     yang.gdata.maybe_add(children, 'name', from_json_netinfra__netinfra__router__name, child_name)
     child_id = yang.gdata.take_json_int(jd, 'id')
     yang.gdata.maybe_add(children, 'id', from_json_netinfra__netinfra__router__id, child_id)
-    child_type = yang.gdata.take_json_opt_str(jd, 'type')
+    child_type = yang.gdata.take_json_str(jd, 'type')
     yang.gdata.maybe_add(children, 'type', from_json_netinfra__netinfra__router__type, child_type)
     child_role = yang.gdata.take_json_opt_str(jd, 'role')
     yang.gdata.maybe_add(children, 'role', from_json_netinfra__netinfra__router__role, child_role)
@@ -4519,7 +4517,7 @@ class netinfra__netinfra(yang.adata.MNode):
         for _element in _router.elements:
             res.append('')
             res.append("# List /netinfra/router element: {_element.to_gdata().key_str(['name'])}")
-            list_elem = 'router_element = {self_name}.router.create({repr(_element.name)}, {repr(_element.id)}, {repr(_element.asn)})'
+            list_elem = 'router_element = {self_name}.router.create({repr(_element.name)}, {repr(_element.id)}, {repr(_element.type)}, {repr(_element.asn)})'
             res.append(list_elem)
             res.extend(_element.prsrc('router_element', False, list_element=True).splitlines())
         _backbone_link = self.backbone_link

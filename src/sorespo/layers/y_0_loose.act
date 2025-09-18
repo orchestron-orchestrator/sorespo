@@ -3502,6 +3502,7 @@ identity urllc {
       }
       leaf type {
         type string;
+        mandatory true;
       }
       leaf role {
         type string;
@@ -4142,7 +4143,7 @@ class netinfra__netinfra__router(yang.adata.MNode):
         self._name = 'router'
         self.elements = elements
 
-    mut def create(self, name, id, asn):
+    mut def create(self, name, id, type, asn):
         for e in self.elements:
             match = True
             if e.name != name:
@@ -4151,7 +4152,7 @@ class netinfra__netinfra__router(yang.adata.MNode):
             if match:
                 return e
 
-        res = netinfra__netinfra__router_entry(name, id, asn)
+        res = netinfra__netinfra__router_entry(name, id, type, asn)
         self.elements.append(res)
         return res
 
