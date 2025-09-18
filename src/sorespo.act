@@ -11,9 +11,6 @@ import orchestron.ttt as ttt
 import yang.adata
 import yang.gdata
 
-import tmf.tmf641
-import sorespo.tmf
-
 import sorespo.layers
 import sorespo.layers.y_0_loose as cfs_layer
 import sorespo.layers.y_0
@@ -83,12 +80,10 @@ actor main(env):
 
     dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, env.cap, logh_dev)
     cfs = sorespo.layers.get_layers(dev_registry, logh_ttt)
-    rfs = cfs.below().below()
+    rfs = cfs.below()
     dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
 
     tcpl_cap = net.TCPListenCap(net.TCPCap(net.NetCap(env.cap)))
-
-    tmf_store = sorespo.tmf.SOStore()
 
     def _on_http_accept(server):
         server.cb_install(_on_http_server_request, _on_http_server_error)
@@ -144,47 +139,6 @@ actor main(env):
                         return
 
             # Other /config-queue operations could go here
-            respond(404, {}, "Not found")
-            return
-
-        if len(path_elements) > 1 and path_elements[1] == "tmf-api":
-            # GET /tmf-api/serviceOrdering/v4/serviceOrder/{id}
-            if request.method == "GET":
-                if len(path_elements) == 5 and path_elements[2] == "serviceOrdering" and path_elements[3] == "v4" and path_elements[4] == "serviceOrder":
-                    res = [so.to_json() for so in tmf_store.get_service_orders()]
-                    respond(200, {}, json.encode({"items": res}))
-                    return
-
-                elif len(path_elements) == 6 and path_elements[2] == "serviceOrdering" and path_elements[3] == "v4" and path_elements[4] == "serviceOrder":
-                    try:
-                        so_id = path_elements[5]
-                        sr = tmf_store.get_service_order(so_id)
-                        if sr is not None:
-                            respond(200, {}, json.encode(sr.to_json()))
-                            return
-                        else:
-                            respond(404, {}, "Not found")
-                            return
-                    except Exception as e:
-                        respond(400, {}, "Error getting service order: {e}")
-                        return
-
-            # POST /tmf-api/serviceOrdering/v4/serviceOrder
-            if request.method == "POST":
-                if len(path_elements) > 3 and path_elements[2] == "serviceOrdering" and path_elements[3] == "v4" and path_elements[4] == "serviceOrder":
-                    so_in = json.decode(request.body.decode())
-                    try:
-                        sr = tmf_store.create_service_order(so_in)
-                        sr_diff = sr.diff
-                        if sr_diff is not None:
-                            session = cfs.newsession()
-                            session.edit_config(sr_diff, config_done)
-                        return
-                    except Exception as e:
-                        respond(400, {}, "Error creating service order: {e}")
-                        return
-
-            # no more tmf-api
             respond(404, {}, "Not found")
             return
 

@@ -39,7 +39,6 @@ wait: $(addprefix platform-wait-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 .PHONY: copy
 copy:
 	docker cp ../../out/bin/sorespo $(TESTENV)-otron:/sorespo
-	docker cp l3vpn-svc.xml $(TESTENV)-otron:/l3vpn-svc.xml
 	docker cp netinfra.xml $(TESTENV)-otron:/netinfra.xml
 
 .PHONY: run
@@ -52,12 +51,11 @@ endif
 
 .PHONY: run-and-configure
 run-and-configure:
-	docker exec $(INTERACTIVE) -e EXIT_ON_DONE=$(CI) $(TESTENV)-otron /sorespo netinfra.xml l3vpn-svc.xml --rts-bt-dbg
+	docker exec $(INTERACTIVE) -e EXIT_ON_DONE=$(CI) $(TESTENV)-otron /sorespo netinfra.xml --rts-bt-dbg
 
 .PHONY: configure
 configure:
 	$(MAKE) FILE="netinfra.xml" send-config
-	$(MAKE) FILE="l3vpn-svc.xml" send-config
 
 .PHONY: tutorial
 tutorial:

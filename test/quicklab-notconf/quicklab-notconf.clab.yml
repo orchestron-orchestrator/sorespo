@@ -18,36 +18,6 @@ topology:
       image: ghcr.io/notconf/notconf-cisco-xr:2411
       binds:
         - clab-admin.xml:/yang-modules/startup/clab-admin.xml
-    fra-core-1:
-      kind: linux
-      image: ghcr.io/notconf/notconf-cisco-xr:2411
-      binds:
-        - clab-admin.xml:/yang-modules/startup/clab-admin.xml
-    sto-core-1:
-      kind: linux
-      image: ghcr.io/notconf/notconf
-      # image: ghcr.io/notconf/notconf-junos:23.4R1
-      # The ghcr.io/notconf/notconf-junos:23.4R1 was built using the "native"
-      # YANG modules obtained from
-      # https://github.com/Juniper/yang/tree/master/23.4/23.4R1/native/conf-and-rpcs/junos/conf/models.
-      # The modules are structured such that they augment the root module
-      # junos-conf-root with their own structures. This means different parts
-      # of the tree use different XML namespaces. In contrast, on cRPD it
-      # appears as if the entire config tree is in a single root top-level
-      # namespace. The sorespo YANG modules are structued as a mix of both
-      # (which is a bit of a hacky shortcut anyway), but nevertheless it works
-      # even if orchestron sends extra XML namespaces. notconf is more strict
-      # regarding namespacing, so we instead use the exact same YANG modules
-      # that were used to build adata for sorespo.
-      binds:
-        - ../../gen/yang/JuniperCRPD_23_4R1_9:/yang-modules
-        - clab-admin.xml:/yang-modules/startup/clab-admin.xml
-    lju-core-1:
-      kind: linux
-      image: ghcr.io/notconf/notconf
-      binds:
-        - ../../gen/yang/JuniperCRPD_23_4R1_9:/yang-modules
-        - clab-admin.xml:/yang-modules/startup/clab-admin.xml
     otron:
       kind: linux
       image: sorespo-otron-base
