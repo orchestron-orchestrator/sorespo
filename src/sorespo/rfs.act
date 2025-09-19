@@ -60,6 +60,8 @@ class BaseConfig(base.BaseConfig):
             intf = dev.interfaces.interface.create("Loopback0")
             intf.ipv4.addresses.create_address(i.ipv4_address, "255.255.255.255")
 
+            oob_intf = dev.interfaces.interface.create("MgmtEth0/RP0/CPU0/0")
+
             # IS-IS global config
             ip = dev.um_router_isis_cfg_router.isis.processes.process.create("1")
             ip.is_type = "level-2-only"
@@ -308,7 +310,6 @@ class BBInterface(base.BBInterface):
             # Create the interface
             intf = dev.interfaces.interface.create(i.name)
             intf.description = "Link to {i.remote.device} [{i.remote.interface}]"
-            intf.shutdown = False
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(i.ipv4_prefix_length))
@@ -461,8 +462,8 @@ class Vrf(base.Vrf):
             vrf = dev.vrfs.vrf.create(i.name)
             vrf.description = i.description
             ipv4_unicast = vrf.address_family.ipv4.create_unicast()
-            ipv4_unicast.import_.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, int(i.id), False)
-            ipv4_unicast.export.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, int(i.id), False)
+            ipv4_unicast.import_.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, int(i.id), True)
+            ipv4_unicast.export.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, int(i.id), True)
 
             # Create RD in BGP VRF
             bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(str(i.asn))
@@ -544,10 +545,8 @@ class VrfInterface(base.VrfInterface):
 
             # Main interface config
             intf = dev.interfaces.interface.create(main_intf)
-            intf.shutdown = False
             sub_intf = dev.interfaces.interface.create(i.name)
             sub_intf.description = i.description
-            sub_intf.shutdown = False
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 sub_intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(i.ipv4_prefix_length))
