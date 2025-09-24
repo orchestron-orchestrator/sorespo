@@ -80,6 +80,10 @@ class orchestron_device__devices__device_entry(yang.adata.MNode):
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_device__devices__device_entry:
         return orchestron_device__devices__device_entry(name=n.get_str('name'), modset_id=n.get_opt_str('modset_id'))
 
+    def copy(self):
+        """Create a deep copy of this adata object"""
+        return orchestron_device__devices__device_entry.from_gdata(self.to_gdata())
+
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
         if top:
@@ -134,6 +138,16 @@ class orchestron_device__devices__device(yang.adata.MNode):
         if n is not None:
             return [orchestron_device__devices__device_entry.from_gdata(e) for e in n.elements]
         return []
+
+    def copy(self):
+        """Create a deep copy of this list object"""
+        # Copy each element in the list
+        copied_elements = []
+        for e in self.elements:
+            ce = e.copy()
+            if ce is not None:
+                copied_elements.append(ce)
+        return orchestron_device__devices__device(elements=copied_elements)
 
 
 mut def from_xml_orchestron_device__devices__device_element(node: xml.Node) -> yang.gdata.Node:
@@ -227,6 +241,10 @@ class orchestron_device__devices(yang.adata.MNode):
             return orchestron_device__devices(device=orchestron_device__devices__device.from_gdata(n.get_opt_list('device')))
         return orchestron_device__devices()
 
+    def copy(self):
+        """Create a deep copy of this adata object"""
+        return orchestron_device__devices.from_gdata(self.to_gdata())
+
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
         if top:
@@ -301,6 +319,10 @@ class root(yang.adata.MNode):
         if n is not None:
             return root(devices=orchestron_device__devices.from_gdata(n.get_opt_cnt('devices')))
         return root()
+
+    def copy(self):
+        """Create a deep copy of this adata object"""
+        return root.from_gdata(self.to_gdata())
 
     def prsrc(self, self_name='ad', top=True, list_element=False):
         res = []
