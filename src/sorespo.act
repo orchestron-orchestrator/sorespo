@@ -10,6 +10,7 @@ import orchestron.device as odev
 import orchestron.ttt as ttt
 import yang.adata
 import yang.gdata
+import yang.gen3
 
 import tmf.tmf641
 import sorespo.tmf
@@ -203,7 +204,8 @@ actor main(env):
                 return
             
             if len(path_elements) > 3 and path_elements[1] == "device":
-                def respond_with_data(data: ?yang.gdata.Node, schema: odev.DeviceSchema, accept_header: ?str):
+                # TODO; this is not used anywhere?!
+                def respond_with_data(data: ?yang.gdata.Node, dev: odev.DeviceMgr, accept_header: ?str):
                     aheader = accept_header if accept_header is not None else "application/yang-data+json"
                     if data is not None:
                         if aheader == "application/yang-data+json":
@@ -211,8 +213,12 @@ actor main(env):
                         elif aheader == "application/yang-data+xml":
                             out_data = data.to_xmlstr()
                         elif aheader == "application/yang-data+acton-adata":
-                            adata = schema.from_gdata(data)
-                            out_data = adata.prsrc()
+                            schema = dev.get_schema()
+                            if schema is not None:
+                                out_data = yang.gen3.pradata(schema, data, loose=True)
+                            else:
+                                respond(500, {}, "Schemas not compiled")
+                                return
                         else:
                             respond(404, {}, "Unsupported media type")
                             return
@@ -258,8 +264,12 @@ actor main(env):
                                 elif format_type == "gdata":
                                     diff_str = config_diff.prsrc()
                                 elif format_type == "adata":
-                                    # adata conversion would need schema
                                     diff_str = "# Adata format not available for diff"
+                                    schema = dev.get_schema()
+                                    if schema is not None:
+                                        diff_str = yang.gen3.pradata(schema, config_diff, loose=True)
+                                    else:
+                                        diff_str = "# Adata format not available for diff"
                                 else:
                                     diff_str = config_diff.to_json()  # default to json
                                 respond(200, {"Content-Type": "text/plain"}, diff_str)
@@ -316,8 +326,12 @@ actor main(env):
                             elif format_type == "gdata":
                                 conf_str = running_conf.prsrc()
                             elif format_type == "adata":
-                                # adata conversion would need schema
                                 conf_str = "# Adata format not available"
+                                schema = dev.get_schema()
+                                if schema is not None:
+                                    conf_str = yang.gen3.pradata(schema, running_conf, loose=True)
+                                else:
+                                    conf_str = "# Adata format not available"
                             else:
                                 conf_str = running_conf.to_json()  # default to json
                             respond(200, {"Content-Type": "text/plain"}, conf_str)
