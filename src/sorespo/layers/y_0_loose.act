@@ -673,7 +673,10 @@ SRC_DNODE = DRoot(identities=[
             DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='role', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
             DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='asn', config=True, mandatory=True, type_=DTypeInteger(name='inet:as-number', description='The as-number type represents autonomous system numbers\nwhich identify an Autonomous System (AS).  An AS is a set\nof routers under a single technical administration, using\nan interior gateway protocol and common metrics to route\npackets within the AS, and using an exterior gateway\nprotocol to route packets to other ASes.  IANA maintains\nthe AS number space and has delegated large parts to the\nregional registries.\n\nAutonomous system numbers were originally limited to 16\nbits.  BGP extensions have enlarged the autonomous system\nnumber space to 32 bits.  This type therefore uses an uint32\nbase type without a range restriction in order to support\na larger autonomous system number space.\n\nIn the value set and its semantics, this type is equivalent\nto the InetAutonomousSystemNumber textual convention of\nthe SMIv2.', reference='RFC 1930: Guidelines for creation, selection, and registration\n          of an Autonomous System (AS)\nRFC 4271: A Border Gateway Protocol 4 (BGP-4)\nRFC 4001: Textual Conventions for Internet Network Addresses\nRFC 6793: BGP Support for Four-Octet Autonomous System (AS)\n          Number Space', exts=[], builtin_type='uint32', default=None, ranges=Ranges([(bigint("0"), bigint("4294967295"))]))),
             DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='mock', config=True, mandatory=False, type_=DTypeEnum(name='enumeration', description=None, reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'cisco-ios-xr':0, 'juniper-junos':1})),
-            DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='approval-required', config=True, default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
+            DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='approval-required', config=True, default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
+            DContainer(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='feature-flags', config=True, presence=False, children=[
+                DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='runtime-schema-fetch', config=True, default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
+            ])
         ]),
         DList(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='backbone-link', key=[
 'left-router',
@@ -4554,6 +4557,12 @@ identity urllc {
       leaf approval-required {
         type boolean;
         default false;
+      }
+      container feature-flags {
+        leaf runtime-schema-fetch {
+          type boolean;
+          default false;
+        }
       }
     }
 
@@ -8562,6 +8571,34 @@ class orchestron_tmf__tmf_store(yang.adata.MNode):
         return orchestron_tmf__tmf_store.from_gdata(self.to_gdata())
 
 
+class netinfra__netinfra__router__feature_flags(yang.adata.MNode):
+    runtime_schema_fetch: ?bool
+
+    mut def __init__(self, runtime_schema_fetch: ?bool):
+        self._ns = 'http://example.com/netinfra'
+        self.runtime_schema_fetch = runtime_schema_fetch
+
+    def _get_attr(self, name: str) -> ?value:
+        if name == 'runtime_schema_fetch':
+            return self.runtime_schema_fetch
+        raise ValueError('Attribute {name} not found in netinfra__netinfra__router__feature_flags')
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        if isinstance(self, yang.adata.MNode):
+            return yang.gen3.from_data(SRC_DNODE, self, loose=True, root_path=['netinfra:netinfra', 'router', 'feature-flags'])
+        raise ValueError('unreachable')
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> netinfra__netinfra__router__feature_flags:
+        if n is not None:
+            return netinfra__netinfra__router__feature_flags(runtime_schema_fetch=n.get_opt_bool(yang.gdata.Id(NS_netinfra, 'runtime-schema-fetch')))
+        return netinfra__netinfra__router__feature_flags()
+
+    def copy(self):
+        """Create a deep copy of this adata object"""
+        return netinfra__netinfra__router__feature_flags.from_gdata(self.to_gdata())
+
+
 class netinfra__netinfra__router_entry(yang.adata.MNode):
     name: str
     id: ?u64
@@ -8570,8 +8607,9 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
     asn: ?u64
     mock: ?str
     approval_required: ?bool
+    feature_flags: netinfra__netinfra__router__feature_flags
 
-    mut def __init__(self, name: str, id: ?u64, type: ?str, role: ?str, asn: ?u64, mock: ?str, approval_required: ?bool):
+    mut def __init__(self, name: str, id: ?u64, type: ?str, role: ?str, asn: ?u64, mock: ?str, approval_required: ?bool, feature_flags: ?netinfra__netinfra__router__feature_flags=None):
         self._ns = 'http://example.com/netinfra'
         self.name = name
         self.id = id
@@ -8580,6 +8618,7 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
         self.asn = asn
         self.mock = mock
         self.approval_required = approval_required
+        self.feature_flags = feature_flags if feature_flags is not None else netinfra__netinfra__router__feature_flags()
 
     def _get_attr(self, name: str) -> ?value:
         if name == 'name':
@@ -8596,6 +8635,8 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
             return self.mock
         if name == 'approval_required':
             return self.approval_required
+        if name == 'feature_flags':
+            return self.feature_flags
         raise ValueError('Attribute {name} not found in netinfra__netinfra__router')
 
     mut def to_gdata(self) -> yang.gdata.Node:
@@ -8605,7 +8646,7 @@ class netinfra__netinfra__router_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra__netinfra__router_entry:
-        return netinfra__netinfra__router_entry(name=n.get_str(yang.gdata.Id(NS_netinfra, 'name')), id=n.get_opt_u64(yang.gdata.Id(NS_netinfra, 'id')), type=n.get_opt_str(yang.gdata.Id(NS_netinfra, 'type')), role=n.get_opt_str(yang.gdata.Id(NS_netinfra, 'role')), asn=n.get_opt_u64(yang.gdata.Id(NS_netinfra, 'asn')), mock=n.get_opt_str(yang.gdata.Id(NS_netinfra, 'mock')), approval_required=n.get_opt_bool(yang.gdata.Id(NS_netinfra, 'approval-required')))
+        return netinfra__netinfra__router_entry(name=n.get_str(yang.gdata.Id(NS_netinfra, 'name')), id=n.get_opt_u64(yang.gdata.Id(NS_netinfra, 'id')), type=n.get_opt_str(yang.gdata.Id(NS_netinfra, 'type')), role=n.get_opt_str(yang.gdata.Id(NS_netinfra, 'role')), asn=n.get_opt_u64(yang.gdata.Id(NS_netinfra, 'asn')), mock=n.get_opt_str(yang.gdata.Id(NS_netinfra, 'mock')), approval_required=n.get_opt_bool(yang.gdata.Id(NS_netinfra, 'approval-required')), feature_flags=netinfra__netinfra__router__feature_flags.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_netinfra, 'feature-flags'))))
 
     def copy(self):
         """Create a deep copy of this adata object"""
