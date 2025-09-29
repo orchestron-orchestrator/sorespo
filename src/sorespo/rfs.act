@@ -261,7 +261,7 @@ actor BBInterfaceTransform(update_dynstate: proc(?orchestron_rfs__rfs__backbone_
                 # print("BBInterfaceTransform.isis_response: {output.to_gdata().to_xmlstr()}, {error}")
                 iai = output.isis_adjacency_information
                 if iai is not None:
-                    for ia in iai.isis_adjacency.elements:
+                    for ia in iai.isis_adjacency:
                         if ia.interface_name == interface_name:
                             isis_healthy = (ia.adjacency_state == "Up")
                             update_health_state()
@@ -272,7 +272,7 @@ actor BBInterfaceTransform(update_dynstate: proc(?orchestron_rfs__rfs__backbone_
                 # print("BBInterfaceTransform.ldp_response: {output.to_gdata().to_xmlstr()}, {error}")
                 lni = output.ldp_neighbor_information
                 if lni is not None:
-                    for ln in lni.ldp_neighbor.elements:
+                    for ln in lni.ldp_neighbor:
                         if ln.interface_name == interface_name:
                             ldp_healthy = (ln.ldp_neighbor_address != "")
                             update_health_state()

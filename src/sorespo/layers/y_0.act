@@ -4139,7 +4139,7 @@ class netinfra__netinfra__router(yang.adata.MNode):
         self.elements = elements
 
     mut def create(self, name, id, type, asn):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.name != name:
                 match = False
@@ -4153,7 +4153,7 @@ class netinfra__netinfra__router(yang.adata.MNode):
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -4169,12 +4169,15 @@ class netinfra__netinfra__router(yang.adata.MNode):
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return netinfra__netinfra__router(elements=copied_elements)
 
+extension netinfra__netinfra__router(Iterable[netinfra__netinfra__router_entry]):
+    def __iter__(self) -> Iterator[netinfra__netinfra__router_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_netinfra__netinfra__router_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -4378,7 +4381,7 @@ class netinfra__netinfra__backbone_link(yang.adata.MNode):
         self.elements = elements
 
     mut def create(self, left_router, left_interface, right_router, right_interface):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.left_router != left_router:
                 match = False
@@ -4401,7 +4404,7 @@ class netinfra__netinfra__backbone_link(yang.adata.MNode):
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -4417,12 +4420,15 @@ class netinfra__netinfra__backbone_link(yang.adata.MNode):
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return netinfra__netinfra__backbone_link(elements=copied_elements)
 
+extension netinfra__netinfra__backbone_link(Iterable[netinfra__netinfra__backbone_link_entry]):
+    def __iter__(self) -> Iterator[netinfra__netinfra__backbone_link_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_netinfra__netinfra__backbone_link_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -4546,14 +4552,14 @@ class netinfra__netinfra(yang.adata.MNode):
             res.append('{self_name} = netinfra__netinfra()')
         leaves = []
         _router = self.router
-        for _element in _router.elements:
+        for _element in _router:
             res.append('')
             res.append("# List /netinfra/router element: {_element.to_gdata().key_str(['name'])}")
             list_elem = 'router_element = {self_name}.router.create({repr(_element.name)}, {repr(_element.id)}, {repr(_element.type)}, {repr(_element.asn)})'
             res.append(list_elem)
             res.extend(_element.prsrc('router_element', False, list_element=True).splitlines())
         _backbone_link = self.backbone_link
-        for _element in _backbone_link.elements:
+        for _element in _backbone_link:
             res.append('')
             res.append("# List /netinfra/backbone-link element: {_element.to_gdata().key_str(['left-router', 'left-interface', 'right-router', 'right-interface'])}")
             list_elem = 'backbone_link_element = {self_name}.backbone_link.create({repr(_element.left_router)}, {repr(_element.left_interface)}, {repr(_element.right_router)}, {repr(_element.right_interface)})'
@@ -4662,7 +4668,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud
         self.elements = elements
 
     mut def create(self, id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.id != id:
                 match = False
@@ -4676,7 +4682,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -4692,12 +4698,15 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier(Iterable[ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -4818,7 +4827,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encry
         self.elements = elements
 
     mut def create(self, id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.id != id:
                 match = False
@@ -4832,7 +4841,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encry
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -4848,12 +4857,15 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encry
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier(Iterable[ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -4974,7 +4986,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_p
         self.elements = elements
 
     mut def create(self, id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.id != id:
                 match = False
@@ -4988,7 +5000,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_p
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -5004,12 +5016,15 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_p
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier(Iterable[ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -5130,7 +5145,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_p
         self.elements = elements
 
     mut def create(self, id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.id != id:
                 match = False
@@ -5144,7 +5159,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_p
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -5160,12 +5175,15 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_p
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier(Iterable[ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -5278,28 +5296,28 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers(yang.a
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers()')
         leaves = []
         _cloud_identifier = self.cloud_identifier
-        for _element in _cloud_identifier.elements:
+        for _element in _cloud_identifier:
             res.append('')
             res.append("# List /l3vpn-svc/vpn-profiles/valid-provider-identifiers/cloud-identifier element: {_element.to_gdata().key_str(['id'])}")
             list_elem = 'cloud_identifier_element = {self_name}.cloud_identifier.create({repr(_element.id)})'
             res.append(list_elem)
             res.extend(_element.prsrc('cloud_identifier_element', False, list_element=True).splitlines())
         _encryption_profile_identifier = self.encryption_profile_identifier
-        for _element in _encryption_profile_identifier.elements:
+        for _element in _encryption_profile_identifier:
             res.append('')
             res.append("# List /l3vpn-svc/vpn-profiles/valid-provider-identifiers/encryption-profile-identifier element: {_element.to_gdata().key_str(['id'])}")
             list_elem = 'encryption_profile_identifier_element = {self_name}.encryption_profile_identifier.create({repr(_element.id)})'
             res.append(list_elem)
             res.extend(_element.prsrc('encryption_profile_identifier_element', False, list_element=True).splitlines())
         _qos_profile_identifier = self.qos_profile_identifier
-        for _element in _qos_profile_identifier.elements:
+        for _element in _qos_profile_identifier:
             res.append('')
             res.append("# List /l3vpn-svc/vpn-profiles/valid-provider-identifiers/qos-profile-identifier element: {_element.to_gdata().key_str(['id'])}")
             list_elem = 'qos_profile_identifier_element = {self_name}.qos_profile_identifier.create({repr(_element.id)})'
             res.append(list_elem)
             res.extend(_element.prsrc('qos_profile_identifier_element', False, list_element=True).splitlines())
         _bfd_profile_identifier = self.bfd_profile_identifier
-        for _element in _bfd_profile_identifier.elements:
+        for _element in _bfd_profile_identifier:
             res.append('')
             res.append("# List /l3vpn-svc/vpn-profiles/valid-provider-identifiers/bfd-profile-identifier element: {_element.to_gdata().key_str(['id'])}")
             list_elem = 'bfd_profile_identifier_element = {self_name}.bfd_profile_identifier.create({repr(_element.id)})'
@@ -5748,7 +5766,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__clou
         self.elements = elements
 
     mut def create(self, cloud_identifier):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.cloud_identifier != cloud_identifier:
                 match = False
@@ -5762,7 +5780,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__clou
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -5778,12 +5796,15 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__clou
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access(Iterable[ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -5905,7 +5926,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses(yang.
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses()')
         leaves = []
         _cloud_access = self.cloud_access
-        for _element in _cloud_access.elements:
+        for _element in _cloud_access:
             res.append('')
             res.append("# List /l3vpn-svc/vpn-services/vpn-service/cloud-accesses/cloud-access element: {_element.to_gdata().key_str(['cloud-identifier'])}")
             list_elem = 'cloud_access_element = {self_name}.cloud_access.create({repr(_element.cloud_identifier)})'
@@ -6289,7 +6310,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
         self.elements = elements
 
     mut def create(self, id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.id != id:
                 match = False
@@ -6303,7 +6324,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -6319,12 +6340,15 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group(Iterable[ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -6440,7 +6464,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups()')
         leaves = []
         _group = self.group
-        for _element in _group.elements:
+        for _element in _group:
             res.append('')
             res.append("# List /l3vpn-svc/vpn-services/vpn-service/multicast/rp/rp-group-mappings/rp-group-mapping/groups/group element: {_element.to_gdata().key_str(['id'])}")
             list_elem = 'group_element = {self_name}.group.create({repr(_element.id)})'
@@ -6557,7 +6581,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
         self.elements = elements
 
     mut def create(self, id, rp_address):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.id != id:
                 match = False
@@ -6571,7 +6595,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -6587,12 +6611,15 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping(Iterable[ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -6708,7 +6735,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings()')
         leaves = []
         _rp_group_mapping = self.rp_group_mapping
-        for _element in _rp_group_mapping.elements:
+        for _element in _rp_group_mapping:
             res.append('')
             res.append("# List /l3vpn-svc/vpn-services/vpn-service/multicast/rp/rp-group-mappings/rp-group-mapping element: {_element.to_gdata().key_str(['id'])}")
             list_elem = 'rp_group_mapping_element = {self_name}.rp_group_mapping.create({repr(_element.id)}, {repr(_element.rp_address)})'
@@ -7233,7 +7260,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extra
         self.elements = elements
 
     mut def create(self, vpn_id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.vpn_id != vpn_id:
                 match = False
@@ -7247,7 +7274,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extra
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -7263,12 +7290,15 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extra
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn(Iterable[ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -7372,7 +7402,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns(yang.a
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns()')
         leaves = []
         _extranet_vpn = self.extranet_vpn
-        for _element in _extranet_vpn.elements:
+        for _element in _extranet_vpn:
             res.append('')
             res.append("# List /l3vpn-svc/vpn-services/vpn-service/extranet-vpns/extranet-vpn element: {_element.to_gdata().key_str(['vpn-id'])}")
             list_elem = 'extranet_vpn_element = {self_name}.extranet_vpn.create({repr(_element.vpn_id)})'
@@ -7525,7 +7555,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service(yang.adata.MNode):
         self.elements = elements
 
     mut def create(self, vpn_id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.vpn_id != vpn_id:
                 match = False
@@ -7539,7 +7569,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service(yang.adata.MNode):
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -7555,12 +7585,15 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service(yang.adata.MNode):
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service(Iterable[ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -7694,7 +7727,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services(yang.adata.MNode):
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__vpn_services()')
         leaves = []
         _vpn_service = self.vpn_service
-        for _element in _vpn_service.elements:
+        for _element in _vpn_service:
             res.append('')
             res.append("# List /l3vpn-svc/vpn-services/vpn-service element: {_element.to_gdata().key_str(['vpn-id'])}")
             list_elem = 'vpn_service_element = {self_name}.vpn_service.create({repr(_element.vpn_id)})'
@@ -7884,7 +7917,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location(yang.adata.MNo
         self.elements = elements
 
     mut def create(self, location_id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.location_id != location_id:
                 match = False
@@ -7898,7 +7931,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location(yang.adata.MNo
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -7914,12 +7947,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location(yang.adata.MNo
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -8047,7 +8083,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__locations(yang.adata.MNode):
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__locations()')
         leaves = []
         _location = self.location
-        for _element in _location.elements:
+        for _element in _location:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/locations/location element: {_element.to_gdata().key_str(['location-id'])}")
             list_elem = 'location_element = {self_name}.location.create({repr(_element.location_id)})'
@@ -8266,7 +8302,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device(yang.adata.MNode):
         self.elements = elements
 
     mut def create(self, device_id, location, management):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.device_id != device_id:
                 match = False
@@ -8280,7 +8316,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device(yang.adata.MNode):
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -8296,12 +8332,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device(yang.adata.MNode):
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -8411,7 +8450,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__devices(yang.adata.MNode):
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__devices()')
         leaves = []
         _device = self.device
-        for _element in _device.elements:
+        for _element in _device:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/devices/device element: {_element.to_gdata().key_str(['device-id'])}")
             res.append('element_management = ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device__management({repr(_element.management.address)})')
@@ -8514,7 +8553,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group(yang
         self.elements = elements
 
     mut def create(self, group_id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.group_id != group_id:
                 match = False
@@ -8528,7 +8567,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group(yang
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -8544,12 +8583,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group(yang
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -8647,7 +8689,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups(yang.adata.
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups()')
         leaves = []
         _group = self.group
-        for _element in _group.elements:
+        for _element in _group:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/site-diversity/groups/group element: {_element.to_gdata().key_str(['group-id'])}")
             list_elem = 'group_element = {self_name}.group.create({repr(_element.group_id)})'
@@ -8981,7 +9023,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
         self.elements = elements
 
     mut def create(self, type):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.type != type:
                 match = False
@@ -8995,7 +9037,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -9011,12 +9053,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -9132,7 +9177,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters()')
         leaves = []
         _filter = self.filter
-        for _element in _filter.elements:
+        for _element in _filter:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/vpn-policies/vpn-policy/entries/filters/filter element: {_element.to_gdata().key_str(['type'])}")
             list_elem = 'filter_element = {self_name}.filter.create({repr(_element.type)})'
@@ -9265,7 +9310,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
         self.elements = elements
 
     mut def create(self, vpn_id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.vpn_id != vpn_id:
                 match = False
@@ -9279,7 +9324,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -9295,12 +9340,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -9415,7 +9463,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
         if _filters is not None:
             res.extend(_filters.prsrc('{self_name}.filters', False).splitlines())
         _vpn = self.vpn
-        for _element in _vpn.elements:
+        for _element in _vpn:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/vpn-policies/vpn-policy/entries/vpn element: {_element.to_gdata().key_str(['vpn-id'])}")
             list_elem = 'vpn_element = {self_name}.vpn.create({repr(_element.vpn_id)})'
@@ -9441,7 +9489,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries(
         self.elements = elements
 
     mut def create(self, id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.id != id:
                 match = False
@@ -9455,7 +9503,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries(
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -9471,12 +9519,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries(
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -9589,7 +9640,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy_entry(yan
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy({repr(self.vpn_policy_id)})')
         leaves = []
         _entries = self.entries
-        for _element in _entries.elements:
+        for _element in _entries:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/vpn-policies/vpn-policy/entries element: {_element.to_gdata().key_str(['id'])}")
             list_elem = 'entries_element = {self_name}.entries.create({repr(_element.id)})'
@@ -9615,7 +9666,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy(yang.adat
         self.elements = elements
 
     mut def create(self, vpn_policy_id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.vpn_policy_id != vpn_policy_id:
                 match = False
@@ -9629,7 +9680,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy(yang.adat
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -9645,12 +9696,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy(yang.adat
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -9754,7 +9808,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies(yang.adata.MNode):
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies()')
         leaves = []
         _vpn_policy = self.vpn_policy
-        for _element in _vpn_policy.elements:
+        for _element in _vpn_policy:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/vpn-policies/vpn-policy element: {_element.to_gdata().key_str(['vpn-policy-id'])}")
             list_elem = 'vpn_policy_element = {self_name}.vpn_policy.create({repr(_element.vpn_policy_id)})'
@@ -9884,7 +9938,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family(yan
         self.elements = elements
 
     mut def create(self, af):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.af != af:
                 match = False
@@ -9898,7 +9952,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family(yan
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -9914,12 +9968,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family(yan
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -10023,7 +10080,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes(yang.adata.MNode):
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes()')
         leaves = []
         _address_family = self.address_family
-        for _element in _address_family.elements:
+        for _element in _address_family:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/maximum-routes/address-family element: {_element.to_gdata().key_str(['af'])}")
             list_elem = 'address_family_element = {self_name}.address_family.create({repr(_element.af)})'
@@ -11050,7 +11107,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_p
         self.elements = elements
 
     mut def create(self, id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.id != id:
                 match = False
@@ -11064,7 +11121,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_p
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -11080,12 +11137,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_p
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -11201,7 +11261,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_p
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy()')
         leaves = []
         _rule = self.rule
-        for _element in _rule.elements:
+        for _element in _rule:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/service/qos/qos-classification-policy/rule element: {_element.to_gdata().key_str(['id'])}")
             list_elem = 'rule_element = {self_name}.rule.create({repr(_element.id)})'
@@ -11676,7 +11736,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes
         self.elements = elements
 
     mut def create(self, class_id, bandwidth):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.class_id != class_id:
                 match = False
@@ -11690,7 +11750,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -11706,12 +11766,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -11839,7 +11902,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes()')
         leaves = []
         _class_ = self.class_
-        for _element in _class_.elements:
+        for _element in _class_:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/service/qos/qos-profile/classes/class element: {_element.to_gdata().key_str(['class-id'])}")
             res.append('element_bandwidth = ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__bandwidth({repr(_element.bandwidth.guaranteed_bw_percent)})')
@@ -12647,7 +12710,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         self.elements = elements
 
     mut def create(self, target_site):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.target_site != target_site:
                 match = False
@@ -12661,7 +12724,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -12677,12 +12740,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -12786,7 +12852,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links()')
         leaves = []
         _sham_link = self.sham_link
-        for _element in _sham_link.elements:
+        for _element in _sham_link:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/routing-protocols/routing-protocol/ospf/sham-links/sham-link element: {_element.to_gdata().key_str(['target-site'])}")
             list_elem = 'sham_link_element = {self_name}.sham_link.create({repr(_element.target_site)})'
@@ -13124,7 +13190,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         self.elements = elements
 
     mut def create(self, lan, next_hop):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.lan != lan:
                 match = False
@@ -13141,7 +13207,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -13157,12 +13223,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -13319,7 +13388,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         self.elements = elements
 
     mut def create(self, lan, next_hop):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.lan != lan:
                 match = False
@@ -13336,7 +13405,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -13352,12 +13421,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -13471,14 +13543,14 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes()')
         leaves = []
         _ipv4_lan_prefixes = self.ipv4_lan_prefixes
-        for _element in _ipv4_lan_prefixes.elements:
+        for _element in _ipv4_lan_prefixes:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/routing-protocols/routing-protocol/static/cascaded-lan-prefixes/ipv4-lan-prefixes element: {_element.to_gdata().key_str(['lan', 'next-hop'])}")
             list_elem = 'ipv4_lan_prefixes_element = {self_name}.ipv4_lan_prefixes.create({repr(_element.lan)}, {repr(_element.next_hop)})'
             res.append(list_elem)
             res.extend(_element.prsrc('ipv4_lan_prefixes_element', False, list_element=True).splitlines())
         _ipv6_lan_prefixes = self.ipv6_lan_prefixes
-        for _element in _ipv6_lan_prefixes.elements:
+        for _element in _ipv6_lan_prefixes:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/routing-protocols/routing-protocol/static/cascaded-lan-prefixes/ipv6-lan-prefixes element: {_element.to_gdata().key_str(['lan', 'next-hop'])}")
             list_elem = 'ipv6_lan_prefixes_element = {self_name}.ipv6_lan_prefixes.create({repr(_element.lan)}, {repr(_element.next_hop)})'
@@ -13904,7 +13976,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         self.elements = elements
 
     mut def create(self, type):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.type != type:
                 match = False
@@ -13918,7 +13990,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -13934,12 +14006,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -14067,7 +14142,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols(yang.adata.MNode
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols()')
         leaves = []
         _routing_protocol = self.routing_protocol
-        for _element in _routing_protocol.elements:
+        for _element in _routing_protocol:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/routing-protocols/routing-protocol element: {_element.to_gdata().key_str(['type'])}")
             list_elem = 'routing_protocol_element = {self_name}.routing_protocol.create({repr(_element.type)})'
@@ -14201,7 +14276,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         self.elements = elements
 
     mut def create(self, group_id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.group_id != group_id:
                 match = False
@@ -14215,7 +14290,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -14231,12 +14306,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -14334,7 +14412,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups()')
         leaves = []
         _group = self.group
-        for _element in _group.elements:
+        for _element in _group:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/site-network-accesses/site-network-access/access-diversity/groups/group element: {_element.to_gdata().key_str(['group-id'])}")
             list_elem = 'group_element = {self_name}.group.create({repr(_element.group_id)})'
@@ -14450,7 +14528,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         self.elements = elements
 
     mut def create(self, group_id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.group_id != group_id:
                 match = False
@@ -14464,7 +14542,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -14480,12 +14558,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -14605,7 +14686,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target()')
         leaves = []
         _group = self.group
-        for _element in _group.elements:
+        for _element in _group:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/site-network-accesses/site-network-access/access-diversity/constraints/constraint/target/group element: {_element.to_gdata().key_str(['group-id'])}")
             list_elem = 'group_element = {self_name}.group.create({repr(_element.group_id)})'
@@ -14732,7 +14813,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         self.elements = elements
 
     mut def create(self, constraint_type):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.constraint_type != constraint_type:
                 match = False
@@ -14746,7 +14827,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -14762,12 +14843,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -14871,7 +14955,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints()')
         leaves = []
         _constraint = self.constraint
-        for _element in _constraint.elements:
+        for _element in _constraint:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/site-network-accesses/site-network-access/access-diversity/constraints/constraint element: {_element.to_gdata().key_str(['constraint-type'])}")
             list_elem = 'constraint_element = {self_name}.constraint.create({repr(_element.constraint_type)})'
@@ -15338,7 +15422,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         self.elements = elements
 
     mut def create(self, group_id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.group_id != group_id:
                 match = False
@@ -15352,7 +15436,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -15368,12 +15452,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -15483,7 +15570,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses()')
         leaves = []
         _address_group = self.address_group
-        for _element in _address_group.elements:
+        for _element in _address_group:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/site-network-accesses/site-network-access/ip-connection/ipv4/provider-dhcp/customer-addresses/address-group element: {_element.to_gdata().key_str(['group-id'])}")
             list_elem = 'address_group_element = {self_name}.address_group.create({repr(_element.group_id)})'
@@ -16201,7 +16288,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         self.elements = elements
 
     mut def create(self, group_id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.group_id != group_id:
                 match = False
@@ -16215,7 +16302,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -16231,12 +16318,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -16346,7 +16436,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses()')
         leaves = []
         _address_group = self.address_group
-        for _element in _address_group.elements:
+        for _element in _address_group:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/site-network-accesses/site-network-access/ip-connection/ipv6/provider-dhcp/customer-addresses/address-group element: {_element.to_gdata().key_str(['group-id'])}")
             list_elem = 'address_group_element = {self_name}.address_group.create({repr(_element.group_id)})'
@@ -18247,7 +18337,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         self.elements = elements
 
     mut def create(self, id):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.id != id:
                 match = False
@@ -18261,7 +18351,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -18277,12 +18367,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -18398,7 +18491,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy()')
         leaves = []
         _rule = self.rule
-        for _element in _rule.elements:
+        for _element in _rule:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/site-network-accesses/site-network-access/service/qos/qos-classification-policy/rule element: {_element.to_gdata().key_str(['id'])}")
             list_elem = 'rule_element = {self_name}.rule.create({repr(_element.id)})'
@@ -18873,7 +18966,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         self.elements = elements
 
     mut def create(self, class_id, bandwidth):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.class_id != class_id:
                 match = False
@@ -18887,7 +18980,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -18903,12 +18996,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -19036,7 +19132,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes()')
         leaves = []
         _class_ = self.class_
-        for _element in _class_.elements:
+        for _element in _class_:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/site-network-accesses/site-network-access/service/qos/qos-profile/classes/class element: {_element.to_gdata().key_str(['class-id'])}")
             res.append('element_bandwidth = ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__bandwidth({repr(_element.bandwidth.guaranteed_bw_percent)})')
@@ -19797,7 +19893,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         self.elements = elements
 
     mut def create(self, target_site):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.target_site != target_site:
                 match = False
@@ -19811,7 +19907,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -19827,12 +19923,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -19936,7 +20035,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links()')
         leaves = []
         _sham_link = self.sham_link
-        for _element in _sham_link.elements:
+        for _element in _sham_link:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/site-network-accesses/site-network-access/routing-protocols/routing-protocol/ospf/sham-links/sham-link element: {_element.to_gdata().key_str(['target-site'])}")
             list_elem = 'sham_link_element = {self_name}.sham_link.create({repr(_element.target_site)})'
@@ -20274,7 +20373,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         self.elements = elements
 
     mut def create(self, lan, next_hop):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.lan != lan:
                 match = False
@@ -20291,7 +20390,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -20307,12 +20406,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -20469,7 +20571,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         self.elements = elements
 
     mut def create(self, lan, next_hop):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.lan != lan:
                 match = False
@@ -20486,7 +20588,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -20502,12 +20604,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -20621,14 +20726,14 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes()')
         leaves = []
         _ipv4_lan_prefixes = self.ipv4_lan_prefixes
-        for _element in _ipv4_lan_prefixes.elements:
+        for _element in _ipv4_lan_prefixes:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/site-network-accesses/site-network-access/routing-protocols/routing-protocol/static/cascaded-lan-prefixes/ipv4-lan-prefixes element: {_element.to_gdata().key_str(['lan', 'next-hop'])}")
             list_elem = 'ipv4_lan_prefixes_element = {self_name}.ipv4_lan_prefixes.create({repr(_element.lan)}, {repr(_element.next_hop)})'
             res.append(list_elem)
             res.extend(_element.prsrc('ipv4_lan_prefixes_element', False, list_element=True).splitlines())
         _ipv6_lan_prefixes = self.ipv6_lan_prefixes
-        for _element in _ipv6_lan_prefixes.elements:
+        for _element in _ipv6_lan_prefixes:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/site-network-accesses/site-network-access/routing-protocols/routing-protocol/static/cascaded-lan-prefixes/ipv6-lan-prefixes element: {_element.to_gdata().key_str(['lan', 'next-hop'])}")
             list_elem = 'ipv6_lan_prefixes_element = {self_name}.ipv6_lan_prefixes.create({repr(_element.lan)}, {repr(_element.next_hop)})'
@@ -21054,7 +21159,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         self.elements = elements
 
     mut def create(self, type):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.type != type:
                 match = False
@@ -21068,7 +21173,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -21084,12 +21189,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -21217,7 +21325,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols()')
         leaves = []
         _routing_protocol = self.routing_protocol
-        for _element in _routing_protocol.elements:
+        for _element in _routing_protocol:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/site-network-accesses/site-network-access/routing-protocols/routing-protocol element: {_element.to_gdata().key_str(['type'])}")
             list_elem = 'routing_protocol_element = {self_name}.routing_protocol.create({repr(_element.type)})'
@@ -21628,7 +21736,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         self.elements = elements
 
     mut def create(self, site_network_access_id, service):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.site_network_access_id != site_network_access_id:
                 match = False
@@ -21642,7 +21750,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -21658,12 +21766,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -21827,7 +21938,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses(yang.adata.M
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses()')
         leaves = []
         _site_network_access = self.site_network_access
-        for _element in _site_network_access.elements:
+        for _element in _site_network_access:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site/site-network-accesses/site-network-access element: {_element.to_gdata().key_str(['site-network-access-id'])}")
             res.append('element_service = ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service({repr(_element.service.svc_input_bandwidth)}, {repr(_element.service.svc_output_bandwidth)}, {repr(_element.service.svc_mtu)})')
@@ -22046,7 +22157,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site(yang.adata.MNode):
         self.elements = elements
 
     mut def create(self, site_id, management):
-        for e in self.elements:
+        for e in self:
             match = True
             if e.site_id != site_id:
                 match = False
@@ -22060,7 +22171,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site(yang.adata.MNode):
 
     mut def to_gdata(self):
         elements = []
-        for e in self.elements:
+        for e in self:
             e_gdata = e.to_gdata()
             if isinstance(e_gdata, yang.gdata.Container):
                 elements.append(e_gdata)
@@ -22076,12 +22187,15 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site(yang.adata.MNode):
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
-        for e in self.elements:
+        for e in self:
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
         return ietf_l3vpn_svc__l3vpn_svc__sites__site(elements=copied_elements)
 
+extension ietf_l3vpn_svc__l3vpn_svc__sites__site(Iterable[ietf_l3vpn_svc__l3vpn_svc__sites__site_entry]):
+    def __iter__(self) -> Iterator[ietf_l3vpn_svc__l3vpn_svc__sites__site_entry]:
+        return self.elements.__iter__()
 
 mut def from_xml_ietf_l3vpn_svc__l3vpn_svc__sites__site_element(node: xml.Node) -> yang.gdata.Node:
     children = {}
@@ -22263,7 +22377,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites(yang.adata.MNode):
             res.append('{self_name} = ietf_l3vpn_svc__l3vpn_svc__sites()')
         leaves = []
         _site = self.site
-        for _element in _site.elements:
+        for _element in _site:
             res.append('')
             res.append("# List /l3vpn-svc/sites/site element: {_element.to_gdata().key_str(['site-id'])}")
             res.append('element_management = ietf_l3vpn_svc__l3vpn_svc__sites__site__management({repr(_element.management.type)})')
