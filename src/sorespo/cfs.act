@@ -55,7 +55,7 @@ class L3VpnSite(base.L3VpnSite):
     def transform(self, i):
         print("CFS L3VPN Site transform running %s" % (i.site_id))
         o = base.o_root()
-        for sna in i.site_network_accesses.site_network_access.elements:
+        for sna in i.site_network_accesses.site_network_access:
             vpn_id = sna.vpn_attachment.vpn_id
             bearer_ref = sna.bearer.bearer_reference
             if bearer_ref is not None:
@@ -75,7 +75,7 @@ class L3VpnSite(base.L3VpnSite):
                 o_ep.provider_ipv4_address = provider_ipv4_address
                 o_ep.ipv4_prefix_length = ipv4_len
 
-                for rp in sna.routing_protocols.routing_protocol.elements:
+                for rp in sna.routing_protocols.routing_protocol:
                     if rp.type == y_0.ietf_l3vpn_svc_bgp:
                         bgp = rp.bgp
                         if bgp is not None:

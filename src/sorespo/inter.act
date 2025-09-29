@@ -2,6 +2,7 @@ import yang.adata
 import orchestron.ttt
 
 import sorespo.layers.base_1 as base
+import sorespo.layers.y_1   # TODO: remove https://github.com/actonlang/acton/issues/2390
 
 
 def letter_position(letter):
@@ -40,7 +41,7 @@ class Router(base.Router):
         bc.asn = i.base_config.asn
 
         # Inject router id, asn into rfs.Vrf, rfs.EbgpCustomer transform
-        for vrf in i.l3vpn_vrf.elements:
+        for vrf in i.l3vpn_vrf:
             o_vrf = rfs.vrf.create(vrf.vpn_id)
             o_vrf.router_id = sid
             o_vrf.asn = i.base_config.asn
@@ -79,10 +80,10 @@ class IbgpFullmesh(base.IbgpFullmesh):
     def transform(self, i):
         print("Intermediate ibgp-fullmesh transform running %d" % (i.asn))
         o = base.o_root()
-        for ra in i.router.elements:
+        for ra in i.router:
             rfs = o.rfs.create(ra.name)
             rfs.base_config.create(ra.name).ibgp_authentication_key = i.authentication_key
-            for rb in i.router.elements:
+            for rb in i.router:
                 if ra.name == rb.name:
                     continue
                 n = rfs.ibgp_neighbor.create(rb.ipv4_address)
@@ -97,7 +98,7 @@ class L3Vpn(base.L3Vpn):
         print("Intermediate L3VPN transform running %s" % (i.name))
         o = base.o_root()
 
-        for ep in i.endpoint.elements:
+        for ep in i.endpoint:
             rfs = o.rfs.create(ep.device)
 
             vrf = rfs.vrf.create(i.name)
