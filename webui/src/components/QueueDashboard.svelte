@@ -17,7 +17,7 @@
   let itemDetail = null;
   let approvingItem = null;
   let refreshInterval = null;
-  let diffFormat = 'xml'; // 'xml', 'json', or 'adata'
+  let diffFormat = 'xml'; // 'xml', 'json', 'gdata', or 'adata'
 
   onMount(async () => {
     await loadAllQueues();
