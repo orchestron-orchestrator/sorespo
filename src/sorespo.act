@@ -566,13 +566,13 @@ actor main(env):
                             respond(200, {}, format_listq(dev.list_confq()))
                             return
                         elif len(path_elements) >= 5:
-                            pe = path_elements[4].split('?', 1)
-                            id: str = pe[0]
+                            id: str = path_elements[4]
                             if len(path_elements) == 5:
                                 format_type = "xml"  # default
                                 query_params = {}
-                                if len(pe) > 1:
-                                    for param in pe[1].split("&"):
+                                if "?" in request.path:
+                                    query_string = request.path.split('?', 1)[1]
+                                    for param in query_string.split("&"):
                                         if "=" in param:
                                             kv = param.split("=", 1)
                                             query_params[kv[0]] = kv[1]
