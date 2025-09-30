@@ -12,7 +12,7 @@
 
   let device = null;
   let configViewMode = 'running'; // Start with running config by default
-  let configFormat = 'xml';  // XML is the only working format currently
+  let configFormat = 'xml';
   let configData = null;
   let loadingConfig = false;
   let loading = true;
@@ -114,30 +114,27 @@
         <div class="control-group">
           <span class="control-label">Format:</span>
           <div class="button-group">
-            <button 
-              class="control-btn disabled"
-              disabled
-              title="JSON format not yet available"
+            <button
+              class="control-btn {configFormat === 'json' ? 'active' : ''}"
+              on:click|preventDefault={() => changeFormat('json')}
             >
               JSON
             </button>
-            <button 
+            <button
               class="control-btn {configFormat === 'xml' ? 'active' : ''}"
               on:click|preventDefault={() => changeFormat('xml')}
             >
               XML
             </button>
-            <button 
-              class="control-btn disabled"
-              disabled
-              title="GData format not yet available"
+            <button
+              class="control-btn {configFormat === 'gdata' ? 'active' : ''}"
+              on:click|preventDefault={() => changeFormat('gdata')}
             >
               GData
             </button>
-            <button 
-              class="control-btn disabled"
-              disabled
-              title="AData format not yet available"
+            <button
+              class="control-btn {configFormat === 'adata' ? 'active' : ''}"
+              on:click|preventDefault={() => changeFormat('adata')}
             >
               AData
             </button>
@@ -267,17 +264,6 @@
   .control-btn.active {
     background: #3498db;
     color: white;
-  }
-
-  .control-btn.disabled,
-  .control-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    color: #adb5bd;
-  }
-
-  .control-btn.disabled:hover {
-    background: transparent;
   }
 
   .config-content {
