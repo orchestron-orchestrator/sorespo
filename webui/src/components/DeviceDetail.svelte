@@ -1,8 +1,8 @@
 <script>
   import { onMount } from 'svelte';
   import { link } from 'svelte-routing';
-  import { 
-    fetchDevice, 
+  import {
+    fetchDevice,
     resyncDevice,
     fetchDeviceConfigQueue,
     fetchConfigQueueItem,
@@ -24,11 +24,11 @@
 
   onMount(() => {
     loadDevice();
-    
+
     // Listen for global refresh events
     const handleRefresh = () => loadDevice();
     window.addEventListener('global-refresh', handleRefresh);
-    
+
     return () => {
       window.removeEventListener('global-refresh', handleRefresh);
     };
@@ -72,13 +72,13 @@
       approvingItem = queueId;
       await approveConfigQueueItem(deviceId, queueId);
       message = { type: 'success', text: `Queue item ${queueId} approved and pushed to device` };
-      
+
       // Clear selected item if it was the one we just approved
       if (selectedQueueItem === queueId) {
         selectedQueueItem = null;
         queueItemDetail = null;
       }
-      
+
       // Reload the queue to show updated state
       await loadConfigQueue();
     } catch (err) {
@@ -137,23 +137,23 @@
       {/if}
 
       <div class="actions">
-        <button 
-          class="btn btn-primary" 
+        <button
+          class="btn btn-primary"
           on:click={handleResync}
           disabled={resyncing}
         >
           {resyncing ? 'Resyncing...' : 'Resync'}
         </button>
-        <a 
-          href="/device/{deviceId}/config" 
-          use:link 
+        <a
+          href="/device/{deviceId}/config"
+          use:link
           class="btn btn-secondary"
         >
           View Configuration
         </a>
-        <a 
-          href="/device/{deviceId}/log" 
-          use:link 
+        <a
+          href="/device/{deviceId}/log"
+          use:link
           class="btn btn-secondary"
         >
           Configuration Log
@@ -166,15 +166,15 @@
           <dl>
             <dt>ID</dt>
             <dd>{device.id}</dd>
-            
+
             <dt>Device Type</dt>
             <dd>{device.type || 'Unknown'}</dd>
-            
+
             {#if device.username}
               <dt>Username</dt>
               <dd>{device.username}</dd>
             {/if}
-            
+
             {#if device.addresses && device.addresses.length > 0}
               <dt>Addresses</dt>
               <dd>
@@ -185,15 +185,15 @@
                 {/each}
               </dd>
             {/if}
-            
+
             <dt>Approval Required</dt>
             <dd>{device.approvalRequired ? 'Yes' : 'No'}</dd>
-            
+
             {#if device.version}
               <dt>Version</dt>
               <dd>{device.version}</dd>
             {/if}
-            
+
             {#if device.uptime}
               <dt>Uptime</dt>
               <dd>{device.uptime}</dd>
@@ -206,15 +206,15 @@
           <dl>
             <dt>Has Running Config</dt>
             <dd>{device.hasRunningConfig ? 'Yes' : 'No'}</dd>
-            
+
             <dt>Has Target Config</dt>
             <dd>{device.hasTargetConfig ? 'Yes' : 'No'}</dd>
-            
+
             {#if device.queueLength > 0}
               <dt>Queue Length</dt>
               <dd>{device.queueLength}</dd>
             {/if}
-            
+
             {#if device.pendingApprovals > 0}
               <dt>Pending Approvals</dt>
               <dd class="pending-approvals">{device.pendingApprovals}</dd>
@@ -244,8 +244,8 @@
                     View Details
                   </button>
                   {#if item.approved !== true}
-                    <button 
-                      class="btn btn-small btn-success" 
+                    <button
+                      class="btn btn-small btn-success"
                       on:click={() => handleApproveItem(queueId)}
                       disabled={approvingItem === queueId}
                     >
@@ -257,7 +257,7 @@
             {/each}
           </div>
         {/if}
-        
+
         {#if selectedQueueItem && queueItemDetail}
           <div class="queue-detail">
             <h4>Queue Item {selectedQueueItem} Details</h4>
@@ -269,6 +269,46 @@
               <pre class="config-diff">{queueItemDetail.config}</pre>
             {/if}
           </div>
+        {/if}
+      </div>
+
+      <div class="modules-section">
+        <h3>YANG Modules ({device.modules ? device.modules.length : 0})</h3>
+        {#if device.modules && device.modules.length > 0}
+          <div class="modules-table-container">
+            <table class="modules-table">
+              <thead>
+                <tr>
+                  <th>Module Name</th>
+                  <th>Namespace</th>
+                  <th>Revision</th>
+                  <th>Features</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each device.modules as module}
+                  <tr>
+                    <td class="module-name-cell">{module.name}</td>
+                    <td class="module-namespace-cell" title={module.namespace}>
+                      {module.namespace.length > 50 ? module.namespace.substring(0, 50) + '...' : module.namespace}
+                    </td>
+                    <td class="module-revision-cell">{module.revision || '-'}</td>
+                    <td class="module-features-cell">
+                      {#if module.features && module.features.length > 0}
+                        <span title={module.features.join(', ')}>
+                          {module.features.length} feature{module.features.length !== 1 ? 's' : ''}
+                        </span>
+                      {:else}
+                        -
+                      {/if}
+                    </td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
+        {:else}
+          <p class="empty-modules">No YANG modules reported by device</p>
         {/if}
       </div>
 
@@ -592,5 +632,93 @@
     color: #495057;
     max-height: 400px;
     overflow-y: auto;
+  }
+  .modules-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border: 1px solid #ecf0f1;
+    border-radius: 8px;
+  }
+
+  .modules-section h3 {
+    margin: 0 0 1rem 0;
+    color: #2c3e50;
+  }
+
+  .modules-table-container {
+    max-height: 500px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+  }
+
+  .modules-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  .modules-table thead {
+    background: #f8f9fa;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .modules-table th {
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: #2c3e50;
+    border-bottom: 2px solid #dee2e6;
+  }
+
+  .modules-table tbody tr {
+    transition: background-color 0.2s;
+  }
+
+  .modules-table tbody tr:hover {
+    background: #f8f9fa;
+  }
+
+  .modules-table tbody tr:nth-child(even) {
+    background: #fafbfc;
+  }
+
+  .modules-table td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #ecf0f1;
+  }
+
+  .module-name-cell {
+    font-weight: 500;
+    color: #2c3e50;
+  }
+
+  .module-namespace-cell {
+    color: #6c757d;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 400px;
+  }
+
+  .module-revision-cell {
+    color: #007bff;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.85rem;
+  }
+
+  .module-features-cell {
+    color: #28a745;
+    font-weight: 500;
+  }
+
+  .empty-modules {
+    color: #7f8c8d;
+    font-style: italic;
+    padding: 1rem 0;
   }
 </style>
