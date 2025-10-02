@@ -23,7 +23,7 @@ export async function fetchDevices() {
     const response = await fetchJSON(`${API_BASE}/device`);
     // API returns {"devices": ["AMS-CORE-1", "AMS-CORE-2", ...]}
     const deviceNames = response.devices || [];
-    
+
     return deviceNames.map(name => ({
       id: name,
       name: name
@@ -38,7 +38,7 @@ export async function fetchDevices() {
 export async function fetchDevice(deviceId) {
   // Ensure device ID is uppercase
   const upperId = deviceId.toUpperCase();
-  
+
   // Get device info from the new endpoint
   try {
     const info = await fetchJSON(`${API_BASE}/device/${upperId}/info`);
@@ -52,7 +52,8 @@ export async function fetchDevice(deviceId) {
       hasRunningConfig: info.has_running_config,
       hasTargetConfig: info.has_target_config,
       queueLength: info.queue_length,
-      pendingApprovals: info.pending_approvals
+      pendingApprovals: info.pending_approvals,
+      modules: info.modules
     };
   } catch (err) {
     throw new Error(`Device ${upperId} not found or offline`);
@@ -68,11 +69,11 @@ export async function fetchDeviceConfig(deviceId) {
         'Accept': 'application/yang-data+json'
       }
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to fetch device config');
     }
-    
+
     const text = await response.text();
     return text ? JSON.parse(text) : {};
   } catch (err) {
@@ -113,10 +114,10 @@ export async function fetchAllDeviceQueues() {
   try {
     // Use the new /config-queue endpoint that only returns devices with pending approvals
     const response = await fetchJSON(`${API_BASE}/config-queue`);
-    
+
     // Transform the response into flat list of queue items for the dashboard
     const allQueues = [];
-    
+
     if (response.devices) {
       response.devices.forEach(device => {
         device.items.forEach(item => {
@@ -143,33 +144,33 @@ export async function fetchAllDeviceQueues() {
 export async function fetchDeviceRunningConfig(deviceId, format = 'json') {
   const upperId = deviceId.toUpperCase();
   const response = await fetch(`${API_BASE}/device/${upperId}/running?format=${format}`);
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch running config');
   }
-  
+
   return response.text();
 }
 
 export async function fetchDeviceTargetConfig(deviceId, format = 'json') {
   const upperId = deviceId.toUpperCase();
   const response = await fetch(`${API_BASE}/device/${upperId}/target?format=${format}`);
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch target config');
   }
-  
+
   return response.text();
 }
 
 export async function fetchDeviceConfigDiff(deviceId, format = 'json') {
   const upperId = deviceId.toUpperCase();
   const response = await fetch(`${API_BASE}/device/${upperId}/diff?format=${format}`);
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch config diff');
   }
-  
+
   return response.text();
 }
 

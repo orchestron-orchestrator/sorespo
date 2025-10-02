@@ -202,7 +202,7 @@ actor main(env):
                 except Exception as e:
                     respond(500, {}, f"Error fetching devices: {e}")
                 return
-            
+
             if len(path_elements) > 3 and path_elements[1] == "device":
                 def respond_with_data(data: ?yang.gdata.Node, schema: odev.DeviceSchema, accept_header: ?str):
                     aheader = accept_header if accept_header is not None else "application/yang-data+json"
@@ -245,10 +245,10 @@ actor main(env):
                                     kv = param.split("=", 1)
                                     if kv[0] == "format":
                                         format_type = kv[1]
-                        
+
                         running_conf = dev.get_running_conf()
                         target_conf = dev.get_target_conf()
-                        
+
                         if running_conf is not None and target_conf is not None:
                             config_diff = yang.gdata.diff(running_conf, target_conf)
                             if config_diff is not None:
@@ -279,7 +279,7 @@ actor main(env):
                                     kv = param.split("=", 1)
                                     if kv[0] == "format":
                                         format_type = kv[1]
-                        
+
                         target_conf = dev.get_target_conf()
                         if target_conf is not None:
                             if format_type == "json":
@@ -307,7 +307,7 @@ actor main(env):
                                     kv = param.split("=", 1)
                                     if kv[0] == "format":
                                         format_type = kv[1]
-                        
+
                         running_conf = dev.get_running_conf()
                         if running_conf is not None:
                             if format_type == "json":
@@ -325,18 +325,18 @@ actor main(env):
                         else:
                             respond(200, {"Content-Type": "text/plain"}, "# No running configuration available")
                         return
-                    
+
                     if path_elements[3] == 'resync':
                         # Trigger device resync
                         dev.resync()
                         respond(200, {"Content-Type": "application/json"}, json.encode({"status": "ok", "message": "Resync initiated"}))
                         return
-                    
+
                     if path_elements[3] == 'info':
                         # Get device meta configuration and state
                         dmc = dev.get_dmc()
                         dev_state = dev.get_state()
-                        
+
                         info = {
                             "name": dev_name,
                             "type": dmc.type if dmc.type is not None else "unknown",
@@ -346,7 +346,7 @@ actor main(env):
                             "queue_length": dev_state.queue_length,
                             "pending_approvals": dev_state.pending_approvals
                         }
-                        
+
                         # Add address information
                         addresses = []
                         for addr_entry in dmc.address:
@@ -358,19 +358,34 @@ actor main(env):
                                 addr_info["port"] = addr_entry.port
                             addresses.append(addr_info)
                         info["addresses"] = addresses
-                        
+
                         # Add credentials info (just username, not password)
                         if dmc.credentials is not None:
                             info["username"] = dmc.credentials.username if dmc.credentials.username is not None else ""
                         
+                        # Add YANG modules information (available for all devices)
+                        modset, modset_id = dev.get_modules()
+                        modules = []
+                        for mod_name, mod in modset.items():
+                            module_info = {
+                                "name": mod.name,
+                                "namespace": mod.namespace
+                            }
+                            if mod.revision is not None:
+                                module_info["revision"] = mod.revision
+                            if mod.feature is not None and len(mod.feature) > 0:
+                                module_info["features"] = list(mod.feature)
+                            modules.append(module_info)
+                        info["modules"] = modules
+
                         respond(200, {"Content-Type": "application/json"}, json.encode(info))
                         return
-                    
+
                     if path_elements[3] == 'log':
                         # Get device configuration log
                         conf_log = dev.get_conf_log()
                         log_items = []
-                        
+
                         # Parse query params for format
                         format_type = "xml"  # default
                         query_params = {}
@@ -381,9 +396,9 @@ actor main(env):
                                     kv = param.split("=", 1)
                                     query_params[kv[0]] = kv[1]
                         format_type = query_params.get_def("format", "xml")
-                        
+
                         for item in conf_log:
-                            
+
                             # Format the config diff based on format type
                             diff_str = ""
                             conf_diff = item.conf_diff
@@ -400,7 +415,7 @@ actor main(env):
                                 "event": item.event,
                                 "conf_diff": diff_str
                             })
-                        
+
                         respond(200, {"Content-Type": "application/json"}, json.encode({"log": log_items}))
                         return
                     if path_elements[3] == 'resync':
@@ -429,10 +444,10 @@ actor main(env):
                                             query_params[kv[0]] = kv[1]
                                 log.debug("qp", {"query_params": query_params, "split": request.path.split('&')})
                                 format_type = query_params.get_def("format", "xml")
-                                
+
                                 def format_ci(di: (ci: odev.ConfigItem, running_conf: yang.gdata.Node)):
                                     config_diff = yang.gdata.diff(di.running_conf, di.ci.conf)
-                                    
+
                                     config_diff_str = None
                                     if config_diff is not None:
                                         if format_type == "json":
