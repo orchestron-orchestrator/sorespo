@@ -53,6 +53,7 @@ export async function fetchDevice(deviceId) {
       hasTargetConfig: info.has_target_config,
       queueLength: info.queue_length,
       pendingApprovals: info.pending_approvals,
+      featureFlags: info.feature_flags,
       modules: info.modules
     };
   } catch (err) {
@@ -132,7 +133,7 @@ export async function fetchAllDeviceQueues() {
         });
       });
     }
-    
+
     // Don't sort - maintain the order from the backend which is the actual queue order
     return allQueues;
   } catch (err) {

@@ -123,6 +123,12 @@ def src_yang():
         type boolean;
         default false;
       }
+      container feature-flags {
+        leaf runtime-schema-fetch {
+          type boolean;
+          default false;
+        }
+      }
       container base-config {
         leaf asn {
           type inet:as-number;
@@ -706,6 +712,86 @@ mut def from_json_netinfra_inter__netinfra__router__approval_required(val: value
 mut def from_xml_netinfra_inter__netinfra__router__approval_required(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('boolean', val)
 
+mut def from_json_netinfra_inter__netinfra__router__feature_flags__runtime_schema_fetch(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('boolean', val)
+
+mut def from_xml_netinfra_inter__netinfra__router__feature_flags__runtime_schema_fetch(val: value) -> yang.gdata.Leaf:
+    return yang.gdata.Leaf('boolean', val)
+
+class netinfra_inter__netinfra__router__feature_flags(yang.adata.MNode):
+    runtime_schema_fetch: bool
+
+    mut def __init__(self, runtime_schema_fetch: ?bool=None):
+        self._ns = 'http://example.com/netinfra-inter'
+        self.runtime_schema_fetch = runtime_schema_fetch if runtime_schema_fetch is not None else False
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        children = {}
+        _runtime_schema_fetch = self.runtime_schema_fetch
+        if _runtime_schema_fetch is not None:
+            children['runtime-schema-fetch'] = yang.gdata.Leaf('boolean', _runtime_schema_fetch)
+        return yang.gdata.Container(children)
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> netinfra_inter__netinfra__router__feature_flags:
+        if n is not None:
+            return netinfra_inter__netinfra__router__feature_flags(runtime_schema_fetch=n.get_opt_bool('runtime-schema-fetch'))
+        return netinfra_inter__netinfra__router__feature_flags()
+
+    def copy(self):
+        """Create a deep copy of this adata object"""
+        return netinfra_inter__netinfra__router__feature_flags.from_gdata(self.to_gdata())
+
+    def prsrc(self, self_name='ad', top=True, list_element=False):
+        res = []
+        if top:
+            res.append('# Top node: /netinfra/router/feature-flags')
+            res.append('{self_name} = netinfra_inter__netinfra__router__feature_flags()')
+        leaves = []
+        _runtime_schema_fetch = self.runtime_schema_fetch
+        if _runtime_schema_fetch is not None:
+            leaves.append('{self_name}.runtime_schema_fetch = {repr(_runtime_schema_fetch)}')
+        if leaves:
+            if not list_element:
+               res = ['', '# Container: /netinfra/router/feature-flags'] + leaves + res
+            else:
+                res = leaves + res
+        return '\n'.join(res)
+
+    def prsrc_gen3(self, self_name='ad'):
+        # WARNING: this wrapper for the gen3.pradata schema-driven parser compiles the schema on every call!
+        s = yang.compile(src_yang())
+        return yang.gen3.pradata(s, self.to_gdata(), self_name, loose=False, root_path=['netinfra-inter:netinfra', 'router', 'feature-flags'])
+
+
+mut def from_xml_netinfra_inter__netinfra__router__feature_flags(node: xml.Node) -> yang.gdata.Container:
+    children = {}
+    child_runtime_schema_fetch = yang.gdata.from_xml_opt_bool(node, 'runtime-schema-fetch')
+    yang.gdata.maybe_add(children, 'runtime-schema-fetch', from_xml_netinfra_inter__netinfra__router__feature_flags__runtime_schema_fetch, child_runtime_schema_fetch)
+    return yang.gdata.Container(children)
+
+mut def from_json_path_netinfra_inter__netinfra__router__feature_flags(jd: value, path: list[str]=[], op: ?str='merge') -> yang.gdata.Node:
+    # path handling
+    if len(path) > 0:
+        point = path[0]
+        rest_path = path[1:]
+        if point == 'runtime-schema-fetch':
+            raise ValueError("Invalid json path to non-inner node")
+        raise ValueError("Invalid path")
+    elif len(path) == 0:
+        if op == "merge":
+            return from_json_netinfra_inter__netinfra__router__feature_flags(yang.gdata.unwrap_dict(jd))
+        elif op == "remove":
+            return yang.gdata.Absent()
+        raise ValueError("Invalid operation")
+    raise ValueError("Unable to resolve path")
+
+mut def from_json_netinfra_inter__netinfra__router__feature_flags(jd: dict[str, ?value]) -> yang.gdata.Container:
+    children = {}
+    child_runtime_schema_fetch = yang.gdata.take_json_opt_bool(jd, 'runtime-schema-fetch')
+    yang.gdata.maybe_add(children, 'runtime-schema-fetch', from_json_netinfra_inter__netinfra__router__feature_flags__runtime_schema_fetch, child_runtime_schema_fetch)
+    return yang.gdata.Container(children)
+
 mut def from_json_netinfra_inter__netinfra__router__base_config__asn(val: value) -> yang.gdata.Leaf:
     return yang.gdata.Leaf('uint32', val)
 
@@ -1003,10 +1089,11 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
     role: ?str
     mock: ?str
     approval_required: bool
+    feature_flags: netinfra_inter__netinfra__router__feature_flags
     base_config: netinfra_inter__netinfra__router__base_config
     l3vpn_vrf: netinfra_inter__netinfra__router__l3vpn_vrf
 
-    mut def __init__(self, name: str, id: int, base_config: netinfra_inter__netinfra__router__base_config, type: ?str, role: ?str, mock: ?str, approval_required: ?bool=None, l3vpn_vrf: list[netinfra_inter__netinfra__router__l3vpn_vrf_entry]=[]):
+    mut def __init__(self, name: str, id: int, base_config: netinfra_inter__netinfra__router__base_config, type: ?str, role: ?str, mock: ?str, approval_required: ?bool=None, feature_flags: ?netinfra_inter__netinfra__router__feature_flags=None, l3vpn_vrf: list[netinfra_inter__netinfra__router__l3vpn_vrf_entry]=[]):
         self._ns = 'http://example.com/netinfra-inter'
         self.name = name
         self.id = id
@@ -1014,6 +1101,7 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
         self.role = role
         self.mock = mock
         self.approval_required = approval_required if approval_required is not None else False
+        self.feature_flags = feature_flags if feature_flags is not None else netinfra_inter__netinfra__router__feature_flags()
         self.base_config = base_config
         self.l3vpn_vrf = netinfra_inter__netinfra__router__l3vpn_vrf(elements=l3vpn_vrf)
 
@@ -1037,6 +1125,9 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
         _approval_required = self.approval_required
         if _approval_required is not None:
             children['approval-required'] = yang.gdata.Leaf('boolean', _approval_required)
+        _feature_flags = self.feature_flags
+        if _feature_flags is not None:
+            children['feature-flags'] = _feature_flags.to_gdata()
         _base_config = self.base_config
         if _base_config is not None:
             children['base-config'] = _base_config.to_gdata()
@@ -1047,7 +1138,7 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra_inter__netinfra__router_entry:
-        return netinfra_inter__netinfra__router_entry(name=n.get_str('name'), id=n.get_int('id'), type=n.get_opt_str('type'), role=n.get_opt_str('role'), mock=n.get_opt_str('mock'), approval_required=n.get_opt_bool('approval-required'), base_config=netinfra_inter__netinfra__router__base_config.from_gdata(n.get_cnt('base-config')), l3vpn_vrf=netinfra_inter__netinfra__router__l3vpn_vrf.from_gdata(n.get_opt_list('l3vpn-vrf')))
+        return netinfra_inter__netinfra__router_entry(name=n.get_str('name'), id=n.get_int('id'), type=n.get_opt_str('type'), role=n.get_opt_str('role'), mock=n.get_opt_str('mock'), approval_required=n.get_opt_bool('approval-required'), feature_flags=netinfra_inter__netinfra__router__feature_flags.from_gdata(n.get_opt_cnt('feature-flags')), base_config=netinfra_inter__netinfra__router__base_config.from_gdata(n.get_cnt('base-config')), l3vpn_vrf=netinfra_inter__netinfra__router__l3vpn_vrf.from_gdata(n.get_opt_list('l3vpn-vrf')))
 
     def copy(self):
         """Create a deep copy of this adata object"""
@@ -1072,6 +1163,9 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
         _approval_required = self.approval_required
         if _approval_required is not None:
             leaves.append('{self_name}.approval_required = {repr(_approval_required)}')
+        _feature_flags = self.feature_flags
+        if _feature_flags is not None:
+            res.extend(_feature_flags.prsrc('{self_name}.feature_flags', False).splitlines())
         _base_config = self.base_config
         if _base_config is not None:
             res.extend(_base_config.prsrc('{self_name}.base_config', False).splitlines())
@@ -1156,6 +1250,8 @@ mut def from_xml_netinfra_inter__netinfra__router_element(node: xml.Node) -> yan
     yang.gdata.maybe_add(children, 'mock', from_xml_netinfra_inter__netinfra__router__mock, child_mock)
     child_approval_required = yang.gdata.from_xml_opt_bool(node, 'approval-required')
     yang.gdata.maybe_add(children, 'approval-required', from_xml_netinfra_inter__netinfra__router__approval_required, child_approval_required)
+    child_feature_flags = yang.gdata.from_xml_opt_cnt(node, 'feature-flags')
+    yang.gdata.maybe_add(children, 'feature-flags', from_xml_netinfra_inter__netinfra__router__feature_flags, child_feature_flags)
     child_base_config = yang.gdata.from_xml_cnt(node, 'base-config')
     yang.gdata.maybe_add(children, 'base-config', from_xml_netinfra_inter__netinfra__router__base_config, child_base_config)
     child_l3vpn_vrf = yang.gdata.from_xml_opt_list(node, 'l3vpn-vrf')
@@ -1193,6 +1289,8 @@ mut def from_json_path_netinfra_inter__netinfra__router_element(jd: value, path:
             raise ValueError("Invalid json path to non-inner node")
         if point == 'approval-required':
             raise ValueError("Invalid json path to non-inner node")
+        if point == 'feature-flags':
+            children['feature-flags'] = from_json_path_netinfra_inter__netinfra__router__feature_flags(jd, rest_path, op)
         if point == 'base-config':
             children['base-config'] = from_json_path_netinfra_inter__netinfra__router__base_config(jd, rest_path, op)
         if point == 'l3vpn-vrf':
@@ -1239,6 +1337,8 @@ mut def from_json_netinfra_inter__netinfra__router_element(jd: dict[str, ?value]
     yang.gdata.maybe_add(children, 'mock', from_json_netinfra_inter__netinfra__router__mock, child_mock)
     child_approval_required = yang.gdata.take_json_opt_bool(jd, 'approval-required')
     yang.gdata.maybe_add(children, 'approval-required', from_json_netinfra_inter__netinfra__router__approval_required, child_approval_required)
+    child_feature_flags = yang.gdata.take_json_opt_cnt(jd, 'feature-flags')
+    yang.gdata.maybe_add(children, 'feature-flags', from_json_netinfra_inter__netinfra__router__feature_flags, child_feature_flags)
     child_base_config = yang.gdata.take_json_cnt(jd, 'base-config')
     yang.gdata.maybe_add(children, 'base-config', from_json_netinfra_inter__netinfra__router__base_config, child_base_config)
     child_l3vpn_vrf = yang.gdata.take_json_opt_list(jd, 'l3vpn-vrf')
