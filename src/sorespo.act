@@ -9,8 +9,11 @@ import xml
 import orchestron.device as odev
 import orchestron.ttt as ttt
 import orchestron.device_meta_config    # TODO: remove https://github.com/actonlang/acton/issues/2390
+
+import yang
 import yang.adata
 import yang.gdata
+import yang.gen3
 
 import tmf.tmf641
 import sorespo.tmf
@@ -81,6 +84,10 @@ actor main(env):
     logh_dev.set_handler(logh)
 
     log = logging.Logger(logh)
+
+    print("Compiling schema...")
+    top_schema = yang.compile(sorespo.layers.y_0.src_yang())
+    print("Schema compile done")
 
     dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, env.cap, logh_dev)
     cfs = sorespo.layers.get_layers(dev_registry, logh_ttt)
@@ -507,7 +514,7 @@ actor main(env):
         elif request.method == "DELETE":
             p = split_restconf_path(request.path)
             if p[0] == "restconf":
-                input_config = sorespo.layers.y_0.from_json_path({}, p[1:], "remove")
+                input_config = yang.gen3.from_json_path(top_schema, {}, p[1:], "remove", loose=True)
                 session = cfs.newsession()
                 session.edit_config(input_config, config_done)
                 return
@@ -522,11 +529,11 @@ actor main(env):
                 if request.headers.get("content-type") == "application/yang-data+json":
                     json_in = json.decode(request.body.decode())
                     p = split_restconf_path(request.path)[1:]
-                    input_config = sorespo.layers.y_0.from_json_path(json_in, p)
+                    input_config = yang.gen3.from_json_path(top_schema, json_in, p, loose=True)
                 elif request.headers.get("content-type") == "application/yang-data+xml":
                     try:
                         xml_in = xml.decode(request.body.decode())
-                        input_config = cfs_layer.from_xml(xml_in)
+                        input_config = yang.gen3.from_xml(top_schema, xml_in, loose=True)
                     except Exception as e:
                         respond(400, {}, "Error parsing XML: {e}")
                         return
@@ -607,7 +614,7 @@ actor main(env):
             config = configs.pop(0)
             # Grab the first config
             log.info("Applying config file...", {"config_file": config.filename})
-            input_config = cfs_layer.from_xml(config.config)
+            input_config = yang.gen3.from_xml(top_schema, config.config, loose=True)
             session.edit_config(input_config, None, lambda result: _conf_file_done(config, result))
         except IndexError:
             log.info("All config files applied")
