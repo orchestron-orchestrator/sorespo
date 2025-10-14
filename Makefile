@@ -1,7 +1,7 @@
 
 .PHONY: build
 build:
-	acton build --dev $(DEP_OVERRIDES) $(TARGET)
+	acton build $(DEP_OVERRIDES) $(TARGET)
 
 .PHONY: build-ldep
 build-ldep:
@@ -28,7 +28,7 @@ test-ldep:
 
 .PHONY: gen
 gen:
-	cd gen && acton build --dev $(DEP_OVERRIDES) && out/bin/sorespo_gen
+	cd gen && acton build $(DEP_OVERRIDES) && out/bin/sorespo_gen
 
 .PHONY: gen-ldep
 gen-ldep:
