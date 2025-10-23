@@ -39,6 +39,10 @@ pkg-upgrade:
 	acton pkg upgrade
 	cd gen && acton pkg upgrade
 
+.PHONY: check-dep-consistency
+check-dep-consistency:
+	@python3 scripts/check_dep_consistency.py
+
 .PHONY: download-release
 download-release:
 	@if [ "$$(uname -s)" = "Darwin" ]; then \
