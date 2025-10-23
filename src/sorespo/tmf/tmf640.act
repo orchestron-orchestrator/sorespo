@@ -1,0 +1,68 @@
+import json
+
+import tmf.tmf640
+import yang.gdata
+import yang.gen3
+import yang.schema
+
+def get_json(layer_config: yang.gdata.Node, service_id: ?str = None) -> ?dict[str, ?value]:
+    multiple = service_id is None
+    req_sspec_id = None
+    req_service_key = None
+    services_json = []
+
+    if service_id is not None:
+        service_id_parts = service_id.split("__")
+        if len(service_id_parts) != 2:
+            return None
+        req_sspec_id = service_id_parts[0]
+        req_service_key = service_id_parts[1]
+
+    services = layer_config.children["tmf-store"].children["tmf640"].children["service"]
+    if isinstance(services, yang.gdata.List):
+        for s in services.elements:
+            if not multiple and service_id != tmf.tmf640.get_child_str(s, "id"):
+                continue
+            service = tmf.tmf640.Service.from_gdata(s)
+            if not multiple and req_sspec_id != service.serviceSpecification.id:
+                continue
+
+            if service.serviceSpecification.id == "netinfra.router":
+                routers = layer_config.children["netinfra"].children["router"]
+                if isinstance(routers, yang.gdata.List):
+                    if multiple:
+                        for router in routers.elements:
+                            tmf.tmf640.add_leaf_properties_to_service_characteristics(router, service)
+                            services_json.append(service.to_json())
+                    else:
+                        for router in routers.elements:
+                            if tmf.tmf640.get_child_str(router, "name") == req_service_key:
+                                tmf.tmf640.add_leaf_properties_to_service_characteristics(router, service)
+                                return {"service": service.to_json()}
+
+    if multiple:
+        return {"service": services_json}
+
+def json_to_gdata(data: dict[str, ?value], top_schema: yang.schema.DRoot) -> (yang.gdata.Node, str):
+    service = tmf.tmf640.Service.from_json(data)
+    tmf_id = None
+    
+    if service.serviceSpecification.id == "netinfra.router":
+        router = yang.gen3.from_data(top_schema, top_schema.identities, service.serviceCharacteristic, root_path=["netinfra:netinfra", "router"])
+        for k, v in router.children.items():
+            if k == "name" and isinstance(v, yang.gdata.Leaf):
+                tmf_id = "{service.serviceSpecification.id}__{v.val}"
+        if tmf_id is not None:
+            service.id = tmf_id
+            service.href = "/tmf-api/ServiceActivationAndConfiguration/v4/service/{tmf_id}"
+            ret = yang.gdata.Container({
+                "tmf-store": yang.gdata.Container({
+                    "tmf640": yang.gdata.Container({
+                        "service": yang.gdata.List(["id"], [service.to_gdata()])})
+                        }, ns="http://orchestron.org/yang/orchestron-tmf", module="orchestron-tmf"),
+                "netinfra": yang.gdata.Container({
+                    "router": yang.gdata.List(["name"], [router])}, ns="http://example.com/netinfra", module="netinfra")
+            })
+            return (ret, tmf_id)
+        raise ValueError("Router name not found in service characteristics")
+    raise ValueError("Unsupported service specification {service.serviceSpecification.id}")

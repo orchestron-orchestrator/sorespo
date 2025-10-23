@@ -1,0 +1,1734 @@
+  module orchestron-tmf640 {
+  yang-version "1.1";
+  namespace "http://orchestron.org/yang/orchestron-tmf640";
+  prefix "otmf640";
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import ietf-yang-types {
+    prefix yang;
+  }
+  description "TMF640 Service Activation and Configuration";
+  revision 2025-10-26 {
+    description "Initial revision";
+  }
+
+  typedef OrderItemActionType {
+    type enumeration {
+      enum add;
+      enum modify;
+      enum delete;
+      enum noChange;
+    }
+    description "action to be performed on the product";
+  }
+
+  typedef ServiceStateType {
+    type enumeration {
+      enum feasibilityChecked;
+      enum designed;
+      enum reserved;
+      enum inactive;
+      enum active;
+      enum terminated;
+    }
+    description
+     "Valid values for the lifecycle state of theservice";
+  }
+
+  grouping Addressable {
+    description "Base schema for adressable entities";
+    leaf id {
+      type string;
+      description "unique identifier";
+    }
+    leaf href {
+      type inet:uri;
+      description "Hyperlink reference";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }
+  }
+
+  grouping Characteristic {
+    description
+     "Describes a given characteristic of an object or entity through
+      a name/value pair.";
+    leaf id {
+      type string;
+      mandatory true;
+      description "Unique identifier of the characteristic";
+    }
+    leaf name {
+      type string;
+      mandatory true;
+      description "Name of the characteristic";
+    }
+    // The value and valueType are not stored in the TMF Store
+    // because they are stored on the respective leaf
+    // of the destination transform.
+    list characteristicRelationship {
+      key "id";
+      uses CharacteristicRelationship;
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }     
+  }
+
+  grouping CharacteristicRelationship {
+    description
+     "Another Characteristic that is related to the current
+      Characteristic;";
+    leaf id {
+      type string;
+      description "Unique identifier of the characteristic";
+    }
+    leaf relationshipType {
+      type string;
+      description "The type of relationship";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }
+  }
+
+  grouping Constraint {
+    description
+     "Constraint reference. The Constraint resource represents a
+      policy/rule applied to an entity or entity spec.";
+    leaf id {
+      type string;
+      mandatory true;
+      description "reference id to the target constraint";
+    }
+    leaf href {
+      type string;
+      description "Hyperlink reference to the target constraint";
+    }
+    leaf name {
+      type string;
+      description "Name given to the constraint";
+    }
+    leaf version {
+      type string;
+      description "constraint version";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }
+    leaf referredType {
+      type string;
+      description "The (class) type of the referred constraint";
+    }
+  }
+
+  grouping EntityRef {
+    description
+     "Entity reference schema to be use for all entityRef class.";
+    leaf id {
+      type string;
+      mandatory true;
+      description "unique identifier";
+    }
+    leaf href {
+      type inet:uri;
+      description "Hyperlink reference";
+    }
+    leaf name {
+      type string;
+      description "Name of the related entity.";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class Extensible
+        name";
+    }
+    leaf referredType {
+      type string;
+      description
+       "The actual type of the target instance when needed for
+        disambiguation.";
+    }
+  }
+
+  grouping EntityValue {
+    description
+     "Base entity value  schema for use in TMForum Open-APIs";
+    leaf id {
+      type string;
+      description "Unique identifier of a related entity.";
+    }
+    leaf href {
+      type string;
+      description "Reference of the related entity.";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }
+  }
+
+  grouping Extensible {
+    description
+     "Base Extensible schema for use in TMForum Open-APIs";
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class Extensible
+        name";
+    }
+  }
+
+  grouping Feature {
+    description "Configuration feature.";
+    leaf id {
+      type string;
+      description "Unique identifier of the feature.";
+    }
+    leaf isBundle {
+      type boolean;
+      description
+       "True if this is a feature group. Default is false.";
+    }
+    leaf isEnabled {
+      type boolean;
+      description
+       "True if this feature is enabled. Default is true.";
+    }
+    leaf name {
+      type string;
+      mandatory true;
+      description "This is the name for the feature.";
+    }
+    list constraint {
+      key "id";
+      uses Constraint;
+      description "This is a list of feature constraints.";
+    }
+    list featureCharacteristic {
+        key "id";
+        uses Characteristic;
+        min-elements 1;
+        description
+         "This is a list of Characteristics for a particular
+          feature.";
+    }
+    list featureRelationship {
+      key "id";
+      uses FeatureRelationship;
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional attributes
+        and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }
+  }
+
+  grouping FeatureRelationship {
+    description "Configuration feature";
+    leaf id {
+      type string;
+      description "Unique identifier of the target feature.";
+    }
+    leaf name {
+      type string;
+      mandatory true;
+      description "This is the name of the target feature.";
+    }
+    leaf relationshipType {
+      type string;
+      mandatory true;
+      description "This is the type of the feature relationship.";
+    }
+    container validFor {
+      uses TimePeriod;
+      description
+       "The period for which this feature relationship is valid.";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }
+  }
+
+  grouping HeaderItem {
+    description
+     "An item typically included in a request or response";
+    leaf name {
+      type string;
+      mandatory true;
+      description "The name of the header item, e.g. locale";
+    }
+    leaf value {
+      type string;
+      mandatory true;
+      description "The value of the header item, e.g. en-us";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }
+  }
+
+  grouping Monitor {
+    description "Monitoring of resources";
+    leaf id {
+      type string;
+      description
+       "Identifier of an instance of the monitor. Required to be
+        unique within the resource type.  Used in URIs as the
+        identifier for specific instances of a type";
+    }
+    leaf href {
+      type string;
+      description "reference to this monitor";
+    }
+    leaf sourceHref {
+      type string;
+      description "The monitored resource href";
+    }
+    leaf state {
+      type string;
+      description
+       "The Monitor state of the resource.  InProgress, InError,
+        Completed";
+    }
+    container request {
+      uses Request;
+      description "Represents the request";
+    }
+    container response {
+      uses Response;
+      description "Represents the response";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }
+  }
+
+  grouping Note {
+    description "Extra information about a given entity";
+    leaf id {
+      type string;
+      description
+       "Identifier of the note within its containing entity (may or
+        may not be globally unique, depending on provider
+        implementation)";
+    }
+    leaf author {
+      type string;
+      description "Author of the note";
+    }
+    leaf date {
+      type yang:date-and-time;
+      description "Date of the note";
+    }
+    leaf text {
+      type string;
+      description "Text of the note";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }
+  }
+
+  grouping Place {
+    description
+     "Place reference. Place defines the places where the products
+      are sold or delivered.";
+    leaf id {
+      type string;
+      description "Unique identifier of the place";
+    }
+    leaf href {
+      type string;
+      description "Unique reference of the place";
+    }
+    leaf name {
+      type string;
+      description
+       "A user-friendly name for the place, such as [Paris Store],
+        [London Store], [Main Home]";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }
+  }
+
+  grouping PlaceRef {
+    description
+     "Place reference. PlaceRef defines the placeRefs where the
+      products are sold or delivered.";
+    leaf id {
+      type string;
+      mandatory true;
+      description "unique identifier";
+    }
+    leaf href {
+      type inet:uri;
+      description "Hyperlink reference";
+    }
+    leaf name {
+      type string;
+      description "Name of the related entity.";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class Extensible
+        name";
+    }
+    leaf referredType {
+      type string;
+      description
+       "The actual type of the target instance when needed for
+        disambiguation.";
+    }
+  }
+
+  grouping RelatedEntityRefOrValue {
+    description
+     "A reference to an entity, where the type of the entity is not
+      known in advance. A related entity defines a entity described
+      by reference or by value linked to a specific entity. The
+      polymorphic attributes type, schemaLocation & referredType are
+      related to the Entity and not the RelatedEntityRefOrValue class
+      itself";
+    leaf id {
+      type string;
+      description "Unique identifier of a related entity.";
+    }
+    leaf href {
+      type string;
+      description "Reference of the related entity.";
+    }
+    leaf name {
+      type string;
+      description "Name of the related entity.";
+    }
+    leaf role {
+      type string;
+      mandatory true;
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class Extensible
+        name";
+    }
+    leaf referredType {
+      type string;
+      description
+       "The actual type of the target instance when needed for
+        disambiguation.";
+    }
+  }
+
+  grouping RelatedParty {
+    description
+     "Related Entity reference. A related party defines party or
+      party role linked to a specific entity.";
+    leaf id {
+      type string;
+      mandatory true;
+      description "unique identifier";
+    }
+    leaf href {
+      type inet:uri;
+      description "Hyperlink reference";
+    }
+    leaf name {
+      type string;
+      description "Name of the related entity.";
+    }
+    leaf role {
+      type string;
+      description "Role played by the related party";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class Extensible
+        name";
+    }
+    leaf referredType {
+      type string;
+      mandatory true;
+      description
+       "The actual type of the target instance when needed for
+        disambiguation.";
+    }
+  }
+
+  grouping RelatedPlaceRefOrValue {
+    description
+     "Related Entity reference. A related place defines a place
+      described by reference or by value linked to a specific entity.
+      The polymorphic attributes type, schemaLocation & referredType
+      are related to the place entity and not the
+      RelatedPlaceRefOrValue class itself";
+    leaf id {
+      type string;
+      description "Unique identifier of the place";
+    }
+    leaf href {
+      type string;
+      description "Unique reference of the place";
+    }
+    leaf name {
+      type string;
+      description
+       "A user-friendly name for the place, such as [Paris Store],
+        [London Store], [Main Home]";
+    }
+    leaf role {
+      type string;
+      mandatory true;
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+       attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class Extensible
+       name";
+    }
+    leaf referredType {
+      type string;
+      description
+       "The actual type of the target instance when needed for
+       disambiguation.";
+    }
+  }
+
+  grouping RelatedServiceOrderItem {
+    description
+     "RelatedServiceOrderItem (a ServiceOrder item) .The service
+      order item which triggered service
+      creation/change/termination.";
+    leaf itemId {
+      type string;
+      mandatory true;
+      description
+       "Identifier of the order item where the service was managed";
+    }
+    leaf role {
+      type string;
+      description
+       "role of the service order item for this service";
+    }
+    leaf serviceOrderHref {
+      type string;
+      description "Reference of the related entity.";
+    }
+    leaf serviceOrderId {
+      type string;
+      mandatory true;
+      description "Unique identifier of a related entity.";
+    }
+    leaf itemAction {
+      type OrderItemActionType;
+      description "Action of the order item for this service";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }
+    leaf referredType {
+      type string;
+      description
+       "The actual type of the target instance when needed for
+        disambiguation.";
+    }
+  }
+
+  grouping Request {
+    description "A response to a request";
+    leaf body {
+      type string;
+      mandatory true;
+      description
+       "The body of the request. For example for an HTTP request
+        might contain content of a form .";
+    }
+    leaf method {
+      type string;
+      description "The protocol of the request, e.g. http";
+    }
+    leaf to {
+      type string;
+      description
+       "The target of the request, e.g. a URL for an HTTP request";
+    }
+    list header {
+      uses HeaderItem;
+      min-elements 1;
+      description
+       "Items included in the header of the request. For example for
+        an HTTP request might contain requested locale, basic
+        authentication.";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }
+  }
+
+  grouping ResourceRef {
+    leaf id {
+      type string;
+      mandatory true;
+      description "unique identifier";
+    }
+    leaf href {
+      type inet:uri;
+      description "Hyperlink reference";
+    }
+    leaf name {
+      type string;
+      description "Name of the related entity.";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class Extensible
+        name";
+    }
+    leaf referredType {
+      type string;
+      description
+       "The actual type of the target instance when needed for
+        disambiguation.";
+    }
+  }
+
+  grouping Response {
+    description "A response to a request";
+    leaf body {
+      type string;
+      mandatory true;
+      description
+       "The body of the response. For example for an HTTP response
+        might contain HTML for rendering.";
+    }
+    leaf statusCode {
+      type string;
+      description
+       "The status of the response. For example for an HTTP
+        response would be codes such as 200, 400, etc.";
+    }
+    list header {
+      uses HeaderItem;
+      min-elements 1;
+      description
+       "Items included in the header of the response. For example
+        for an HTTP response might contain negotiated locale.";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }
+  }
+
+  grouping Service {
+    description
+     "Service is a base class for defining the Service hierarchy.
+      All Services are characterized as either being possibly
+      visible and usable by a Customer or not. This gives rise to
+      the two subclasses of Service: CustomerFacingService and
+      ResourceFacingService.";
+    leaf id {
+      type string;
+      mandatory true;
+      description "Unique identifier of the service";
+    }
+    leaf href {
+      type string;
+      description "Reference of the service";
+    }
+    leaf category {
+      type string;
+      description
+       "Is it a customer facing or resource facing service";
+    }
+    leaf description {
+      type string;
+      description "Free-text description of the service";
+    }
+    leaf endDate {
+      type yang:date-and-time;
+      description "Date when the service ends";
+    }
+    leaf hasStarted {
+      type boolean;
+      description "If TRUE, this Service has already been started";
+    }
+    leaf isBundle {
+      type boolean;
+      description
+       "If true, the service is a ServiceBundle which regroup a
+        service hierachy. If false, the service is a 'atomic' service
+        (hierachy leaf).";
+    }
+    leaf isServiceEnabled {
+      type boolean;
+      description
+       "If FALSE and hasStarted is FALSE, this particular Service has
+        NOT been enabled for use - if FALSE and hasStarted is TRUE
+        then the service has failed ";
+    }
+    leaf isStateful {
+      type boolean;
+      description
+       "If TRUE, this Service can be changed without affecting any
+        other services";
+    }
+    leaf name {
+      type string;
+      description "Name of the service";
+    }
+    leaf serviceDate {
+      type string;
+      description
+       "Date when the service was created (whatever its status).";
+    }
+    leaf serviceType {
+      type string;
+      description "Business type of the service";
+    }
+    leaf startDate {
+      type yang:date-and-time;
+      description "Date when the service starts";
+    }
+    leaf startMode {
+      type string;
+      description
+       "This attribute is an enumerated integer that indicates how
+        the Service is started, such as: 0: Unknown; 1: Automatically
+        by the managed environment; 2: Automatically by the owning
+        device; 3: Manually by the Provider of the Service; 4:
+        Manually by a Customer of the Provider; 5: Any of the above";
+    }
+    list feature {
+      key "id";
+      uses Feature;
+      description
+       "A list of feature associated with this service ";
+    }
+    list note {
+      key "id";
+      uses Note;
+      description "A list of notes made on this service";
+    }
+    list place {
+      key "id";
+      uses RelatedPlaceRefOrValue;
+      description
+       "A list of places (Place [*]). Used to define a place useful 
+        or the service (for example a geographical place whre the
+        service is installed)";
+    }
+    list relatedEntity {
+      key "id";
+      uses RelatedEntityRefOrValue;
+      description
+       "A list of related  entity in relationship with this service";
+    }
+    list relatedParty {
+      key "id";
+      uses RelatedParty;
+      description
+       "A list of related party references (RelatedParty [*]). A
+        related party defines party or party role linked to a
+        specific entity";
+    }
+    list serviceCharacteristic {
+      key "id";
+      uses Characteristic;
+       description
+        "A list of characteristics that characterize this service
+         (ServiceCharacteristic [*]) ";
+    }
+    list serviceOrderItem {
+      key "itemId";
+      uses RelatedServiceOrderItem;
+      description
+       "A list of service order items related to this service";
+    }
+    list serviceRelationship {
+      key "service";
+      uses ServiceRelationship;
+      description
+       "A list of service relationships (ServiceRelationship [*]).
+        Describes links with other service(s) in the inventory
+        (useful for describing relies-on, relies-from between CFS
+        for example).";
+    }
+    container serviceSpecification {
+      uses ServiceSpecificationRef;
+      description
+       "The specification from which this service was instantiated";
+    }
+    leaf state {
+      type ServiceStateType;
+      description
+       "The life cycle state of the service, such as designed,
+        reserved, active, etc...";
+    }
+    list supportingResource {
+      key "id";
+      uses ResourceRef;
+      description
+       "A list of supporting resources (SupportingResource [*]).Note:
+        only Service of type RFS can be associated with Resources";
+    }
+    leaf-list supportingService {
+      type leafref {
+        path "../../service/id";
+      }
+      description
+       "A list of supporting services (SupportingService [*]). A
+        collection of services that support this service (bundling,
+        link CFS to RFS)";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }
+  }
+
+  grouping ServiceRef {
+    description
+     "Service reference, for when Service is used by other entities";
+    leaf id {
+      type string;
+      mandatory true;
+      description "unique identifier";
+    }
+    leaf href {
+      type inet:uri;
+      description "Hyperlink reference";
+    }
+    leaf name {
+      type string;
+      description "Name of the related entity.";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class Extensible
+        name";
+    }
+    leaf referredType {
+      type string;
+      description
+       "The actual type of the target instance when needed for
+        disambiguation.";
+    }
+  }
+
+  grouping ServiceRelationship {
+    leaf relationshipType {
+      type string;
+      mandatory true;
+    }
+    list ServiceRelationshipCharacteristic {
+      key "id";
+      uses Characteristic;
+    }
+    leaf service {
+      type leafref {
+        path "../../../service/id";
+      }
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }
+  }
+
+  grouping ServiceSpecificationRef {
+      description
+       "Service specification reference: ServiceSpecification(s)
+        required to realize a ProductSpecification.";
+      leaf id {
+        type string;
+        mandatory true;
+        description "unique identifier";
+      }
+      leaf href {
+        type inet:uri;
+        description "Hyperlink reference";
+      }
+      leaf name {
+        type string;
+        description "Name of the related entity.";
+      }
+      leaf version {
+        type string;
+        description "Service specification version";
+      }
+      leaf baseType {
+        type string;
+        description "When sub-classing, this defines the
+         super-class";
+      }
+      leaf schemaLocation {
+        type inet:uri;
+        description "A URI to a JSON-Schema file that defines
+         additional attributes and relationships";
+      }
+      leaf type {
+        type string;
+        description "When sub-classing, this defines the sub-class
+         Extensible name";
+      }
+      leaf referredType {
+        type string;
+        description
+         "The actual type of the target instance when needed for
+          disambiguation.";
+      }
+  }
+
+  grouping TimePeriod {
+    description
+     "A period of time, either as a deadline (endDateTime only)
+      a startDateTime only, or both";
+    leaf endDateTime {
+      type yang:date-and-time;
+      description
+       "End of the time period, using IETC-RFC-3339 format";
+    }
+    leaf startDateTime {
+      type yang:date-and-time;
+      description
+       "Start of the time period, using IETC-RFC-3339 format. If you
+        define a start, you must also define an end";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name";
+    }
+  }
+
+  grouping EventSubscription {
+    description
+     "Sets the communication endpoint address the service instance
+      must use to deliver notification information";
+    leaf id {
+      type string;
+      mandatory true;
+      description "Id of the listener";
+    }
+    leaf callback {
+      type string;
+      mandatory true;
+      description "The callback being registered.";
+    }
+    leaf query {
+      type string;
+      description "additional data to be passed";
+    }
+  }
+
+  grouping EventSubscriptionInput {
+    description
+     "Sets the communication endpoint address the service instance
+      must use to deliver notification information";
+    leaf callback {
+      type string;
+      mandatory true;
+      description "The callback being registered.";
+    }
+    leaf query {
+      type string;
+      description "additional data to be passed";
+    }
+  }
+
+  grouping ServiceCreateEvent {
+    description "The notification data structure";
+    container event {
+      description
+       "The event payload linked to the involved resource object";
+      uses ServiceCreateEventPayload;
+    }
+    leaf eventId {
+      type string;
+      description "The identifier of the notification.";
+    }
+    leaf eventTime {
+      type yang:date-and-time;
+      description "Time of the event occurrence.";
+    }
+    leaf eventType {
+      type string;
+      description "The type of the notification.";
+    }
+    leaf correlationId {
+      type string;
+      description "The correlation id for this event.";
+    }
+    leaf domain {
+      type string;
+      description "The domain of the event.";
+    }
+    leaf title {
+      type string;
+      description "The title of the event.";
+    }
+    leaf description {
+      type string;
+      description "An explnatory of the event.";
+    }
+    leaf priority {
+      type string;
+      description "A priority.";
+    }
+    leaf timeOcurred {
+      type yang:date-and-time;
+      description "The time the event occured.";
+    }
+  }
+
+  grouping ServiceCreateEventPayload {
+    description "The event data structure";
+    container service {
+      description "The involved resource data for the event";
+      uses Service;
+    }
+  }
+
+  grouping ServiceAttributeValueChangeEvent {
+    description "The notification data structure";
+    leaf eventId {
+      type string;
+      description "The identifier of the notification.";
+    }
+    leaf eventTime {
+      type yang:date-and-time;
+      description "Time of the event occurrence.";
+    }
+    leaf eventType {
+      type string;
+      description "The type of the notification.";
+    }
+    leaf correlationId {
+      type string;
+      description "The correlation id for this event.";
+    }
+    leaf domain {
+      type string;
+      description "The domain of the event.";
+    }
+    leaf title {
+      type string;
+      description "The title of the event.";
+    }
+    leaf description {
+      type string;
+      description "An explnatory of the event.";
+    }
+    leaf priority {
+      type string;
+      description "A priority.";
+    }
+    leaf timeOcurred {
+      type yang:date-and-time;
+      description "The time the event occured.";
+    }
+    leaf fieldPath {
+      type string;
+      description
+       "The path identifying the object field concerned by this
+        notification.";
+    }
+    container event {
+      description
+       "The event payload linked to the involved resource object";
+      uses ServiceAttributeValueChangeEventPayload;
+    }
+  }
+
+  grouping ServiceAttributeValueChangeEventPayload {
+      description "The event data structure";
+          container service {
+              description "The involved resource data for the event";
+              uses Service;
+          }
+  }
+
+  grouping ServiceStateChangeEvent {
+    description "The notification data structure";
+    container event {
+      description
+       "The event payload linked to the involved resource object";
+      uses ServiceStateChangeEventPayload;
+    }
+    leaf eventId {
+      type string;
+      description "The identifier of the notification.";
+    }
+    leaf eventTime {
+      type yang:date-and-time;
+      description "Time of the event occurrence.";
+    }
+    leaf eventType {
+      type string;
+      description "The type of the notification.";
+    }
+    leaf correlationId {
+      type string;
+      description "The correlation id for this event.";
+    }
+    leaf domain {
+      type string;
+      description "The domain of the event.";
+    }
+    leaf title {
+      type string;
+      description "The title of the event.";
+    }
+    leaf description {
+      type string;
+      description "An explnatory of the event.";
+    }
+    leaf priority {
+      type string;
+      description "A priority.";
+    }
+    leaf timeOcurred {
+      type yang:date-and-time;
+      description "The time the event occured.";
+    }
+  }
+
+  grouping ServiceStateChangeEventPayload {
+    description "The event data structure";
+    container service {
+      description "The involved resource data for the event";
+      uses Service;
+    }
+  }
+
+  grouping ServiceDeleteEvent {
+    description "The notification data structure";
+    container event {
+      description
+       "The event payload linked to the involved resource object";
+      uses ServiceDeleteEventPayload;
+    }
+    leaf eventId {
+      type string;
+      description "The identifier of the notification.";
+    }
+    leaf eventTime {
+      type yang:date-and-time;
+      description "Time of the event occurrence.";
+    }
+    leaf eventType {
+      type string;
+      description "The type of the notification.";
+    }
+    leaf correlationId {
+      type string;
+      description "The correlation id for this event.";
+    }
+    leaf domain {
+      type string;
+      description "The domain of the event.";
+    }
+    leaf title {
+      type string;
+      description "The title of the event.";
+    }
+    leaf description {
+      type string;
+      description "An explnatory of the event.";
+    }
+    leaf priority {
+      type string;
+      description "A priority.";
+    }
+    leaf timeOcurred {
+      type yang:date-and-time;
+      description "The time the event occured.";
+    }
+  }
+
+  grouping ServiceDeleteEventPayload {
+    description "The event data structure";
+    container service {
+      description "The involved resource data for the event";
+      uses Service;
+    }
+  }
+
+  grouping MonitorCreateEvent {
+    description "The notification data structure";
+    container event {
+      description
+       "The event payload linked to the involved resource object";
+      uses MonitorCreateEventPayload;
+    }
+    leaf eventId {
+      type string;
+      description "The identifier of the notification.";
+    }
+    leaf eventTime {
+      type yang:date-and-time;
+      description "Time of the event occurrence.";
+    }
+    leaf eventType {
+      type string;
+      description "The type of the notification.";
+    }
+    leaf correlationId {
+      type string;
+      description "The correlation id for this event.";
+    }
+    leaf domain {
+      type string;
+      description "The domain of the event.";
+    }
+    leaf title {
+      type string;
+      description "The title of the event.";
+    }
+    leaf description {
+      type string;
+      description "An explnatory of the event.";
+    }
+    leaf priority {
+      type string;
+      description "A priority.";
+    }
+    leaf timeOcurred {
+      type yang:date-and-time;
+      description "The time the event occured.";
+    }
+  }
+
+  grouping MonitorCreateEventPayload {
+    description "The event data structure";
+    container monitor {
+      description "The involved resource data for the event";
+      uses Monitor;
+    }
+  }
+
+  grouping MonitorAttributeValueChangeEvent {
+    description "The notification data structure";
+    leaf eventId {
+      type string;
+      description "The identifier of the notification.";
+    }
+    leaf eventTime {
+      type yang:date-and-time;
+      description "Time of the event occurrence.";
+    }
+    leaf eventType {
+      type string;
+      description "The type of the notification.";
+    }
+    leaf correlationId {
+      type string;
+      description "The correlation id for this event.";
+    }
+    leaf domain {
+      type string;
+      description "The domain of the event.";
+    }
+    leaf title {
+      type string;
+      description "The title of the event.";
+    }
+    leaf description {
+      type string;
+      description "An explnatory of the event.";
+    }
+    leaf priority {
+      type string;
+      description "A priority.";
+    }
+    leaf timeOcurred {
+      type yang:date-and-time;
+      description "The time the event occured.";
+    }
+    leaf fieldPath {
+      type string;
+      description
+       "The path identifying the object field concerned by this
+        notification.";
+    }
+    container event {
+      description
+       "The event payload linked to the involved resource object";
+      uses MonitorAttributeValueChangeEventPayload;
+    }
+  }
+
+  grouping MonitorAttributeValueChangeEventPayload {
+    description "The event data structure";
+    container monitor {
+      description "The involved resource data for the event";
+      uses Monitor;
+    }
+  }
+
+  grouping MonitorStateChangeEvent {
+    description "The notification data structure";
+    container event {
+      description
+       "The event payload linked to the involved resource object";
+      uses MonitorStateChangeEventPayload;
+    }
+    leaf eventId {
+      type string;
+      description "The identifier of the notification.";
+    }
+    leaf eventTime {
+      type yang:date-and-time;
+      description "Time of the event occurrence.";
+    }
+    leaf eventType {
+      type string;
+      description "The type of the notification.";
+    }
+    leaf correlationId {
+      type string;
+      description "The correlation id for this event.";
+    }
+    leaf domain {
+      type string;
+      description "The domain of the event.";
+    }
+    leaf title {
+      type string;
+      description "The title of the event.";
+    }
+    leaf description {
+      type string;
+      description "An explnatory of the event.";
+    }
+    leaf priority {
+      type string;
+      description "A priority.";
+    }
+    leaf timeOcurred {
+      type yang:date-and-time;
+      description "The time the event occured.";
+    }
+  }
+
+  grouping MonitorStateChangeEventPayload {
+    description "The event data structure";
+    container monitor {
+      description "The involved resource data for the event";
+      uses Monitor;
+    }
+  }
+
+  grouping MonitorDeleteEvent {
+    description "The notification data structure";
+    container event {
+      description
+       "The event payload linked to the involved resource object";
+      uses MonitorDeleteEventPayload;
+    }
+    leaf eventId {
+      type string;
+      description "The identifier of the notification.";
+    }
+    leaf eventTime {
+      type yang:date-and-time;
+      description "Time of the event occurrence.";
+    }
+    leaf eventType {
+      type string;
+      description "The type of the notification.";
+    }
+    leaf correlationId {
+      type string;
+      description "The correlation id for this event.";
+    }
+    leaf domain {
+      type string;
+      description "The domain of the event.";
+    }
+    leaf title {
+      type string;
+      description "The title of the event.";
+    }
+    leaf description {
+      type string;
+      description "An explnatory of the event.";
+    }
+    leaf priority {
+      type string;
+      description "A priority.";
+    }
+    leaf timeOcurred {
+      type yang:date-and-time;
+      description "The time the event occured.";
+    }
+  }
+
+  grouping MonitorDeleteEventPayload {
+    description "The event data structure";
+    container monitor {
+      description "The involved resource data for the event";
+      uses Monitor;
+    }
+  }
+
+  grouping Error {
+    description
+     "Used when an API throws an Error, typically with a HTTP error
+      response-code (3xx, 4xx, 5xx)";
+    leaf code {
+      type string;
+      mandatory true;
+      description
+       "Application relevant detail, defined in the API or a common
+        list.";
+    }
+    leaf reason {
+      type string;
+      mandatory true;
+      description
+       "Explanation of the reason for the error which can be shown
+        to a client user.";
+    }
+    leaf message {
+      type string;
+      description
+       "More details and corrective actions related to the error
+        which can be shown to a client user.";
+    }
+    leaf status {
+      type string;
+      description "HTTP Error code extension";
+    }
+    leaf referenceError {
+      type inet:uri;
+      description "URI of documentation describing the error.";
+    }
+    leaf baseType {
+      type string;
+      description
+       "When sub-classing, this defines the super-class.";
+    }
+    leaf schemaLocation {
+      type inet:uri;
+      description
+       "A URI to a JSON-Schema file that defines additional
+        attributes and relationships";
+    }
+    leaf type {
+      type string;
+      description
+       "When sub-classing, this defines the sub-class entity name.";
+    }
+  }
+}

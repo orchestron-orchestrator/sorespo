@@ -1,0 +1,190 @@
+import json
+
+import tmf.tmf633
+import yang.gdata
+import yang.gen3
+import yang.schema
+
+SSPECS = [
+    ["netinfra.router", "name", "Router", "Network Infrastructure Router"],
+]
+
+def get_service_catalog_json(catalog_id: ?str = None) -> ?dict[str, ?value]:
+        multiple = catalog_id is None
+
+        if not multiple and catalog_id != "default":
+            return None
+
+        catalog = tmf.tmf633.ServiceCatalog(
+            id="default",
+            href="/tmf-api/serviceCatalogManagement/v4/serviceCatalog/default",
+            description="Default Service Catalog",
+            lastUpdate="2025-11-01T00:00:00",
+            lifecycleStatus="active",
+            name="Default Service Catalog",
+            version="2025-11-01",
+            category=[tmf.tmf633.ServiceCategoryRef(
+                id="default",
+                href="/tmf-api/serviceCatalogManagement/v4/serviceCategory/default",
+                name="Default Service Category",
+                version="2025-11-01",
+                baseType="ServiceCategoryRef",
+                schemaLocation="/tmf-api/schema/Service/ServiceCategoryRef.schema.json",
+                type="ServiceCategoryRef",
+                referredType="ServiceCategory"
+            )],
+            relatedParty=[],
+            validFor=tmf.tmf633.TimePeriod(
+                endDateTime=None,
+                startDateTime="1970-01-01T00:00:00"
+            ),
+            baseType="ServiceCatalog",
+            schemaLocation="/tmf-api/schema/Service/ServiceCatalog.schema.json",
+            type="ServiceCatalog"
+        )
+
+        if multiple:
+            return {"serviceCatalog": [catalog.to_json()]}
+        else:
+            return {"serviceCatalog": catalog.to_json()}
+
+def get_service_category_json(layer_config: yang.gdata.Node, category_id: ?str = None) -> ?dict[str, ?value]:
+    multiple = category_id is None
+
+    if not multiple and category_id != "default":
+        return None
+
+    category = tmf.tmf633.ServiceCategory(
+        id="default",
+        href="/tmf-api/serviceCatalogManagement/v4/serviceCategory/default",
+        description="Default Service Category",
+        isRoot=True,
+        lastUpdate="2025-11-01T00:00:00",
+        lifecycleStatus="active",
+        name="Default Service Category",
+        parentId=None,
+        version="2025-11-01",
+        category=[],
+        serviceCandidate=[],
+        validFor=tmf.tmf633.TimePeriod(
+            endDateTime=None,
+            startDateTime="1970-01-01T00:00:00"
+        ),
+        baseType="Category",
+        schemaLocation="/tmf-api/schema/Service/ServiceCategory.schema.json",
+        type="ServiceCategory"
+    )
+    for s in SSPECS:
+        category.serviceCandidate.append(tmf.tmf633.ServiceCandidateRef(
+            id=s[0],
+            href="/tmf-api/serviceCatalogManagement/v4/serviceCandidate/{s[0]}",
+            name="{s[2]} Service Candidate",
+            version="2025-11-01",
+            baseType="ServiceCandidateRef",
+            schemaLocation="/tmf-api/schema/Service/ServiceCandidateRef.schema.json",
+            type="ServiceCandidateRef",
+            referredType="ServiceCandidate"
+        ))
+
+    if multiple:
+        return {"serviceCategory": [category.to_json()]}
+    else:
+        return {"serviceCategory": category.to_json()}
+
+def get_service_candidate_json(layer_config: yang.gdata.Node, candidate_id: ?str = None) -> ?dict[str, ?value]:
+    multiple = candidate_id is None
+    candidates_json = []
+
+    for s in SSPECS:
+        if not multiple and candidate_id != s[0]:
+            continue
+
+        candidate = tmf.tmf633.ServiceCandidate(
+            id=s[0],
+            href="/tmf-api/serviceCatalogManagement/v4/serviceCandidate/{s[0]}",
+            description="{s[3]} Service Candidate",
+            lastUpdate="2025-11-01T00:00:00",
+            lifecycleStatus="active",
+            name="{s[2]} Service Candidate",
+            version="2025-11-01",
+            category=[tmf.tmf633.ServiceCategoryRef(
+                id="default",
+                href="/tmf-api/serviceCatalogManagement/v4/serviceCategory/default",
+                name="Default Service Category",
+                version="2025-11-01",
+                baseType="",
+                schemaLocation="/tmf-api/schema/Service/ServiceCategoryRef.schema.json",
+                type="ServiceCategoryRef",
+                referredType="ServiceCategory"
+            )],
+            serviceSpecification=tmf.tmf633.ServiceSpecificationRef(
+                id=s[0],
+                href="/tmf-api/serviceCatalogManagement/v4/serviceSpecification/{s[0]}",
+                name="{s[2]} Service Specification",
+                version="2025-11-01",
+                baseType="ServiceSpecificationRef",
+                schemaLocation="/tmf-api/schema/Service/ServiceSpecificationRef.schema.json",
+                type="ServiceSpecificationRef",
+                referredType="CustomerFacingServiceSpecification"
+            ),
+            validFor=tmf.tmf633.TimePeriod(
+                endDateTime=None,
+                startDateTime="1970-01-01T00:00:00"
+            ),
+            baseType="ServiceCandidate",
+            schemaLocation="/tmf-api/schema/Service/ServiceCandidate.schema.json",
+            type="ServiceCandidate"
+        )
+
+        if multiple:
+            candidates_json.append(candidate.to_json())
+        else:
+            return {"serviceCandidate": candidate.to_json()}
+
+    if multiple:
+        return {"serviceCandidate": candidates_json}
+
+def get_service_specification_json(layer_config: yang.gdata.Node, sspec_id: ?str = None) -> ?dict[str, ?value]:
+    multiple = sspec_id is None
+    sspecs_json = []
+
+    for s in SSPECS:
+        if not multiple and sspec_id != s[0]:
+            continue
+
+        sspec = tmf.tmf633.ServiceSpecification(
+            id=s[0],
+            href="/tmf-api/serviceCatalogManagement/v4/serviceSpecification/{s[0]}",
+            description="{s[3]} Service Specification",
+            isBundle=False,
+            lastUpdate="2025-11-01T00:00:00",
+            lifecycleStatus="active",
+            name="{s[2]} Service Specification",
+            version="2025-11-01",
+            attachment=[],
+            constraint=[],
+            entitySpecRelationship=[],
+            featureSpecification=[],
+            relatedParty=[],
+            resourceSpecification=[],
+            serviceLevelSpecification=[],
+            serviceSpecRelationship=[],
+            specCharacteristic=[],
+            targetEntitySchema=None,
+            validFor=tmf.tmf633.TimePeriod(
+                endDateTime=None,
+                startDateTime="1970-01-01T00:00:00"
+            ),
+            baseType="ServiceSpecification",
+            schemaLocation="/tmf-api/schema/Service/CustomerFacingServiceSpecification.schema.json",
+            type="CustomerFacingServiceSpecification"
+        )
+
+        sspec_json = sspec.to_json()
+        if multiple:
+            sspecs_json.append(sspec_json)
+        else:
+            return sspec_json
+
+    if multiple:
+        return {"serviceSpecification": sspecs_json}
