@@ -15,8 +15,8 @@ import yang.adata
 import yang.gdata
 import yang.gen3
 
-import tmf.tmf641
-import sorespo.tmf
+import tmf.tmf633
+import tmf.tmf640
 
 import sorespo.layers
 import sorespo.layers.y_0_loose as cfs_layer
@@ -31,6 +31,7 @@ import sorespo.layers.y_2_loose
 import sorespo.layers.y_3_loose
 
 import sorespo.sysspec
+import sorespo.tmf
 
 import testing
 
@@ -96,18 +97,27 @@ actor main(env):
 
     tcpl_cap = net.TCPListenCap(net.TCPCap(net.NetCap(env.cap)))
 
-    tmf_store = sorespo.tmf.SOStore()
-
     def _on_http_accept(server):
         server.cb_install(_on_http_server_request, _on_http_server_error)
 
     def _on_http_server_request(server, request, respond):
+        tmf_id = ""  # FIXME: We cannot None check $Box type vars, workaround for acton#2494
 
         def config_done(result):
             if isinstance(result, Exception):
                 respond(400, {}, json.encode({"status": "error", "message": str(result)}))
             else:
-                respond(200, {}, json.encode({"status": "ok"}))
+                tmf_id_str = str(tmf_id)
+                if tmf_id_str != "":
+                    session = cfs.newsession()
+                    layer_config: yang.gdata.Node = session.get()
+                    service_json = tmf.tmf640.get_json(sorespo.tmf.tmf_spec, layer_config, tmf_id_str)
+                    if service_json is not None:
+                        respond(200, {"Content-Type": "application/json"}, json.encode(service_json))
+                    else:
+                        respond(404, {}, "Service not found")
+                else:
+                    respond(200, {}, json.encode({"status": "ok"}))
 
         # Strip query string from path before splitting
         path_without_query = request.path.split("?")[0] if "?" in request.path else request.path
@@ -156,44 +166,163 @@ actor main(env):
             return
 
         if len(path_elements) > 1 and path_elements[1] == "tmf-api":
-            # GET /tmf-api/serviceOrdering/v4/serviceOrder/{id}
-            if request.method == "GET":
-                if len(path_elements) == 5 and path_elements[2] == "serviceOrdering" and path_elements[3] == "v4" and path_elements[4] == "serviceOrder":
-                    res = [so.to_json() for so in tmf_store.get_service_orders()]
-                    respond(200, {}, json.encode({"items": res}))
+            if len(path_elements) == 5 and path_elements[2].lower() == "serviceactivationandconfiguration" and path_elements[3] == "v4" and path_elements[4] == "service":
+                if request.method == "POST":
+                    # POST /tmf-api/ServiceActivationAndConfiguration/v4/service
+                    jd = json.decode(request.body.decode())
+                    try:
+                        gd, tmf_id = tmf.tmf640.json_to_gdata(sorespo.tmf.tmf_spec, jd, top_schema)
+                        session = cfs.newsession()
+                        session.edit_config(gd, config_done)
+                        return
+                    except Exception as e:
+                        respond(400, {}, "Error creating service: {e}")
+                        return
+                    respond(400, {}, "Unknown serviceSpecification")
                     return
 
-                elif len(path_elements) == 6 and path_elements[2] == "serviceOrdering" and path_elements[3] == "v4" and path_elements[4] == "serviceOrder":
-                    try:
-                        so_id = path_elements[5]
-                        sr = tmf_store.get_service_order(so_id)
-                        if sr is not None:
-                            respond(200, {}, json.encode(sr.to_json()))
-                            return
-                        else:
-                            respond(404, {}, "Not found")
-                            return
-                    except Exception as e:
-                        respond(400, {}, "Error getting service order: {e}")
+                if request.method == "GET":
+                    # GET /tmf-api/ServiceActivationAndConfiguration/v4/service
+                    session = cfs.newsession()
+                    layer_config: yang.gdata.Node = session.get()
+                    data = tmf.tmf640.get_json(sorespo.tmf.tmf_spec, layer_config)
+                    if data is not None:
+                        respond(200, {"Content-Type": "application/json"}, json.encode(data))
                         return
+                    raise Unreachable()
 
-            # POST /tmf-api/serviceOrdering/v4/serviceOrder
-            if request.method == "POST":
-                if len(path_elements) > 3 and path_elements[2] == "serviceOrdering" and path_elements[3] == "v4" and path_elements[4] == "serviceOrder":
-                    so_in = json.decode(request.body.decode())
-                    try:
-                        sr = tmf_store.create_service_order(so_in)
-                        sr_diff = sr.diff
-                        if sr_diff is not None:
-                            session = cfs.newsession()
-                            session.edit_config(sr_diff, config_done)
+            elif len(path_elements) == 6 and path_elements[2].lower() == "serviceactivationandconfiguration" and path_elements[3] == "v4" and path_elements[4] == "service":
+                if request.method == "GET":
+                    # GET /tmf-api/ServiceActivationAndConfiguration/v4/service/{id}
+                    service_id = path_elements[5]
+                    session = cfs.newsession()
+                    layer_config: yang.gdata.Node = session.get()
+                    data = tmf.tmf640.get_json(sorespo.tmf.tmf_spec, layer_config, service_id)
+                    if data is not None:
+                        respond(200, {"Content-Type": "application/json"}, json.encode(data))
                         return
-                    except Exception as e:
-                        respond(400, {}, "Error creating service order: {e}")
-                        return
+                    respond(404, {}, "Not found")
+                    return
 
-            # no more tmf-api
-            respond(404, {}, "Not found")
+            elif len(path_elements) == 5 and path_elements[2].lower() == "servicecatalogmanagement" and path_elements[3] == "v4" and path_elements[4].lower() == "servicecatalog":
+                if request.method == "GET":
+                    # GET  /tmf-api/serviceCatalogManagement/v4/serviceCatalog
+                    session = cfs.newsession()
+                    layer_config: yang.gdata.Node = session.get()
+                    data = tmf.tmf633.get_service_catalog_json()
+                    respond(200, {"Content-Type": "application/json"}, json.encode({"serviceCatalog": data}))
+                    return
+                elif request.method == "POST":
+                    # POST /tmf-api/serviceCatalogManagement/v4/serviceCatalog
+                    respond(401, {}, "Unauthorized")
+                    return
+
+            elif len(path_elements) == 6 and path_elements[2].lower() == "servicecatalogmanagement" and path_elements[3] == "v4" and path_elements[4].lower() == "servicecatalog":
+                if request.method == "GET":
+                    # GET  /tmf-api/serviceCatalogManagement/v4/serviceCatalog/{id}
+                    session = cfs.newsession()
+                    layer_config: yang.gdata.Node = session.get()
+                    data = tmf.tmf633.get_service_catalog_json(path_elements[5])
+                    if data is not None:
+                        respond(200, {"Content-Type": "application/json"}, json.encode({"serviceCatalog": data}))
+                        return
+                    respond(404, {}, "Not found")
+                    return
+                elif request.method in {"PUT", "PATCH", "DELETE"}:
+                    # PUT, PATCH, DELETE /tmf-api/serviceCatalogManagement/v4/serviceCatalog
+                    respond(401, {}, "Unauthorized")
+                    return
+
+            elif len(path_elements) == 5 and path_elements[2].lower() == "servicecatalogmanagement" and path_elements[3] == "v4" and path_elements[4].lower() == "servicecategory":
+                if request.method == "GET":
+                    # GET  /tmf-api/serviceCatalogManagement/v4/serviceCategory
+                    session = cfs.newsession()
+                    layer_config: yang.gdata.Node = session.get()
+                    data = tmf.tmf633.get_service_category_json(sorespo.tmf.tmf_spec)
+                    respond(200, {"Content-Type": "application/json"}, json.encode({"serviceCategory": data}))
+                    return
+                elif request.method == "POST":
+                    # POST /tmf-api/serviceCatalogManagement/v4/serviceCategory
+                    respond(401, {}, "Unauthorized")
+                    return
+
+            elif len(path_elements) == 6 and path_elements[2].lower() == "servicecatalogmanagement" and path_elements[3] == "v4" and path_elements[4].lower() == "servicecategory":
+                if request.method == "GET":
+                    # GET  /tmf-api/serviceCatalogManagement/v4/serviceCategory/{id}
+                    session = cfs.newsession()
+                    layer_config: yang.gdata.Node = session.get()
+                    data = tmf.tmf633.get_service_category_json(sorespo.tmf.tmf_spec, path_elements[5])
+                    if data is not None:
+                        respond(200, {"Content-Type": "application/json"}, json.encode({"serviceCategory": data}))
+                        return
+                    respond(404, {}, "Not found")
+                    return
+                elif request.method in {"PUT", "PATCH", "DELETE"}:
+                    # PUT, PATCH, DELETE /tmf-api/serviceCatalogManagement/v4/serviceCategory
+                    respond(401, {}, "Unauthorized")
+                    return
+
+            elif len(path_elements) == 5 and path_elements[2].lower() == "servicecatalogmanagement" and path_elements[3] == "v4" and path_elements[4].lower() == "servicecandidate":
+                if request.method == "GET":
+                    # GET  /tmf-api/serviceCatalogManagement/v4/serviceCandidate
+                    session = cfs.newsession()
+                    layer_config: yang.gdata.Node = session.get()
+                    data = tmf.tmf633.get_service_candidate_json(sorespo.tmf.tmf_spec)
+                    respond(200, {"Content-Type": "application/json"}, json.encode({"serviceCandidate": data}))
+                    return
+                elif request.method == "POST":
+                    # POST /tmf-api/serviceCatalogManagement/v4/serviceCandidate
+                    respond(401, {}, "Unauthorized")
+                    return
+
+            elif len(path_elements) == 6 and path_elements[2].lower() == "servicecatalogmanagement" and path_elements[3] == "v4" and path_elements[4].lower() == "servicecandidate":
+                if request.method == "GET":
+                    # GET  /tmf-api/serviceCatalogManagement/v4/serviceCandidate/{id}
+                    session = cfs.newsession()
+                    layer_config: yang.gdata.Node = session.get()
+                    data = tmf.tmf633.get_service_candidate_json(sorespo.tmf.tmf_spec, path_elements[5])
+                    if data is not None:
+                        respond(200, {"Content-Type": "application/json"}, json.encode({"serviceCandidate": data}))
+                        return
+                    respond(404, {}, "Not found")
+                    return
+                elif request.method in {"PUT", "PATCH", "DELETE"}:
+                    # PUT, PATCH, DELETE /tmf-api/serviceCatalogManagement/v4/serviceCandidate
+                    respond(401, {}, "Unauthorized")
+                    return
+
+            elif len(path_elements) == 5 and path_elements[2].lower() == "servicecatalogmanagement" and path_elements[3] == "v4" and path_elements[4].lower() == "servicespecification":
+
+                if request.method == "GET":
+                    # GET  /tmf-api/serviceCatalogManagement/v4/serviceSpecification
+                    session = cfs.newsession()
+                    layer_config: yang.gdata.Node = session.get()
+                    data = tmf.tmf633.get_service_specification_json(sorespo.tmf.tmf_spec, top_schema)
+                    respond(200, {"Content-Type": "application/json"}, json.encode({"serviceSpecification": data}))
+                    return
+                elif request.method == "POST":
+                    # POST /tmf-api/serviceCatalogManagement/v4/serviceSpecification
+                    respond(401, {}, "Unauthorized")
+                    return
+
+            elif len(path_elements) == 6 and path_elements[2].lower() == "servicecatalogmanagement" and path_elements[3] == "v4" and path_elements[4].lower() == "servicespecification":
+                if request.method == "GET":
+                    # GET  /tmf-api/serviceCatalogManagement/v4/serviceSpecification/{id}
+                    session = cfs.newsession()
+                    layer_config: yang.gdata.Node = session.get()
+                    data = tmf.tmf633.get_service_specification_json(sorespo.tmf.tmf_spec, top_schema, path_elements[5])
+                    if data is not None:
+                        respond(200, {"Content-Type": "application/json"}, json.encode({"serviceSpecification": data}))
+                        return
+                    respond(404, {}, "Not found")
+                    return
+                elif request.method in {"PUT", "PATCH", "DELETE"}:
+                    # PUT, PATCH, DELETE /tmf-api/serviceCatalogManagement/v4/serviceSpecification
+                    respond(401, {}, "Unauthorized")
+                    return
+
+            # No matching TMF API endpoint
+            respond(400, {}, "Bad request")
             return
 
         if request.method == "GET":

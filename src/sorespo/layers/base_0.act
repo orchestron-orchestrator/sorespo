@@ -8,10 +8,12 @@ import orchestron.ttt as ttt
 import yang.adata
 import yang.gdata
 
+from sorespo.layers.y_0 import orchestron_tmf__tmf_store__tmf640__service_entry
 from sorespo.layers.y_0 import netinfra__netinfra__router_entry
 from sorespo.layers.y_0 import netinfra__netinfra__backbone_link_entry
 from sorespo.layers.y_0 import ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry
 from sorespo.layers.y_0 import ietf_l3vpn_svc__l3vpn_svc__sites__site_entry
+from sorespo.layers.y_0 import from_xml_orchestron_tmf__tmf_store__tmf640__service_element
 from sorespo.layers.y_0 import from_xml_netinfra__netinfra__router_element
 from sorespo.layers.y_0 import from_xml_netinfra__netinfra__backbone_link_element
 from sorespo.layers.y_0 import from_xml_ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_element
@@ -21,6 +23,31 @@ from sorespo.layers.y_1_loose import root as output_root
 def o_root():
     return output_root()
 
+
+class Tmf640Store(ttt.TransformFunction):
+    transform: mut(orchestron_tmf__tmf_store__tmf640__service_entry) -> yang.adata.MNode
+
+    @staticmethod
+    def input_type():
+        """Return the modeled input type for this transform"""
+        return orchestron_tmf__tmf_store__tmf640__service_entry
+
+    mut def transform_wrapper(self, i: yang.gdata.Node, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
+        """Wrap the user provided transform method to convert from gdata to
+        modeled input and back to gdata
+        """
+        modeled_input = orchestron_tmf__tmf_store__tmf640__service_entry.from_gdata(i)
+
+        return self.transform(modeled_input).to_gdata(), None
+
+    mut def transform_xml(self, i: xml.Node, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
+        """Wrap the user provided transform method to convert from XML to
+        modeled input and return gdata
+        """
+        gdata_input = from_xml_orchestron_tmf__tmf_store__tmf640__service_element(i)
+        modeled_input = orchestron_tmf__tmf_store__tmf640__service_entry.from_gdata(gdata_input)
+
+        return self.transform(modeled_input).to_gdata(), None
 
 class Router(ttt.TransformFunction):
     transform: mut(netinfra__netinfra__router_entry) -> yang.adata.MNode

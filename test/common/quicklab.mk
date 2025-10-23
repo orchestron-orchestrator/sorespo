@@ -95,13 +95,29 @@ send-config-json-async:
 send-config-json-wait:
 	curl -X PUT -H "Content-Type: application/yang-data+json" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf
 
-.PHONY: send-config-tmf
-send-config-tmf:
-	curl -X POST -H "Content-Type: application/json" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/serviceOrdering/v4/serviceOrder
+.PHONY: send-config-tmf640
+send-config-tmf640:
+	curl  -k -sS -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/ServiceActivationAndConfiguration/v4/service | jq '.'
 
-.PHONY: get-config-tmf
-get-config-tmf:
-	curl -X GET http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/serviceOrdering/v4/serviceOrder$(if $(ID),/$(ID),)
+.PHONY: get-config-tmf640
+get-config-tmf640:
+	curl -k -sS -H "Accept: application/json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/ServiceActivationAndConfiguration/v4/service$(if $(ID),/$(ID),) | jq '.'
+
+.PHONY: get-tmf633-service-catalog
+get-tmf633-service-catalog:
+	curl -k -sS -H "Accept: application/json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/serviceCatalogManagement/v4/serviceCatalog$(if $(ID),/$(ID),) | jq '.'
+
+.PHONY: get-tmf633-service-category
+get-tmf633-service-category:
+	curl -k -sS -H "Accept: application/json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/serviceCatalogManagement/v4/serviceCategory$(if $(ID),/$(ID),) | jq '.'
+
+.PHONY: get-tmf633-service-candidate
+get-tmf633-service-candidate:
+	curl -k -sS -H "Accept: application/json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/serviceCatalogManagement/v4/serviceCandidate$(if $(ID),/$(ID),) | jq '.'
+
+.PHONY: get-tmf633-service-specification
+get-tmf633-service-specification:
+	curl -k -sS -H "Accept: application/json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/serviceCatalogManagement/v4/serviceSpecification$(if $(ID),/$(ID),) | jq '.'
 
 .PHONY: get-config0 get-config1 get-config2 get-config3
 get-config0 get-config1 get-config2 get-config3:
