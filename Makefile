@@ -5,7 +5,7 @@ build:
 
 .PHONY: build-ldep
 build-ldep:
-	$(MAKE) build DEP_OVERRIDES="--dep netconf=../netconf --dep orchestron=../orchestron --dep yang=../acton-yang"
+	$(MAKE) build DEP_OVERRIDES="--dep netconf=../netconf --dep orchestron=../orchestron --dep yang=../acton-yang --dep actmf=../actmf"
 
 .PHONY: build-linux-x86_64
 build-linux-x86_64:
@@ -19,12 +19,16 @@ build-linux-aarch64:
 build-macos-aarch64:
 	$(MAKE) build TARGET="--target aarch64-macos"
 
+.PHONY: build-linux-aarch64-ldep
+build-linux-aarch64-ldep:
+	$(MAKE) build DEP_OVERRIDES="--dep netconf=../netconf --dep orchestron=../orchestron --dep yang=../acton-yang --dep actmf=../actmf" TARGET="--target aarch64-linux-gnu.2.27"
+
 .PHONY: test
 test:
 	acton test $(DEP_OVERRIDES)
 
 test-ldep:
-	$(MAKE) test DEP_OVERRIDES="--dep netconf=../netconf --dep orchestron=../orchestron --dep yang=../acton-yang"
+	$(MAKE) test DEP_OVERRIDES="--dep netconf=../netconf --dep orchestron=../orchestron --dep yang=../acton-yang --dep actmf=../actmf"
 
 .PHONY: gen
 gen:
@@ -32,7 +36,7 @@ gen:
 
 .PHONY: gen-ldep
 gen-ldep:
-	$(MAKE) gen DEP_OVERRIDES="--dep netconf=../../netconf --dep orchestron=../../orchestron --dep yang=../../acton-yang"
+	$(MAKE) gen DEP_OVERRIDES="--dep netconf=../../netconf --dep orchestron=../../orchestron --dep yang=../../acton-yang --dep actmf=../../actmf"
 
 .PHONY: pkg-upgrade
 pkg-upgrade:
