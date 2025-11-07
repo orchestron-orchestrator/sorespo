@@ -111,7 +111,7 @@ actor main(env):
                 if tmf_id_str != "":
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    service_json = tmf.tmf640.get_json(layer_config, tmf_id_str)
+                    service_json = tmf.tmf640.get_service_json(layer_config, tmf_id_str)
                     if service_json is not None:
                         respond(200, {"Content-Type": "application/json"}, json.encode(service_json))
                     else:
@@ -185,11 +185,8 @@ actor main(env):
                     # GET /tmf-api/ServiceActivationAndConfiguration/v4/service
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    data = tmf.tmf640.get_json(layer_config)
-                    if data is not None:
-                        respond(200, {"Content-Type": "application/json"}, json.encode(data))
-                        return
-                    raise Unreachable()
+                    data = tmf.tmf640.get_service_list_json(layer_config)
+                    respond(200, {"Content-Type": "application/json"}, json.encode_list(data))
 
             elif len(path_elements) == 6 and path_elements[2].lower() == "serviceactivationandconfiguration" and path_elements[3] == "v4" and path_elements[4] == "service":
                 if request.method == "GET":
@@ -197,7 +194,7 @@ actor main(env):
                     service_id = path_elements[5]
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    data = tmf.tmf640.get_json(layer_config, service_id)
+                    data = tmf.tmf640.get_service_json(layer_config, service_id)
                     if data is not None:
                         respond(200, {"Content-Type": "application/json"}, json.encode(data))
                         return
@@ -209,8 +206,8 @@ actor main(env):
                     # GET  /tmf-api/serviceCatalogManagement/v4/serviceCatalog
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    data = tmf.tmf633.get_service_catalog_json()
-                    respond(200, {"Content-Type": "application/json"}, json.encode({"serviceCatalog": data}))
+                    data = tmf.tmf633.get_service_catalog_list_json()
+                    respond(200, {"Content-Type": "application/json"}, json.encode_list(data))
                     return
                 elif request.method == "POST":
                     # POST /tmf-api/serviceCatalogManagement/v4/serviceCatalog
@@ -224,7 +221,7 @@ actor main(env):
                     layer_config: yang.gdata.Node = session.get()
                     data = tmf.tmf633.get_service_catalog_json(path_elements[5])
                     if data is not None:
-                        respond(200, {"Content-Type": "application/json"}, json.encode({"serviceCatalog": data}))
+                        respond(200, {"Content-Type": "application/json"}, json.encode(data))
                         return
                     respond(404, {}, "Not found")
                     return
@@ -238,8 +235,8 @@ actor main(env):
                     # GET  /tmf-api/serviceCatalogManagement/v4/serviceCategory
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    data = tmf.tmf633.get_service_category_json(sorespo.tmf.tmf_spec)
-                    respond(200, {"Content-Type": "application/json"}, json.encode({"serviceCategory": data}))
+                    data = tmf.tmf633.get_service_category_list_json(sorespo.tmf.tmf_spec)
+                    respond(200, {"Content-Type": "application/json"}, json.encode_list(data))
                     return
                 elif request.method == "POST":
                     # POST /tmf-api/serviceCatalogManagement/v4/serviceCategory
@@ -253,7 +250,7 @@ actor main(env):
                     layer_config: yang.gdata.Node = session.get()
                     data = tmf.tmf633.get_service_category_json(sorespo.tmf.tmf_spec, path_elements[5])
                     if data is not None:
-                        respond(200, {"Content-Type": "application/json"}, json.encode({"serviceCategory": data}))
+                        respond(200, {"Content-Type": "application/json"}, json.encode(data))
                         return
                     respond(404, {}, "Not found")
                     return
@@ -267,8 +264,8 @@ actor main(env):
                     # GET  /tmf-api/serviceCatalogManagement/v4/serviceCandidate
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    data = tmf.tmf633.get_service_candidate_json(sorespo.tmf.tmf_spec)
-                    respond(200, {"Content-Type": "application/json"}, json.encode({"serviceCandidate": data}))
+                    data = tmf.tmf633.get_service_candidate_list_json(sorespo.tmf.tmf_spec)
+                    respond(200, {"Content-Type": "application/json"}, json.encode_list(data))
                     return
                 elif request.method == "POST":
                     # POST /tmf-api/serviceCatalogManagement/v4/serviceCandidate
@@ -282,7 +279,7 @@ actor main(env):
                     layer_config: yang.gdata.Node = session.get()
                     data = tmf.tmf633.get_service_candidate_json(sorespo.tmf.tmf_spec, path_elements[5])
                     if data is not None:
-                        respond(200, {"Content-Type": "application/json"}, json.encode({"serviceCandidate": data}))
+                        respond(200, {"Content-Type": "application/json"}, json.encode(data))
                         return
                     respond(404, {}, "Not found")
                     return
@@ -297,8 +294,8 @@ actor main(env):
                     # GET  /tmf-api/serviceCatalogManagement/v4/serviceSpecification
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    data = tmf.tmf633.get_service_specification_json(sorespo.tmf.tmf_spec, top_schema)
-                    respond(200, {"Content-Type": "application/json"}, json.encode({"serviceSpecification": data}))
+                    data = tmf.tmf633.get_service_specification_list_json(sorespo.tmf.tmf_spec, top_schema)
+                    respond(200, {"Content-Type": "application/json"}, json.encode_list(data))
                     return
                 elif request.method == "POST":
                     # POST /tmf-api/serviceCatalogManagement/v4/serviceSpecification
@@ -312,7 +309,7 @@ actor main(env):
                     layer_config: yang.gdata.Node = session.get()
                     data = tmf.tmf633.get_service_specification_json(sorespo.tmf.tmf_spec, top_schema, path_elements[5])
                     if data is not None:
-                        respond(200, {"Content-Type": "application/json"}, json.encode({"serviceSpecification": data}))
+                        respond(200, {"Content-Type": "application/json"}, json.encode(data))
                         return
                     respond(404, {}, "Not found")
                     return
