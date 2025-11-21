@@ -12,6 +12,9 @@ from yang.schema import DIdentity
 # == This file is generated ==
 
 
+_identities: list[DIdentity] = []
+
+
 def src_yang():
     res = []
     res.append(r"""module Cisco-IOS-XR-policy-repository-cfg {
@@ -21182,6 +21185,11 @@ def from_xml_gen3(node: xml.Node, root_path: list[str]=[]) -> yang.gdata.Contain
     s = yang.compile(src_yang())
     return yang.gen3.from_data(s, node, loose=True, root_path=root_path)
 
+def prsrc_gen3(data, self_name='ad'):
+    # WARNING: this wrapper for the gen3.prsrc schema-driven parser compiles the schema on every call!
+    s = yang.compile(src_yang())
+    return yang.gen3.pradata(s, data, self_name, loose=True)
+
 schema_namespaces: set[str] = {
     'http://cisco.com/ns/yang/Cisco-IOS-XR-policy-repository-cfg',
     'http://cisco.com/ns/yang/Cisco-IOS-XR-um-hostname-cfg',
@@ -21194,8 +21202,3 @@ schema_namespaces: set[str] = {
     'http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-isis-cfg',
     'http://cisco.com/ns/yang/Cisco-IOS-XR-um-vrf-cfg',
 }
-
-def prsrc_gen3(data, self_name='ad'):
-    # WARNING: this wrapper for the gen3.prsrc schema-driven parser compiles the schema on every call!
-    s = yang.compile(src_yang())
-    return yang.gen3.pradata(s, data, self_name, loose=True)
