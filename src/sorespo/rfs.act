@@ -19,8 +19,8 @@ import sorespo.devices.NokiaSRLinux_25_3_2 as srl25
 
 CRPD = True
 
-def prefix_length_to_netmask(prefix_length):
-    binary_netmask = ("1" * prefix_length).ljust(32, "0")
+def prefix_length_to_netmask(prefix_length: bigint):
+    binary_netmask = ("1" * int(prefix_length)).ljust(32, "0")
     octets = [int(binary_netmask[i:i + 8], 2) for i in range(0, 32, 8)]
     return ".".join(map(str, octets))
 
@@ -113,9 +113,11 @@ end-policy"""
             # IS-IS global config
             dcpi = dev.configuration.protocols.isis
             dcpi.lsp_lifetime = 65535
-            il1 = dcpi.level.create(1)
+            # HACK: remove cast to bigint once union base type resolving is fixed
+            il1 = dcpi.level.create(bigint(1))
             il1.disable = True
-            il2 = dcpi.level.create(2)
+            # HACK: remove cast to bigint once union base type resolving is fixed
+            il2 = dcpi.level.create(bigint(2))
             il2.wide_metrics_only = True
             ilo0 = dcpi.interface.create("lo0.0")
             ilo0.create_passive()
@@ -353,9 +355,11 @@ class BBInterface(base.BBInterface):
                     interface = i.name
                 isis_intf = dcpi.interface.create(interface)
                 isis_intf.point_to_point = True
-                il1 = isis_intf.level.create(1)
+                # HACK: remove cast to bigint once union base type resolving is fixed
+                il1 = isis_intf.level.create(bigint(1))
                 il1.disable = True
-                il2 = isis_intf.level.create(2)
+                # HACK: remove cast to bigint once union base type resolving is fixed
+                il2 = isis_intf.level.create(bigint(2))
                 il2.metric = 5000
 
                 # MPLS and LDP config for this interface
@@ -452,7 +456,7 @@ class Vrf(base.Vrf):
     def transform(self, i, di):
         print("RFS /rfs{{{di.name}}}/vrf transform running {i.name}", err=True)
 
-        route_distinguisher_id = "%d%d" % (i.id, i.router_id)
+        route_distinguisher_id = "{i.id}{i.router_id}"
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
             print("RFS /rfs{{{di.name}}}/vrf transform running {i.name} for Cisco IOS XR", err=True)
             dev = xr24.root()
@@ -461,13 +465,13 @@ class Vrf(base.Vrf):
             vrf = dev.vrfs.vrf.create(i.name)
             vrf.description = i.description
             ipv4_unicast = vrf.address_family.ipv4.create_unicast()
-            ipv4_unicast.import_.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, int(i.id), False)
-            ipv4_unicast.export.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, int(i.id), False)
+            ipv4_unicast.import_.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, bigint(i.id), False)
+            ipv4_unicast.export.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, bigint(i.id), False)
 
             # Create RD in BGP VRF
             bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(str(i.asn))
             bgp_vrf = bgp_as.vrfs.vrf.create(i.name)
-            bgp_vrf.create_rd().create_two_byte_as(str(i.asn), int(route_distinguisher_id))
+            bgp_vrf.create_rd().create_two_byte_as(str(i.asn), bigint(route_distinguisher_id))
 
             return dev
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
@@ -552,7 +556,7 @@ class VrfInterface(base.VrfInterface):
             if ipv4_address is not None:
                 sub_intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(i.ipv4_prefix_length))
             sub_intf.vrf = i.vrf
-            sub_intf.um_l2_ethernet_cfg_encapsulation.dot1q.vlan_id = int(vlan_id)
+            sub_intf.um_l2_ethernet_cfg_encapsulation.dot1q.vlan_id = bigint(vlan_id)
             return dev
 
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
@@ -585,9 +589,9 @@ class VrfInterface(base.VrfInterface):
             intf.vlan_tagging = True
 
             # Create the subinterface
-            subif = intf.subinterface.create(int(vlan_id))
+            subif = intf.subinterface.create(bigint(vlan_id))
             subif.admin_state = "enable"
-            subif.vlan.encap.create_single_tagged().vlan_id = int(vlan_id)
+            subif.vlan.encap.create_single_tagged().vlan_id = bigint(vlan_id)
             subif.description = i.description
 
             # Configure IPv4 address if present
