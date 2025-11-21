@@ -1,4 +1,5 @@
 import yang.adata
+import yang.gdata
 import orchestron.device as odev
 import orchestron.ttt
 from orchestron import UnsupportedDevice
@@ -101,8 +102,8 @@ end-policy"""
             dev.configuration.system.host_name = di.name
 
             services = dev.configuration.system.create_services()
-            services.netconf.rfc_compliant = True
-            services.netconf.yang_compliant = True
+            services.netconf.rfc_compliant = yang.gdata.Present()
+            services.netconf.yang_compliant = yang.gdata.Present()
 
             lo0 = dev.configuration.interfaces.interface.create("lo0")
             lo0.description = "ROLE: {i.role}"
@@ -114,16 +115,16 @@ end-policy"""
             dcpi = dev.configuration.protocols.isis
             dcpi.lsp_lifetime = 65535
             il1 = dcpi.level.create(1)
-            il1.disable = True
+            il1.disable = yang.gdata.Present()
             il2 = dcpi.level.create(2)
-            il2.wide_metrics_only = True
+            il2.wide_metrics_only = yang.gdata.Present()
             ilo0 = dcpi.interface.create("lo0.0")
             ilo0.create_passive()
 
             # BGP global config
             dev.configuration.routing_options.autonomous_system.as_number = str(i.asn)
             bgp = dev.configuration.protocols.bgp
-            bgp.log_updown = True
+            bgp.log_updown = yang.gdata.Present()
 
             # Create neighbor-group: IPV4-IBGP
             g1 = bgp.group.create("IPV4-IBGP")
@@ -308,7 +309,7 @@ class BBInterface(base.BBInterface):
             # Create the interface
             intf = dev.interfaces.interface.create(i.name)
             intf.description = "Link to {i.remote.device} [{i.remote.interface}]"
-            intf.shutdown = False
+            intf.shutdown = yang.gdata.Present(False)
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(int(i.ipv4_prefix_length)))
@@ -352,9 +353,9 @@ class BBInterface(base.BBInterface):
                 else:
                     interface = i.name
                 isis_intf = dcpi.interface.create(interface)
-                isis_intf.point_to_point = True
+                isis_intf.point_to_point = yang.gdata.Present()
                 il1 = isis_intf.level.create(1)
-                il1.disable = True
+                il1.disable = yang.gdata.Present()
                 il2 = isis_intf.level.create(2)
                 il2.metric = 5000
 
@@ -479,7 +480,7 @@ class Vrf(base.Vrf):
             ri.vrf_target.community = "target:{i.asn}:{i.id}"
             ri.create_vrf_table_label()
             group = ri.protocols.bgp.group.create("customer")
-            group.passive = True
+            group.passive = yang.gdata.Present()
             # group.import_.append("ACCEPT")
             # group.export.append("ACCEPT")
 
@@ -544,10 +545,10 @@ class VrfInterface(base.VrfInterface):
 
             # Main interface config
             intf = dev.interfaces.interface.create(main_intf)
-            intf.shutdown = False
+            intf.shutdown = yang.gdata.Present(False)
             sub_intf = dev.interfaces.interface.create(i.name)
             sub_intf.description = i.description
-            sub_intf.shutdown = False
+            sub_intf.shutdown = yang.gdata.Present(False)
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 sub_intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(int(i.ipv4_prefix_length)))
@@ -642,7 +643,7 @@ class EbgpCustomer(base.EbgpCustomer):
             neighbor.description = i.description
             neighbor.authentication_key = junos_encrypt(i.authentication_key, "4")
             neighbor.peer_as = str(i.peer_asn)
-            neighbor.as_override = True
+            neighbor.as_override = yang.gdata.Present()
 
             return dev
 

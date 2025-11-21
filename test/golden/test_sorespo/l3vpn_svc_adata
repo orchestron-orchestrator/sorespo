@@ -166,7 +166,7 @@ def adata_AMS_CORE_1():
     
     # List /interfaces/interface element: GigabitEthernet0/0/0/0
     interface_element = ad.interfaces.interface.create('GigabitEthernet0/0/0/0')
-    interface_element.shutdown = False
+    interface_element.shutdown = yang.gdata.Present(False)
     interface_element.description = 'Link to FRA-CORE-1 [GigabitEthernet0/0/0/0]'
     
     # P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/0']/ipv4/addresses/address
@@ -178,7 +178,7 @@ def adata_AMS_CORE_1():
     
     # List /interfaces/interface element: GigabitEthernet0/0/0/1
     interface_element = ad.interfaces.interface.create('GigabitEthernet0/0/0/1')
-    interface_element.shutdown = False
+    interface_element.shutdown = yang.gdata.Present(False)
     interface_element.description = 'Link to STO-CORE-1 [eth1]'
     
     # P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/1']/ipv4/addresses/address
@@ -190,11 +190,11 @@ def adata_AMS_CORE_1():
     
     # List /interfaces/interface element: GigabitEthernet0/0/0/2
     interface_element = ad.interfaces.interface.create('GigabitEthernet0/0/0/2')
-    interface_element.shutdown = False
+    interface_element.shutdown = yang.gdata.Present(False)
     
     # List /interfaces/interface element: GigabitEthernet0/0/0/2.100
     interface_element = ad.interfaces.interface.create('GigabitEthernet0/0/0/2.100')
-    interface_element.shutdown = False
+    interface_element.shutdown = yang.gdata.Present(False)
     interface_element.description = 'Customer VPN access SITE-1 [SNA-1-1] in VPN acme-65501'
     interface_element.vrf = 'acme-65501'
     
@@ -410,7 +410,7 @@ def adata_FRA_CORE_1():
     
     # List /interfaces/interface element: GigabitEthernet0/0/0/0
     interface_element = ad.interfaces.interface.create('GigabitEthernet0/0/0/0')
-    interface_element.shutdown = False
+    interface_element.shutdown = yang.gdata.Present(False)
     interface_element.description = 'Link to AMS-CORE-1 [GigabitEthernet0/0/0/0]'
     
     # P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/0']/ipv4/addresses/address
@@ -422,7 +422,7 @@ def adata_FRA_CORE_1():
     
     # List /interfaces/interface element: GigabitEthernet0/0/0/1
     interface_element = ad.interfaces.interface.create('GigabitEthernet0/0/0/1')
-    interface_element.shutdown = False
+    interface_element.shutdown = yang.gdata.Present(False)
     interface_element.description = 'Link to STO-CORE-1 [eth2]'
     
     # P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/1']/ipv4/addresses/address
@@ -434,7 +434,7 @@ def adata_FRA_CORE_1():
     
     # List /interfaces/interface element: GigabitEthernet0/0/0/2
     interface_element = ad.interfaces.interface.create('GigabitEthernet0/0/0/2')
-    interface_element.shutdown = False
+    interface_element.shutdown = yang.gdata.Present(False)
     interface_element.description = 'Link to LJU-CORE-1 [eth1]'
     
     # P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/2']/ipv4/addresses/address
@@ -446,11 +446,11 @@ def adata_FRA_CORE_1():
     
     # List /interfaces/interface element: GigabitEthernet0/0/0/3
     interface_element = ad.interfaces.interface.create('GigabitEthernet0/0/0/3')
-    interface_element.shutdown = False
+    interface_element.shutdown = yang.gdata.Present(False)
     
     # List /interfaces/interface element: GigabitEthernet0/0/0/3.100
     interface_element = ad.interfaces.interface.create('GigabitEthernet0/0/0/3.100')
-    interface_element.shutdown = False
+    interface_element.shutdown = yang.gdata.Present(False)
     interface_element.description = 'Customer VPN access SITE-2 [SNA-2-1] in VPN acme-65501'
     interface_element.vrf = 'acme-65501'
     
@@ -492,8 +492,8 @@ def adata_LJU_CORE_1():
     services = ad.configuration.system.create_services()
     
     # Container: /configuration/system/services/netconf
-    services.netconf.rfc_compliant = True
-    services.netconf.yang_compliant = True
+    services.netconf.rfc_compliant = yang.gdata.Present()
+    services.netconf.yang_compliant = yang.gdata.Present()
     
     # List /configuration/interfaces/interface element: eth1
     interface_element = ad.configuration.interfaces.interface.create('eth1')
@@ -561,14 +561,14 @@ def adata_LJU_CORE_1():
     
     # List /configuration/routing-instances/instance[name='acme-65501']/protocols/bgp/group element: customer
     group_element = instance_element.protocols.bgp.group.create('customer')
-    group_element.passive = True
+    group_element.passive = yang.gdata.Present()
     
     # List /configuration/routing-instances/instance[name='acme-65501']/protocols/bgp/group[name='customer']/neighbor element: 10.204.1.2
     neighbor_element = group_element.neighbor.create('10.204.1.2')
     neighbor_element.description = 'Customer eBGP SITE-4 [SNA-4-1] in VPN acme-65501 to 10.204.1.2'
     neighbor_element.authentication_key = '$9$4TaJDkqf36AoJ5Q36AtLx7-Yg4aZUik'
     neighbor_element.peer_as = '65501'
-    neighbor_element.as_override = True
+    neighbor_element.as_override = yang.gdata.Present()
     
     # List /configuration/routing-instances/instance[name='acme-65501']/interface element: eth3.100
     interface_element = instance_element.interface.create('eth3.100')
@@ -586,7 +586,7 @@ def adata_LJU_CORE_1():
     ad.configuration.routing_options.autonomous_system.as_number = '65001'
     
     # Container: /configuration/protocols/bgp
-    ad.configuration.protocols.bgp.log_updown = True
+    ad.configuration.protocols.bgp.log_updown = yang.gdata.Present()
     
     # List /configuration/protocols/bgp/group element: IPV4-IBGP
     group_element = ad.configuration.protocols.bgp.group.create('IPV4-IBGP')
@@ -621,20 +621,20 @@ def adata_LJU_CORE_1():
     
     # List /configuration/protocols/isis/interface element: eth1
     interface_element = ad.configuration.protocols.isis.interface.create('eth1')
-    interface_element.point_to_point = True
+    interface_element.point_to_point = yang.gdata.Present()
     
     # List /configuration/protocols/isis/interface[name='eth1']/level element: 1
     level_element = interface_element.level.create('1')
-    level_element.disable = True
+    level_element.disable = yang.gdata.Present()
     level_element.metric = '5000'
     
     # List /configuration/protocols/isis/interface element: eth2
     interface_element = ad.configuration.protocols.isis.interface.create('eth2')
-    interface_element.point_to_point = True
+    interface_element.point_to_point = yang.gdata.Present()
     
     # List /configuration/protocols/isis/interface[name='eth2']/level element: 1
     level_element = interface_element.level.create('1')
-    level_element.disable = True
+    level_element.disable = yang.gdata.Present()
     level_element.metric = '5000'
     
     # List /configuration/protocols/isis/interface element: lo0.0
@@ -645,8 +645,8 @@ def adata_LJU_CORE_1():
     
     # List /configuration/protocols/isis/level element: 1
     level_element = ad.configuration.protocols.isis.level.create('1')
-    level_element.disable = True
-    level_element.wide_metrics_only = True
+    level_element.disable = yang.gdata.Present()
+    level_element.wide_metrics_only = yang.gdata.Present()
     
     # List /configuration/protocols/ldp/interface element: eth1
     interface_element = ad.configuration.protocols.ldp.interface.create('eth1')
@@ -671,8 +671,8 @@ def adata_STO_CORE_1():
     services = ad.configuration.system.create_services()
     
     # Container: /configuration/system/services/netconf
-    services.netconf.rfc_compliant = True
-    services.netconf.yang_compliant = True
+    services.netconf.rfc_compliant = yang.gdata.Present()
+    services.netconf.yang_compliant = yang.gdata.Present()
     
     # List /configuration/interfaces/interface element: eth1
     interface_element = ad.configuration.interfaces.interface.create('eth1')
@@ -753,14 +753,14 @@ def adata_STO_CORE_1():
     
     # List /configuration/routing-instances/instance[name='acme-65501']/protocols/bgp/group element: customer
     group_element = instance_element.protocols.bgp.group.create('customer')
-    group_element.passive = True
+    group_element.passive = yang.gdata.Present()
     
     # List /configuration/routing-instances/instance[name='acme-65501']/protocols/bgp/group[name='customer']/neighbor element: 10.203.1.2
     neighbor_element = group_element.neighbor.create('10.203.1.2')
     neighbor_element.description = 'Customer eBGP SITE-3 [SNA-3-1] in VPN acme-65501 to 10.203.1.2'
     neighbor_element.authentication_key = '$9$4TaJDkqf36AoJ5Q36AtLx7-Yg4aZUik'
     neighbor_element.peer_as = '65501'
-    neighbor_element.as_override = True
+    neighbor_element.as_override = yang.gdata.Present()
     
     # List /configuration/routing-instances/instance[name='acme-65501']/interface element: eth4.100
     interface_element = instance_element.interface.create('eth4.100')
@@ -778,7 +778,7 @@ def adata_STO_CORE_1():
     ad.configuration.routing_options.autonomous_system.as_number = '65001'
     
     # Container: /configuration/protocols/bgp
-    ad.configuration.protocols.bgp.log_updown = True
+    ad.configuration.protocols.bgp.log_updown = yang.gdata.Present()
     
     # List /configuration/protocols/bgp/group element: IPV4-IBGP
     group_element = ad.configuration.protocols.bgp.group.create('IPV4-IBGP')
@@ -813,29 +813,29 @@ def adata_STO_CORE_1():
     
     # List /configuration/protocols/isis/interface element: eth1
     interface_element = ad.configuration.protocols.isis.interface.create('eth1')
-    interface_element.point_to_point = True
+    interface_element.point_to_point = yang.gdata.Present()
     
     # List /configuration/protocols/isis/interface[name='eth1']/level element: 1
     level_element = interface_element.level.create('1')
-    level_element.disable = True
+    level_element.disable = yang.gdata.Present()
     level_element.metric = '5000'
     
     # List /configuration/protocols/isis/interface element: eth2
     interface_element = ad.configuration.protocols.isis.interface.create('eth2')
-    interface_element.point_to_point = True
+    interface_element.point_to_point = yang.gdata.Present()
     
     # List /configuration/protocols/isis/interface[name='eth2']/level element: 1
     level_element = interface_element.level.create('1')
-    level_element.disable = True
+    level_element.disable = yang.gdata.Present()
     level_element.metric = '5000'
     
     # List /configuration/protocols/isis/interface element: eth3
     interface_element = ad.configuration.protocols.isis.interface.create('eth3')
-    interface_element.point_to_point = True
+    interface_element.point_to_point = yang.gdata.Present()
     
     # List /configuration/protocols/isis/interface[name='eth3']/level element: 1
     level_element = interface_element.level.create('1')
-    level_element.disable = True
+    level_element.disable = yang.gdata.Present()
     level_element.metric = '5000'
     
     # List /configuration/protocols/isis/interface element: lo0.0
@@ -846,8 +846,8 @@ def adata_STO_CORE_1():
     
     # List /configuration/protocols/isis/level element: 1
     level_element = ad.configuration.protocols.isis.level.create('1')
-    level_element.disable = True
-    level_element.wide_metrics_only = True
+    level_element.disable = yang.gdata.Present()
+    level_element.wide_metrics_only = yang.gdata.Present()
     
     # List /configuration/protocols/ldp/interface element: eth1
     interface_element = ad.configuration.protocols.ldp.interface.create('eth1')
