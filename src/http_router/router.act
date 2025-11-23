@@ -1,0 +1,388 @@
+"""HTTP router implementation"""
+
+import http
+import logging
+import re
+
+
+class RouteContext(object):
+    """Context for a matched route, stores URL parameters"""
+    
+    @property
+    url_params: dict[str, str]
+    
+    def __init__(self):
+        self.url_params = {}
+
+
+class Route(object):
+    """A single route definition"""
+    
+    @property
+    method: str
+    @property
+    pattern: str
+    @property
+    handler: action(http.Request, action(int, dict[str, str], str) -> None) -> None
+    @property
+    is_wildcard: bool
+    @property
+    param_names: list[str]
+    @property
+    regex_pattern: ?str
+    
+    def __init__(self, method: str, pattern: str, handler: action(http.Request, action(int, dict[str, str], str) -> None) -> None):
+        self.method = method
+        self.pattern = pattern
+        self.handler = handler
+        self.is_wildcard = False
+        self.param_names = []
+        self.regex_pattern = None
+        
+        # Parse pattern to detect params and wildcards
+        self._parse_pattern()
+    
+    def _parse_pattern(self):
+        """Parse the pattern to extract param names
+        
+        Supports both :param and CURLY_OPEN param CURLY_CLOSE syntax (Chi style)
+        """
+        # Check for wildcard
+        if self.pattern.endswith("/*"):
+            self.is_wildcard = True
+            return
+        
+        # Extract param names - support both :name and curly brace name formats
+        parts = self.pattern.split("/")
+        regex_pat = self.pattern
+        
+        for part in parts:
+            if part.startswith(":"):
+                # :param syntax
+                param_name = part[1:]
+                self.param_names.append(param_name)
+                regex_pat = regex_pat.replace(":" + param_name, "([^/]+)")
+            elif part.startswith("{") and part.endswith("}"):
+                # Curly brace param syntax (Chi-style)
+                param_name = part[1:-1]
+                # Handle regex constraints like param:regex
+                if ":" in param_name:
+                    param_parts = param_name.split(":", 1)
+                    param_name = param_parts[0]
+                    constraint = param_parts[1]
+                    self.param_names.append(param_name)
+                    regex_pat = regex_pat.replace(part, "(" + constraint + ")")
+                else:
+                    self.param_names.append(param_name)
+                    regex_pat = regex_pat.replace(part, "([^/]+)")
+        
+        # Build regex if pattern has params
+        if len(self.param_names) > 0:
+            self.regex_pattern = "^" + regex_pat + "$"
+    
+    def match(self, path: str) -> ?dict[str, str]:
+        """Check if path matches this route, return params if match"""
+        # Exact match for static routes
+        if len(self.param_names) == 0 and not self.is_wildcard:
+            if path == self.pattern:
+                return dict()
+            return None
+        
+        # Wildcard match
+        if self.is_wildcard:
+            prefix = self.pattern[:-2]  # Remove /*
+            if path.startswith(prefix):
+                params = dict()
+                params["*"] = path[len(prefix):]
+                return params
+            return None
+        
+        # Param match using regex
+        rpat = self.regex_pattern
+        if rpat is not None:
+            match_result = re.match(rpat, path)
+            if match_result is not None:
+                params = dict()
+                for i in range(len(self.param_names)):
+                    if i < len(match_result.group):
+                        group_val = match_result.group[i + 1]  # group[0] is full match, group[1+] are captures
+                        if group_val is not None:
+                            params[self.param_names[i]] = group_val
+                return params
+        
+        return None
+
+
+class Router(object):
+    """HTTP request router
+    
+    The router matches incoming HTTP requests to registered handlers based on
+    the request method and URL path pattern.
+    
+    Supports Chi-style patterns (id is just an example param name):
+    - Static routes like /users
+    - Named params like /users/ID or /users/:id where ID is in curly braces
+    - Regex constraints like /users/ID:REGEX where ID is in curly braces and REGEX is 0-9 plus
+    - Wildcards like /files/*
+    
+    Supports middleware chains via use(), with(), group() methods.
+    """
+    
+    @property
+    routes: list[Route]
+    @property
+    middlewares: list[action(action(http.Request, action(int, dict[str, str], str) -> None) -> None) -> action(http.Request, action(int, dict[str, str], str) -> None) -> None]
+    @property
+    not_found_handler: ?action(http.Request, action(int, dict[str, str], str) -> None) -> None
+    @property
+    log: logging.Logger
+    @property
+    route_context: ?RouteContext
+    
+    def __init__(self, log_handler: ?logging.Handler):
+        self.routes = []
+        self.middlewares = []
+        self.not_found_handler = None
+        self.log = logging.Logger(log_handler)
+        self.route_context = None
+    
+    def use(self, middleware: action(action(http.Request, action(int, dict[str, str], str) -> None) -> None) -> action(http.Request, action(int, dict[str, str], str) -> None) -> None):
+        """Add middleware to the router chain (Chi-style)
+        
+        Middleware will be applied to all routes registered after this call.
+        Example:
+            router.use(logger_middleware)
+            router.use(auth_middleware)
+            router.get("/protected", handler)
+        """
+        self.middlewares.append(middleware)
+    
+    def with_middlewares(self, middlewares: list[action(action(http.Request, action(int, dict[str, str], str) -> None) -> None) -> action(http.Request, action(int, dict[str, str], str) -> None) -> None]) -> Router:
+        """Create a new router with additional middlewares (Chi's With pattern)
+        
+        Returns a new router instance that inherits this router's middlewares
+        plus the additional ones. Useful for route groups with shared middleware.
+        Example:
+            admin_router = router.with_middlewares([auth, admin_only])
+            admin_router.get("/users", list_users)
+        """
+        new_router = Router(self.log.handler)
+        new_router.routes = self.routes
+        new_router.not_found_handler = self.not_found_handler
+        
+        # Copy existing middlewares and add new ones
+        for mw in self.middlewares:
+            new_router.middlewares.append(mw)
+        for mw in middlewares:
+            new_router.middlewares.append(mw)
+        
+        return new_router
+    
+    def group(self, config: action(Router) -> None):
+        """Create a route group with its own middleware stack (Chi-style)
+        
+        The config function receives a router with a copy of the current
+        middleware stack. Routes registered in the group inherit all middlewares.
+        Example:
+            def configure_api(r):
+                r.use(json_middleware)
+                r.get("/users", list_users)
+                r.post("/users", create_user)
+            
+            router.group(configure_api)
+        """
+        group_router = self.with_middlewares([])
+        config(group_router)
+    
+    def route(self, pattern: str, config: action(Router) -> None):
+        """Create and mount a subrouter at pattern (Chi-style)
+        
+        Combines Router creation, configuration, and mounting in one call.
+        Example:
+            def configure_api(r):
+                r.get("/users", list_users)
+                r.get("/posts", list_posts)
+            
+            router.route("/api", configure_api)
+        """
+        subrouter = Router(self.log.handler)
+        config(subrouter)
+        self.mount(pattern, subrouter)
+    
+    def get(self, pattern: str, handler: action(http.Request, action(int, dict[str, str], str) -> None) -> None):
+        """Register a GET route"""
+        self._add_route("GET", pattern, handler)
+    
+    def post(self, pattern: str, handler: action(http.Request, action(int, dict[str, str], str) -> None) -> None):
+        """Register a POST route"""
+        self._add_route("POST", pattern, handler)
+    
+    def put(self, pattern: str, handler: action(http.Request, action(int, dict[str, str], str) -> None) -> None):
+        """Register a PUT route"""
+        self._add_route("PUT", pattern, handler)
+    
+    def delete(self, pattern: str, handler: action(http.Request, action(int, dict[str, str], str) -> None) -> None):
+        """Register a DELETE route"""
+        self._add_route("DELETE", pattern, handler)
+    
+    def patch(self, pattern: str, handler: action(http.Request, action(int, dict[str, str], str) -> None) -> None):
+        """Register a PATCH route"""
+        self._add_route("PATCH", pattern, handler)
+    
+    def head(self, pattern: str, handler: action(http.Request, action(int, dict[str, str], str) -> None) -> None):
+        """Register a HEAD route"""
+        self._add_route("HEAD", pattern, handler)
+    
+    def options(self, pattern: str, handler: action(http.Request, action(int, dict[str, str], str) -> None) -> None):
+        """Register an OPTIONS route"""
+        self._add_route("OPTIONS", pattern, handler)
+    
+    def handle(self, pattern: str, handler: action(http.Request, action(int, dict[str, str], str) -> None) -> None):
+        """Register a route for all HTTP methods"""
+        for method in ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"]:
+            self._add_route(method, pattern, handler)
+    
+    def not_found(self, handler: action(http.Request, action(int, dict[str, str], str) -> None) -> None):
+        """Set handler for 404 Not Found"""
+        self.not_found_handler = handler
+    
+    def mount(self, prefix: str, subrouter: Router):
+        """Mount a subrouter at the given prefix
+        
+        All routes from the subrouter will be added with the prefix prepended.
+        Example: router.mount("/api", api_router) will make api_router's "/users"
+        route accessible at "/api/users" on the main router.
+        
+        Note: Following Chi's approach, handlers receive the full path including
+        the mount prefix, not a stripped relative path. Handlers should parse
+        the path accordingly.
+        """
+        # Add all routes from subrouter with prefix
+        for route in subrouter.routes:
+            prefixed_pattern = prefix + route.pattern
+            self._add_route(route.method, prefixed_pattern, route.handler)
+    
+    def _add_route(self, method: str, pattern: str, handler: action(http.Request, action(int, dict[str, str], str) -> None) -> None):
+        """Add a route to the router with middleware chain applied"""
+        # Apply middleware chain to handler
+        final_handler = handler
+        
+        # Apply middlewares in reverse order (last added wraps first)
+        i = len(self.middlewares) - 1
+        while i >= 0:
+            final_handler = self.middlewares[i](final_handler)
+            i = i - 1
+        
+        route = Route(method, pattern, final_handler)
+        self.routes.append(route)
+        self.log.debug("Registered route", {"method": method, "pattern": pattern})
+
+    def handle_request(self, server: http.Server, req: http.Request, respond: action(int, dict[str, str], str) -> None) -> bool:
+        """Handle an HTTP request, return True if a route matched
+        
+        This method should be called from your HTTP server callback.
+        Returns True if a route was matched and handled, False otherwise.
+        
+        When a route matches, URL parameters are stored in the route context
+        which can be accessed via url_param() function.
+        """
+        # Try to match a route
+        for route in self.routes:
+            if route.method != req.method:
+                continue
+            
+            matched_params = route.match(req.path)
+            if matched_params is not None:
+                # Route matched - store params in context
+                ctx = RouteContext()
+                ctx.url_params = matched_params
+                self.route_context = ctx
+                
+                self.log.debug("Route matched", {"method": req.method, "pattern": route.pattern, "path": req.path})
+                route.handler(req, respond)
+                return True
+        
+        # No route matched
+        nfh = self.not_found_handler
+        if nfh is not None:
+            nfh(req, respond)
+        return False
+
+
+def parse_query_string(path: str) -> dict[str, str]:
+    """Parse query string from a path
+    
+    Example: /api/users?id=123&name=test returns dict with id and name keys
+    """
+    params = {}
+    if "?" not in path:
+        return params
+    
+    query_string = path.split("?", 1)[1]
+    for param in query_string.split("&"):
+        if "=" in param:
+            kv = param.split("=", 1)
+            params[kv[0]] = kv[1]
+    
+    return params
+
+
+def strip_query_string(path: str) -> str:
+    """Remove query string from path
+    
+    Example: /api/users?id=123 returns /api/users
+    """
+    if "?" in path:
+        return path.split("?")[0]
+    return path
+
+
+def url_param(router: ?Router, param_name: str) -> ?str:
+    """Get a URL parameter from the current route context (Chi's URLParam)
+    
+    Use this to extract parameters from the matched route pattern.
+    Example:
+        Route pattern: /users/:id or /users/ID_IN_BRACES
+        Request path: /users/123
+        user_id = url_param(router, "id")  returns "123"
+    
+    Returns None if parameter not found or router is None.
+    """
+    if router is not None:
+        ctx = router.route_context
+        if ctx is not None:
+            if param_name in ctx.url_params:
+                return ctx.url_params[param_name]
+    return None
+
+
+# Common middleware patterns (Chi-inspired)
+# Middleware can modify both requests and responses by wrapping the respond callback
+
+
+# Middleware pattern documentation
+# 
+# To answer the question: YES, middleware CAN modify responses!
+#
+# Middleware modifies responses by wrapping the 'respond' callback.
+# The middleware intercepts the response before it reaches the client.
+#
+# Pattern for response modification:
+#
+#   def make_cors_middleware():
+#       def middleware(handler):
+#           def wrapper(req, orig_respond):
+#               # Create wrapped respond that modifies headers
+#               def modified_respond(status, headers, body):
+#                   headers["Access-Control-Allow-Origin"] = "*"
+#                   orig_respond(status, headers, body)
+#               # Call handler with modified respond
+#               handler(req, modified_respond)
+#           return wrapper
+#       return middleware
+#
+#   router.use(make_cors_middleware())
+#
+# Due to Acton's type system (def creates proc, not action), middleware
+# implementations work best when defined in application code with proper
+# closure handling.

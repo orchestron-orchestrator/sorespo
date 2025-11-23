@@ -1,0 +1,188 @@
+"""TMF HTTP routing module - Provides a reusable TMF API router
+
+This module follows Chi design principles: it exports an actor that encapsulates
+TMF-specific state and provides a method to create a configured subrouter.
+
+This is a hybrid approach: simple read-only handlers are fully encapsulated in
+this module, while complex async handlers (service creation) are passed in from
+the parent actor due to Acton compiler limitations with nested callbacks.
+"""
+
+import http
+import http_router.router
+import json
+import orchestron.ttt
+import tmf.tmf633
+import tmf.tmf640
+import yang.gdata
+
+
+actor TMFRouter(tmf_spec, top_schema, config_layer: orchestron.ttt.Layer, handle_service_create, main_router: http_router.router.Router):
+    """Actor that provides TMF API routing with access to required state
+    
+    Following Chi's pattern where handlers can access state through closures.
+    This actor encapsulates TMF-specific state and provides handlers that
+    close over that state.
+    
+    Args:
+        tmf_spec: TMF specification data
+        top_schema: YANG top schema
+        config_layer: Configuration layer for creating sessions
+        handle_service_create: Complex async handler passed from parent (compiler limitation workaround)
+        main_router: Main router instance for accessing route context
+    """
+    
+    var cfs = config_layer
+    var _main_router = main_router
+    var _tmf_spec = tmf_spec
+    var _top_schema = top_schema
+    
+    def create_router():
+        """Create and return a configured TMF API router
+        
+        Returns a Router with all TMF API routes registered.
+        Similar to Chi's pattern: r.Mount("/tmf-api", tmfRouter.create_router())
+        """
+        tmf_router = http_router.router.Router()
+        
+        # Register TMF ServiceActivationAndConfiguration routes
+        # Note: service_create handler is passed in due to nested callback complexity
+        tmf_router.post("/ServiceActivationAndConfiguration/v4/service", handle_service_create)
+        tmf_router.get("/ServiceActivationAndConfiguration/v4/service", _handle_service_list)
+        tmf_router.get("/ServiceActivationAndConfiguration/v4/service/{{id}}", _handle_service_get)
+        
+        # Register TMF serviceCatalogManagement - serviceCatalog routes
+        tmf_router.get("/serviceCatalogManagement/v4/serviceCatalog", _handle_catalog_list)
+        tmf_router.post("/serviceCatalogManagement/v4/serviceCatalog", _handle_unauthorized)
+        tmf_router.get("/serviceCatalogManagement/v4/serviceCatalog/{{id}}", _handle_catalog_get)
+        tmf_router.put("/serviceCatalogManagement/v4/serviceCatalog/*", _handle_unauthorized)
+        tmf_router.patch("/serviceCatalogManagement/v4/serviceCatalog/*", _handle_unauthorized)
+        tmf_router.delete("/serviceCatalogManagement/v4/serviceCatalog/*", _handle_unauthorized)
+        
+        # Register TMF serviceCatalogManagement - serviceCategory routes
+        tmf_router.get("/serviceCatalogManagement/v4/serviceCategory", _handle_category_list)
+        tmf_router.post("/serviceCatalogManagement/v4/serviceCategory", _handle_unauthorized)
+        tmf_router.get("/serviceCatalogManagement/v4/serviceCategory/{{id}}", _handle_category_get)
+        tmf_router.put("/serviceCatalogManagement/v4/serviceCategory/*", _handle_unauthorized)
+        tmf_router.patch("/serviceCatalogManagement/v4/serviceCategory/*", _handle_unauthorized)
+        tmf_router.delete("/serviceCatalogManagement/v4/serviceCategory/*", _handle_unauthorized)
+        
+        # Register TMF serviceCatalogManagement - serviceCandidate routes
+        tmf_router.get("/serviceCatalogManagement/v4/serviceCandidate", _handle_candidate_list)
+        tmf_router.post("/serviceCatalogManagement/v4/serviceCandidate", _handle_unauthorized)
+        tmf_router.get("/serviceCatalogManagement/v4/serviceCandidate/{{id}}", _handle_candidate_get)
+        tmf_router.put("/serviceCatalogManagement/v4/serviceCandidate/*", _handle_unauthorized)
+        tmf_router.patch("/serviceCatalogManagement/v4/serviceCandidate/*", _handle_unauthorized)
+        tmf_router.delete("/serviceCatalogManagement/v4/serviceCandidate/*", _handle_unauthorized)
+        
+        # Register TMF serviceCatalogManagement - serviceSpecification routes
+        tmf_router.get("/serviceCatalogManagement/v4/serviceSpecification", _handle_spec_list)
+        tmf_router.post("/serviceCatalogManagement/v4/serviceSpecification", _handle_unauthorized)
+        tmf_router.get("/serviceCatalogManagement/v4/serviceSpecification/{{id}}", _handle_spec_get)
+        tmf_router.put("/serviceCatalogManagement/v4/serviceSpecification/*", _handle_unauthorized)
+        tmf_router.patch("/serviceCatalogManagement/v4/serviceSpecification/*", _handle_unauthorized)
+        tmf_router.delete("/serviceCatalogManagement/v4/serviceSpecification/*", _handle_unauthorized)
+        
+        return tmf_router
+    
+    # Handler methods - these are fully encapsulated in this module
+    # They access the actor's state (tmf_spec, top_schema, cfs) directly
+    
+    def _handle_service_list(request, respond):
+        """GET /ServiceActivationAndConfiguration/v4/service"""
+        session = cfs.newsession()
+        layer_config: yang.gdata.Node = session.get()
+        data = tmf.tmf640.get_service_list_json(layer_config)
+        respond(200, {"Content-Type": "application/json"}, json.encode_list(data))
+    
+    def _handle_service_get(request, respond):
+        """GET /ServiceActivationAndConfiguration/v4/service/{{id}}"""
+        service_id = http_router.router.url_param(_main_router, "id")
+        if service_id is not None:
+            session = cfs.newsession()
+            layer_config: yang.gdata.Node = session.get()
+            data = tmf.tmf640.get_service_json(layer_config, service_id)
+            if data is not None:
+                respond(200, {"Content-Type": "application/json"}, json.encode(data))
+            else:
+                respond(404, {}, "Not found")
+        else:
+            respond(400, {}, "Bad request")
+    
+    def _handle_catalog_list(request, respond):
+        """GET /serviceCatalogManagement/v4/serviceCatalog"""
+        data = tmf.tmf633.get_service_catalog_list_json()
+        respond(200, {"Content-Type": "application/json"}, json.encode_list(data))
+    
+    def _handle_catalog_get(request, respond):
+        """GET /serviceCatalogManagement/v4/serviceCatalog/{{id}}"""
+        catalog_id = http_router.router.url_param(_main_router, "id")
+        if catalog_id is not None:
+            data = tmf.tmf633.get_service_catalog_json(catalog_id)
+            if data is not None:
+                respond(200, {"Content-Type": "application/json"}, json.encode(data))
+            else:
+                respond(404, {}, "Not found")
+        else:
+            respond(400, {}, "Bad request")
+    
+    def _handle_category_list(request, respond):
+        """GET /serviceCatalogManagement/v4/serviceCategory"""
+        data = tmf.tmf633.get_service_category_list_json(tmf_spec)
+        respond(200, {"Content-Type": "application/json"}, json.encode_list(data))
+    
+    def _handle_category_get(request, respond):
+        """GET /serviceCatalogManagement/v4/serviceCategory/{{id}}"""
+        category_id = http_router.router.url_param(_main_router, "id")
+        if category_id is not None:
+            data = tmf.tmf633.get_service_category_json(_tmf_spec, category_id)
+            if data is not None:
+                respond(200, {"Content-Type": "application/json"}, json.encode(data))
+            else:
+                respond(404, {}, "Not found")
+        else:
+            respond(400, {}, "Bad request")
+    
+    def _handle_candidate_list(request, respond):
+        """GET /serviceCatalogManagement/v4/serviceCandidate"""
+        data = tmf.tmf633.get_service_candidate_list_json(tmf_spec)
+        respond(200, {"Content-Type": "application/json"}, json.encode_list(data))
+    
+    def _handle_candidate_get(request, respond):
+        """GET /serviceCatalogManagement/v4/serviceCandidate/{{id}}"""
+        candidate_id = http_router.router.url_param(_main_router, "id")
+        if candidate_id is not None:
+            data = tmf.tmf633.get_service_candidate_json(_tmf_spec, candidate_id)
+            if data is not None:
+                respond(200, {"Content-Type": "application/json"}, json.encode(data))
+            else:
+                respond(404, {}, "Not found")
+        else:
+            respond(400, {}, "Bad request")
+    
+    def _handle_spec_list(request, respond):
+        """GET /serviceCatalogManagement/v4/serviceSpecification"""
+        data = tmf.tmf633.get_service_specification_list_json(_tmf_spec, _top_schema)
+        respond(200, {"Content-Type": "application/json"}, json.encode_list(data))
+    
+    def _handle_spec_get(request, respond):
+        """GET /serviceCatalogManagement/v4/serviceSpecification/{{id}}"""
+        spec_id = http_router.router.url_param(_main_router, "id")
+        if spec_id is not None:
+            data = tmf.tmf633.get_service_specification_json(_tmf_spec, _top_schema, spec_id)
+            if data is not None:
+                respond(200, {"Content-Type": "application/json"}, json.encode(data))
+            else:
+                respond(404, {}, "Not found")
+        else:
+            respond(400, {}, "Bad request")
+    
+    def _handle_unauthorized(request, respond):
+        """Handler for unauthorized operations"""
+        respond(401, {}, "Unauthorized")
+
+
+
+
+
+

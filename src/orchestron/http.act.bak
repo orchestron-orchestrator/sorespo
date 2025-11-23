@@ -1,0 +1,579 @@
+"""Orchestron HTTP routing module - Provides reusable routers for device, RESTCONF, and layer APIs
+
+This module follows Chi design principles: it exports actors that encapsulate
+orchestron-specific state and provide methods to create configured subrouters.
+
+Exports:
+- DeviceRouter: Handles device operations (/device/*) and config queue operations (/config-queue)
+- RestconfRouter: Handles RESTCONF operations (/restconf/*)
+- LayerRouter: Handles layer operations (/layer/*)
+"""
+
+import http
+import http_router.router
+import json
+import orchestron.device as odev
+import orchestron.ttt
+import yang
+import yang.gdata
+import yang.gen3
+import yang.schema
+import xml
+
+
+actor DeviceRouter(dev_registry: odev.DeviceRegistry, main_router: http_router.router.Router):
+    """Actor that provides device and config queue routing
+    
+    Encapsulates device registry state, providing handlers for device operations
+    and config queue operations.
+    
+    Args:
+        dev_registry: Device registry for accessing devices
+        main_router: Main router instance for accessing route context
+    """
+    
+    var _main_router = main_router
+    
+    def create_device_router():
+        """Create and return a configured device router
+        
+        Returns a Router with all device routes registered.
+        """
+        device_router = http_router.router.Router()
+        
+        device_router.get("/", _handle_device_list)
+        device_router.get("/{{name}}/capabilities", _handle_device_capabilities)
+        device_router.get("/{{name}}/modules", _handle_device_modules)
+        device_router.get("/{{name}}/diff", _handle_device_diff)
+        device_router.get("/{{name}}/target", _handle_device_target)
+        device_router.get("/{{name}}/running", _handle_device_running)
+        device_router.get("/{{name}}/resync", _handle_device_resync)
+        device_router.get("/{{name}}/info", _handle_device_info)
+        device_router.get("/{{name}}/log", _handle_device_log)
+        device_router.get("/{{name}}/q", _handle_device_queue_list)
+        device_router.get("/{{name}}/q/{{queue_id}}", _handle_device_queue_item)
+        device_router.post("/{{name}}/q/{{queue_id}}/set_approval", _handle_device_queue_set_approval)
+        
+        return device_router
+    
+    def create_config_queue_router():
+        """Create and return a configured config queue router
+        
+        Returns a Router with config queue routes registered.
+        """
+        queue_router = http_router.router.Router()
+        
+        queue_router.get("/", _handle_config_queue_list)
+        
+        return queue_router
+    
+    # Config queue handler
+    
+    def _handle_config_queue_list(request, respond):
+        """GET / - List all devices with pending config queue items"""
+        try:
+            devices_with_queues = []
+            devices_needing_approval = dev_registry.get_devices_needing_approval()
+            
+            for dev_name, dev in devices_needing_approval.items():
+                pending_items = dev.get_pending_approvals()
+                
+                if len(pending_items) > 0:
+                    formatted_items = []
+                    for queue_id, config_item in pending_items.items():
+                        formatted_items.append({
+                            "queue_id": queue_id,
+                            "tid": config_item.tid,
+                            "device_txid": dev.get_device_txid(),
+                            "approved": str(config_item.approved) if config_item.approved is not None else "null"
+                        })
+                    
+                    devices_with_queues.append({
+                        "device_id": dev_name,
+                        "pending_count": len(pending_items),
+                        "items": formatted_items
+                    })
+            
+            respond(200, {}, json.encode({"devices": devices_with_queues}))
+        except Exception as e:
+            respond(500, {}, f"Failed to get config queues: {e}")
+    
+    # Device handler methods
+    
+    def _handle_device_list(request, respond):
+        """GET / - List all devices"""
+        try:
+            devices = dev_registry.list()
+            device_names = []
+            for name in devices:
+                device_names.append(name)
+            respond(200, {"Content-Type": "application/json"}, json.encode({"devices": device_names}))
+        except Exception as e:
+            respond(500, {}, f"Error fetching devices: {e}")
+    
+    def _handle_device_capabilities(request, respond):
+        """GET /:name/capabilities"""
+        dev_name = http_router.router.url_param(_device_router, "name")
+        if dev_name is not None:
+            try:
+                dev = dev_registry.get(dev_name)
+                respond(200, {}, str(dev.get_capabilities()))
+            except Exception as e:
+                respond(404, {}, "Device not found")
+        else:
+            respond(400, {}, "Bad request")
+
+    def _handle_device_modules(request, respond):
+        """GET /:name/modules"""
+        dev_name = http_router.router.url_param(_device_router, "name")
+        if dev_name is not None:
+            try:
+                dev = dev_registry.get(dev_name)
+                txt = r"{"
+                modset, modset_id = dev.get_modules()
+                for mod in modset.values():
+                    txt += '{{"name": {mod.name}, "namespace": {mod.namespace}, "revision": {mod.revision}, "feature": {mod.feature}}}, '
+                txt += r"}"
+                respond(200, {}, txt)
+            except Exception as e:
+                respond(404, {}, "Device not found")
+        else:
+            respond(400, {}, "Bad request")
+
+    def _handle_device_diff(request, respond):
+        """GET /:name/diff"""
+        dev_name = http_router.router.url_param(_device_router, "name")
+        if dev_name is not None:
+            try:
+                dev = dev_registry.get(dev_name)
+                query_params = http_router.router.parse_query_string(request.path)
+                format_type = query_params.get_def("format", "json")
+
+                running_conf = dev.get_running_conf()
+                target_conf = dev.get_target_conf()
+
+                if running_conf is not None and target_conf is not None:
+                    config_diff = yang.gdata.diff(running_conf, target_conf)
+                    if config_diff is not None:
+                        if format_type == "json":
+                            diff_str = config_diff.to_json()
+                        elif format_type == "xml":
+                            diff_str = config_diff.to_xmlstr()
+                        elif format_type == "gdata":
+                            diff_str = config_diff.prsrc()
+                        elif format_type == "adata":
+                            diff_str = "# Adata format not available for diff"
+                        else:
+                            diff_str = config_diff.to_json()
+                        respond(200, {"Content-Type": "text/plain"}, diff_str)
+                    else:
+                        respond(200, {"Content-Type": "text/plain"}, "# No differences")
+                else:
+                    respond(200, {"Content-Type": "text/plain"}, "# Configuration not available")
+            except Exception as e:
+                respond(404, {}, "Device not found")
+        else:
+            respond(400, {}, "Bad request")
+
+    def _handle_device_target(request, respond):
+        """GET /:name/target"""
+        dev_name = http_router.router.url_param(_device_router, "name")
+        if dev_name is not None:
+            try:
+                dev = dev_registry.get(dev_name)
+                query_params = http_router.router.parse_query_string(request.path)
+                format_type = query_params.get_def("format", "json")
+
+                target_conf = dev.get_target_conf()
+                if target_conf is not None:
+                    if format_type == "json":
+                        conf_str = target_conf.to_json()
+                    elif format_type == "xml":
+                        conf_str = target_conf.to_xmlstr()
+                    elif format_type == "gdata":
+                        conf_str = target_conf.prsrc()
+                    elif format_type == "adata":
+                        conf_str = "# Adata format not available"
+                    else:
+                        conf_str = target_conf.to_json()
+                    respond(200, {"Content-Type": "text/plain"}, conf_str)
+                else:
+                    respond(200, {"Content-Type": "text/plain"}, "# No target configuration available")
+            except Exception as e:
+                respond(404, {}, "Device not found")
+        else:
+            respond(400, {}, "Bad request")
+
+    def _handle_device_running(request, respond):
+        """GET /:name/running"""
+        dev_name = http_router.router.url_param(_device_router, "name")
+        if dev_name is not None:
+            try:
+                dev = dev_registry.get(dev_name)
+                query_params = http_router.router.parse_query_string(request.path)
+                format_type = query_params.get_def("format", "json")
+
+                running_conf = dev.get_running_conf()
+                if running_conf is not None:
+                    if format_type == "json":
+                        conf_str = running_conf.to_json()
+                    elif format_type == "xml":
+                        conf_str = running_conf.to_xmlstr()
+                    elif format_type == "gdata":
+                        conf_str = running_conf.prsrc()
+                    elif format_type == "adata":
+                        conf_str = "# Adata format not available"
+                    else:
+                        conf_str = running_conf.to_json()
+                    respond(200, {"Content-Type": "text/plain"}, conf_str)
+                else:
+                    respond(200, {"Content-Type": "text/plain"}, "# No running configuration available")
+            except Exception as e:
+                respond(404, {}, "Device not found")
+        else:
+            respond(400, {}, "Bad request")
+
+    def _handle_device_resync(request, respond):
+        """GET /:name/resync"""
+        dev_name = http_router.router.url_param(_device_router, "name")
+        if dev_name is not None:
+            try:
+                dev = dev_registry.get(dev_name)
+                dev.resync()
+                respond(200, {"Content-Type": "application/json"}, json.encode({"status": "ok", "message": "Resync initiated"}))
+            except Exception as e:
+                respond(404, {}, "Device not found")
+        else:
+            respond(400, {}, "Bad request")
+
+    def _handle_device_info(request, respond):
+        """GET /:name/info"""
+        dev_name = http_router.router.url_param(_device_router, "name")
+        if dev_name is not None:
+            try:
+                dev = dev_registry.get(dev_name)
+                dmc = dev.get_dmc()
+                dev_state = dev.get_state()
+
+                info = {
+                    "name": dev_name,
+                    "type": dmc.type if dmc.type is not None else "unknown",
+                    "approval_required": dmc.approval_required if dmc.approval_required is not None else False,
+                    "has_running_config": dev_state.has_running_config,
+                    "has_target_config": dev_state.has_target_config,
+                    "queue_length": dev_state.queue_length,
+                    "pending_approvals": dev_state.pending_approvals
+                }
+
+                #Add address information - skipped due to type inference issues in actor
+                # TODO: Fix address iteration in actor context
+                # addresses = []
+                # for addr_entry in dmc.address:
+                #     addr_info = {"name": addr_entry.name, "address": addr_entry.address}
+                #     if addr_entry.port is not None:
+                #         addr_info["port"] = addr_entry.port
+                #     addresses.append(addr_info)
+                # info["addresses"] = addresses
+
+                # Add credentials info (just username, not password)
+                if dmc.credentials is not None:
+                    info["username"] = dmc.credentials.username if dmc.credentials.username is not None else ""
+                
+                # Add YANG modules information
+                modset, modset_id = dev.get_modules()
+                modules = []
+                for mod_name, mod in modset.items():
+                    module_info = {
+                        "name": mod.name,
+                        "namespace": mod.namespace
+                    }
+                    if mod.revision is not None:
+                        module_info["revision"] = mod.revision
+                    if mod.feature is not None and len(mod.feature) > 0:
+                        module_info["features"] = list(mod.feature)
+                    modules.append(module_info)
+                info["modules"] = modules
+
+                respond(200, {"Content-Type": "application/json"}, json.encode(info))
+            except Exception as e:
+                respond(404, {}, "Device not found")
+        else:
+            respond(400, {}, "Bad request")
+
+    def _handle_device_log(request, respond):
+        """GET /:name/log"""
+        dev_name = http_router.router.url_param(_device_router, "name")
+        if dev_name is not None:
+            try:
+                dev = dev_registry.get(dev_name)
+                conf_log = dev.get_conf_log()
+                log_items = []
+
+                query_params = http_router.router.parse_query_string(request.path)
+                format_type = query_params.get_def("format", "xml")
+
+                for item in conf_log:
+                    diff_str = ""
+                    conf_diff = item.conf_diff
+                    if conf_diff is not None:
+                        if format_type == "json":
+                            diff_str = conf_diff.to_json()
+                        elif format_type == "xml":
+                            diff_str = conf_diff.to_xmlstr()
+                        elif format_type == "gdata":
+                            diff_str = conf_diff.prsrc()
+
+                    log_items.append({
+                        "timestamp": str(item.ts),
+                        "event": item.event,
+                        "conf_diff": diff_str
+                    })
+
+                respond(200, {"Content-Type": "application/json"}, json.encode({"log": log_items}))
+            except Exception as e:
+                respond(404, {}, "Device not found")
+        else:
+            respond(400, {}, "Bad request")
+
+    def _handle_device_queue_list(request, respond):
+        """GET /:name/q"""
+        dev_name = http_router.router.url_param(_device_router, "name")
+        if dev_name is not None:
+            try:
+                dev = dev_registry.get(dev_name)
+                def format_listq(listq):
+                    def format_ci(ci):
+                        return {"tid": ci.tid}
+                    return json.encode({id: format_ci(ci) for id, ci in listq.items()})
+                respond(200, {}, format_listq(dev.list_confq()))
+            except Exception as e:
+                respond(404, {}, "Device not found")
+        else:
+            respond(400, {}, "Bad request")
+
+    def _handle_device_queue_item(request, respond):
+        """GET /{{name}}/q/{{queue_id}}"""
+        dev_name = http_router.router.url_param(_device_router, "name")
+        queue_id_raw = http_router.router.url_param(_device_router, "queue_id")
+        if dev_name is not None and queue_id_raw is not None:
+            pe = queue_id_raw.split('?', 1)
+            id: str = pe[0]
+            try:
+                dev = dev_registry.get(dev_name)
+                query_params = http_router.router.parse_query_string(request.path)
+                format_type = query_params.get_def("format", "xml")
+
+                def format_ci(di: (ci: odev.ConfigItem, running_conf: yang.gdata.Node)):
+                    config_diff = yang.gdata.diff(di.running_conf, di.ci.conf)
+
+                    config_diff_str = None
+                    if config_diff is not None:
+                        if format_type == "json":
+                            config_diff_str = "# JSON diff not available"
+                        elif format_type == "adata":
+                            config_diff_str = "# Adata diff not available"
+                        elif format_type == "gdata":
+                            config_diff_str = config_diff.prsrc()
+                        else:  # xml is default
+                            config_diff_str = config_diff.to_xmlstr()
+                    
+                    return {
+                        "tid": di.ci.tid,
+                        "config_diff": config_diff_str,
+                        "device_txid": di.running_conf.txid,
+                        "format": format_type,
+                    }
+                respond(200, {}, json.encode(format_ci(dev.get_confq(id))))
+            except Exception as e:
+                respond(404, {}, "Device or queue item not found")
+        else:
+            respond(400, {}, "Bad request")
+
+    def _handle_device_queue_set_approval(request, respond):
+        """POST /{{name}}/q/{{queue_id}}/set_approval"""
+        dev_name = http_router.router.url_param(_device_router, "name")
+        queue_id = http_router.router.url_param(_device_router, "queue_id")
+        if dev_name is not None and queue_id is not None:
+            id = queue_id
+            try:
+                dev = dev_registry.get(dev_name)
+                
+                def parse_confq_approval_request(request) -> (device_txid: str, approved: bool):
+                    json_in = json.decode(request.body.decode())
+                    json_device_txid = json_in.get("device_txid")
+                    json_approved = json_in.get("approved")
+                    if isinstance(json_device_txid, str) and isinstance(json_approved, bool):
+                        return (json_device_txid, json_approved)
+                    else:
+                        raise ValueError("Invalid request body")
+
+                try:
+                    req = parse_confq_approval_request(request)
+                    approval_ok = dev.set_confq_approval(id, req.device_txid, req.approved)
+                    respond(200, {}, json.encode({"status": "ok", "approved": req.approved}))
+                except ValueError as e:
+                    respond(400, {}, str(e))
+            except Exception as e:
+                respond(404, {}, "Device or queue item not found")
+        else:
+            respond(400, {}, "Bad request")
+
+
+actor RestconfRouter(config_layer: orchestron.ttt.Layer, top_schema: yang.schema.DRoot):
+    """Actor that provides RESTCONF routing
+    
+    Encapsulates config layer state, providing handlers for RESTCONF operations.
+    
+    Args:
+        config_layer: Configuration layer for RESTCONF operations  
+        top_schema: YANG top schema for config operations
+    """
+    
+    var cfs = config_layer
+    
+    def create_router():
+        """Create and return a configured RESTCONF router
+        
+        Returns a Router with all RESTCONF routes registered.
+        """
+        restconf_router = http_router.router.Router()
+        
+        restconf_router.get("/*", _handle_restconf_get)
+        restconf_router.delete("/*", _handle_restconf_delete)
+        restconf_router.post("/*", _handle_restconf_post_put)
+        restconf_router.put("/*", _handle_restconf_post_put)
+        
+        return restconf_router
+
+    # RESTCONF handlers
+    
+    def _handle_restconf_get(request, respond):
+        """GET /*"""
+        respond(404, {}, "Not found")
+
+    def _handle_restconf_delete(request, respond):
+        """DELETE /*"""
+        def config_done(result):
+            if isinstance(result, Exception):
+                respond(400, {}, json.encode({"status": "error", "message": str(result)}))
+            else:
+                respond(200, {}, json.encode({"status": "ok"}))
+
+        # Parse RESTCONF path: /data/<datastore>/path/to/resource
+        parts = [p for p in request.path.split("/") if p]
+        if len(parts) >= 2 and parts[0] == "data":
+            # parts[1] is the datastore, parts[2:] is the resource path
+            resource_path = parts[2:] if len(parts) > 2 else []
+            input_config = yang.gen3.from_json_path(top_schema, {}, resource_path, "remove", loose=True)
+            session = cfs.newsession()
+            session.edit_config(input_config, config_done)
+        else:
+            respond(404, {}, "")
+
+    def _handle_restconf_post_put(request, respond):
+        """POST/PUT /*"""
+        def config_done(result):
+            if isinstance(result, Exception):
+                respond(400, {}, json.encode({"status": "error", "message": str(result)}))
+            else:
+                respond(200, {}, json.encode({"status": "ok"}))
+
+        input_config = None
+        content_type = request.headers.get("content-type")
+
+        if content_type == "application/yang-data+json":
+            json_in = json.decode(request.body.decode())
+            # Parse RESTCONF path: /restconf or /restconf/data/<datastore>/path/to/resource
+            # After mounting at /restconf, handler receives full path including mount prefix
+            parts = [p for p in request.path.split("/") if p]
+            
+            # Handle both /restconf and /restconf/data/... patterns
+            if len(parts) >= 1 and parts[0] == "restconf":
+                # Remove 'restconf' prefix
+                parts = parts[1:]
+            
+            # Now check for /data/<datastore> pattern
+            if len(parts) == 0:
+                # Just /restconf - use empty resource path (root)
+                resource_path = []
+                input_config = yang.gen3.from_json_path(top_schema, json_in, resource_path, loose=True)
+            elif len(parts) >= 1 and parts[0] == "data":
+                # /restconf/data/<datastore>/path/to/resource
+                resource_path = parts[2:] if len(parts) > 2 else []
+                input_config = yang.gen3.from_json_path(top_schema, json_in, resource_path, loose=True)
+            else:
+                # Other patterns - treat as resource path
+                resource_path = parts
+                input_config = yang.gen3.from_json_path(top_schema, json_in, resource_path, loose=True)
+        elif content_type == "application/yang-data+xml":
+            try:
+                xml_in = xml.decode(request.body.decode())
+                input_config = yang.gen3.from_data(top_schema, xml_in, loose=True)
+            except Exception as e:
+                respond(400, {}, "Error parsing XML: {e}")
+                return
+        else:
+            respond(415, {}, "Unsupported content type")
+            return
+
+        if input_config is not None:
+            session = cfs.newsession()
+            session.edit_config(input_config, config_done)
+        else:
+            respond(400, {}, "Error processing request")
+
+
+actor LayerRouter(config_layer: orchestron.ttt.Layer, main_router: http_router.router.Router):
+    """Actor that provides layer routing
+    
+    Encapsulates config layer state, providing handlers for layer operations.
+    
+    Args:
+        config_layer: Configuration layer for layer operations
+        main_router: Main router instance for accessing route context
+    """
+    
+    var cfs = config_layer
+    var _main_router = main_router
+    
+    def create_router():
+        """Create and return a configured layer router
+        
+        Returns a Router with layer routes registered.
+        """
+        layer_router = http_router.router.Router()
+        
+        layer_router.get("/{{id}}", _handle_layer_get)
+        
+        return layer_router
+
+    # Layer handler
+    
+    def _handle_layer_get(request, respond):
+        """GET /{{id}}"""
+        layer_id = http_router.router.url_param(_main_router, "id")
+        if layer_id is not None:
+            try:
+                session = cfs.newsession()
+                layer_idx = int(layer_id)
+                if layer_idx > 3:
+                    respond(404, {}, "Unknown layer")
+                    return
+                for _ in range(layer_idx):
+                    session = session.below()
+                layer_config: yang.gdata.Node = session.get()
+                content = ""
+                accept_header = request.headers.get("accept")
+                if accept_header == "application/yang-data+json":
+                    content = layer_config.to_json()
+                elif accept_header == "application/yang-data+xml":
+                    content = layer_config.to_xmlstr()
+                else:
+                    content = layer_config.to_json()  # default to json
+                respond(200, {}, content)
+            except ValueError:
+                respond(400, {}, "Bad request, layer index must be an integer")
+            except Exception as e:
+                respond(500, {}, "Internal error")
+        else:
+            respond(400, {}, "Bad request")

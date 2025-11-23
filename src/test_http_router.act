@@ -1,0 +1,261 @@
+"""Tests for http_router functionality"""
+
+import http_router.router as router
+import http_router.context as context
+import testing
+
+
+def _test_route_matching():
+    """Test basic route matching"""
+    # Static route
+    route = router.Route("GET", "/users", lambda r, resp: None)
+    
+    # Exact match
+    params = route.match("/users")
+    testing.assertEqual(params is not None, True, "Should match exact path")
+    
+    # No match
+    params = route.match("/users/123")
+    testing.assertEqual(params is None, True, "Should not match longer path")
+    
+    params = route.match("/user")
+    testing.assertEqual(params is None, True, "Should not match partial path")
+
+
+def _test_param_route():
+    """Test parameterized routes"""
+    route = router.Route("GET", "/users/:id", lambda r, resp: None)
+    
+    # Match with param
+    params = route.match("/users/123")
+    testing.assertEqual(params is not None, True, "Should match param route")
+    if params is not None:
+        testing.assertEqual("id" in params, True, "Should have id param")
+        testing.assertEqual(params["id"], "123", "Should extract correct param value")
+    
+    # No match - wrong path
+    params = route.match("/users")
+    testing.assertEqual(params is None, True, "Should not match without param")
+    
+    params = route.match("/posts/123")
+    testing.assertEqual(params is None, True, "Should not match different path")
+
+
+def _test_multi_param_route():
+    """Test routes with multiple parameters"""
+    route = router.Route("GET", "/users/:user_id/posts/:post_id", lambda r, resp: None)
+    
+    params = route.match("/users/42/posts/99")
+    testing.assertEqual(params is not None, True, "Should match multi-param route")
+    if params is not None:
+        testing.assertEqual(params["user_id"], "42", "Should extract first param")
+        testing.assertEqual(params["post_id"], "99", "Should extract second param")
+
+
+def _test_wildcard_route():
+    """Test wildcard routes"""
+    route = router.Route("GET", "/files/*", lambda r, resp: None)
+    
+    # Match any path under /files
+    params = route.match("/files/documents/report.pdf")
+    testing.assertEqual(params is not None, True, "Should match wildcard")
+    if params is not None:
+        testing.assertEqual("*" in params, True, "Should have wildcard param")
+        testing.assertEqual(params["*"], "/documents/report.pdf", "Should capture remaining path")
+    
+    # Match exact wildcard
+    params = route.match("/files/")
+    testing.assertEqual(params is not None, True, "Should match empty wildcard")
+    
+    # No match - wrong prefix
+    params = route.match("/documents/file.pdf")
+    testing.assertEqual(params is None, True, "Should not match different prefix")
+
+
+def _test_router_registration():
+    """Test route registration"""
+    r = router.Router(None)
+    
+    # Register routes
+    r.get("/", lambda req, resp: None)
+    r.post("/users", lambda req, resp: None)
+    r.put("/users/:id", lambda req, resp: None)
+    r.delete("/users/:id", lambda req, resp: None)
+    
+    testing.assertEqual(len(r.routes), 4, "Should have 4 routes registered")
+    
+    # Check methods
+    testing.assertEqual(r.routes[0].method, "GET", "First route should be GET")
+    testing.assertEqual(r.routes[1].method, "POST", "Second route should be POST")
+    testing.assertEqual(r.routes[2].method, "PUT", "Third route should be PUT")
+    testing.assertEqual(r.routes[3].method, "DELETE", "Fourth route should be DELETE")
+
+
+def _test_router_pattern_matching():
+    """Test router finds correct routes"""
+    r = router.Router(None)
+    
+    def home_handler(req, resp):
+        pass
+    
+    def users_handler(req, resp):
+        pass
+    
+    def user_handler(req, resp):
+        pass
+    
+    r.get("/", home_handler)
+    r.get("/users", users_handler)
+    r.get("/users/:id", user_handler)
+    
+    # Find routes by matching
+    found = False
+    for route in r.routes:
+        if route.method == "GET":
+            params = route.match("/")
+            if params is not None:
+                found = True
+                break
+    testing.assertEqual(found, True, "Should find home route")
+    
+    found = False
+    for route in r.routes:
+        if route.method == "GET":
+            params = route.match("/users")
+            if params is not None:
+                found = True
+                break
+    testing.assertEqual(found, True, "Should find users route")
+    
+    found = False
+    for route in r.routes:
+        if route.method == "GET":
+            params = route.match("/users/123")
+            if params is not None:
+                found = True
+                break
+    testing.assertEqual(found, True, "Should find user route with param")
+
+
+def _test_route_priority():
+    """Test that more specific routes match before wildcards"""
+    r = router.Router(None)
+    
+    r.get("/users", lambda req, resp: None)
+    r.get("/users/:id", lambda req, resp: None)
+    r.get("/users/*", lambda req, resp: None)
+    
+    # Find matching route for /users/123
+    matched_pattern = ""
+    for route in r.routes:
+        if route.method == "GET":
+            params = route.match("/users/123")
+            if params is not None:
+                matched_pattern = route.pattern
+                break
+    
+    # Should match param route, not wildcard
+    testing.assertEqual(matched_pattern, "/users/:id", "Should prefer param route over wildcard")
+
+
+def _test_context():
+    """Test route context"""
+    ctx = context.RouteContext()
+    
+    # Initially empty
+    val = ctx.get("user_id")
+    testing.assertEqual(val is None, True, "Should be empty initially")
+    
+    # Set and get params
+    ctx.set("user_id", "123")
+    ctx.set("post_id", "456")
+    
+    val = ctx.get("user_id")
+    testing.assertEqual(val is not None, True, "Should have user_id")
+    if val is not None:
+        testing.assertEqual(val, "123", "Should get correct value")
+    
+    val = ctx.get("post_id")
+    if val is not None:
+        testing.assertEqual(val, "456", "Should get correct value")
+    
+    # Reset
+    ctx.reset()
+    val = ctx.get("user_id")
+    testing.assertEqual(val is None, True, "Should be empty after reset")
+
+
+def _test_param_extraction():
+    """Test parameter name extraction from patterns"""
+    # Single param
+    route = router.Route("GET", "/users/:id", lambda req, resp: None)
+    testing.assertEqual(len(route.param_names), 1, "Should have one param")
+    testing.assertEqual(route.param_names[0], "id", "Should extract param name")
+    
+    # Multiple params
+    route = router.Route("GET", "/users/:user_id/posts/:post_id/comments/:comment_id", lambda req, resp: None)
+    testing.assertEqual(len(route.param_names), 3, "Should have three params")
+    testing.assertEqual(route.param_names[0], "user_id", "Should extract first param")
+    testing.assertEqual(route.param_names[1], "post_id", "Should extract second param")
+    testing.assertEqual(route.param_names[2], "comment_id", "Should extract third param")
+    
+    # No params
+    route = router.Route("GET", "/users", lambda req, resp: None)
+    testing.assertEqual(len(route.param_names), 0, "Should have no params")
+
+
+def _test_method_matching():
+    """Test that routes only match their specified method"""
+    get_route = router.Route("GET", "/users", lambda req, resp: None)
+    post_route = router.Route("POST", "/users", lambda req, resp: None)
+    
+    # GET route matches GET, not POST
+    testing.assertEqual(get_route.method, "GET", "Should be GET route")
+    testing.assertEqual(post_route.method, "POST", "Should be POST route")
+    
+    # Both can match same path but different methods
+    params1 = get_route.match("/users")
+    params2 = post_route.match("/users")
+    testing.assertEqual(params1 is not None, True, "GET route should match path")
+    testing.assertEqual(params2 is not None, True, "POST route should match path")
+
+
+def _test_edge_cases():
+    """Test edge cases and boundary conditions"""
+    # Root path
+    route = router.Route("GET", "/", lambda req, resp: None)
+    params = route.match("/")
+    testing.assertEqual(params is not None, True, "Should match root path")
+    
+    # Path with trailing slash
+    route = router.Route("GET", "/users/", lambda req, resp: None)
+    params = route.match("/users/")
+    testing.assertEqual(params is not None, True, "Should match with trailing slash")
+    
+    # Param with empty value should not match
+    route = router.Route("GET", "/users/:id", lambda req, resp: None)
+    params = route.match("/users/")
+    testing.assertEqual(params is None, True, "Should not match empty param")
+    
+    # Param containing slashes
+    route = router.Route("GET", "/files/:path", lambda req, resp: None)
+    params = route.match("/files/docs/report")
+    testing.assertEqual(params is None, True, "Param should not capture slashes")
+
+
+actor main(env):
+    # Run all tests
+    _test_route_matching()
+    _test_param_route()
+    _test_multi_param_route()
+    _test_wildcard_route()
+    _test_router_registration()
+    _test_router_pattern_matching()
+    _test_route_priority()
+    _test_context()
+    _test_param_extraction()
+    _test_method_matching()
+    _test_edge_cases()
+    
+    env.exit(0)
+
