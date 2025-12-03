@@ -1,211 +1,72 @@
 <devices xmlns="http://orchestron.org/yang/orchestron-device.yang">
   <device>
     <name>AMS-CORE-1</name>
-    <modset_id>8608638066243661451</modset_id>
     <config>
-      <vrfs xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-vrf-cfg">
-        <vrf>
-          <vrf-name>acme-65501</vrf-name>
-          <address-family>
-            <ipv4>
-              <unicast>
-                <import xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg">
-                  <route-target>
-                    <two-byte-as-rts>
-                      <two-byte-as-rt>
-                        <as-number>65001</as-number>
-                        <index>65501</index>
-                        <stitching>false</stitching>
-                      </two-byte-as-rt>
-                    </two-byte-as-rts>
-                  </route-target>
-                </import>
-                <export xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg">
-                  <route-target>
-                    <two-byte-as-rts>
-                      <two-byte-as-rt>
-                        <as-number>65001</as-number>
-                        <index>65501</index>
-                        <stitching>false</stitching>
-                      </two-byte-as-rt>
-                    </two-byte-as-rts>
-                  </route-target>
-                </export>
-              </unicast>
-            </ipv4>
-          </address-family>
-          <description>Customer VPN for CUSTOMER-1</description>
-        </vrf>
-      </vrfs>
-      <router xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-isis-cfg">
-        <isis>
-          <processes>
-            <process>
-              <process-id>1</process-id>
-              <is-type>level-2-only</is-type>
-              <nets>
-                <net>
-                  <net-id>49.0001.0100.0000.0001.00</net-id>
-                </net>
-              </nets>
-              <address-families>
-                <address-family>
-                  <af-name>ipv4</af-name>
-                  <saf-name>unicast</saf-name>
-                  <metric-style>
-                    <wide/>
-                  </metric-style>
-                </address-family>
-              </address-families>
-              <interfaces>
-                <interface>
-                  <interface-name>GigabitEthernet0/0/0/0</interface-name>
-                  <circuit-type>level-2-only</circuit-type>
-                  <point-to-point/>
-                  <address-families>
-                    <address-family>
-                      <af-name>ipv4</af-name>
-                      <saf-name>unicast</saf-name>
-                      <metric>
-                        <levels>
-                          <level>
-                            <level-id>2</level-id>
-                            <default-metric>5000</default-metric>
-                          </level>
-                        </levels>
-                      </metric>
-                    </address-family>
-                  </address-families>
-                </interface>
-                <interface>
-                  <interface-name>GigabitEthernet0/0/0/1</interface-name>
-                  <circuit-type>level-2-only</circuit-type>
-                  <point-to-point/>
-                  <address-families>
-                    <address-family>
-                      <af-name>ipv4</af-name>
-                      <saf-name>unicast</saf-name>
-                      <metric>
-                        <levels>
-                          <level>
-                            <level-id>2</level-id>
-                            <default-metric>5000</default-metric>
-                          </level>
-                        </levels>
-                      </metric>
-                    </address-family>
-                  </address-families>
-                </interface>
-                <interface>
-                  <interface-name>Loopback0</interface-name>
-                  <passive/>
-                  <address-families>
-                    <address-family>
-                      <af-name>ipv4</af-name>
-                      <saf-name>unicast</saf-name>
-                    </address-family>
-                  </address-families>
-                </interface>
-              </interfaces>
-            </process>
-          </processes>
-        </isis>
-      </router>
-      <router xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg">
-        <bgp>
-          <as>
-            <as-number>65001</as-number>
-            <address-families>
-              <address-family>
-                <af-name>vpnv4-unicast</af-name>
-              </address-family>
-              <address-family>
-                <af-name>vpnv6-unicast</af-name>
-              </address-family>
-            </address-families>
-            <neighbors>
-              <neighbor>
-                <neighbor-address>10.0.0.2</neighbor-address>
-                <use>
-                  <neighbor-group>IPV4-IBGP</neighbor-group>
-                </use>
-                <description>FRA-CORE-1</description>
-              </neighbor>
-              <neighbor>
-                <neighbor-address>10.0.0.3</neighbor-address>
-                <use>
-                  <neighbor-group>IPV4-IBGP</neighbor-group>
-                </use>
-                <description>STO-CORE-1</description>
-              </neighbor>
-              <neighbor>
-                <neighbor-address>10.0.0.4</neighbor-address>
-                <use>
-                  <neighbor-group>IPV4-IBGP</neighbor-group>
-                </use>
-                <description>LJU-CORE-1</description>
-              </neighbor>
-            </neighbors>
-            <neighbor-groups>
-              <neighbor-group>
-                <neighbor-group-name>IPV4-IBGP</neighbor-group-name>
-                <address-families>
-                  <address-family>
-                    <af-name>vpnv4-unicast</af-name>
-                  </address-family>
-                  <address-family>
-                    <af-name>vpnv6-unicast</af-name>
-                  </address-family>
-                </address-families>
-                <remote-as>65001</remote-as>
-                <password>
-                  <encrypted>045209011F6C4D5B1D11001906020F053E222B267E3E270A</encrypted>
-                </password>
-                <update-source>Loopback0</update-source>
-              </neighbor-group>
-            </neighbor-groups>
-            <bgp>
-              <router-id>10.0.0.1</router-id>
-            </bgp>
-            <vrfs>
-              <vrf>
-                <vrf-name>acme-65501</vrf-name>
-                <address-families>
-                  <address-family>
-                    <af-name>ipv4-unicast</af-name>
-                  </address-family>
-                </address-families>
-                <neighbors>
-                  <neighbor>
-                    <neighbor-address>10.201.1.2</neighbor-address>
-                    <address-families>
-                      <address-family>
-                        <af-name>ipv4-unicast</af-name>
-                        <route-policy>
-                          <in>ACCEPT</in>
-                          <out>ACCEPT</out>
-                        </route-policy>
-                        <as-override/>
-                      </address-family>
-                    </address-families>
-                    <remote-as>65501</remote-as>
-                    <description>Customer eBGP SITE-1 [SNA-1-1] in VPN acme-65501 to 10.201.1.2</description>
-                    <password>
-                      <encrypted>045A080B0A6C1A1B5C4954</encrypted>
-                    </password>
-                  </neighbor>
-                </neighbors>
-                <rd>
-                  <two-byte-as>
-                    <as-number>65001</as-number>
-                    <index>655011</index>
-                  </two-byte-as>
-                </rd>
-              </vrf>
-            </vrfs>
-          </as>
-        </bgp>
-      </router>
+      <hostname xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-hostname-cfg">
+        <system-network-name>AMS-CORE-1</system-network-name>
+      </hostname>
+      <interfaces xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-interface-cfg">
+        <interface>
+          <interface-name>GigabitEthernet0/0/0/0</interface-name>
+          <description>Link to FRA-CORE-1 [GigabitEthernet0/0/0/0]</description>
+          <ipv4>
+            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
+              <address>
+                <address>10.0.7.1</address>
+                <netmask>255.255.255.252</netmask>
+              </address>
+            </addresses>
+          </ipv4>
+          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
+        </interface>
+        <interface>
+          <interface-name>GigabitEthernet0/0/0/1</interface-name>
+          <description>Link to STO-CORE-1 [eth1]</description>
+          <ipv4>
+            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
+              <address>
+                <address>10.0.20.1</address>
+                <netmask>255.255.255.252</netmask>
+              </address>
+            </addresses>
+          </ipv4>
+          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
+        </interface>
+        <interface>
+          <interface-name>GigabitEthernet0/0/0/2</interface-name>
+          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
+        </interface>
+        <interface>
+          <interface-name>GigabitEthernet0/0/0/2.100</interface-name>
+          <description>Customer VPN access SITE-1 [SNA-1-1] in VPN acme-65501</description>
+          <ipv4>
+            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
+              <address>
+                <address>10.201.1.1</address>
+                <netmask>255.255.255.252</netmask>
+              </address>
+            </addresses>
+          </ipv4>
+          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
+          <encapsulation xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-l2-ethernet-cfg">
+            <dot1q>
+              <vlan-id>100</vlan-id>
+            </dot1q>
+          </encapsulation>
+          <vrf xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-vrf-cfg">acme-65501</vrf>
+        </interface>
+        <interface>
+          <interface-name>Loopback0</interface-name>
+          <ipv4>
+            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
+              <address>
+                <address>10.0.0.1</address>
+                <netmask>255.255.255.255</netmask>
+              </address>
+            </addresses>
+          </ipv4>
+        </interface>
+      </interfaces>
       <mpls xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-mpls-ldp-cfg">
         <ldp>
           <address-families>
@@ -223,71 +84,6 @@
           </interfaces>
         </ldp>
       </mpls>
-      <interfaces xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-interface-cfg">
-        <interface>
-          <interface-name>GigabitEthernet0/0/0/0</interface-name>
-          <ipv4>
-            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
-              <address>
-                <address>10.0.7.1</address>
-                <netmask>255.255.255.252</netmask>
-              </address>
-            </addresses>
-          </ipv4>
-          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
-          <description>Link to FRA-CORE-1 [GigabitEthernet0/0/0/0]</description>
-        </interface>
-        <interface>
-          <interface-name>GigabitEthernet0/0/0/1</interface-name>
-          <ipv4>
-            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
-              <address>
-                <address>10.0.20.1</address>
-                <netmask>255.255.255.252</netmask>
-              </address>
-            </addresses>
-          </ipv4>
-          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
-          <description>Link to STO-CORE-1 [eth1]</description>
-        </interface>
-        <interface>
-          <interface-name>GigabitEthernet0/0/0/2</interface-name>
-          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
-        </interface>
-        <interface>
-          <interface-name>GigabitEthernet0/0/0/2.100</interface-name>
-          <ipv4>
-            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
-              <address>
-                <address>10.201.1.1</address>
-                <netmask>255.255.255.252</netmask>
-              </address>
-            </addresses>
-          </ipv4>
-          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
-          <description>Customer VPN access SITE-1 [SNA-1-1] in VPN acme-65501</description>
-          <vrf xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-vrf-cfg">acme-65501</vrf>
-          <encapsulation xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-l2-ethernet-cfg">
-            <dot1q>
-              <vlan-id>100</vlan-id>
-            </dot1q>
-          </encapsulation>
-        </interface>
-        <interface>
-          <interface-name>Loopback0</interface-name>
-          <ipv4>
-            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
-              <address>
-                <address>10.0.0.1</address>
-                <netmask>255.255.255.255</netmask>
-              </address>
-            </addresses>
-          </ipv4>
-        </interface>
-      </interfaces>
-      <hostname xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-hostname-cfg">
-        <system-network-name>AMS-CORE-1</system-network-name>
-      </hostname>
       <routing-policy xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-policy-repository-cfg">
         <route-policies>
           <route-policy>
@@ -298,139 +94,6 @@ end-policy</rpl-route-policy>
           </route-policy>
         </route-policies>
       </routing-policy>
-    </config>
-  </device>
-  <device>
-    <name>FRA-CORE-1</name>
-    <modset_id>8608638066243661451</modset_id>
-    <config>
-      <vrfs xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-vrf-cfg">
-        <vrf>
-          <vrf-name>acme-65501</vrf-name>
-          <address-family>
-            <ipv4>
-              <unicast>
-                <import xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg">
-                  <route-target>
-                    <two-byte-as-rts>
-                      <two-byte-as-rt>
-                        <as-number>65001</as-number>
-                        <index>65501</index>
-                        <stitching>false</stitching>
-                      </two-byte-as-rt>
-                    </two-byte-as-rts>
-                  </route-target>
-                </import>
-                <export xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg">
-                  <route-target>
-                    <two-byte-as-rts>
-                      <two-byte-as-rt>
-                        <as-number>65001</as-number>
-                        <index>65501</index>
-                        <stitching>false</stitching>
-                      </two-byte-as-rt>
-                    </two-byte-as-rts>
-                  </route-target>
-                </export>
-              </unicast>
-            </ipv4>
-          </address-family>
-          <description>Customer VPN for CUSTOMER-1</description>
-        </vrf>
-      </vrfs>
-      <router xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-isis-cfg">
-        <isis>
-          <processes>
-            <process>
-              <process-id>1</process-id>
-              <is-type>level-2-only</is-type>
-              <nets>
-                <net>
-                  <net-id>49.0001.0100.0000.0002.00</net-id>
-                </net>
-              </nets>
-              <address-families>
-                <address-family>
-                  <af-name>ipv4</af-name>
-                  <saf-name>unicast</saf-name>
-                  <metric-style>
-                    <wide/>
-                  </metric-style>
-                </address-family>
-              </address-families>
-              <interfaces>
-                <interface>
-                  <interface-name>GigabitEthernet0/0/0/0</interface-name>
-                  <circuit-type>level-2-only</circuit-type>
-                  <point-to-point/>
-                  <address-families>
-                    <address-family>
-                      <af-name>ipv4</af-name>
-                      <saf-name>unicast</saf-name>
-                      <metric>
-                        <levels>
-                          <level>
-                            <level-id>2</level-id>
-                            <default-metric>5000</default-metric>
-                          </level>
-                        </levels>
-                      </metric>
-                    </address-family>
-                  </address-families>
-                </interface>
-                <interface>
-                  <interface-name>GigabitEthernet0/0/0/1</interface-name>
-                  <circuit-type>level-2-only</circuit-type>
-                  <point-to-point/>
-                  <address-families>
-                    <address-family>
-                      <af-name>ipv4</af-name>
-                      <saf-name>unicast</saf-name>
-                      <metric>
-                        <levels>
-                          <level>
-                            <level-id>2</level-id>
-                            <default-metric>5000</default-metric>
-                          </level>
-                        </levels>
-                      </metric>
-                    </address-family>
-                  </address-families>
-                </interface>
-                <interface>
-                  <interface-name>GigabitEthernet0/0/0/2</interface-name>
-                  <circuit-type>level-2-only</circuit-type>
-                  <point-to-point/>
-                  <address-families>
-                    <address-family>
-                      <af-name>ipv4</af-name>
-                      <saf-name>unicast</saf-name>
-                      <metric>
-                        <levels>
-                          <level>
-                            <level-id>2</level-id>
-                            <default-metric>5000</default-metric>
-                          </level>
-                        </levels>
-                      </metric>
-                    </address-family>
-                  </address-families>
-                </interface>
-                <interface>
-                  <interface-name>Loopback0</interface-name>
-                  <passive/>
-                  <address-families>
-                    <address-family>
-                      <af-name>ipv4</af-name>
-                      <saf-name>unicast</saf-name>
-                    </address-family>
-                  </address-families>
-                </interface>
-              </interfaces>
-            </process>
-          </processes>
-        </isis>
-      </router>
       <router xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg">
         <bgp>
           <as>
@@ -443,29 +106,9 @@ end-policy</rpl-route-policy>
                 <af-name>vpnv6-unicast</af-name>
               </address-family>
             </address-families>
-            <neighbors>
-              <neighbor>
-                <neighbor-address>10.0.0.1</neighbor-address>
-                <use>
-                  <neighbor-group>IPV4-IBGP</neighbor-group>
-                </use>
-                <description>AMS-CORE-1</description>
-              </neighbor>
-              <neighbor>
-                <neighbor-address>10.0.0.3</neighbor-address>
-                <use>
-                  <neighbor-group>IPV4-IBGP</neighbor-group>
-                </use>
-                <description>STO-CORE-1</description>
-              </neighbor>
-              <neighbor>
-                <neighbor-address>10.0.0.4</neighbor-address>
-                <use>
-                  <neighbor-group>IPV4-IBGP</neighbor-group>
-                </use>
-                <description>LJU-CORE-1</description>
-              </neighbor>
-            </neighbors>
+            <bgp>
+              <router-id>10.0.0.1</router-id>
+            </bgp>
             <neighbor-groups>
               <neighbor-group>
                 <neighbor-group-name>IPV4-IBGP</neighbor-group-name>
@@ -477,16 +120,36 @@ end-policy</rpl-route-policy>
                     <af-name>vpnv6-unicast</af-name>
                   </address-family>
                 </address-families>
-                <remote-as>65001</remote-as>
                 <password>
                   <encrypted>045209011F6C4D5B1D11001906020F053E222B267E3E270A</encrypted>
                 </password>
+                <remote-as>65001</remote-as>
                 <update-source>Loopback0</update-source>
               </neighbor-group>
             </neighbor-groups>
-            <bgp>
-              <router-id>10.0.0.2</router-id>
-            </bgp>
+            <neighbors>
+              <neighbor>
+                <neighbor-address>10.0.0.2</neighbor-address>
+                <description>FRA-CORE-1</description>
+                <use>
+                  <neighbor-group>IPV4-IBGP</neighbor-group>
+                </use>
+              </neighbor>
+              <neighbor>
+                <neighbor-address>10.0.0.3</neighbor-address>
+                <description>STO-CORE-1</description>
+                <use>
+                  <neighbor-group>IPV4-IBGP</neighbor-group>
+                </use>
+              </neighbor>
+              <neighbor>
+                <neighbor-address>10.0.0.4</neighbor-address>
+                <description>LJU-CORE-1</description>
+                <use>
+                  <neighbor-group>IPV4-IBGP</neighbor-group>
+                </use>
+              </neighbor>
+            </neighbors>
             <vrfs>
               <vrf>
                 <vrf-name>acme-65501</vrf-name>
@@ -497,28 +160,28 @@ end-policy</rpl-route-policy>
                 </address-families>
                 <neighbors>
                   <neighbor>
-                    <neighbor-address>10.202.1.2</neighbor-address>
+                    <neighbor-address>10.201.1.2</neighbor-address>
                     <address-families>
                       <address-family>
                         <af-name>ipv4-unicast</af-name>
+                        <as-override/>
                         <route-policy>
                           <in>ACCEPT</in>
                           <out>ACCEPT</out>
                         </route-policy>
-                        <as-override/>
                       </address-family>
                     </address-families>
-                    <remote-as>65501</remote-as>
-                    <description>Customer eBGP SITE-2 [SNA-2-1] in VPN acme-65501 to 10.202.1.2</description>
+                    <description>Customer eBGP SITE-1 [SNA-1-1] in VPN acme-65501 to 10.201.1.2</description>
                     <password>
                       <encrypted>045A080B0A6C1A1B5C4954</encrypted>
                     </password>
+                    <remote-as>65501</remote-as>
                   </neighbor>
                 </neighbors>
                 <rd>
                   <two-byte-as>
                     <as-number>65001</as-number>
-                    <index>655012</index>
+                    <index>655011</index>
                   </two-byte-as>
                 </rd>
               </vrf>
@@ -526,6 +189,198 @@ end-policy</rpl-route-policy>
           </as>
         </bgp>
       </router>
+      <router xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-isis-cfg">
+        <isis>
+          <processes>
+            <process>
+              <process-id>1</process-id>
+              <address-families>
+                <address-family>
+                  <af-name>ipv4</af-name>
+                  <saf-name>unicast</saf-name>
+                  <metric-style>
+                    <wide/>
+                  </metric-style>
+                </address-family>
+              </address-families>
+              <interfaces>
+                <interface>
+                  <interface-name>GigabitEthernet0/0/0/0</interface-name>
+                  <address-families>
+                    <address-family>
+                      <af-name>ipv4</af-name>
+                      <saf-name>unicast</saf-name>
+                      <metric>
+                        <levels>
+                          <level>
+                            <level-id>2</level-id>
+                            <default-metric>5000</default-metric>
+                          </level>
+                        </levels>
+                      </metric>
+                    </address-family>
+                  </address-families>
+                  <circuit-type>level-2-only</circuit-type>
+                  <point-to-point/>
+                </interface>
+                <interface>
+                  <interface-name>GigabitEthernet0/0/0/1</interface-name>
+                  <address-families>
+                    <address-family>
+                      <af-name>ipv4</af-name>
+                      <saf-name>unicast</saf-name>
+                      <metric>
+                        <levels>
+                          <level>
+                            <level-id>2</level-id>
+                            <default-metric>5000</default-metric>
+                          </level>
+                        </levels>
+                      </metric>
+                    </address-family>
+                  </address-families>
+                  <circuit-type>level-2-only</circuit-type>
+                  <point-to-point/>
+                </interface>
+                <interface>
+                  <interface-name>Loopback0</interface-name>
+                  <address-families>
+                    <address-family>
+                      <af-name>ipv4</af-name>
+                      <saf-name>unicast</saf-name>
+                    </address-family>
+                  </address-families>
+                  <passive/>
+                </interface>
+              </interfaces>
+              <is-type>level-2-only</is-type>
+              <nets>
+                <net>
+                  <net-id>49.0001.0100.0000.0001.00</net-id>
+                </net>
+              </nets>
+            </process>
+          </processes>
+        </isis>
+      </router>
+      <vrfs xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-vrf-cfg">
+        <vrf>
+          <vrf-name>acme-65501</vrf-name>
+          <address-family>
+            <ipv4>
+              <unicast>
+                <export xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg">
+                  <route-target>
+                    <two-byte-as-rts>
+                      <two-byte-as-rt>
+                        <as-number>65001</as-number>
+                        <index>65501</index>
+                        <stitching>false</stitching>
+                      </two-byte-as-rt>
+                    </two-byte-as-rts>
+                  </route-target>
+                </export>
+                <import xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg">
+                  <route-target>
+                    <two-byte-as-rts>
+                      <two-byte-as-rt>
+                        <as-number>65001</as-number>
+                        <index>65501</index>
+                        <stitching>false</stitching>
+                      </two-byte-as-rt>
+                    </two-byte-as-rts>
+                  </route-target>
+                </import>
+              </unicast>
+            </ipv4>
+          </address-family>
+          <description>Customer VPN for CUSTOMER-1</description>
+        </vrf>
+      </vrfs>
+    </config>
+    <modset_id>8608638066243661451</modset_id>
+  </device>
+  <device>
+    <name>FRA-CORE-1</name>
+    <config>
+      <hostname xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-hostname-cfg">
+        <system-network-name>FRA-CORE-1</system-network-name>
+      </hostname>
+      <interfaces xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-interface-cfg">
+        <interface>
+          <interface-name>GigabitEthernet0/0/0/0</interface-name>
+          <description>Link to AMS-CORE-1 [GigabitEthernet0/0/0/0]</description>
+          <ipv4>
+            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
+              <address>
+                <address>10.0.7.2</address>
+                <netmask>255.255.255.252</netmask>
+              </address>
+            </addresses>
+          </ipv4>
+          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
+        </interface>
+        <interface>
+          <interface-name>GigabitEthernet0/0/0/1</interface-name>
+          <description>Link to STO-CORE-1 [eth2]</description>
+          <ipv4>
+            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
+              <address>
+                <address>10.0.25.1</address>
+                <netmask>255.255.255.252</netmask>
+              </address>
+            </addresses>
+          </ipv4>
+          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
+        </interface>
+        <interface>
+          <interface-name>GigabitEthernet0/0/0/2</interface-name>
+          <description>Link to LJU-CORE-1 [eth1]</description>
+          <ipv4>
+            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
+              <address>
+                <address>10.0.18.1</address>
+                <netmask>255.255.255.252</netmask>
+              </address>
+            </addresses>
+          </ipv4>
+          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
+        </interface>
+        <interface>
+          <interface-name>GigabitEthernet0/0/0/3</interface-name>
+          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
+        </interface>
+        <interface>
+          <interface-name>GigabitEthernet0/0/0/3.100</interface-name>
+          <description>Customer VPN access SITE-2 [SNA-2-1] in VPN acme-65501</description>
+          <ipv4>
+            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
+              <address>
+                <address>10.202.1.1</address>
+                <netmask>255.255.255.252</netmask>
+              </address>
+            </addresses>
+          </ipv4>
+          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
+          <encapsulation xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-l2-ethernet-cfg">
+            <dot1q>
+              <vlan-id>100</vlan-id>
+            </dot1q>
+          </encapsulation>
+          <vrf xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-vrf-cfg">acme-65501</vrf>
+        </interface>
+        <interface>
+          <interface-name>Loopback0</interface-name>
+          <ipv4>
+            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
+              <address>
+                <address>10.0.0.2</address>
+                <netmask>255.255.255.255</netmask>
+              </address>
+            </addresses>
+          </ipv4>
+        </interface>
+      </interfaces>
       <mpls xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-mpls-ldp-cfg">
         <ldp>
           <address-families>
@@ -546,84 +401,6 @@ end-policy</rpl-route-policy>
           </interfaces>
         </ldp>
       </mpls>
-      <interfaces xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-interface-cfg">
-        <interface>
-          <interface-name>GigabitEthernet0/0/0/0</interface-name>
-          <ipv4>
-            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
-              <address>
-                <address>10.0.7.2</address>
-                <netmask>255.255.255.252</netmask>
-              </address>
-            </addresses>
-          </ipv4>
-          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
-          <description>Link to AMS-CORE-1 [GigabitEthernet0/0/0/0]</description>
-        </interface>
-        <interface>
-          <interface-name>GigabitEthernet0/0/0/1</interface-name>
-          <ipv4>
-            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
-              <address>
-                <address>10.0.25.1</address>
-                <netmask>255.255.255.252</netmask>
-              </address>
-            </addresses>
-          </ipv4>
-          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
-          <description>Link to STO-CORE-1 [eth2]</description>
-        </interface>
-        <interface>
-          <interface-name>GigabitEthernet0/0/0/2</interface-name>
-          <ipv4>
-            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
-              <address>
-                <address>10.0.18.1</address>
-                <netmask>255.255.255.252</netmask>
-              </address>
-            </addresses>
-          </ipv4>
-          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
-          <description>Link to LJU-CORE-1 [eth1]</description>
-        </interface>
-        <interface>
-          <interface-name>GigabitEthernet0/0/0/3</interface-name>
-          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
-        </interface>
-        <interface>
-          <interface-name>GigabitEthernet0/0/0/3.100</interface-name>
-          <ipv4>
-            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
-              <address>
-                <address>10.202.1.1</address>
-                <netmask>255.255.255.252</netmask>
-              </address>
-            </addresses>
-          </ipv4>
-          <shutdown xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="remove"/>
-          <description>Customer VPN access SITE-2 [SNA-2-1] in VPN acme-65501</description>
-          <vrf xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-vrf-cfg">acme-65501</vrf>
-          <encapsulation xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-l2-ethernet-cfg">
-            <dot1q>
-              <vlan-id>100</vlan-id>
-            </dot1q>
-          </encapsulation>
-        </interface>
-        <interface>
-          <interface-name>Loopback0</interface-name>
-          <ipv4>
-            <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
-              <address>
-                <address>10.0.0.2</address>
-                <netmask>255.255.255.255</netmask>
-              </address>
-            </addresses>
-          </ipv4>
-        </interface>
-      </interfaces>
-      <hostname xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-hostname-cfg">
-        <system-network-name>FRA-CORE-1</system-network-name>
-      </hostname>
       <routing-policy xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-policy-repository-cfg">
         <route-policies>
           <route-policy>
@@ -634,22 +411,235 @@ end-policy</rpl-route-policy>
           </route-policy>
         </route-policies>
       </routing-policy>
+      <router xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg">
+        <bgp>
+          <as>
+            <as-number>65001</as-number>
+            <address-families>
+              <address-family>
+                <af-name>vpnv4-unicast</af-name>
+              </address-family>
+              <address-family>
+                <af-name>vpnv6-unicast</af-name>
+              </address-family>
+            </address-families>
+            <bgp>
+              <router-id>10.0.0.2</router-id>
+            </bgp>
+            <neighbor-groups>
+              <neighbor-group>
+                <neighbor-group-name>IPV4-IBGP</neighbor-group-name>
+                <address-families>
+                  <address-family>
+                    <af-name>vpnv4-unicast</af-name>
+                  </address-family>
+                  <address-family>
+                    <af-name>vpnv6-unicast</af-name>
+                  </address-family>
+                </address-families>
+                <password>
+                  <encrypted>045209011F6C4D5B1D11001906020F053E222B267E3E270A</encrypted>
+                </password>
+                <remote-as>65001</remote-as>
+                <update-source>Loopback0</update-source>
+              </neighbor-group>
+            </neighbor-groups>
+            <neighbors>
+              <neighbor>
+                <neighbor-address>10.0.0.1</neighbor-address>
+                <description>AMS-CORE-1</description>
+                <use>
+                  <neighbor-group>IPV4-IBGP</neighbor-group>
+                </use>
+              </neighbor>
+              <neighbor>
+                <neighbor-address>10.0.0.3</neighbor-address>
+                <description>STO-CORE-1</description>
+                <use>
+                  <neighbor-group>IPV4-IBGP</neighbor-group>
+                </use>
+              </neighbor>
+              <neighbor>
+                <neighbor-address>10.0.0.4</neighbor-address>
+                <description>LJU-CORE-1</description>
+                <use>
+                  <neighbor-group>IPV4-IBGP</neighbor-group>
+                </use>
+              </neighbor>
+            </neighbors>
+            <vrfs>
+              <vrf>
+                <vrf-name>acme-65501</vrf-name>
+                <address-families>
+                  <address-family>
+                    <af-name>ipv4-unicast</af-name>
+                  </address-family>
+                </address-families>
+                <neighbors>
+                  <neighbor>
+                    <neighbor-address>10.202.1.2</neighbor-address>
+                    <address-families>
+                      <address-family>
+                        <af-name>ipv4-unicast</af-name>
+                        <as-override/>
+                        <route-policy>
+                          <in>ACCEPT</in>
+                          <out>ACCEPT</out>
+                        </route-policy>
+                      </address-family>
+                    </address-families>
+                    <description>Customer eBGP SITE-2 [SNA-2-1] in VPN acme-65501 to 10.202.1.2</description>
+                    <password>
+                      <encrypted>045A080B0A6C1A1B5C4954</encrypted>
+                    </password>
+                    <remote-as>65501</remote-as>
+                  </neighbor>
+                </neighbors>
+                <rd>
+                  <two-byte-as>
+                    <as-number>65001</as-number>
+                    <index>655012</index>
+                  </two-byte-as>
+                </rd>
+              </vrf>
+            </vrfs>
+          </as>
+        </bgp>
+      </router>
+      <router xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-isis-cfg">
+        <isis>
+          <processes>
+            <process>
+              <process-id>1</process-id>
+              <address-families>
+                <address-family>
+                  <af-name>ipv4</af-name>
+                  <saf-name>unicast</saf-name>
+                  <metric-style>
+                    <wide/>
+                  </metric-style>
+                </address-family>
+              </address-families>
+              <interfaces>
+                <interface>
+                  <interface-name>GigabitEthernet0/0/0/0</interface-name>
+                  <address-families>
+                    <address-family>
+                      <af-name>ipv4</af-name>
+                      <saf-name>unicast</saf-name>
+                      <metric>
+                        <levels>
+                          <level>
+                            <level-id>2</level-id>
+                            <default-metric>5000</default-metric>
+                          </level>
+                        </levels>
+                      </metric>
+                    </address-family>
+                  </address-families>
+                  <circuit-type>level-2-only</circuit-type>
+                  <point-to-point/>
+                </interface>
+                <interface>
+                  <interface-name>GigabitEthernet0/0/0/1</interface-name>
+                  <address-families>
+                    <address-family>
+                      <af-name>ipv4</af-name>
+                      <saf-name>unicast</saf-name>
+                      <metric>
+                        <levels>
+                          <level>
+                            <level-id>2</level-id>
+                            <default-metric>5000</default-metric>
+                          </level>
+                        </levels>
+                      </metric>
+                    </address-family>
+                  </address-families>
+                  <circuit-type>level-2-only</circuit-type>
+                  <point-to-point/>
+                </interface>
+                <interface>
+                  <interface-name>GigabitEthernet0/0/0/2</interface-name>
+                  <address-families>
+                    <address-family>
+                      <af-name>ipv4</af-name>
+                      <saf-name>unicast</saf-name>
+                      <metric>
+                        <levels>
+                          <level>
+                            <level-id>2</level-id>
+                            <default-metric>5000</default-metric>
+                          </level>
+                        </levels>
+                      </metric>
+                    </address-family>
+                  </address-families>
+                  <circuit-type>level-2-only</circuit-type>
+                  <point-to-point/>
+                </interface>
+                <interface>
+                  <interface-name>Loopback0</interface-name>
+                  <address-families>
+                    <address-family>
+                      <af-name>ipv4</af-name>
+                      <saf-name>unicast</saf-name>
+                    </address-family>
+                  </address-families>
+                  <passive/>
+                </interface>
+              </interfaces>
+              <is-type>level-2-only</is-type>
+              <nets>
+                <net>
+                  <net-id>49.0001.0100.0000.0002.00</net-id>
+                </net>
+              </nets>
+            </process>
+          </processes>
+        </isis>
+      </router>
+      <vrfs xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-vrf-cfg">
+        <vrf>
+          <vrf-name>acme-65501</vrf-name>
+          <address-family>
+            <ipv4>
+              <unicast>
+                <export xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg">
+                  <route-target>
+                    <two-byte-as-rts>
+                      <two-byte-as-rt>
+                        <as-number>65001</as-number>
+                        <index>65501</index>
+                        <stitching>false</stitching>
+                      </two-byte-as-rt>
+                    </two-byte-as-rts>
+                  </route-target>
+                </export>
+                <import xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg">
+                  <route-target>
+                    <two-byte-as-rts>
+                      <two-byte-as-rt>
+                        <as-number>65001</as-number>
+                        <index>65501</index>
+                        <stitching>false</stitching>
+                      </two-byte-as-rt>
+                    </two-byte-as-rts>
+                  </route-target>
+                </import>
+              </unicast>
+            </ipv4>
+          </address-family>
+          <description>Customer VPN for CUSTOMER-1</description>
+        </vrf>
+      </vrfs>
     </config>
+    <modset_id>8608638066243661451</modset_id>
   </device>
   <device>
     <name>LJU-CORE-1</name>
-    <modset_id>11126824067001399111</modset_id>
     <config>
       <configuration xmlns="http://yang.juniper.net/junos/conf/root">
-        <system>
-          <host-name>LJU-CORE-1</host-name>
-          <services>
-            <netconf>
-              <rfc-compliant/>
-              <yang-compliant/>
-            </netconf>
-          </services>
-        </system>
         <interfaces>
           <interface>
             <name>eth1</name>
@@ -685,7 +675,6 @@ end-policy</rpl-route-policy>
             <unit>
               <name>100</name>
               <description>Customer VPN access SITE-4 [SNA-4-1] in VPN acme-65501</description>
-              <vlan-id>100</vlan-id>
               <family>
                 <inet>
                   <address>
@@ -693,6 +682,7 @@ end-policy</rpl-route-policy>
                   </address>
                 </inet>
               </family>
+              <vlan-id>100</vlan-id>
             </unit>
           </interface>
           <interface>
@@ -715,49 +705,11 @@ end-policy</rpl-route-policy>
             </unit>
           </interface>
         </interfaces>
-        <routing-instances>
-          <instance>
-            <name>acme-65501</name>
-            <instance-type>vrf</instance-type>
-            <protocols>
-              <bgp>
-                <group>
-                  <name>customer</name>
-                  <passive/>
-                  <neighbor>
-                    <name>10.204.1.2</name>
-                    <description>Customer eBGP SITE-4 [SNA-4-1] in VPN acme-65501 to 10.204.1.2</description>
-                    <authentication-key>$9$4TaJDkqf36AoJ5Q36AtLx7-Yg4aZUik</authentication-key>
-                    <peer-as>65501</peer-as>
-                    <as-override/>
-                  </neighbor>
-                </group>
-              </bgp>
-            </protocols>
-            <interface>
-              <name>eth3.100</name>
-            </interface>
-            <route-distinguisher>
-              <rd-type>65001:655014</rd-type>
-            </route-distinguisher>
-            <vrf-target>
-              <community>target:65001:65501</community>
-            </vrf-target>
-            <vrf-table-label/>
-          </instance>
-        </routing-instances>
-        <routing-options>
-          <autonomous-system>
-            <as-number>65001</as-number>
-          </autonomous-system>
-        </routing-options>
         <protocols>
           <bgp>
             <group>
               <name>IPV4-IBGP</name>
-              <type>internal</type>
-              <local-address>10.0.0.4</local-address>
-              <hold-time>90</hold-time>
+              <authentication-key>$9$4TaGiq.5/9pmfp0B1yr4aZGkP6/t1Ic36eWL7sYoJGDjq5Qn/Cumfu1RSledbs24Zmfz</authentication-key>
               <family>
                 <inet-vpn>
                   <unicast/>
@@ -767,7 +719,8 @@ end-policy</rpl-route-policy>
                 </inet6-vpn>
                 <route-target/>
               </family>
-              <authentication-key>$9$4TaGiq.5/9pmfp0B1yr4aZGkP6/t1Ic36eWL7sYoJGDjq5Qn/Cumfu1RSledbs24Zmfz</authentication-key>
+              <hold-time>90</hold-time>
+              <local-address>10.0.0.4</local-address>
               <neighbor>
                 <name>10.0.0.1</name>
                 <description>AMS-CORE-1</description>
@@ -780,6 +733,7 @@ end-policy</rpl-route-policy>
                 <name>10.0.0.3</name>
                 <description>STO-CORE-1</description>
               </neighbor>
+              <type>internal</type>
             </group>
             <log-updown/>
           </bgp>
@@ -830,16 +784,44 @@ end-policy</rpl-route-policy>
             </interface>
           </mpls>
         </protocols>
-      </configuration>
-    </config>
-  </device>
-  <device>
-    <name>STO-CORE-1</name>
-    <modset_id>11126824067001399111</modset_id>
-    <config>
-      <configuration xmlns="http://yang.juniper.net/junos/conf/root">
+        <routing-instances>
+          <instance>
+            <name>acme-65501</name>
+            <instance-type>vrf</instance-type>
+            <interface>
+              <name>eth3.100</name>
+            </interface>
+            <protocols>
+              <bgp>
+                <group>
+                  <name>customer</name>
+                  <neighbor>
+                    <name>10.204.1.2</name>
+                    <as-override/>
+                    <authentication-key>$9$4TaJDkqf36AoJ5Q36AtLx7-Yg4aZUik</authentication-key>
+                    <description>Customer eBGP SITE-4 [SNA-4-1] in VPN acme-65501 to 10.204.1.2</description>
+                    <peer-as>65501</peer-as>
+                  </neighbor>
+                  <passive/>
+                </group>
+              </bgp>
+            </protocols>
+            <route-distinguisher>
+              <rd-type>65001:655014</rd-type>
+            </route-distinguisher>
+            <vrf-table-label/>
+            <vrf-target>
+              <community>target:65001:65501</community>
+            </vrf-target>
+          </instance>
+        </routing-instances>
+        <routing-options>
+          <autonomous-system>
+            <as-number>65001</as-number>
+          </autonomous-system>
+        </routing-options>
         <system>
-          <host-name>STO-CORE-1</host-name>
+          <host-name>LJU-CORE-1</host-name>
           <services>
             <netconf>
               <rfc-compliant/>
@@ -847,6 +829,14 @@ end-policy</rpl-route-policy>
             </netconf>
           </services>
         </system>
+      </configuration>
+    </config>
+    <modset_id>11126824067001399111</modset_id>
+  </device>
+  <device>
+    <name>STO-CORE-1</name>
+    <config>
+      <configuration xmlns="http://yang.juniper.net/junos/conf/root">
         <interfaces>
           <interface>
             <name>eth1</name>
@@ -896,7 +886,6 @@ end-policy</rpl-route-policy>
             <unit>
               <name>100</name>
               <description>Customer VPN access SITE-3 [SNA-3-1] in VPN acme-65501</description>
-              <vlan-id>100</vlan-id>
               <family>
                 <inet>
                   <address>
@@ -904,6 +893,7 @@ end-policy</rpl-route-policy>
                   </address>
                 </inet>
               </family>
+              <vlan-id>100</vlan-id>
             </unit>
           </interface>
           <interface>
@@ -926,49 +916,11 @@ end-policy</rpl-route-policy>
             </unit>
           </interface>
         </interfaces>
-        <routing-instances>
-          <instance>
-            <name>acme-65501</name>
-            <instance-type>vrf</instance-type>
-            <protocols>
-              <bgp>
-                <group>
-                  <name>customer</name>
-                  <passive/>
-                  <neighbor>
-                    <name>10.203.1.2</name>
-                    <description>Customer eBGP SITE-3 [SNA-3-1] in VPN acme-65501 to 10.203.1.2</description>
-                    <authentication-key>$9$4TaJDkqf36AoJ5Q36AtLx7-Yg4aZUik</authentication-key>
-                    <peer-as>65501</peer-as>
-                    <as-override/>
-                  </neighbor>
-                </group>
-              </bgp>
-            </protocols>
-            <interface>
-              <name>eth4.100</name>
-            </interface>
-            <route-distinguisher>
-              <rd-type>65001:655013</rd-type>
-            </route-distinguisher>
-            <vrf-target>
-              <community>target:65001:65501</community>
-            </vrf-target>
-            <vrf-table-label/>
-          </instance>
-        </routing-instances>
-        <routing-options>
-          <autonomous-system>
-            <as-number>65001</as-number>
-          </autonomous-system>
-        </routing-options>
         <protocols>
           <bgp>
             <group>
               <name>IPV4-IBGP</name>
-              <type>internal</type>
-              <local-address>10.0.0.3</local-address>
-              <hold-time>90</hold-time>
+              <authentication-key>$9$4TaGiq.5/9pmfp0B1yr4aZGkP6/t1Ic36eWL7sYoJGDjq5Qn/Cumfu1RSledbs24Zmfz</authentication-key>
               <family>
                 <inet-vpn>
                   <unicast/>
@@ -978,7 +930,8 @@ end-policy</rpl-route-policy>
                 </inet6-vpn>
                 <route-target/>
               </family>
-              <authentication-key>$9$4TaGiq.5/9pmfp0B1yr4aZGkP6/t1Ic36eWL7sYoJGDjq5Qn/Cumfu1RSledbs24Zmfz</authentication-key>
+              <hold-time>90</hold-time>
+              <local-address>10.0.0.3</local-address>
               <neighbor>
                 <name>10.0.0.1</name>
                 <description>AMS-CORE-1</description>
@@ -991,6 +944,7 @@ end-policy</rpl-route-policy>
                 <name>10.0.0.4</name>
                 <description>LJU-CORE-1</description>
               </neighbor>
+              <type>internal</type>
             </group>
             <log-updown/>
           </bgp>
@@ -1056,7 +1010,53 @@ end-policy</rpl-route-policy>
             </interface>
           </mpls>
         </protocols>
+        <routing-instances>
+          <instance>
+            <name>acme-65501</name>
+            <instance-type>vrf</instance-type>
+            <interface>
+              <name>eth4.100</name>
+            </interface>
+            <protocols>
+              <bgp>
+                <group>
+                  <name>customer</name>
+                  <neighbor>
+                    <name>10.203.1.2</name>
+                    <as-override/>
+                    <authentication-key>$9$4TaJDkqf36AoJ5Q36AtLx7-Yg4aZUik</authentication-key>
+                    <description>Customer eBGP SITE-3 [SNA-3-1] in VPN acme-65501 to 10.203.1.2</description>
+                    <peer-as>65501</peer-as>
+                  </neighbor>
+                  <passive/>
+                </group>
+              </bgp>
+            </protocols>
+            <route-distinguisher>
+              <rd-type>65001:655013</rd-type>
+            </route-distinguisher>
+            <vrf-table-label/>
+            <vrf-target>
+              <community>target:65001:65501</community>
+            </vrf-target>
+          </instance>
+        </routing-instances>
+        <routing-options>
+          <autonomous-system>
+            <as-number>65001</as-number>
+          </autonomous-system>
+        </routing-options>
+        <system>
+          <host-name>STO-CORE-1</host-name>
+          <services>
+            <netconf>
+              <rfc-compliant/>
+              <yang-compliant/>
+            </netconf>
+          </services>
+        </system>
       </configuration>
     </config>
+    <modset_id>11126824067001399111</modset_id>
   </device>
 </devices>

@@ -12,10 +12,7 @@ from sorespo.layers.y_1 import netinfra_inter__netinfra__router_entry
 from sorespo.layers.y_1 import netinfra_inter__netinfra__backbone_link_entry
 from sorespo.layers.y_1 import netinfra_inter__netinfra__ibgp_fullmesh_entry
 from sorespo.layers.y_1 import l3vpn_inter__l3vpns__l3vpn_entry
-from sorespo.layers.y_1 import from_xml_netinfra_inter__netinfra__router_element
-from sorespo.layers.y_1 import from_xml_netinfra_inter__netinfra__backbone_link_element
-from sorespo.layers.y_1 import from_xml_netinfra_inter__netinfra__ibgp_fullmesh_element
-from sorespo.layers.y_1 import from_xml_l3vpn_inter__l3vpns__l3vpn_element
+from sorespo.layers.y_1 import from_xml
 from sorespo.layers.y_2_loose import root as output_root
 
 def o_root():
@@ -42,7 +39,7 @@ class Router(ttt.TransformFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = from_xml_netinfra_inter__netinfra__router_element(i)
+        gdata_input = from_xml(i, ['netinfra-inter:netinfra', 'router'])
         modeled_input = netinfra_inter__netinfra__router_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input).to_gdata(), None
@@ -67,7 +64,7 @@ class BBLink(ttt.TransformFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = from_xml_netinfra_inter__netinfra__backbone_link_element(i)
+        gdata_input = from_xml(i, ['netinfra-inter:netinfra', 'backbone-link'])
         modeled_input = netinfra_inter__netinfra__backbone_link_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input).to_gdata(), None
@@ -92,7 +89,7 @@ class IbgpFullmesh(ttt.TransformFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = from_xml_netinfra_inter__netinfra__ibgp_fullmesh_element(i)
+        gdata_input = from_xml(i, ['netinfra-inter:netinfra', 'ibgp-fullmesh'])
         modeled_input = netinfra_inter__netinfra__ibgp_fullmesh_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input).to_gdata(), None
@@ -117,7 +114,7 @@ class L3Vpn(ttt.TransformFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = from_xml_l3vpn_inter__l3vpns__l3vpn_element(i)
+        gdata_input = from_xml(i, ['l3vpn-inter:l3vpns', 'l3vpn'])
         modeled_input = l3vpn_inter__l3vpns__l3vpn_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input).to_gdata(), None

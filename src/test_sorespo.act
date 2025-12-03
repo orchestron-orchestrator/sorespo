@@ -75,7 +75,7 @@ actor _test_netinfra1(t: testing.AsyncT):
         ln_cfg = None
         for n in range(4):
             ln = lnext.get()
-            ln_cfg = ln.to_xmlstr()
+            ln_cfg = ln.to_xmlstr(deterministic=True)
             print(f"layer {n}:\n{ln_cfg}", err=True)
             lnext = lnext.below()
         # Return last (device) layer config
@@ -371,16 +371,15 @@ actor l3vpn_tester(t: testing.AsyncT, output_formatter: mut(gdata.Node) -> str):
     def cont(_r: value):
         res = session.below().below().below().get()
         output = output_formatter(res)
-        print(output)
         t.success(output)
 
     session.edit_config(input_config, None, cont)
 
 actor _test_l3vpn_svc(t: testing.AsyncT):
-    l3vpn_tester(t, lambda n: n.to_xmlstr())
+    l3vpn_tester(t, lambda n: n.to_xmlstr(deterministic=True))
 
 actor _test_l3vpn_svc_json(t: testing.AsyncT):
-    l3vpn_tester(t, lambda n: n.to_json())
+    l3vpn_tester(t, lambda n: n.to_json(deterministic=True))
 
 actor _test_l3vpn_svc_adata(t: testing.AsyncT):
     def _adata_formatter(n: gdata.Node) -> str:
