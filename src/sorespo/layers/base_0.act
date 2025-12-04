@@ -7,13 +7,14 @@ import xml
 import orchestron.ttt as ttt
 import yang.adata
 import yang.gdata
+import yang.gen3
 
 from sorespo.layers.y_0 import orchestron_tmf__tmf_store__tmf640__service_entry
 from sorespo.layers.y_0 import netinfra__netinfra__router_entry
 from sorespo.layers.y_0 import netinfra__netinfra__backbone_link_entry
 from sorespo.layers.y_0 import ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry
 from sorespo.layers.y_0 import ietf_l3vpn_svc__l3vpn_svc__sites__site_entry
-from sorespo.layers.y_0 import from_xml
+from sorespo.layers.y_0 import src_dnode
 from sorespo.layers.y_1_loose import root as output_root
 
 def o_root():
@@ -40,7 +41,7 @@ class Tmf640Store(ttt.TransformFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = from_xml(i, ['orchestron-tmf:tmf-store', 'tmf640', 'service'])
+        gdata_input = yang.gen3.from_data(src_dnode(), i, loose=False, root_path=['orchestron-tmf:tmf-store', 'tmf640', 'service'])
         modeled_input = orchestron_tmf__tmf_store__tmf640__service_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input).to_gdata(), None
@@ -65,7 +66,7 @@ class Router(ttt.TransformFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = from_xml(i, ['netinfra:netinfra', 'router'])
+        gdata_input = yang.gen3.from_data(src_dnode(), i, loose=False, root_path=['netinfra:netinfra', 'router'])
         modeled_input = netinfra__netinfra__router_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input).to_gdata(), None
@@ -90,7 +91,7 @@ class BBLink(ttt.TransformFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = from_xml(i, ['netinfra:netinfra', 'backbone-link'])
+        gdata_input = yang.gen3.from_data(src_dnode(), i, loose=False, root_path=['netinfra:netinfra', 'backbone-link'])
         modeled_input = netinfra__netinfra__backbone_link_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input).to_gdata(), None
@@ -115,7 +116,7 @@ class L3VpnVpnService(ttt.TransformFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = from_xml(i, ['ietf-l3vpn-svc:l3vpn-svc', 'vpn-services', 'vpn-service'])
+        gdata_input = yang.gen3.from_data(src_dnode(), i, loose=False, root_path=['ietf-l3vpn-svc:l3vpn-svc', 'vpn-services', 'vpn-service'])
         modeled_input = ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input).to_gdata(), None
@@ -140,7 +141,7 @@ class L3VpnSite(ttt.TransformFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = from_xml(i, ['ietf-l3vpn-svc:l3vpn-svc', 'sites', 'site'])
+        gdata_input = yang.gen3.from_data(src_dnode(), i, loose=False, root_path=['ietf-l3vpn-svc:l3vpn-svc', 'sites', 'site'])
         modeled_input = ietf_l3vpn_svc__l3vpn_svc__sites__site_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input).to_gdata(), None

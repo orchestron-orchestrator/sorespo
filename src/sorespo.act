@@ -48,21 +48,21 @@ def rfs_for_device(dev):
         ])
     })
 
-def adata_for_layer(layer, gdata):
+def schema_for_layer(layer):
     if layer == 0:
-        return sorespo.layers.y_0_loose.root.from_gdata(gdata)
+        return sorespo.layers.y_0_loose.src_dnode()
     elif layer == 1:
-        return sorespo.layers.y_1_loose.root.from_gdata(gdata)
+        return sorespo.layers.y_1_loose.src_dnode()
     elif layer == 2:
-        return sorespo.layers.y_2_loose.root.from_gdata(gdata)
+        return sorespo.layers.y_2_loose.src_dnode()
     elif layer == 3:
-        # Layer 3 (device) is a bit special, in that there is more than one adata tree:
+        # Layer 3 (device) is a bit special, in that there is more than one schema:
         # 1. The device manager, defined in orchestron-device.yang
         # 2. The device configuration, defined in the device's own YANG model
-        # The contents of layer 3 (gdata) is a combination of both, but to
-        # reconstruct adata, we must pick whether we want the internal device
+        # The contents of layer 3 (gdata) is a combination of both, but to ???
+        # , we must pick whether we want the internal device
         # manager or the device configuration. Here we return the device manager tree.
-        return sorespo.layers.y_3_loose.root.from_gdata(gdata)
+        return sorespo.layers.y_3_loose.src_dnode()
     else:
         raise ValueError("Invalid layer: {layer}")
 
@@ -343,8 +343,7 @@ actor main(env):
                         elif aheader == "application/yang-data+xml":
                             out_data = data.to_xmlstr()
                         elif aheader == "application/yang-data+acton-adata":
-                            adata = schema.from_gdata(data)
-                            out_data = adata.prsrc()
+                            out_data = yang.gen3.pradata(schema.src_dnode(), data, loose=True)
                         else:
                             respond(404, {}, "Unsupported media type")
                             return
@@ -355,6 +354,9 @@ actor main(env):
                 try:
                     dev_name = path_elements[2]
                     dev = dev_registry.get(dev_name)
+                    # TODO: avoid "actonc: #### findAttr' fails for __builtin__.str . val"
+                    # This compiler error occurs when we get the schema closer to where it is needed
+                    schema = dev.get_schema()
                     if path_elements[3] == "capabilities":
                         respond(200, {}, str(dev.get_capabilities()))
                         return
@@ -390,8 +392,7 @@ actor main(env):
                                 elif format_type == "gdata":
                                     diff_str = config_diff.prsrc()
                                 elif format_type == "adata":
-                                    # adata conversion would need schema
-                                    diff_str = "# Adata format not available for diff"
+                                    diff_str = yang.gen3.pradata(schema.src_dnode(), config_diff, loose=True)
                                 else:
                                     diff_str = config_diff.to_json()  # default to json
                                 respond(200, {"Content-Type": "text/plain"}, diff_str)
@@ -420,8 +421,7 @@ actor main(env):
                             elif format_type == "gdata":
                                 conf_str = target_conf.prsrc()
                             elif format_type == "adata":
-                                # adata conversion would need schema
-                                conf_str = "# Adata format not available"
+                                conf_str = yang.gen3.pradata(schema.src_dnode(), target_conf, loose=True)
                             else:
                                 conf_str = target_conf.to_json()  # default to json
                             respond(200, {"Content-Type": "text/plain"}, conf_str)
@@ -448,8 +448,7 @@ actor main(env):
                             elif format_type == "gdata":
                                 conf_str = running_conf.prsrc()
                             elif format_type == "adata":
-                                # adata conversion would need schema
-                                conf_str = "# Adata format not available"
+                                conf_str = yang.gen3.pradata(schema.src_dnode(), running_conf, loose=True)
                             else:
                                 conf_str = running_conf.to_json()  # default to json
                             respond(200, {"Content-Type": "text/plain"}, conf_str)
@@ -628,8 +627,8 @@ actor main(env):
                     if request.headers.get("accept") == "application/yang-data+xml":
                         content = layer_config.to_xmlstr()
                     if request.headers.get("accept") == "application/yang-data+acton-adata":
-                        adata = adata_for_layer(layer_idx, layer_config)
-                        content = adata.prsrc()
+                        src_dnode = schema_for_layer(layer_idx)
+                        content = yang.gen3.pradata(src_dnode, layer_config, loose=True)
                     respond(200, {}, content)
                     return
             else:
