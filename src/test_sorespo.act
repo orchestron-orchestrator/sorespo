@@ -5,13 +5,14 @@ import xml
 
 import yang.adata
 import yang.gdata as gdata
+import yang.gen3
 import orchestron.ttt
 import orchestron.device as odev
 
 import sorespo.layers
 import sorespo.layers.y_0 as cfs_layer
-from sorespo.devices.CiscoIosXr_24_1_ncs55a1 import root as xr24
-from sorespo.devices.JuniperCRPD_23_4R1_9 import root as crpd23
+import sorespo.devices.CiscoIosXr_24_1_ncs55a1 as xr24
+import sorespo.devices.JuniperCRPD_23_4R1_9 as crpd23
 
 def rfs_for_device(dev):
     return gdata.Container({
@@ -59,7 +60,7 @@ netinfra1_in = """<data>
 
 actor _test_netinfra1(t: testing.AsyncT):
     xml_conf = xml.decode(netinfra1_in)
-    input_config = cfs_layer.from_xml(xml_conf)
+    input_config = yang.gen3.from_data(cfs_layer.src_dnode(), xml_conf, loose=False)
 
     dev_registry = odev.DeviceRegistry(log_handler=t.log_handler)
     cfs = sorespo.layers.get_layers(dev_registry)
@@ -360,7 +361,7 @@ l3vpn_in = """<data>
 
 actor l3vpn_tester(t: testing.AsyncT, output_formatter: mut(gdata.Node) -> str):
     xml_conf = xml.decode(l3vpn_in)
-    input_config = cfs_layer.from_xml(xml_conf)
+    input_config = yang.gen3.from_data(cfs_layer.src_dnode(), xml_conf, loose=False)
 
     dev_registry = odev.DeviceRegistry(log_handler=t.log_handler)
     cfs = sorespo.layers.get_layers(dev_registry)
@@ -390,11 +391,9 @@ actor _test_l3vpn_svc_adata(t: testing.AsyncT):
             config = device_entry.get_cnt("config")
             device_name = str(device_entry.get_leaf("name").val)
             if device_name == "AMS-CORE-1" or device_name == "FRA-CORE-1":
-                config_ad = xr24.from_gdata(config)
-                res[device_name] = config_ad.prsrc()
+                res[device_name] = yang.gen3.pradata(xr24.src_dnode(), config, loose=True)
             elif device_name == "STO-CORE-1" or device_name == "LJU-CORE-1":
-                config_ad = crpd23.from_gdata(config)
-                res[device_name] = config_ad.prsrc()
+                res[device_name] = yang.gen3.pradata(crpd23.src_dnode(), config, loose=True)
             else:
                 raise ValueError(f"Unknown device {device_name}")
 
