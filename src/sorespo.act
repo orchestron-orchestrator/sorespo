@@ -50,11 +50,11 @@ def rfs_for_device(dev):
 
 def schema_for_layer(layer):
     if layer == 0:
-        return sorespo.layers.y_0_loose.src_dnode()
+        return sorespo.layers.y_0_loose.SRC_DNODE
     elif layer == 1:
-        return sorespo.layers.y_1_loose.src_dnode()
+        return sorespo.layers.y_1_loose.SRC_DNODE
     elif layer == 2:
-        return sorespo.layers.y_2_loose.src_dnode()
+        return sorespo.layers.y_2_loose.SRC_DNODE
     elif layer == 3:
         # Layer 3 (device) is a bit special, in that there is more than one schema:
         # 1. The device manager, defined in orchestron-device.yang
@@ -62,7 +62,7 @@ def schema_for_layer(layer):
         # The contents of layer 3 (gdata) is a combination of both, but to ???
         # , we must pick whether we want the internal device
         # manager or the device configuration. Here we return the device manager tree.
-        return sorespo.layers.y_3_loose.src_dnode()
+        return sorespo.layers.y_3_loose.SRC_DNODE
     else:
         raise ValueError("Invalid layer: {layer}")
 
@@ -86,7 +86,7 @@ actor main(env):
 
     log = logging.Logger(logh)
 
-    top_schema = sorespo.layers.y_0.src_dnode()
+    top_schema = sorespo.layers.y_0.SRC_DNODE
 
     dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, env.cap, logh_dev)
     cfs = sorespo.layers.get_layers(dev_registry, logh_ttt)
@@ -343,7 +343,7 @@ actor main(env):
                         elif aheader == "application/yang-data+xml":
                             out_data = data.to_xmlstr()
                         elif aheader == "application/yang-data+acton-adata":
-                            out_data = yang.gen3.pradata(schema.src_dnode(), data, loose=True)
+                            out_data = yang.gen3.pradata(schema.src_dnode, data, loose=True)
                         else:
                             respond(404, {}, "Unsupported media type")
                             return
@@ -392,7 +392,7 @@ actor main(env):
                                 elif format_type == "gdata":
                                     diff_str = config_diff.prsrc()
                                 elif format_type == "adata":
-                                    diff_str = yang.gen3.pradata(schema.src_dnode(), config_diff, loose=True)
+                                    diff_str = yang.gen3.pradata(schema.src_dnode, config_diff, loose=True)
                                 else:
                                     diff_str = config_diff.to_json()  # default to json
                                 respond(200, {"Content-Type": "text/plain"}, diff_str)
@@ -421,7 +421,7 @@ actor main(env):
                             elif format_type == "gdata":
                                 conf_str = target_conf.prsrc()
                             elif format_type == "adata":
-                                conf_str = yang.gen3.pradata(schema.src_dnode(), target_conf, loose=True)
+                                conf_str = yang.gen3.pradata(schema.src_dnode, target_conf, loose=True)
                             else:
                                 conf_str = target_conf.to_json()  # default to json
                             respond(200, {"Content-Type": "text/plain"}, conf_str)
@@ -448,7 +448,7 @@ actor main(env):
                             elif format_type == "gdata":
                                 conf_str = running_conf.prsrc()
                             elif format_type == "adata":
-                                conf_str = yang.gen3.pradata(schema.src_dnode(), running_conf, loose=True)
+                                conf_str = yang.gen3.pradata(schema.src_dnode, running_conf, loose=True)
                             else:
                                 conf_str = running_conf.to_json()  # default to json
                             respond(200, {"Content-Type": "text/plain"}, conf_str)
