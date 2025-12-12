@@ -277,7 +277,7 @@ list vrf-interface {
     }
 +   leaf mtu {
 +       type uint16 {
-+           range "..9000";
++           range "1..9000";
 +       }
 +   }
 }
