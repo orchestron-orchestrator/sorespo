@@ -14,11 +14,16 @@ import sorespo.layers.y_0 as cfs_layer
 import sorespo.devices.CiscoIosXr_24_1_ncs55a1 as xr24
 import sorespo.devices.JuniperCRPD_23_4R1_9 as crpd23
 
+NS_ODEV = "http://orchestron.org/yang/orchestron-device.yang";
+NS_ORFS = "http://orchestron.org/yang/orchestron-rfs.yang"
 def rfs_for_device(dev):
+    def q(n):
+        return gdata.Id(NS_ORFS, n)
+
     return gdata.Container({
-        'rfs': gdata.List(["name"], [
+        q('rfs'): gdata.List([q("name")], [
             gdata.Container({
-                "name": gdata.Leaf(dev)
+                q("name"): gdata.Leaf(dev)
             })
         ])
     })
@@ -385,11 +390,11 @@ actor _test_l3vpn_svc_json(t: testing.AsyncT):
 actor _test_l3vpn_svc_adata(t: testing.AsyncT):
     def _adata_formatter(n: gdata.Node) -> str:
         res = {}
-        device_list = n.get_cnt("devices").get_list("device")
+        device_list = n.get_cnt(gdata.Id(NS_ODEV, "devices")).get_list(gdata.Id(NS_ODEV, "device"))
         # We must sort the elements to ensure the output is deterministic
         for device_entry in gdata.sorted_elements(device_list.elements, device_list.keys):
-            config = device_entry.get_cnt("config")
-            device_name = str(device_entry.get_leaf("name").val)
+            config = device_entry.get_cnt(gdata.Id(NS_ODEV, "config"))
+            device_name = str(device_entry.get_leaf(gdata.Id(NS_ODEV, "name")).val)
             if device_name == "AMS-CORE-1" or device_name == "FRA-CORE-1":
                 res[device_name] = yang.gen3.pradata(xr24.SRC_DNODE, config, loose=True)
             elif device_name == "STO-CORE-1" or device_name == "LJU-CORE-1":

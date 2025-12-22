@@ -39,11 +39,15 @@ class Unreachable(Exception):
     """Exception raised when code is unreachable."""
     pass
 
+NS_ORFS = "http://orchestron.org/yang/orchestron-rfs.yang"
 def rfs_for_device(dev):
+    def q(n):
+        return yang.gdata.Id(NS_ORFS, n)
+
     return yang.gdata.Container({
-        'rfs': yang.gdata.List(["name"], [
+        q('rfs'): yang.gdata.List([q("name")], [
             yang.gdata.Container({
-                "name": yang.gdata.Leaf(dev)
+                q("name"): yang.gdata.Leaf(dev)
             })
         ])
     })
@@ -109,7 +113,7 @@ actor main(env):
                 if tmf_id_str != "":
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    service_json = tmf.tmf640.get_service_json(layer_config, tmf_id_str)
+                    service_json = tmf.tmf640.get_service_json(layer_config, sorespo.layers.y_0.SRC_DNODE, tmf_id_str)
                     if service_json is not None:
                         respond(200, {"Content-Type": "application/json"}, json.encode(service_json))
                     else:
@@ -183,7 +187,7 @@ actor main(env):
                     # GET /tmf-api/ServiceActivationAndConfiguration/v4/service
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    data = tmf.tmf640.get_service_list_json(layer_config)
+                    data = tmf.tmf640.get_service_list_json(layer_config, sorespo.layers.y_0.SRC_DNODE)
                     respond(200, {"Content-Type": "application/json"}, json.encode_list(data))
 
             elif len(path_elements) == 6 and path_elements[2].lower() == "serviceactivationandconfiguration" and path_elements[3] == "v4" and path_elements[4] == "service":
@@ -192,7 +196,7 @@ actor main(env):
                     service_id = path_elements[5]
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    data = tmf.tmf640.get_service_json(layer_config, service_id)
+                    data = tmf.tmf640.get_service_json(layer_config, sorespo.layers.y_0.SRC_DNODE, service_id)
                     if data is not None:
                         respond(200, {"Content-Type": "application/json"}, json.encode(data))
                         return
@@ -492,7 +496,7 @@ actor main(env):
                         # Add credentials info (just username, not password)
                         if dmc.credentials is not None:
                             info["username"] = dmc.credentials.username if dmc.credentials.username is not None else ""
-                        
+
                         # Add YANG modules information (available for all devices)
                         modset, modset_id = dev.get_modules()
                         modules = []
@@ -591,7 +595,7 @@ actor main(env):
                                             config_diff_str = config_diff.prsrc()
                                         else:  # xml is default
                                             config_diff_str = config_diff.to_xmlstr()
-                                    
+
                                     return {
                                         "tid": di.ci.tid,
                                         "config_diff": config_diff_str,
