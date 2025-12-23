@@ -31,7 +31,6 @@ import sorespo.layers.y_2_loose
 import sorespo.layers.y_3_loose
 
 import sorespo.sysspec
-import sorespo.tmf
 
 import testing
 
@@ -173,7 +172,7 @@ actor main(env):
                     # POST /tmf-api/ServiceActivationAndConfiguration/v4/service
                     jd = json.decode(request.body.decode())
                     try:
-                        gd, tmf_id = tmf.tmf640.json_to_gdata(sorespo.tmf.tmf_spec, jd, top_schema)
+                        gd, tmf_id = tmf.tmf640.json_to_gdata(jd, top_schema)
                         session = cfs.newsession()
                         session.edit_config(gd, config_done)
                         return
@@ -237,7 +236,7 @@ actor main(env):
                     # GET  /tmf-api/serviceCatalogManagement/v4/serviceCategory
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    data = tmf.tmf633.get_service_category_list_json(sorespo.tmf.tmf_spec)
+                    data = tmf.tmf633.get_service_category_list_json(top_schema)
                     respond(200, {"Content-Type": "application/json"}, json.encode_list(data))
                     return
                 elif request.method == "POST":
@@ -250,7 +249,7 @@ actor main(env):
                     # GET  /tmf-api/serviceCatalogManagement/v4/serviceCategory/{id}
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    data = tmf.tmf633.get_service_category_json(sorespo.tmf.tmf_spec, path_elements[5])
+                    data = tmf.tmf633.get_service_category_json(top_schema, path_elements[5])
                     if data is not None:
                         respond(200, {"Content-Type": "application/json"}, json.encode(data))
                         return
@@ -266,7 +265,7 @@ actor main(env):
                     # GET  /tmf-api/serviceCatalogManagement/v4/serviceCandidate
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    data = tmf.tmf633.get_service_candidate_list_json(sorespo.tmf.tmf_spec)
+                    data = tmf.tmf633.get_service_candidate_list_json(top_schema)
                     respond(200, {"Content-Type": "application/json"}, json.encode_list(data))
                     return
                 elif request.method == "POST":
@@ -279,7 +278,7 @@ actor main(env):
                     # GET  /tmf-api/serviceCatalogManagement/v4/serviceCandidate/{id}
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    data = tmf.tmf633.get_service_candidate_json(sorespo.tmf.tmf_spec, path_elements[5])
+                    data = tmf.tmf633.get_service_candidate_json(top_schema, path_elements[5])
                     if data is not None:
                         respond(200, {"Content-Type": "application/json"}, json.encode(data))
                         return
@@ -296,7 +295,7 @@ actor main(env):
                     # GET  /tmf-api/serviceCatalogManagement/v4/serviceSpecification
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    data = tmf.tmf633.get_service_specification_list_json(sorespo.tmf.tmf_spec, top_schema)
+                    data = tmf.tmf633.get_service_specification_list_json(top_schema)
                     respond(200, {"Content-Type": "application/json"}, json.encode_list(data))
                     return
                 elif request.method == "POST":
@@ -309,7 +308,8 @@ actor main(env):
                     # GET  /tmf-api/serviceCatalogManagement/v4/serviceSpecification/{id}
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    data = tmf.tmf633.get_service_specification_json(sorespo.tmf.tmf_spec, top_schema, path_elements[5])
+                    spec_id: str = path_elements[5]
+                    data = tmf.tmf633.get_service_specification_json(top_schema, spec_id)
                     if data is not None:
                         respond(200, {"Content-Type": "application/json"}, json.encode(data))
                         return
