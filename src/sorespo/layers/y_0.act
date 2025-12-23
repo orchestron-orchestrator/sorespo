@@ -662,8 +662,9 @@ SRC_DNODE = DRoot(identities=[
         ])
     ]),
     DContainer(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='netinfra', config=True, description='Network infrastructure', presence=False, children=[
-        DList(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='router', key=['name'], config=True, min_elements=0, ordered_by='system', exts=[
-                Ext('orchestron', 'transform', arg='sorespo.cfs.Router')
+        DList(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='router', key=['name'], config=True, description='Network Infrastructure Router', min_elements=0, ordered_by='system', exts=[
+                Ext('orchestron', 'transform', arg='sorespo.cfs.Router'),
+                Ext('orchestron', 'tmf-cfs', arg='Router')
             ], children=[
             DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='name', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
             DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='id', config=True, description='router id', mandatory=True, type_=DTypeInteger(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(bigint("0"), bigint("4294967295"))]))),
@@ -4518,9 +4519,11 @@ identity urllc {
   container netinfra {
     description "Network infrastructure";
     list router {
+      description "Network Infrastructure Router";
       key name;
 
       orchestron:transform sorespo.cfs.Router;
+      orchestron:tmf-cfs "Router";
 
       leaf name {
         type string;
