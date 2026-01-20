@@ -150,6 +150,23 @@ actor main(env):
         filter_schema(dt.root, paths)
         return dt
 
+    # The paths referenced by these leafrefs are invalid - missing module
+    # imports. We explicitly allow resolving the target leaf type to fallback to
+    # a string so that we can avoid adding more models here ...
+    broken_leafrefs = [
+        "/network-instance/protocols/isis/instance/export-policy",
+        "/network-instance/protocols/isis/instance/authentication/keychain",
+        "/network-instance/protocols/isis/instance/interface/level/authentication/keychain",
+        "/network-instance/protocols/isis/instance/interface/authentication/keychain",
+        "/network-instance/protocols/isis/instance/level/authentication/keychain",
+        "/network-instance/protocols/bgp/authentication/keychain",
+        "/network-instance/protocols/bgp/rib-management/table/route-table-import",
+        "/network-instance/protocols/bgp/group/authentication/keychain",
+        "/network-instance/protocols/bgp/group/send-default-route/export-policy",
+        "/network-instance/protocols/bgp/neighbor/authentication/keychain",
+        "/network-instance/protocols/bgp/neighbor/send-default-route/export-policy",
+    ]
+
     spec = orchestron.build.SysSpec("sorespo", [
         cfs_layer,
         inter_layer,
@@ -159,7 +176,7 @@ actor main(env):
         orchestron.build.DeviceType.from_dir(fc, "JuniperCRPD_23_4R1_9", "yang/JuniperCRPD_23_4R1_9"),
         orchestron.build.DeviceType.from_dir(fc, "NokiaSRLinux_25_3_2", "yang/NokiaSRLinux_25_3_2"),
     ])
-    compiled_spec = spec.compile()
+    compiled_spec = spec.compile(broken_leafrefs)
     transform_list_order(transform_filter(compiled_spec.dev_types["JuniperCRPD_23_4R1_9"]))
     compiled_spec.gen_app(fc, "../src/")
 
