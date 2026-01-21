@@ -461,13 +461,13 @@ class Vrf(base.Vrf):
             vrf = dev.vrfs.vrf.create(i.name)
             vrf.description = i.description
             ipv4_unicast = vrf.address_family.ipv4.create_unicast()
-            ipv4_unicast.import_.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, bigint(i.id), False)
-            ipv4_unicast.export.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, bigint(i.id), False)
+            ipv4_unicast.import_.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, i.id, False)
+            ipv4_unicast.export.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, i.id, False)
 
             # Create RD in BGP VRF
             bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(str(i.asn))
             bgp_vrf = bgp_as.vrfs.vrf.create(i.name)
-            bgp_vrf.create_rd().create_two_byte_as(str(i.asn), bigint(route_distinguisher_id))
+            bgp_vrf.create_rd().create_two_byte_as(str(i.asn), u64(route_distinguisher_id))
 
             return dev
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
@@ -552,7 +552,7 @@ class VrfInterface(base.VrfInterface):
             if ipv4_address is not None:
                 sub_intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(int(i.ipv4_prefix_length)))
             sub_intf.vrf = i.vrf
-            sub_intf.um_l2_ethernet_cfg_encapsulation.dot1q.vlan_id = bigint(vlan_id)
+            sub_intf.um_l2_ethernet_cfg_encapsulation.dot1q.vlan_id = u64(vlan_id)
             return dev
 
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
@@ -585,7 +585,7 @@ class VrfInterface(base.VrfInterface):
             intf.vlan_tagging = True
 
             # Create the subinterface
-            subif = intf.subinterface.create(bigint(vlan_id))
+            subif = intf.subinterface.create(u64(vlan_id))
             subif.admin_state = "enable"
             subif.vlan.encap.create_single_tagged().vlan_id = int(vlan_id)
             subif.description = i.description
