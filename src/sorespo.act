@@ -339,28 +339,6 @@ actor main(env):
                 return
 
             if len(path_elements) > 3 and path_elements[1] == "device":
-                # TODO; this is not used anywhere?!
-                def respond_with_data(data: ?yang.gdata.Node, dev: odev.DeviceMgr, accept_header: ?str):
-                    aheader = accept_header if accept_header is not None else "application/yang-data+json"
-                    if data is not None:
-                        if aheader == "application/yang-data+json":
-                            out_data = data.to_jsonstr()
-                        elif aheader == "application/yang-data+xml":
-                            out_data = data.to_xmlstr()
-                        elif aheader == "application/yang-data+acton-adata":
-                            schema = dev.get_fetched_schema()
-                            if schema is not None:
-                                out_data = yang.gen3.pradata(schema, data, loose=True)
-                            else:
-                                respond(500, {}, "Schemas not compiled")
-                                return
-                        else:
-                            respond(404, {}, "Unsupported media type")
-                            return
-                        respond(200, {"Content-type": aheader}, out_data)
-                    else:
-                        respond(500, {}, "No data")
-
                 try:
                     dev_name = path_elements[2]
                     dev = dev_registry.get(dev_name)
