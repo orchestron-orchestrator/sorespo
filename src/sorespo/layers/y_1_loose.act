@@ -30,6 +30,9 @@ SRC_DNODE = DRoot(children=[
             DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='role', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
             DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='mock', config=True, mandatory=False, type_=DTypeEnum(name='enumeration', description=None, reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'cisco-ios-xr':0, 'juniper-junos':1})),
             DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='approval-required', config=True, default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
+            DContainer(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='feature-flags', config=True, presence=False, children=[
+                DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='runtime-schema-fetch', config=True, default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
+            ]),
             DContainer(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='base-config', config=True, presence=False, children=[
                 DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='asn', config=True, mandatory=True, type_=DTypeInteger(name='inet:as-number', description='The as-number type represents autonomous system numbers\nwhich identify an Autonomous System (AS).  An AS is a set\nof routers under a single technical administration, using\nan interior gateway protocol and common metrics to route\npackets within the AS, and using an exterior gateway\nprotocol to route packets to other ASes.  IANA maintains\nthe AS number space and has delegated large parts to the\nregional registries.\n\nAutonomous system numbers were originally limited to 16\nbits.  BGP extensions have enlarged the autonomous system\nnumber space to 32 bits.  This type therefore uses an uint32\nbase type without a range restriction in order to support\na larger autonomous system number space.\n\nIn the value set and its semantics, this type is equivalent\nto the InetAutonomousSystemNumber textual convention of\nthe SMIv2.', reference='RFC 1930: Guidelines for creation, selection, and registration\n          of an Autonomous System (AS)\nRFC 4271: A Border Gateway Protocol 4 (BGP-4)\nRFC 4001: Textual Conventions for Internet Network Addresses\nRFC 6793: BGP Support for Four-Octet Autonomous System (AS)\n          Number Space', exts=[], builtin_type='uint32', default=None, ranges=Ranges([(bigint("0"), bigint("4294967295"))]))),
                 DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='ipv4-address', config=True, mandatory=True, type_=DTypeString(name='inet:ipv4-address', description='The ipv4-address type represents an IPv4 address in\ndotted-quad notation.  The IPv4 address may include a zone\nindex, separated by a % sign.\n\nThe zone index is used to disambiguate identical address\nvalues.  For link-local addresses, the zone index will\ntypically be the interface index number or the name of an\ninterface.  If the zone index is not present, the default\nzone of the device will be used.\n\nThe canonical format for the zone index is the numerical\nformat', reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(%[\\p{{N}}\\p{{L}}]+)?', pcre='^((([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(%[\\p{{N}}\\p{{L}}]+)?)$', invert=False)])),
@@ -200,6 +203,12 @@ def src_yang():
       leaf approval-required {
         type boolean;
         default false;
+      }
+      container feature-flags {
+        leaf runtime-schema-fetch {
+          type boolean;
+          default false;
+        }
       }
       container base-config {
         leaf asn {
@@ -752,6 +761,34 @@ NS_l3vpn_inter = 'http://example.com/l3vpn-inter'
 NS_netinfra_inter = 'http://example.com/netinfra-inter'
 
 
+class netinfra_inter__netinfra__router__feature_flags(yang.adata.MNode):
+    runtime_schema_fetch: ?bool
+
+    mut def __init__(self, runtime_schema_fetch: ?bool):
+        self._ns = 'http://example.com/netinfra-inter'
+        self.runtime_schema_fetch = runtime_schema_fetch
+
+    def _get_attr(self, name: str) -> ?value:
+        if name == 'runtime_schema_fetch':
+            return self.runtime_schema_fetch
+        raise ValueError('Attribute {name} not found in netinfra_inter__netinfra__router__feature_flags')
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        if isinstance(self, yang.adata.MNode):
+            return yang.gen3.from_data(SRC_DNODE, self, loose=True, root_path=['netinfra-inter:netinfra', 'router', 'feature-flags'])
+        raise ValueError('unreachable')
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> netinfra_inter__netinfra__router__feature_flags:
+        if n is not None:
+            return netinfra_inter__netinfra__router__feature_flags(runtime_schema_fetch=n.get_opt_bool(yang.gdata.Id(NS_netinfra_inter, 'runtime-schema-fetch')))
+        return netinfra_inter__netinfra__router__feature_flags()
+
+    def copy(self):
+        """Create a deep copy of this adata object"""
+        return netinfra_inter__netinfra__router__feature_flags.from_gdata(self.to_gdata())
+
+
 class netinfra_inter__netinfra__router__base_config(yang.adata.MNode):
     asn: ?u64
     ipv4_address: ?str
@@ -864,10 +901,11 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
     role: ?str
     mock: ?str
     approval_required: ?bool
+    feature_flags: netinfra_inter__netinfra__router__feature_flags
     base_config: netinfra_inter__netinfra__router__base_config
     l3vpn_vrf: netinfra_inter__netinfra__router__l3vpn_vrf
 
-    mut def __init__(self, name: str, id: ?u64, type: ?str, role: ?str, mock: ?str, approval_required: ?bool, base_config: ?netinfra_inter__netinfra__router__base_config=None, l3vpn_vrf: list[netinfra_inter__netinfra__router__l3vpn_vrf_entry]=[]):
+    mut def __init__(self, name: str, id: ?u64, type: ?str, role: ?str, mock: ?str, approval_required: ?bool, feature_flags: ?netinfra_inter__netinfra__router__feature_flags=None, base_config: ?netinfra_inter__netinfra__router__base_config=None, l3vpn_vrf: list[netinfra_inter__netinfra__router__l3vpn_vrf_entry]=[]):
         self._ns = 'http://example.com/netinfra-inter'
         self.name = name
         self.id = id
@@ -875,6 +913,7 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
         self.role = role
         self.mock = mock
         self.approval_required = approval_required
+        self.feature_flags = feature_flags if feature_flags is not None else netinfra_inter__netinfra__router__feature_flags()
         self.base_config = base_config if base_config is not None else netinfra_inter__netinfra__router__base_config()
         self.l3vpn_vrf = netinfra_inter__netinfra__router__l3vpn_vrf(elements=l3vpn_vrf)
 
@@ -891,6 +930,8 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
             return self.mock
         if name == 'approval_required':
             return self.approval_required
+        if name == 'feature_flags':
+            return self.feature_flags
         if name == 'base_config':
             return self.base_config
         if name == 'l3vpn_vrf':
@@ -904,7 +945,7 @@ class netinfra_inter__netinfra__router_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra_inter__netinfra__router_entry:
-        return netinfra_inter__netinfra__router_entry(name=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'name')), id=n.get_opt_u64(yang.gdata.Id(NS_netinfra_inter, 'id')), type=n.get_opt_str(yang.gdata.Id(NS_netinfra_inter, 'type')), role=n.get_opt_str(yang.gdata.Id(NS_netinfra_inter, 'role')), mock=n.get_opt_str(yang.gdata.Id(NS_netinfra_inter, 'mock')), approval_required=n.get_opt_bool(yang.gdata.Id(NS_netinfra_inter, 'approval-required')), base_config=netinfra_inter__netinfra__router__base_config.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_netinfra_inter, 'base-config'))), l3vpn_vrf=netinfra_inter__netinfra__router__l3vpn_vrf.from_gdata(n.get_opt_list(yang.gdata.Id(NS_netinfra_inter, 'l3vpn-vrf'))))
+        return netinfra_inter__netinfra__router_entry(name=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'name')), id=n.get_opt_u64(yang.gdata.Id(NS_netinfra_inter, 'id')), type=n.get_opt_str(yang.gdata.Id(NS_netinfra_inter, 'type')), role=n.get_opt_str(yang.gdata.Id(NS_netinfra_inter, 'role')), mock=n.get_opt_str(yang.gdata.Id(NS_netinfra_inter, 'mock')), approval_required=n.get_opt_bool(yang.gdata.Id(NS_netinfra_inter, 'approval-required')), feature_flags=netinfra_inter__netinfra__router__feature_flags.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_netinfra_inter, 'feature-flags'))), base_config=netinfra_inter__netinfra__router__base_config.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_netinfra_inter, 'base-config'))), l3vpn_vrf=netinfra_inter__netinfra__router__l3vpn_vrf.from_gdata(n.get_opt_list(yang.gdata.Id(NS_netinfra_inter, 'l3vpn-vrf'))))
 
     def copy(self):
         """Create a deep copy of this adata object"""

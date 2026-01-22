@@ -221,6 +221,22 @@
             {/if}
           </dl>
         </div>
+
+        <div class="info-section">
+          <h3>Feature Flags</h3>
+          <dl>
+            {#if device.featureFlags && Object.keys(device.featureFlags).length > 0}
+              {#each Object.entries(device.featureFlags) as [flag, enabled]}
+                <dt>{flag.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</dt>
+                <dd class:feature-enabled={enabled} class:feature-disabled={!enabled}>
+                  {enabled ? 'Enabled' : 'Disabled'}
+                </dd>
+              {/each}
+            {:else}
+              <dd class="no-features">No feature flags configured</dd>
+            {/if}
+          </dl>
+        </div>
       </div>
 
       <div class="config-queue-section">
@@ -633,6 +649,21 @@
     max-height: 400px;
     overflow-y: auto;
   }
+
+  .feature-enabled {
+    color: #27ae60;
+    font-weight: 500;
+  }
+
+  .feature-disabled {
+    color: #95a5a6;
+  }
+
+  .no-features {
+    font-style: italic;
+    color: #95a5a6;
+  }
+
   .modules-section {
     margin-top: 2rem;
     padding: 1.5rem;
