@@ -73,13 +73,13 @@ class BaseConfig(base.BaseConfig):
             lo0_af = lo0.address_families.address_family.create("ipv4", "unicast")
 
             # BGP global config
-            bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(str(i.asn))
+            bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(i.asn)
             bgp_as.bgp.router_id = i.ipv4_address
             # Create neighbor-group: IPV4-IBGP
             bgp_ng = bgp_as.neighbor_groups.neighbor_group.create("IPV4-IBGP")
             bgp_ng.address_families.address_family.create("vpnv4-unicast")
             bgp_ng.address_families.address_family.create("vpnv6-unicast")
-            bgp_ng.remote_as = str(i.asn)
+            bgp_ng.remote_as = i.asn
             bgp_ng.create_password().encrypted = sorespo.cisco_vigenere.encrypt(i.ibgp_authentication_key, 4)
             bgp_ng.update_source = "Loopback0"
 
@@ -89,7 +89,8 @@ class BaseConfig(base.BaseConfig):
             # Route policy ACCEPT
             rpl = """route-policy ACCEPT
   done
-end-policy"""
+end-policy
+"""
             rp = dev.routing_policy.route_policies.route_policy.create("ACCEPT", rpl)
 
             return dev
@@ -421,7 +422,7 @@ class IbgpNeighbor(base.IbgpNeighbor):
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
             print("RFS /rfs{{{di.name}}}/ibgp-neighbor transform running {i.address} for Cisco IOS XR", err=True)
             dev = xr24.root()
-            bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(str(i.asn))
+            bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(i.asn)
             nb = bgp_as.neighbors.neighbor.create(i.address)
             nb.use.neighbor_group = "IPV4-IBGP"
             nb.description = i.description
@@ -465,9 +466,9 @@ class Vrf(base.Vrf):
             ipv4_unicast.export.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, i.id, False)
 
             # Create RD in BGP VRF
-            bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(str(i.asn))
+            bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(i.asn)
             bgp_vrf = bgp_as.vrfs.vrf.create(i.name)
-            bgp_vrf.create_rd().create_two_byte_as(str(i.asn), u64(route_distinguisher_id))
+            bgp_vrf.create_rd().create_two_byte_as(i.asn, u64(route_distinguisher_id))
 
             return dev
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
@@ -612,7 +613,7 @@ class EbgpCustomer(base.EbgpCustomer):
             print("RFS /rfs{{{di.name}}}/ebgp-customer transform running {i.address} for Cisco IOS XR", err=True)
             dev = xr24.root()
 
-            bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(str(i.local_asn))
+            bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(i.local_asn)
 
             vrf = bgp_as.vrfs.vrf.create(i.vrf)
             vrf.address_families.address_family.create("ipv4-unicast")
@@ -624,7 +625,7 @@ class EbgpCustomer(base.EbgpCustomer):
             af.route_policy.out = "ACCEPT"
             af.create_as_override()
 
-            neighbor.remote_as = str(i.peer_asn)
+            neighbor.remote_as = i.peer_asn
             neighbor.description = i.description
             neighbor.create_password().encrypted = sorespo.cisco_vigenere.encrypt(i.authentication_key, 4)
 
