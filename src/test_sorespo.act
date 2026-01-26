@@ -5,7 +5,8 @@ import xml
 
 import yang.adata
 import yang.gdata as gdata
-import yang.gen3
+import yang.data
+import yang.xml
 import orchestron.ttt
 import orchestron.device as odev
 
@@ -65,7 +66,7 @@ netinfra1_in = """<data>
 
 actor _test_netinfra1(t: testing.AsyncT):
     xml_conf = xml.decode(netinfra1_in)
-    input_config = yang.gen3.from_data(cfs_layer.SRC_DNODE, xml_conf, loose=False)
+    input_config = yang.xml.from_xml(cfs_layer.SRC_DNODE, xml_conf, loose=False)
 
     dev_registry = odev.DeviceRegistry(log_handler=t.log_handler)
     cfs = sorespo.layers.get_layers(dev_registry)
@@ -366,7 +367,7 @@ l3vpn_in = """<data>
 
 actor l3vpn_tester(t: testing.AsyncT, output_formatter: mut(gdata.Node) -> str):
     xml_conf = xml.decode(l3vpn_in)
-    input_config = yang.gen3.from_data(cfs_layer.SRC_DNODE, xml_conf, loose=False)
+    input_config = yang.xml.from_xml(cfs_layer.SRC_DNODE, xml_conf, loose=False)
 
     dev_registry = odev.DeviceRegistry(log_handler=t.log_handler)
     cfs = sorespo.layers.get_layers(dev_registry)
@@ -396,9 +397,9 @@ actor _test_l3vpn_svc_adata(t: testing.AsyncT):
             config = device_entry.get_cnt(gdata.Id(NS_ODEV, "config"))
             device_name = str(device_entry.get_leaf(gdata.Id(NS_ODEV, "name")).val)
             if device_name == "AMS-CORE-1" or device_name == "FRA-CORE-1":
-                res[device_name] = yang.gen3.pradata(xr24.SRC_DNODE, config, loose=True)
+                res[device_name] = yang.data.pradata(xr24.SRC_DNODE, config, loose=True)
             elif device_name == "STO-CORE-1" or device_name == "LJU-CORE-1":
-                res[device_name] = yang.gen3.pradata(crpd23.SRC_DNODE, config, loose=True)
+                res[device_name] = yang.data.pradata(crpd23.SRC_DNODE, config, loose=True)
             else:
                 raise ValueError(f"Unknown device {device_name}")
 
