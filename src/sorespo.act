@@ -728,51 +728,60 @@ actor main(env):
 
     server = http.Listener(tcpl_cap, "::", 80, _on_http_accept, log_handler=logh_http)
 
-    configs = []
     env_exit_on_done = env.getenv("EXIT_ON_DONE")
     exit_on_done = env_exit_on_done if env_exit_on_done is not None else ""
 
-    def _conf_file(session):
+    def _apply_startup_config(config_files):
+        # Read and apply config files; merge multiple snippets (files) into a single intent
+        input_merge = yang.gdata.Container()
+        for filename in config_files:
+            log.debug("Reading config file", {"config_file": filename})
+            f = file.ReadFile(rfcap, filename)
+            nb_input = await async f.read()
+            f.close()
+            try:
+                conf_xml = xml.decode(nb_input.decode())
+                conf_gd = yang.xml.from_xml(top_schema, conf_xml, loose=True)
+                input_merge = yang.gdata.merge(input_merge, conf_gd)
+            except Exception as e:
+                print("Error reading config file {filename}: {e}")
+                env.exit(1)
 
-        def _conf_file_done(config, result):
-            if isinstance(result, str):
-                log.info("Config file successfully applied", {"config_file": config.filename})
-                _conf_file(session)
-            else:
-                log.error("Error applying config file", {"config_file": config.filename})
+        def _conf_load(input_config):
+            def _conf_load_done(result):
+                if isinstance(result, str):
+                    log.info("All config files applied")
+                else:
+                    log.error("Error applying config file(s)", {"result": result})
+                # TODO: exit_on_done.lower() once Acton bug is fixed!?
+                if exit_on_done in ["1", "true", "yes"]:
+                    log.info("No more config files to apply, exiting..")
+                    after 3: env.exit(0)
 
-        try:
-            config = configs.pop(0)
-            # Grab the first config
-            log.info("Applying config file...", {"config_file": config.filename})
-            input_config = yang.xml.from_xml(top_schema, config.config, loose=True)
-            session.edit_config(input_config, None, lambda result: _conf_file_done(config, result))
-        except IndexError:
-            log.info("All config files applied")
-            # TODO: exit_on_done.lower() once Acton bug is fixed!?
-            if exit_on_done in ["1", "true", "yes"]:
-                log.info("No more config files to apply, exiting..")
-                after 3: _exit()
-
-    def _exit():
-        env.exit(0)
-
-    if len(env.argv) > 1:
-        # Read and apply config files, but paced
-        for i in range(1, len(env.argv)):
-            if i > 0:
-                filename = env.argv[i]
-                f = file.ReadFile(rfcap, filename)
-                nb_input = await async f.read()
-                f.close()
-                try:
-                    configs.append((filename=filename, config=xml.decode(nb_input.decode())))
-                except Exception as e:
-                    print("Error reading config file {filename}: {e}")
-                    env.exit(1)
+            log.info("Applying config file(s)...")
+            session = cfs.newsession()
+            session.edit_config(input_config, None, _conf_load_done)
 
         # start to apply..
-        after 0.5: _conf_file(cfs.newsession())
+        after 0.5: _conf_load(input_merge)
+
+    # TODO: do this before starting anything else ...
+    def _parse_args():
+        p = argparse.Parser()
+        p.add_arg("file", "Config XML file(s)", False, "+")
+        return p.parse(env.argv)
+
+    try:
+        args = _parse_args()
+        config_files = args.get_strlist("file")
+        if len(config_files) > 0:
+            _apply_startup_config(config_files)
+    except argparse.PrintUsage as exc:
+        print(exc.error_message)
+        env.exit(0)
+    except argparse.ArgumentError as exc:
+        print(exc.error_message, err=True)
+        env.exit(1)
 
     print("Orchestron/sorespo running..")
 
