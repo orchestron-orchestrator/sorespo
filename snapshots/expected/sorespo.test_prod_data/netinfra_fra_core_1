@@ -1,0 +1,71 @@
+# device FRA-CORE-1
+# Top node: /
+FRA_CORE_1 = root()
+
+# List /um-router-isis-cfg:router/isis/processes/process element: 1
+process_element = FRA_CORE_1.um_router_isis_cfg_router.isis.processes.process.create('1')
+process_element.is_type = 'level-2-only'
+
+# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/nets/net element: 49.0001.0100.0000.0001.00
+net_element = process_element.nets.net.create('49.0001.0100.0000.0001.00')
+
+# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/address-families/address-family element: ipv4,unicast
+address_family_element = process_element.address_families.address_family.create('ipv4', 'unicast')
+
+# P-container: /um-router-isis-cfg:router/isis/processes/process[process-id='1']/address-families/address-family[af-name='ipv4',saf-name='unicast']/metric-style/wide
+wide = address_family_element.metric_style.create_wide()
+
+# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface element: Loopback0
+interface_element = process_element.interfaces.interface.create('Loopback0')
+
+# P-container: /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='Loopback0']/passive
+passive = interface_element.create_passive()
+
+# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='Loopback0']/address-families/address-family element: ipv4,unicast
+address_family_element = interface_element.address_families.address_family.create('ipv4', 'unicast')
+
+# List /um-router-bgp-cfg:router/bgp/as element: 65001
+as__element = FRA_CORE_1.um_router_bgp_cfg_router.bgp.as_.create(u64(65001))
+
+# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/address-families/address-family element: vpnv4-unicast
+address_family_element = as__element.address_families.address_family.create('vpnv4-unicast')
+
+# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/address-families/address-family element: vpnv6-unicast
+address_family_element = as__element.address_families.address_family.create('vpnv6-unicast')
+
+# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbor-groups/neighbor-group element: IPV4-IBGP
+neighbor_group_element = as__element.neighbor_groups.neighbor_group.create('IPV4-IBGP')
+neighbor_group_element.remote_as = u64(65001)
+neighbor_group_element.update_source = 'Loopback0'
+
+# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbor-groups/neighbor-group[neighbor-group-name='IPV4-IBGP']/address-families/address-family element: vpnv4-unicast
+address_family_element = neighbor_group_element.address_families.address_family.create('vpnv4-unicast')
+
+# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbor-groups/neighbor-group[neighbor-group-name='IPV4-IBGP']/address-families/address-family element: vpnv6-unicast
+address_family_element = neighbor_group_element.address_families.address_family.create('vpnv6-unicast')
+
+# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbor-groups/neighbor-group[neighbor-group-name='IPV4-IBGP']/password
+password = neighbor_group_element.create_password()
+
+# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbor-groups/neighbor-group[neighbor-group-name='IPV4-IBGP']/password
+password.encrypted = '045209011F6C4D5B1D11001906020F053E222B267E3E270A'
+
+# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/bgp
+as__element.bgp.router_id = '10.0.0.1'
+
+# List /interfaces/interface element: Loopback0
+interface_element = FRA_CORE_1.interfaces.interface.create('Loopback0')
+
+# P-container: /interfaces/interface[interface-name='Loopback0']/ipv4/addresses/address
+address = interface_element.ipv4.addresses.create_address()
+
+# Container: /interfaces/interface[interface-name='Loopback0']/ipv4/addresses/address
+address.address = '10.0.0.1'
+address.netmask = '255.255.255.255'
+
+# Container: /hostname
+FRA_CORE_1.hostname.system_network_name = 'FRA-CORE-1'
+
+# List /routing-policy/route-policies/route-policy element: ACCEPT
+route_policy_element = FRA_CORE_1.routing_policy.route_policies.route_policy.create('ACCEPT')
+route_policy_element.rpl_route_policy = 'route-policy ACCEPT\n  done\nend-policy\n'
