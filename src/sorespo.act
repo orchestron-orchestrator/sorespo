@@ -71,6 +71,30 @@ def schema_for_layer(layer):
     else:
         raise ValueError("Invalid layer: {layer}")
 
+def parse_query_params(path: str) -> dict[str, str]:
+    query_params = {}
+    if "?" in path:
+        query_string = path.split("?", 1)[1]
+        for param in query_string.split("&"):
+            if param == "":
+                continue
+            if "=" in param:
+                kv = param.split("=", 1)
+                query_params[kv[0]] = kv[1]
+            else:
+                query_params[param] = ""
+    return query_params
+
+def parse_bool(value: str, default: bool) -> bool:
+    if value is None:
+        return default
+    v = value.lower()
+    if v in {"1", "true", "yes", "on"}:
+        return True
+    if v in {"0", "false", "no", "off"}:
+        return False
+    return default
+
 actor main(env):
     rfcap = file.ReadFileCap(file.FileCap(env.cap))
 
@@ -361,15 +385,9 @@ actor main(env):
                         respond(200, {}, txt)
                         return
                     if path_elements[3] == 'diff':
-                        # Parse query params for format
-                        format_type = "json"  # default
-                        if "?" in request.path:
-                            query_string = request.path.split('?', 1)[1]
-                            for param in query_string.split("&"):
-                                if "=" in param:
-                                    kv = param.split("=", 1)
-                                    if kv[0] == "format":
-                                        format_type = kv[1]
+                        query_params = parse_query_params(request.path)
+                        format_type = query_params.get_def("format", "json")
+                        loose = parse_bool(query_params.get_def("loose", ""), True)
 
                         running_conf = dev.get_running_conf()
                         target_conf = dev.get_target_conf()
@@ -387,7 +405,7 @@ actor main(env):
                                     # TODO: avoid "actonc: #### findAttr' fails for __builtin__.str . val"
                                     # schema = dev.get_fetched_schema()
                                     if schema is not None:
-                                        diff_str = yang.data.pradata(schema, config_diff, loose=True)
+                                        diff_str = yang.data.pradata(schema, config_diff, loose=loose)
                                     else:
                                         diff_str = "# Adata format not available for diff (schemas not compiled)"
                                 else:
@@ -399,15 +417,9 @@ actor main(env):
                             respond(200, {"Content-Type": "text/plain"}, "# Configuration not available")
                         return
                     if path_elements[3] == 'target':
-                        # Parse query params for format
-                        format_type = "json"  # default
-                        if "?" in request.path:
-                            query_string = request.path.split('?', 1)[1]
-                            for param in query_string.split("&"):
-                                if "=" in param:
-                                    kv = param.split("=", 1)
-                                    if kv[0] == "format":
-                                        format_type = kv[1]
+                        query_params = parse_query_params(request.path)
+                        format_type = query_params.get_def("format", "json")
+                        loose = parse_bool(query_params.get_def("loose", ""), True)
 
                         target_conf = dev.get_target_conf()
                         if target_conf is not None:
@@ -419,7 +431,7 @@ actor main(env):
                                 conf_str = target_conf.prsrc()
                             elif format_type == "adata":
                                 if schema is not None:
-                                    conf_str = yang.data.pradata(schema, target_conf, loose=True)
+                                    conf_str = yang.data.pradata(schema, target_conf, loose=loose)
                                 else:
                                     respond(500, {}, "Schemas not compiled")
                                     return
@@ -430,15 +442,9 @@ actor main(env):
                             respond(200, {"Content-Type": "text/plain"}, "# No target configuration available")
                         return
                     if path_elements[3] == 'running':
-                        # Parse query params for format
-                        format_type = "json"  # default
-                        if "?" in request.path:
-                            query_string = request.path.split('?', 1)[1]
-                            for param in query_string.split("&"):
-                                if "=" in param:
-                                    kv = param.split("=", 1)
-                                    if kv[0] == "format":
-                                        format_type = kv[1]
+                        query_params = parse_query_params(request.path)
+                        format_type = query_params.get_def("format", "json")
+                        loose = parse_bool(query_params.get_def("loose", ""), True)
 
                         running_conf = dev.get_running_conf()
                         if running_conf is not None:
@@ -452,7 +458,7 @@ actor main(env):
                                 # TODO: avoid "actonc: #### findAttr' fails for __builtin__.str . val"
                                 # schema = dev.get_fetched_schema()
                                 if schema is not None:
-                                    conf_str = yang.data.pradata(schema, running_conf, loose=True)
+                                    conf_str = yang.data.pradata(schema, running_conf, loose=loose)
                                 else:
                                     conf_str = "# Adata format not available (schemas not compiled)"
                             else:
@@ -630,13 +636,15 @@ actor main(env):
                         session = session.below()
                     layer_config: yang.gdata.Node = session.get()
                     content = ""
+                    query_params = parse_query_params(request.path)
+                    loose = parse_bool(query_params.get_def("loose", ""), True)
                     if request.headers.get("accept") == "application/yang-data+json":
                         content = layer_config.to_jsonstr()
                     if request.headers.get("accept") == "application/yang-data+xml":
                         content = layer_config.to_xmlstr()
                     if request.headers.get("accept") == "application/yang-data+acton-adata":
                         src_dnode = schema_for_layer(layer_idx)
-                        content = yang.data.pradata(src_dnode, layer_config, loose=True)
+                        content = yang.data.pradata(src_dnode, layer_config, loose=loose)
                     respond(200, {}, content)
                     return
             else:
