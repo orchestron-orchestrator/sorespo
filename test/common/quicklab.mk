@@ -129,7 +129,14 @@ get-config-json0 get-config-json1 get-config-json2 get-config-json3:
 
 .PHONY: get-config-adata0 get-config-adata1 get-config-adata2 get-config-adata3
 get-config-adata0 get-config-adata1 get-config-adata2 get-config-adata3:
-	@curl -H "Accept: application/yang-data+acton-adata" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/layer/$(subst get-config-adata,,$@)
+	@curl -H "Accept: application/yang-data+acton-adata" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/layer/$(subst get-config-adata,,$@)?loose=$(LAYER_CONFIG_LOOSE)
+
+# Default for /layer/<idx> adata output (query param).
+LAYER_CONFIG_LOOSE?=true
+
+.PHONY: get-config-adata-strict0 get-config-adata-strict1 get-config-adata-strict2 get-config-adata-strict3
+get-config-adata-strict0 get-config-adata-strict1 get-config-adata-strict2 get-config-adata-strict3:
+	@$(MAKE) LAYER_CONFIG_LOOSE=false $(subst -strict,,$@)
 
 # Default format for /device/<name> config endpoints (query param).
 DEVICE_CONFIG_FORMAT?=xml
