@@ -1,0 +1,68 @@
+# device LJU-CORE-1
+# Top node: /
+LJU_CORE_1 = root()
+
+# Container: /configuration/system
+LJU_CORE_1.configuration.system.host_name = 'LJU-CORE-1'
+
+# P-container: /configuration/system/services
+services = LJU_CORE_1.configuration.system.create_services()
+
+# Container: /configuration/system/services/netconf
+services.netconf.rfc_compliant = True
+services.netconf.yang_compliant = True
+
+# List /configuration/interfaces/interface element: lo0
+interface_element = LJU_CORE_1.configuration.interfaces.interface.create('lo0')
+interface_element.description = 'ROLE: edge'
+
+# List /configuration/interfaces/interface[name='lo0']/unit element: 0
+unit_element = interface_element.unit.create('0')
+
+# P-container: /configuration/interfaces/interface[name='lo0']/unit[name='0']/family/inet
+inet = unit_element.family.create_inet()
+
+# List /configuration/interfaces/interface[name='lo0']/unit[name='0']/family/inet/address element: 10.0.0.1/32
+address_element = inet.address.create('10.0.0.1/32')
+
+# P-container: /configuration/interfaces/interface[name='lo0']/unit[name='0']/family/iso
+iso = unit_element.family.create_iso()
+
+# List /configuration/interfaces/interface[name='lo0']/unit[name='0']/family/iso/address element: 49.0001.0100.0000.0001.00
+address_element = iso.address.create('49.0001.0100.0000.0001.00')
+
+# Container: /configuration/routing-options/autonomous-system
+LJU_CORE_1.configuration.routing_options.autonomous_system.as_number = '65001'
+
+# Container: /configuration/protocols/bgp
+LJU_CORE_1.configuration.protocols.bgp.log_updown = True
+
+# List /configuration/protocols/bgp/group element: IPV4-IBGP
+group_element = LJU_CORE_1.configuration.protocols.bgp.group.create('IPV4-IBGP')
+group_element.type = 'internal'
+group_element.local_address = '10.0.0.1'
+group_element.hold_time = u64(90)
+group_element.authentication_key = '$9$4TaGiq.5/9pmfp0B1yr4aZGkP6/t1Ic36eWL7sYoJGDjq5Qn/Cumfu1RSledbs24Zmfz'
+
+# P-container: /configuration/protocols/bgp/group[name='IPV4-IBGP']/family/inet-vpn/unicast
+unicast = group_element.family.inet_vpn.create_unicast()
+
+# P-container: /configuration/protocols/bgp/group[name='IPV4-IBGP']/family/inet6-vpn/unicast
+unicast = group_element.family.inet6_vpn.create_unicast()
+
+# P-container: /configuration/protocols/bgp/group[name='IPV4-IBGP']/family/route-target
+route_target = group_element.family.create_route_target()
+
+# Container: /configuration/protocols/isis
+LJU_CORE_1.configuration.protocols.isis.lsp_lifetime = u64(65535)
+
+# List /configuration/protocols/isis/interface element: lo0.0
+interface_element = LJU_CORE_1.configuration.protocols.isis.interface.create('lo0.0')
+
+# P-container: /configuration/protocols/isis/interface[name='lo0.0']/passive
+passive = interface_element.create_passive()
+
+# List /configuration/protocols/isis/level element: 1
+level_element = LJU_CORE_1.configuration.protocols.isis.level.create(u64(1))
+level_element.disable = True
+level_element.wide_metrics_only = True
