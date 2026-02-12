@@ -1,6 +1,7 @@
 <p align="left">
   <img src="docs/images/sorespo.png" width="400"/>
 </p>
+[![REUSE Compliance Check](https://github.com/orchestron-orchestrator/sorespo/actions/workflows/reuse-compliance.yml/badge.svg)](https://github.com/orchestron-orchestrator/sorespo/actions/workflows/reuse-compliance.yml)
 
 The **SOmewhat REalistic Service Provider Orchestration** (SORESPO) network is
 a rather realistic looking Service Provider network. This repository contains a
