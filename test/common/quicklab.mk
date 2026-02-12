@@ -186,7 +186,7 @@ $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL) $(ROUTERS_FRR)): c
 
 .PHONY: $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
-	docker run $(INTERACTIVE) --rm --network container:$(TESTENV)-otron ghcr.io/notconf/notconf:debug netconf-console2 --host $(@:get-dev-config-%=%) --port 830 --user clab --pass clab@123 --get-config
+	docker run $(INTERACTIVE) --rm --network container:$(TESTENV)-otron ghcr.io/orchestron-orchestrator/ncurl --host $(@:get-dev-config-%=%) --port 830 --username clab --password clab@123 get-config
 
 .PHONY: test
 test:
