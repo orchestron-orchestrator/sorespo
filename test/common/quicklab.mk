@@ -1,5 +1,5 @@
 build-otron-image:
-	docker build -t sorespo-otron-base -f ../common/Dockerfile.otron .
+	docker build --build-arg http_proxy=$(http_proxy) --build-arg https_proxy=$(https_proxy) -t sorespo-otron-base -f ../common/Dockerfile.otron .
 
 licenses/%:
 # Ensure the symlink to the licenses private repo exists in the project root
