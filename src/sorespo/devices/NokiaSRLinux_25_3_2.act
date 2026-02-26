@@ -452,6 +452,9 @@ SRC_DNODE = DRoot(identities=[
             Ext('srl_nokia-ext', 'first-released', arg='20.10.1')
         ]),
     DContainer(module='srl_nokia-system', namespace='urn:nokia.com:srlinux:general:system', prefix='srl_nokia-system', name='system', config=True, description='Enclosing container for system management', presence=False, children=[
+        DLeafList(module='srl_nokia-system', namespace='urn:nokia.com:srlinux:general:system', prefix='srl_nokia-system', name='features', config=False, description='Features enabled on this platform', min_elements=0, ordered_by='system', type_=DTypeString(name='srl_nokia-comm:name', description='A user provided name', reference=None, exts=[], builtin_type='string', default=None, length=Ranges([(1, 255)]), patterns=[YangPattern(yang_regex='[A-Za-z0-9!@#$%^&()|+=`~.,/_:;?-][A-Za-z0-9 !@#$%^&()|+=`~.,/_:;?-]*', pcre='^([A-Za-z0-9!@#$%^&()|+=`~.,/_:;?-][A-Za-z0-9 !@#$%^&()|+=`~.,/_:;?-]*)$', invert=False)]), exts=[
+                Ext('srl-ext', 'first-released', arg='20.6.1')
+            ]),
         DLeafList(module='srl_nokia-system', namespace='urn:nokia.com:srlinux:general:system', prefix='srl_nokia-system', name='trace-options', config=True, description='Management server trace options', min_elements=0, ordered_by='system', type_=DTypeEnum(name='enumeration', description=None, reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'request':0, 'response':1, 'common':2}), exts=[
                 Ext('srl-ext', 'first-released', arg='19.11.1')
             ]),
@@ -531,11 +534,13 @@ DMust(condition=". = false() or (. = true() and ../../../anycast-gw) or not(star
                         ], type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None), exts=[
                             Ext('srl_nokia-ext', 'first-released', arg='20.12.1')
                         ]),
+                    DLeaf(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='origin', config=False, description='The origin of the IPv4 address.', mandatory=False, type_=DTypeEnum(name='srl_nokia-if-ip:address-origin', description='The origin of the IP address', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'other':1, 'static':2, 'dhcp':3, 'link-layer':4, 'random':5})),
                     DLeaf(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='primary', config=True, description='One of the IPv4 prefixes assigned to the subinterface can be explicitly configured as primary by setting this leaf to true. This designates the associated IPv4 address as a primary IPv4 address of the subinterface. By default, the numerically lowest value IPv4 address is selected as the primary address.\n\nThe primary address is used as the source address for locally originated broadcast and multicast packets sent out the subinterface.', mandatory=False, must=[
 DMust(condition="not (starts-with(../../../../name, 'mgmt') or (starts-with(../../../../name, 'system')) or (starts-with(../../../../name, 'sync')))", description=None, error_app_tag=None, error_message='primary not supported on mgmt or system subinterfaces', reference=None)
                         ], type_=DTypeEmpty(name='empty', description=None, reference=None, exts=[], builtin_type='empty', default=None), exts=[
                             Ext('srl_nokia-ext', 'first-released', arg='20.12.1')
-                        ])
+                        ]),
+                    DLeaf(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='status', config=False, description='The status of an IPv4 address', mandatory=False, type_=DTypeEnum(name='srl_nokia-if-ip:ipv4-address-status', description='The IPv4 address status', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'preferred':1, 'inaccessible':2, 'tentative':3, 'duplicate':4}))
                 ]),
                 DLeaf(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='allow-directed-broadcast', config=True, description='When this is set to true the software is allowed to re-broadcast targeted broadcast IPv4 packets on this subinterface\n\nDetailed handling of subnet broadcast is as follows:\n\nIf a targeted broadcast packet is received on subinterface X that has the matching subnet then it is delivered to the CPM and CPM will reply to an ICMP echo.\n\nIf a targeted broadcast packet is received on subinterface X but the matching subnet is associated with subinterface Y, and subinterface Y is configured with allow-directed-broadcasts=false then it is delivered to the CPM and CPM replies to an ICMP echo per above, but it does not re-broadcast the packet on subinterface Y.\n\nIf a targeted broadcast packet is received on subinterface X but the matching subnet is associated with subinterface Y, and subinterface Y is configured with allow-directed-broadcasts=true then it is delivered to the CPM and CPM replies to an ICMP echo per above, and CPM also re-broadcasts the packet on subinterface Y.', default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
                 DContainer(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='unnumbered', config=True, description='Top-level container for configuring unnumbered interfaces', if_feature=[
@@ -550,7 +555,9 @@ DMust(condition="(. = 'disable') or boolean(../interface)", description=None, er
 DMust(condition="not(starts-with(.,'mgmt'))", description=None, error_app_tag=None, error_message='Cannot borrow IPv4 address from management interfaces', reference=None),
 DMust(condition="../../../../../interface[name=substring-before(current(), '.')]/subinterface[index=substring-after(current(), '.')]", description=None, error_app_tag=None, error_message='Cannot borrow IPv4 address from non-existing subinterface', reference=None),
 DMust(condition="(substring-before(current(), '.') != ../../../../name) or (substring-after(current(), '.') != string(../../../index))", description=None, error_app_tag=None, error_message='Cannot borrow IPv4 address from same interface/subinterface', reference=None)
-                        ], type_=DTypeString(name='srl_nokia-comm:subinterface-all', description=None, reference=None, exts=[], builtin_type='string', default=None, length=Ranges([(5, 26)]), patterns=[YangPattern(yang_regex='(mgmt0\\.0|system0\\.0|sync0\\.0|lo(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])\\.(0|[1-9](\\d){{0,3}})|lif-.*\\.(0|[1-9](\\d){{0,3}})|vhn-.*\\.(0|[1-9](\\d){{0,3}})|enp(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])s(0|[1-9]|[1-2][0-9]|3[0-1])f[0-7]\\.(0|[1-9](\\d){{0,3}})|ethernet-([1-9](\\d){{0,1}}(/m[1-6])?(/[1-9](\\d){{0,1}})?/(([1-9](\\d){{0,1}})|(1[0-1]\\d)|(12[0-8])))\\.([0]|[1-9](\\d){{0,3}})|irb(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])\\.(0|[1-9](\\d){{0,3}})|lag(([1-9](\\d){{0,2}})|(1000))\\.(0|[1-9](\\d){{0,3}}))', pcre='^((mgmt0\\.0|system0\\.0|sync0\\.0|lo(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])\\.(0|[1-9](\\p{{Nd}}){{0,3}})|lif-.*\\.(0|[1-9](\\p{{Nd}}){{0,3}})|vhn-.*\\.(0|[1-9](\\p{{Nd}}){{0,3}})|enp(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])s(0|[1-9]|[1-2][0-9]|3[0-1])f[0-7]\\.(0|[1-9](\\p{{Nd}}){{0,3}})|ethernet-([1-9](\\p{{Nd}}){{0,1}}(/m[1-6])?(/[1-9](\\p{{Nd}}){{0,1}})?/(([1-9](\\p{{Nd}}){{0,1}})|(1[0-1]\\p{{Nd}})|(12[0-8])))\\.(0|[1-9](\\p{{Nd}}){{0,3}})|irb(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])\\.(0|[1-9](\\p{{Nd}}){{0,3}})|lag(([1-9](\\p{{Nd}}){{0,2}})|(1000))\\.(0|[1-9](\\p{{Nd}}){{0,3}})))$', invert=False)]))
+                        ], type_=DTypeString(name='srl_nokia-comm:subinterface-all', description=None, reference=None, exts=[], builtin_type='string', default=None, length=Ranges([(5, 26)]), patterns=[YangPattern(yang_regex='(mgmt0\\.0|system0\\.0|sync0\\.0|lo(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])\\.(0|[1-9](\\d){{0,3}})|lif-.*\\.(0|[1-9](\\d){{0,3}})|vhn-.*\\.(0|[1-9](\\d){{0,3}})|enp(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])s(0|[1-9]|[1-2][0-9]|3[0-1])f[0-7]\\.(0|[1-9](\\d){{0,3}})|ethernet-([1-9](\\d){{0,1}}(/m[1-6])?(/[1-9](\\d){{0,1}})?/(([1-9](\\d){{0,1}})|(1[0-1]\\d)|(12[0-8])))\\.([0]|[1-9](\\d){{0,3}})|irb(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])\\.(0|[1-9](\\d){{0,3}})|lag(([1-9](\\d){{0,2}})|(1000))\\.(0|[1-9](\\d){{0,3}}))', pcre='^((mgmt0\\.0|system0\\.0|sync0\\.0|lo(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])\\.(0|[1-9](\\p{{Nd}}){{0,3}})|lif-.*\\.(0|[1-9](\\p{{Nd}}){{0,3}})|vhn-.*\\.(0|[1-9](\\p{{Nd}}){{0,3}})|enp(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])s(0|[1-9]|[1-2][0-9]|3[0-1])f[0-7]\\.(0|[1-9](\\p{{Nd}}){{0,3}})|ethernet-([1-9](\\p{{Nd}}){{0,1}}(/m[1-6])?(/[1-9](\\p{{Nd}}){{0,1}})?/(([1-9](\\p{{Nd}}){{0,1}})|(1[0-1]\\p{{Nd}})|(12[0-8])))\\.(0|[1-9](\\p{{Nd}}){{0,3}})|irb(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])\\.(0|[1-9](\\p{{Nd}}){{0,3}})|lag(([1-9](\\p{{Nd}}){{0,2}})|(1000))\\.(0|[1-9](\\p{{Nd}}){{0,3}})))$', invert=False)])),
+                    DLeaf(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='address', config=False, description='The operational IPv4 address borrowed from the referenced subinterface', mandatory=False, type_=DTypeString(name='srl_nokia-comm:ipv4-address', description='An IPv4 address in dotted quad notation.', reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])', pcre='^((([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))$', invert=False)])),
+                    DLeaf(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='unavailable-address-reason', config=False, description='The reason why there is no operational IPv4 address to use for this subinterface', mandatory=False, type_=DTypeEnum(name='enumeration', description=None, reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'not-same-network-instance':0, 'referenced-interface-is-down':1, 'referenced-interface-ipv4-is-down':2, 'referenced-interface-has-no-ipv4-addresses':3}))
                 ])
             ]),
             DContainer(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='ipv6', config=True, description='IPv6 configuration and state for the subinterface', presence=False, children=[
@@ -572,11 +579,13 @@ DMust(condition="starts-with(../../../../name,'irb')", description=None, error_a
 DMust(condition=". = false() or (. = true() and ../../../anycast-gw) or not(starts-with(../../../../name,'irb'))", description=None, error_app_tag=None, error_message='Only supported if anycast-gw container is configured', reference=None),
 DMust(condition="not(starts-with(../ip-prefix,'fe80'))", description=None, error_app_tag=None, error_message='not supported on link local address', reference=None)
                         ], type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
+                    DLeaf(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='origin', config=False, description='The origin of the IPv6 address', mandatory=False, type_=DTypeEnum(name='srl_nokia-if-ip:address-origin', description='The origin of the IP address', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'other':1, 'static':2, 'dhcp':3, 'link-layer':4, 'random':5})),
                     DLeaf(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='primary', config=True, description='One of the IPv6 prefixes assigned to the subinterface can be explicitly configured as primary by setting this leaf to true. This designates the associated IPv6 address as a primary IPv6 address of the subinterface. By default, the numerically lowest value IPv6 address is selected as the primary address.\n\nThe primary address is used as the source address for locally originated broadcast and multicast packets sent out the subinterface.', mandatory=False, must=[
 DMust(condition="not (starts-with(../../../../name, 'mgmt') or (starts-with(../../../../name, 'system')) or (starts-with(../../../../name, 'sync')))", description=None, error_app_tag=None, error_message='primary not supported on mgmt or system subinterfaces', reference=None)
                         ], type_=DTypeEmpty(name='empty', description=None, reference=None, exts=[], builtin_type='empty', default=None), exts=[
                             Ext('srl_nokia-ext', 'first-released', arg='20.12.1')
-                        ])
+                        ]),
+                    DLeaf(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='status', config=False, description='The status of an IPv6 address', mandatory=False, type_=DTypeEnum(name='srl_nokia-if-ip:ipv6-address-status', description='The IPv6 address status', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'preferred':1, 'deprecated':2, 'invalid':3, 'inaccessible':4, 'unknown':5, 'tentative':6, 'duplicate':7, 'optimistic':8}))
                 ])
             ]),
             DContainer(module='srl_nokia-interfaces-vlans', namespace='urn:nokia.com:srlinux:chassis:interfaces-vlans', prefix='srl_nokia-if-vlan', name='vlan', config=True, description='Parameters for VLAN definition under SRL interfaces', presence=False, children=[
@@ -764,7 +773,8 @@ DMust(condition='../interface', description=None, error_app_tag=None, error_mess
                         DContainer(module='srl_nokia-isis', namespace='urn:nokia.com:srlinux:isis:isis', prefix='srl_nokia-isis', name='delay', config=True, description='Enter the delay context', if_feature=[
 'srl_nokia-feat:isis-dyn-delay'
                             ], presence=False, children=[
-                            DLeaf(module='srl_nokia-isis', namespace='urn:nokia.com:srlinux:isis:isis', prefix='srl_nokia-isis', name='delay-selection', config=True, description='Delay source advertised by IGP for the interface', default='static-preferred', mandatory=False, type_=DTypeEnum(name='enumeration', description=None, reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'static':1, 'dynamic':2, 'static-preferred':3, 'dynamic-preferred':4}))
+                            DLeaf(module='srl_nokia-isis', namespace='urn:nokia.com:srlinux:isis:isis', prefix='srl_nokia-isis', name='delay-selection', config=True, description='Delay source advertised by IGP for the interface', default='static-preferred', mandatory=False, type_=DTypeEnum(name='enumeration', description=None, reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'static':1, 'dynamic':2, 'static-preferred':3, 'dynamic-preferred':4})),
+                            DLeaf(module='srl_nokia-isis', namespace='urn:nokia.com:srlinux:isis:isis', prefix='srl_nokia-isis', name='unidirectional-minimum-link-delay', config=False, description='Operational Unidirectional link delay advertised by ISIS', mandatory=False, type_=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)])), units='microseconds')
                         ]),
                         DLeaf(module='srl_nokia-isis', namespace='urn:nokia.com:srlinux:isis:isis', prefix='srl_nokia-isis', name='hello-padding', config=True, description='Specifies the use of IS-IS Hello PDU padding on the interface', mandatory=False, type_=DTypeEnum(name='srl_nokia-isis-types:isis-hello-padding-type', description='This type defines ISIS hello padding type', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'strict':0, 'loose':1, 'adaptive':2, 'disable':3})),
                         DLeaf(module='srl_nokia-isis', namespace='urn:nokia.com:srlinux:isis:isis', prefix='srl_nokia-isis', name='passive', config=True, description='When set to true the interface is configured as a passive interface and does not send IIH PDUs or try to form an adjacency with other routers.', default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
@@ -889,6 +899,12 @@ DMust(condition='/srl_nokia-system:system/srl-keychain:authentication/srl-keycha
                                 DLeaf(module='srl_nokia-isis', namespace='urn:nokia.com:srlinux:isis:isis', prefix='srl_nokia-isis', name='crypto-algorithm', config=True, description='The cryptographic algorithm used with the keying material to secure the messages.', mandatory=True, type_=DTypeEnum(name='srl_nokia-isis-types:isis-auth-type', description='This type defines the type of authentication used by ISIS PDUs', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'cleartext':0, 'hmac-md5':1, 'hmac-sha-256':2})),
                                 DLeaf(module='srl_nokia-isis', namespace='urn:nokia.com:srlinux:isis:isis', prefix='srl_nokia-isis', name='auth-password', config=True, description='The secret key to use for authentication of PDUs', mandatory=True, type_=DTypeString(name='srl_nokia-comm:routing-password', description="This type is used for passwords that are typically used to authenticate routing protocol messages. The system stores these passwords in encrypted form and always returns the encrypted string when management server reads a leaf of this type.\n\nWhen configuring a leaf of this type, the entered string can be a cleartext password or an encrypted/hashed password. An encrypted password is recognized when the string starts with a '$' character and has two further '$' characters to separate the encoding of the algorithm and the encoding of the salt from the actual encrypted data. Any other text string is interpreted as cleartext.\n\nThe system automatically truncates cleartext passwords to the first 20 characters. Characters beyond this length are not used in the encryption process.", reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
                             ])
+                        ])
+                    ]),
+                    DContainer(module='srl_nokia-isis', namespace='urn:nokia.com:srlinux:isis:isis', prefix='srl_nokia-isis', name='hostnames', config=False, presence=False, children=[
+                        DList(module='srl_nokia-isis', namespace='urn:nokia.com:srlinux:isis:isis', prefix='srl_nokia-isis', name='system-id', key=['host-system-id'], config=False, description='List of system IDs that have discovered hostnames.', min_elements=0, ordered_by='system', children=[
+                            DLeaf(module='srl_nokia-isis', namespace='urn:nokia.com:srlinux:isis:isis', prefix='srl_nokia-isis', name='host-system-id', config=False, description='The system ID', mandatory=False, type_=DTypeString(name='srl_nokia-comm:isis-system-id', description='This type defines ISIS system id using pattern. An example of a system ID is 0143.0438.AeF0', reference=None, exts=[], builtin_type='string', default=None, length=Ranges([(14, 14)]), patterns=[YangPattern(yang_regex='[0-9A-Fa-f]{{4}}\\.[0-9A-Fa-f]{{4}}\\.[0-9A-Fa-f]{{4}}', pcre='^([0-9A-Fa-f]{{4}}\\.[0-9A-Fa-f]{{4}}\\.[0-9A-Fa-f]{{4}})$', invert=False)])),
+                            DLeaf(module='srl_nokia-isis', namespace='urn:nokia.com:srlinux:isis:isis', prefix='srl_nokia-isis', name='hostname', config=False, description='The hostname of the system.', mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
                         ])
                     ])
                 ])
@@ -1090,12 +1106,18 @@ DMust(condition='../as-number', description=None, error_app_tag=None, error_mess
 DMust(condition=". = 'disable' or\n../afi-safi[afi-safi-name='ipv4-unicast']/admin-state = 'enable' or ../afi-safi[afi-safi-name='ipv6-unicast']/admin-state = 'enable' or ../afi-safi[afi-safi-name='evpn']/admin-state = 'enable' or\n../afi-safi[afi-safi-name='l3vpn-ipv4-unicast']/admin-state = 'enable' or ../afi-safi[afi-safi-name='l3vpn-ipv6-unicast']/admin-state = 'enable' or\n../afi-safi[afi-safi-name='ipv4-labeled-unicast']/admin-state = 'enable' or ../afi-safi[afi-safi-name='ipv6-labeled-unicast']/admin-state = 'enable' or\n../afi-safi[afi-safi-name='evpn']/admin-state = 'enable' or ../afi-safi[afi-safi-name='route-target']/admin-state = 'enable' or\n(not(../afi-safi[afi-safi-name='ipv4-unicast']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='ipv4-unicast']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='ipv4-unicast']/admin-state) and ../../afi-safi[afi-safi-name='ipv4-unicast']/admin-state = 'enable')))  or\n(not(../afi-safi[afi-safi-name='ipv6-unicast']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='ipv6-unicast']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='ipv6-unicast']/admin-state) and ../../afi-safi[afi-safi-name='ipv6-unicast']/admin-state = 'enable'))) or\n(not(../afi-safi[afi-safi-name='evpn']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='evpn']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='evpn']/admin-state) and ../../afi-safi[afi-safi-name='evpn']/admin-state = 'enable'))) or\n(not(../afi-safi[afi-safi-name='l3vpn-ipv4-unicast']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='l3vpn-ipv4-unicast']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='l3vpn-ipv4-unicast']/admin-state) and ../../afi-safi[afi-safi-name='l3vpn-ipv4-unicast']/admin-state = 'enable'))) or\n(not(../afi-safi[afi-safi-name='l3vpn-ipv6-unicast']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='l3vpn-ipv6-unicast']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='l3vpn-ipv6-unicast']/admin-state) and ../../afi-safi[afi-safi-name='l3vpn-ipv6-unicast']/admin-state = 'enable'))) or\n(not(../afi-safi[afi-safi-name='ipv4-labeled-unicast']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='ipv4-labeled-unicast']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='ipv4-labeled-unicast']/admin-state) and ../../afi-safi[afi-safi-name='ipv4-labeled-unicast']/admin-state = 'enable'))) or\n(not(../afi-safi[afi-safi-name='ipv6-labeled-unicast']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='ipv6-labeled-unicast']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='ipv6-labeled-unicast']/admin-state) and ../../afi-safi[afi-safi-name='ipv6-labeled-unicast']/admin-state = 'enable'))) or\n(not(../afi-safi[afi-safi-name='route-target']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='route-target']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='route-target']/admin-state) and ../../afi-safi[afi-safi-name='route-target']/admin-state = 'enable'))) or\n(not(../afi-safi[afi-safi-name='srte-policy-ipv4']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='srte-policy-ipv4']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='srte-policy-ipv4']/admin-state) and ../../afi-safi[afi-safi-name='srte-policy-ipv4']/admin-state = 'enable'))) or\n(not(../afi-safi[afi-safi-name='srte-policy-ipv6']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='srte-policy-ipv6']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='srte-policy-ipv6']/admin-state) and ../../afi-safi[afi-safi-name='srte-policy-ipv6']/admin-state = 'enable'))) or\n(not(../afi-safi[afi-safi-name='link-state']/admin-state) and (../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='link-state']/admin-state = 'enable' or (not(../../group[group-name = current()/../peer-group]/afi-safi[afi-safi-name='link-state']/admin-state) and ../../afi-safi[afi-safi-name='link-state']/admin-state = 'enable')))", description=None, error_app_tag=None, error_message='One of the address families must be enabled.', reference=None)
                         ], type_=DTypeEnum(name='srl_nokia-comm:admin-state', description='general admin-state option.', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'enable':1, 'disable':2})),
                     DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='description', config=True, description='A user provided description string for the peer', mandatory=False, type_=DTypeString(name='srl_nokia-comm:description', description='A user provided description string', reference=None, exts=[], builtin_type='string', default=None, length=Ranges([(1, 255)]), patterns=[])),
+                    DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='under-maintenance', config=False, description='State field to determine if this bgp neighbor is in maintenance mode.', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
+                    DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='maintenance-group', config=False, description='State field to display the maintenance group to which this neighbor belongs to.', mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
+                    DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='peer-type', config=False, description='The session type. The type is EBGP when the local AS and peer AS are different, and the type is IBGP when the local AS and peer AS have the same value.', mandatory=False, type_=DTypeEnum(name='enumeration', description=None, reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'ibgp':0, 'ebgp':1})),
                     DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='local-preference', config=True, description='The value of the local-preference attribute that is added to received routes from the peer, if it is EBGP\n\nIt is also used to encode the local preference attribute for locally generated BGP routes.', mandatory=False, type_=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)]))),
                     DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='next-hop-self', config=True, description='When set to true, the next-hop in all IPv4-unicast, IPv6-unicast and EVPN BGP routes advertised to the peer, if IBGP, is set equal to the local-address used on this session (or to the router ID if the NLRI is IPv6 and there is no IPv6 local address to use). This is independent of the route origin (EBGP, IBGP-client, IBGP-non-client or redistributed direct/static/aggregate route).\n\nWhen set to false, normal BGP rules from RFC 4271 apply.', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
                     DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='peer-as', config=True, description='The autonomous system number expected from the peer\n\nA configured session with a peer does not come up if this value does not match the AS value reported by the peer in its OPEN message.', mandatory=False, type_=DTypeIntegerUnsigned(name='srl_nokia-comm:as-number', description='The as-number type represents autonomous system numbers\nwhich identify an Autonomous System (AS).  An AS is a set\nof routers under a single technical administration, using\nan interior gateway protocol and common metrics to route\npackets within the AS, and using an exterior gateway\nprotocol to route packets to other ASes.  IANA maintains\nthe AS number space and has delegated large parts to the\nregional registries.\n\nAutonomous system numbers were originally limited to 16\nbits.  BGP extensions have enlarged the autonomous system\nnumber space to 32 bits.  This type therefore uses an uint32\nbase type without a range restriction in order to support\na larger autonomous system number space.\n\nIn the value set and its semantics, this type is equivalent\nto the InetAutonomousSystemNumber textual convention of\nthe SMIv2.', reference='RFC 1930: Guidelines for creation, selection, and registration\n          of an Autonomous System (AS)\nRFC 4271: A Border Gateway Protocol 4 (BGP-4)\nRFC 4001: Textual Conventions for Internet Network Addresses\nRFC 6793: BGP Support for Four-Octet Autonomous System (AS)\n          Number Space', exts=[], builtin_type='uint32', default=None, ranges=Ranges([(1, 4294967295)])), exts=[
                             Ext('srl_nokia-ext', 'show-importance', arg='high')
                         ]),
                     DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='peer-group', config=True, description='A reference to the peer-group template to use for this BGP session\n\nThis is not immutable.', mandatory=True, type_=DTypeLeafref(name='leafref', description=None, reference=None, exts=[], builtin_type='leafref', default=None, path=yang.xpath.AbsoluteLocationPath([yang.xpath.NodeTestStep('srl_nokia-netinst', 'network-instance', []), yang.xpath.NodeTestStep('srl_nokia-netinst', 'protocols', []), yang.xpath.NodeTestStep(None, 'bgp', []), yang.xpath.NodeTestStep(None, 'group', []), yang.xpath.NodeTestStep(None, 'group-name', [])]), require_instance=False, target_type=DTypeString(name='srl_nokia-comm:name', description='A user provided name', reference=None, exts=[], builtin_type='string', default=None, length=Ranges([(1, 64)]), patterns=[YangPattern(yang_regex='[A-Za-z0-9!@#$%^&()|+=`~.,/_:;?-][A-Za-z0-9 !@#$%^&()|+=`~.,/_:;?-]*', pcre='^([A-Za-z0-9!@#$%^&()|+=`~.,/_:;?-][A-Za-z0-9 !@#$%^&()|+=`~.,/_:;?-]*)$', invert=False)]))),
+                    DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='last-prefix-limit-exceeded', config=False, description='Time when the neighbor last violated a configured prefix-limit for any AFI/SAFI\n\nThis value is set/updated when any AFI/SAFI prefix-limit-exceeded leaf transitions from false/unset to true.', if_feature=[
+'srl_nokia-feat:bgp-prefix-limit-last-exceeded'
+                        ], mandatory=False, type_=DTypeString(name='srl_nokia-comm:date-and-time-delta', description="When this type is used to store a date and time, show routines should display it as a delta\nwith respect to the current date and time in the format 'dddd:hh:mm:ss ago' (for a past\nevent) or 'in dddd:hh:mm:ss' (future event), where dddd is the number of days, hh is the\nnumber of  hours, mm is the number of  minutes and ss is the number of seconds.", reference='RFC 3339: Date and Time on the Internet: Timestamps\nRFC 2579: Textual Conventions for SMIv2\nXSD-TYPES: XML Schema Part 2: Datatypes Second Edition', exts=[], builtin_type='string', default=None, length=Ranges([(20, 32)]), patterns=[YangPattern(yang_regex='\\d{{4}}-\\d{{2}}-\\d{{2}}T\\d{{2}}:\\d{{2}}:\\d{{2}}(\\.\\d+)?(Z|[\\+\\-]\\d{{2}}:\\d{{2}})', pcre='^(\\p{{Nd}}{{4}}-\\p{{Nd}}{{2}}-\\p{{Nd}}{{2}}T\\p{{Nd}}{{2}}:\\p{{Nd}}{{2}}:\\p{{Nd}}{{2}}(\\.\\p{{Nd}}+)?(Z|[\\+\\-]\\p{{Nd}}{{2}}:\\p{{Nd}}{{2}}))$', invert=False)])),
                     DContainer(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='as-path-options', config=True, description='Options for handling the AS_PATH in received BGP routes', presence=False, children=[
                         DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='allow-own-as', config=True, description='The maximum number of times the global AS number or a local AS number of the BGP instance can appear in any received AS_PATH before it is considered a loop and considered invalid', mandatory=False, type_=DTypeIntegerUnsigned(name='uint8', description=None, reference=None, exts=[], builtin_type='uint8', default=None, ranges=Ranges([(0, 255)]))),
                         DContainer(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='remove-private-as', config=True, description='Container with options for removing private AS numbers (2-byte and 4-byte) from the advertised AS path towards all peers', presence=True, children=[
@@ -1117,7 +1139,8 @@ DMust(condition='/srl_nokia-system:system/srl-keychain:authentication/srl-keycha
 'srl_nokia-feat:bgp-auth-password'
                             ], mandatory=False, must=[
 DMust(condition='boolean(../keychain) = false()', description=None, error_app_tag=None, error_message='Can not assign both keychain and password', reference=None)
-                            ], type_=DTypeString(name='srl_nokia-comm:routing-password', description="This type is used for passwords that are typically used to authenticate routing protocol messages. The system stores these passwords in encrypted form and always returns the encrypted string when management server reads a leaf of this type.\n\nWhen configuring a leaf of this type, the entered string can be a cleartext password or an encrypted/hashed password. An encrypted password is recognized when the string starts with a '$' character and has two further '$' characters to separate the encoding of the algorithm and the encoding of the salt from the actual encrypted data. Any other text string is interpreted as cleartext.\n\nThe system automatically truncates cleartext passwords to the first 20 characters. Characters beyond this length are not used in the encryption process.", reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
+                            ], type_=DTypeString(name='srl_nokia-comm:routing-password', description="This type is used for passwords that are typically used to authenticate routing protocol messages. The system stores these passwords in encrypted form and always returns the encrypted string when management server reads a leaf of this type.\n\nWhen configuring a leaf of this type, the entered string can be a cleartext password or an encrypted/hashed password. An encrypted password is recognized when the string starts with a '$' character and has two further '$' characters to separate the encoding of the algorithm and the encoding of the salt from the actual encrypted data. Any other text string is interpreted as cleartext.\n\nThe system automatically truncates cleartext passwords to the first 20 characters. Characters beyond this length are not used in the encryption process.", reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
+                        DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='transmit-active', config=False, description='Reads true when the TCP segments being sent to the peer have authentication data.', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
                     ]),
                     DContainer(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='failure-detection', config=True, description='Options related to methods of detecting BGP session failure', presence=False, children=[
                         DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='enable-bfd', config=True, description='The true setting enables Bi-directional Forwarding Detection on BGP sessions belonging to the peer group', if_feature=[
@@ -1130,7 +1153,27 @@ DMust(condition='boolean(../keychain) = false()', description=None, error_app_ta
                         DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='stale-routes-time', config=True, description='The maximum number of seconds that routes received from a helped peer remain stale until they are deleted\n\nRoutes of AFI/SAFI X received from peer Y are marked stale when peer Y goes down and its previous GR capability included AFI/SAFI X.', mandatory=False, type_=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(1, 3600)])), units='seconds'),
                         DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='requested-restart-time', config=True, description="The restart time encoded in this router's GR capability.\n\nIf the neighbor honors this request then this is the maximum time allowed for this router to re-establish its TCP connection after a restart. If this time is exceeded, the neighbor is expected to flush stale routes that it was maintaining on behalf of this router.", default='300', if_feature=[
 'srl_nokia-feat:bgp-graceful-restart-gaps'
-                            ], mandatory=False, type_=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(1, 3600)])), units='seconds')
+                            ], mandatory=False, type_=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(1, 3600)])), units='seconds'),
+                        DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='number-of-restarts', config=False, description='The number of times the peer has restarted', mandatory=False, type_=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(0, 65535)]))),
+                        DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='last-restart-time', config=False, description='The last time the peer restarted', mandatory=False, type_=DTypeString(name='srl_nokia-comm:date-and-time-delta', description="When this type is used to store a date and time, show routines should display it as a delta\nwith respect to the current date and time in the format 'dddd:hh:mm:ss ago' (for a past\nevent) or 'in dddd:hh:mm:ss' (future event), where dddd is the number of days, hh is the\nnumber of  hours, mm is the number of  minutes and ss is the number of seconds.", reference='RFC 3339: Date and Time on the Internet: Timestamps\nRFC 2579: Textual Conventions for SMIv2\nXSD-TYPES: XML Schema Part 2: Datatypes Second Edition', exts=[], builtin_type='string', default=None, length=Ranges([(20, 32)]), patterns=[YangPattern(yang_regex='\\d{{4}}-\\d{{2}}-\\d{{2}}T\\d{{2}}:\\d{{2}}:\\d{{2}}(\\.\\d+)?(Z|[\\+\\-]\\d{{2}}:\\d{{2}})', pcre='^(\\p{{Nd}}{{4}}-\\p{{Nd}}{{2}}-\\p{{Nd}}{{2}}T\\p{{Nd}}{{2}}:\\p{{Nd}}{{2}}:\\p{{Nd}}{{2}}(\\.\\p{{Nd}}+)?(Z|[\\+\\-]\\p{{Nd}}{{2}}:\\p{{Nd}}{{2}}))$', invert=False)])),
+                        DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='helper-active', config=False, description='Set to true when the router is actively helping the neighbor for at least one address family - i.e. for that address family the peer restarted with F=1 in its capability and the stale-routes-time has not expired yet', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
+                        DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='local-restarting', config=False, description='Set to true when session has restarted, the peer is helping and EOR has not been sent for all AFI-SAFI', if_feature=[
+'srl_nokia-feat:bgp-graceful-restart-state-additions'
+                            ], mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
+                        DContainer(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='neighbor-capability', config=False, description='Container for information about the last GR capability received from the neighbor', presence=False, children=[
+                            DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='restart-time', config=False, description="The value of the Restart Time in the neighbor's last GR capability", mandatory=False, type_=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(0, 65535)]))),
+                            DList(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='afi-safi', key=['name'], config=False, description="List of AFI/SAFI TLVs that were contained in the neighbor's last GR capability", min_elements=0, ordered_by='system', children=[
+                                DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='name', config=False, mandatory=False, type_=DTypeIdentityref(name='identityref', description=None, reference=None, exts=[], builtin_type='identityref', default=None, identity_bases=[_base_srl_nokia_common_bgp_address_family], identities=_identities)),
+                                DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='forwarding-preserved', config=False, description='The F-bit setting in the AFI/SAFI TLV', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
+                            ])
+                        ]),
+                        DContainer(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='local-capability', config=False, description='Container for information about the last GR capability advertised to the neighbor', if_feature=[
+'srl_nokia-feat:bgp-graceful-restart-state-additions'
+                            ], presence=False, children=[
+                            DList(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='afi-safi', key=['name'], config=False, description='List of AFI/SAFI TLVs that were contained in thel ast GR capability sent to the neighbor', min_elements=0, ordered_by='system', children=[
+                                DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='name', config=False, mandatory=False, type_=DTypeIdentityref(name='identityref', description=None, reference=None, exts=[], builtin_type='identityref', default=None, identity_bases=[_base_srl_nokia_common_bgp_address_family], identities=_identities))
+                            ])
+                        ])
                     ]),
                     DContainer(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='multihop', config=True, description='Configuration parameters specifying the multihop behaviour for an EBGP peer. This is not applicable to an IBGP peer.', presence=False, children=[
                         DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='admin-state', config=True, description='When enabled, the peer is allowed to be indirectly connected by up to N hops, where N is controlled by the maximum-hops parameter. When disabled, multihop is allowed only if the peer type is IBGP.\n\nThis overrides the group setting for admin-state.', mandatory=False, type_=DTypeEnum(name='srl_nokia-comm:admin-state', description='general admin-state option.', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'enable':1, 'disable':2})),
@@ -1184,7 +1227,10 @@ DMust(condition='../as-number', description=None, error_app_tag=None, error_mess
                         DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='minimum-advertisement-interval', config=True, description='The value assigned to the MinRouteAdvertisementIntervalTimer of RFC 4271, for both EBGP and IBGP sessions\n\nEach session runs its own independent timer and the timer affects both route advertisements and route withdrawals, regardless of address family. For route withdrawals only, this timer is bypassed if rapid-withdrawal is set to true.', mandatory=False, type_=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(1, 255)])), units='seconds'),
                         DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='prefix-limit-restart-timer', config=True, description='Time interval in seconds after which the BGP session is re-established after being torn down due to exceeding any prefix limit (of any address family)\n\nThis only applies if prevent-teardown is false.', if_feature=[
 'srl_nokia-feat:bgp-prefix-limit'
-                            ], mandatory=False, type_=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(0, 65535)])), units='seconds')
+                            ], mandatory=False, type_=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(0, 65535)])), units='seconds'),
+                        DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='next-connect-retry-time', config=False, description='The time when the next connect retry attempt will occur', mandatory=False, type_=DTypeString(name='srl_nokia-comm:date-and-time-delta', description="When this type is used to store a date and time, show routines should display it as a delta\nwith respect to the current date and time in the format 'dddd:hh:mm:ss ago' (for a past\nevent) or 'in dddd:hh:mm:ss' (future event), where dddd is the number of days, hh is the\nnumber of  hours, mm is the number of  minutes and ss is the number of seconds.", reference='RFC 3339: Date and Time on the Internet: Timestamps\nRFC 2579: Textual Conventions for SMIv2\nXSD-TYPES: XML Schema Part 2: Datatypes Second Edition', exts=[], builtin_type='string', default=None, length=Ranges([(20, 32)]), patterns=[YangPattern(yang_regex='\\d{{4}}-\\d{{2}}-\\d{{2}}T\\d{{2}}:\\d{{2}}:\\d{{2}}(\\.\\d+)?(Z|[\\+\\-]\\d{{2}}:\\d{{2}})', pcre='^(\\p{{Nd}}{{4}}-\\p{{Nd}}{{2}}-\\p{{Nd}}{{2}}T\\p{{Nd}}{{2}}:\\p{{Nd}}{{2}}:\\p{{Nd}}{{2}}(\\.\\p{{Nd}}+)?(Z|[\\+\\-]\\p{{Nd}}{{2}}:\\p{{Nd}}{{2}}))$', invert=False)])),
+                        DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='negotiated-hold-time', config=False, description='The operational hold-time\n\nIt is negotiated to the lowest value proposed by the two peers. A negotiated value of 0 suppresses the sending of keepalives by both peers.', mandatory=False, type_=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(0, 65535)]))),
+                        DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='negotiated-keepalive-interval', config=False, description='The operational keepalive interval\n\nIt is the minimum of the configured value and 1/3 of the negotiated-hold-time. A value of 0 suppresses the sending of keepalives to the peer.', mandatory=False, type_=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(0, 65535)])))
                     ]),
                     DContainer(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='transport', config=True, presence=False, children=[
                         DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='mtu-discovery', config=True, description='Turns path mtu discovery on (true) or off (false)', if_feature=[
@@ -1192,7 +1238,9 @@ DMust(condition='../as-number', description=None, error_app_tag=None, error_mess
                             ], mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
                         DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='tcp-mss', config=True, description='The maximum segment size of BGP TCP packets\n\nThe configured value of this leaf is the TCP MSS value advertised to the peer during TCP connection setup (in the TCP MSS option), reduced if necessary to accommodate the outgoing interface IP MTU.\nThe state value of this leaf is the operational TCP MSS used in the data transmit direction towards the peer. It may be less than the received TCP MSS option value due to adjustment for TCP options used in the transit direction and/or the path MTU discovery process (if enabled).', mandatory=False, type_=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(536, 9446)])), units='bytes'),
                         DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='passive-mode', config=True, description='The true setting causes BGP to wait for the peer to initiate the TCP connection\n\nThe false setting causes BGP to initiate a TCP connection whenever the BGP session is started or restarted.', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
-                        DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='local-address', config=True, description='The local TCP endpoint of used for the BGP session\n\nThis also the source address for next-hop-self, if it applies. The local-address can be specified as an IP address that is resolvable to a local interface.\n\nThis address must be the primary address of an interface, otherwise the session will not come up.', mandatory=False, type_=DTypeUnion(name='union', description=None, reference=None, exts=[], builtin_type='union', default=None, types=[DTypeString(name='ipv4-address', description='An IPv4 address in dotted quad notation.', reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])', pcre='^((([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))$', invert=False)]), DTypeString(name='ipv6-address', description='An IPv6 address represented as either a full address, shortened or mixed-shortened formats', reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='((:|[0-9a-fA-F]{{0,4}}):)([0-9a-fA-F]{{0,4}}:){{0,5}}((([0-9a-fA-F]{{0,4}}:)?(:|[0-9a-fA-F]{{0,4}}))|(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\\.){{3}}(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))', pcre='^(((:|[0-9a-fA-F]{{0,4}}):)([0-9a-fA-F]{{0,4}}:){{0,5}}((([0-9a-fA-F]{{0,4}}:)?(:|[0-9a-fA-F]{{0,4}}))|(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\\.){{3}}(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9]))))$', invert=False)]), DTypeString(name='srl_nokia-comm:subinterface-all', description=None, reference=None, exts=[], builtin_type='string', default=None, length=Ranges([(5, 26)]), patterns=[YangPattern(yang_regex='(mgmt0\\.0|system0\\.0|sync0\\.0|lo(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])\\.(0|[1-9](\\d){{0,3}})|lif-.*\\.(0|[1-9](\\d){{0,3}})|vhn-.*\\.(0|[1-9](\\d){{0,3}})|enp(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])s(0|[1-9]|[1-2][0-9]|3[0-1])f[0-7]\\.(0|[1-9](\\d){{0,3}})|ethernet-([1-9](\\d){{0,1}}(/m[1-6])?(/[1-9](\\d){{0,1}})?/(([1-9](\\d){{0,1}})|(1[0-1]\\d)|(12[0-8])))\\.([0]|[1-9](\\d){{0,3}})|irb(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])\\.(0|[1-9](\\d){{0,3}})|lag(([1-9](\\d){{0,2}})|(1000))\\.(0|[1-9](\\d){{0,3}}))', pcre='^((mgmt0\\.0|system0\\.0|sync0\\.0|lo(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])\\.(0|[1-9](\\p{{Nd}}){{0,3}})|lif-.*\\.(0|[1-9](\\p{{Nd}}){{0,3}})|vhn-.*\\.(0|[1-9](\\p{{Nd}}){{0,3}})|enp(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])s(0|[1-9]|[1-2][0-9]|3[0-1])f[0-7]\\.(0|[1-9](\\p{{Nd}}){{0,3}})|ethernet-([1-9](\\p{{Nd}}){{0,1}}(/m[1-6])?(/[1-9](\\p{{Nd}}){{0,1}})?/(([1-9](\\p{{Nd}}){{0,1}})|(1[0-1]\\p{{Nd}})|(12[0-8])))\\.(0|[1-9](\\p{{Nd}}){{0,3}})|irb(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])\\.(0|[1-9](\\p{{Nd}}){{0,3}})|lag(([1-9](\\p{{Nd}}){{0,2}})|(1000))\\.(0|[1-9](\\p{{Nd}}){{0,3}})))$', invert=False)])]))
+                        DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='local-address', config=True, description='The local TCP endpoint of used for the BGP session\n\nThis also the source address for next-hop-self, if it applies. The local-address can be specified as an IP address that is resolvable to a local interface.\n\nThis address must be the primary address of an interface, otherwise the session will not come up.', mandatory=False, type_=DTypeUnion(name='union', description=None, reference=None, exts=[], builtin_type='union', default=None, types=[DTypeString(name='ipv4-address', description='An IPv4 address in dotted quad notation.', reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])', pcre='^((([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))$', invert=False)]), DTypeString(name='ipv6-address', description='An IPv6 address represented as either a full address, shortened or mixed-shortened formats', reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='((:|[0-9a-fA-F]{{0,4}}):)([0-9a-fA-F]{{0,4}}:){{0,5}}((([0-9a-fA-F]{{0,4}}:)?(:|[0-9a-fA-F]{{0,4}}))|(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\\.){{3}}(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))', pcre='^(((:|[0-9a-fA-F]{{0,4}}):)([0-9a-fA-F]{{0,4}}:){{0,5}}((([0-9a-fA-F]{{0,4}}:)?(:|[0-9a-fA-F]{{0,4}}))|(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\\.){{3}}(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9]))))$', invert=False)]), DTypeString(name='srl_nokia-comm:subinterface-all', description=None, reference=None, exts=[], builtin_type='string', default=None, length=Ranges([(5, 26)]), patterns=[YangPattern(yang_regex='(mgmt0\\.0|system0\\.0|sync0\\.0|lo(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])\\.(0|[1-9](\\d){{0,3}})|lif-.*\\.(0|[1-9](\\d){{0,3}})|vhn-.*\\.(0|[1-9](\\d){{0,3}})|enp(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])s(0|[1-9]|[1-2][0-9]|3[0-1])f[0-7]\\.(0|[1-9](\\d){{0,3}})|ethernet-([1-9](\\d){{0,1}}(/m[1-6])?(/[1-9](\\d){{0,1}})?/(([1-9](\\d){{0,1}})|(1[0-1]\\d)|(12[0-8])))\\.([0]|[1-9](\\d){{0,3}})|irb(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])\\.(0|[1-9](\\d){{0,3}})|lag(([1-9](\\d){{0,2}})|(1000))\\.(0|[1-9](\\d){{0,3}}))', pcre='^((mgmt0\\.0|system0\\.0|sync0\\.0|lo(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])\\.(0|[1-9](\\p{{Nd}}){{0,3}})|lif-.*\\.(0|[1-9](\\p{{Nd}}){{0,3}})|vhn-.*\\.(0|[1-9](\\p{{Nd}}){{0,3}})|enp(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])s(0|[1-9]|[1-2][0-9]|3[0-1])f[0-7]\\.(0|[1-9](\\p{{Nd}}){{0,3}})|ethernet-([1-9](\\p{{Nd}}){{0,1}}(/m[1-6])?(/[1-9](\\p{{Nd}}){{0,1}})?/(([1-9](\\p{{Nd}}){{0,1}})|(1[0-1]\\p{{Nd}})|(12[0-8])))\\.(0|[1-9](\\p{{Nd}}){{0,3}})|irb(0|1[0-9][0-9]|2([0-4][0-9]|5[0-5])|[1-9][0-9]|[1-9])\\.(0|[1-9](\\p{{Nd}}){{0,3}})|lag(([1-9](\\p{{Nd}}){{0,2}})|(1000))\\.(0|[1-9](\\p{{Nd}}){{0,3}})))$', invert=False)])])),
+                        DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='local-port', config=False, description='Local TCP port used for the TCP connection to the peer', mandatory=False, type_=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(0, 65535)]))),
+                        DLeaf(module='srl_nokia-bgp', namespace='urn:nokia.com:srlinux:bgp:bgp', prefix='srl_nokia-bgp', name='remote-port', config=False, description='Remote TCP port used by the peer for its TCP connection to the local router', mandatory=False, type_=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(0, 65535)])))
                     ])
                 ])
             ]),
@@ -1208,6 +1256,9 @@ DMust(condition='not(starts-with(string(.), "0:"))', description=None, error_app
 DMust(condition='not(starts-with(string(.), "0.0:"))', description=None, error_app_tag=None, error_message='invalid value 0.0:*', reference=None),
 DMust(condition='not(starts-with(string(.), "0.0.0.0:") and (number(substring-after(string(.), ":")) < 513))', description=None, error_app_tag=None, error_message='route-distinguisher value reserved', reference=None)
                             ], type_=DTypeUnion(name='srl_nokia-comm:route-distinguisher', description='A route distinguisher value', reference='RFC4364', exts=[], builtin_type='union', default=None, types=[DTypeString(name='route-distinguisher-type-0', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='(6553[0-5]|655[0-2][0-9]|654[0-9]{{2}}|65[0-4][0-9]{{2}}|6[0-4][0-9]{{3}}|[1-5][0-9]{{4}}|[1-9][0-9]{{1,3}}|[0-9]):(429496729[0-5]|42949672[0-8][0-9]|4294967[0-1][0-9]{{2}}|429496[0-6][0-9]{{3}}|42949[0-5][0-9]{{4}}|4294[0-8][0-9]{{5}}|429[0-3][0-9]{{6}}|42[0-8][0-9]{{7}}|4[0-1][0-9]{{8}}|[1-3][0-9]{{9}}|[1-9][0-9]{{1,8}}|[0-9])', pcre='^((6553[0-5]|655[0-2][0-9]|654[0-9]{{2}}|65[0-4][0-9]{{2}}|6[0-4][0-9]{{3}}|[1-5][0-9]{{4}}|[1-9][0-9]{{1,3}}|[0-9]):(429496729[0-5]|42949672[0-8][0-9]|4294967[0-1][0-9]{{2}}|429496[0-6][0-9]{{3}}|42949[0-5][0-9]{{4}}|4294[0-8][0-9]{{5}}|429[0-3][0-9]{{6}}|42[0-8][0-9]{{7}}|4[0-1][0-9]{{8}}|[1-3][0-9]{{9}}|[1-9][0-9]{{1,8}}|[0-9]))$', invert=False)]), DTypeString(name='route-distinguisher-type-1', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]):(6553[0-5]|655[0-2][0-9]|654[0-9]{{2}}|65[0-4][0-9]{{2}}|6[0-4][0-9]{{3}}|[1-5][0-9]{{4}}|[1-9][0-9]{{1,3}}|[0-9])', pcre='^((([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]):(6553[0-5]|655[0-2][0-9]|654[0-9]{{2}}|65[0-4][0-9]{{2}}|6[0-4][0-9]{{3}}|[1-5][0-9]{{4}}|[1-9][0-9]{{1,3}}|[0-9]))$', invert=False)]), DTypeString(name='route-distinguisher-type-2', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='(429496729[0-5]|42949672[0-8][0-9]|4294967[0-1][0-9]{{2}}|429496[0-6][0-9]{{3}}|42949[0-5][0-9]{{4}}|4294[0-8][0-9]{{5}}|429[0-3][0-9]{{6}}|42[0-8][0-9]{{7}}|4[0-1][0-9]{{8}}|[1-3][0-9]{{9}}|[1-9][0-9]{{1,8}}|[0-9]):(6553[0-5]|655[0-2][0-9]|654[0-9]{{2}}|65[0-4][0-9]{{2}}|6[0-4][0-9]{{3}}|[1-5][0-9]{{4}}|[1-9][0-9]{{1,3}}|[0-9])', pcre='^((429496729[0-5]|42949672[0-8][0-9]|4294967[0-1][0-9]{{2}}|429496[0-6][0-9]{{3}}|42949[0-5][0-9]{{4}}|4294[0-8][0-9]{{5}}|429[0-3][0-9]{{6}}|42[0-8][0-9]{{7}}|4[0-1][0-9]{{8}}|[1-3][0-9]{{9}}|[1-9][0-9]{{1,8}}|[0-9]):(6553[0-5]|655[0-2][0-9]|654[0-9]{{2}}|65[0-4][0-9]{{2}}|6[0-4][0-9]{{3}}|[1-5][0-9]{{4}}|[1-9][0-9]{{1,3}}|[0-9]))$', invert=False)]), DTypeString(name='route-distinguisher-type-2b', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='(6553[0-5]|655[0-2][0-9]|654[0-9]{{2}}|65[0-4][0-9]{{2}}|6[0-4][0-9]{{3}}|[1-5][0-9]{{4}}|[1-9][0-9]{{1,3}}|[0-9]).(6553[0-5]|655[0-2][0-9]|654[0-9]{{2}}|65[0-4][0-9]{{2}}|6[0-4][0-9]{{3}}|[1-5][0-9]{{4}}|[1-9][0-9]{{1,3}}|[0-9]):(6553[0-5]|655[0-2][0-9]|654[0-9]{{2}}|65[0-4][0-9]{{2}}|6[0-4][0-9]{{3}}|[1-5][0-9]{{4}}|[1-9][0-9]{{1,3}}|[0-9])', pcre='^((6553[0-5]|655[0-2][0-9]|654[0-9]{{2}}|65[0-4][0-9]{{2}}|6[0-4][0-9]{{3}}|[1-5][0-9]{{4}}|[1-9][0-9]{{1,3}}|[0-9]).(6553[0-5]|655[0-2][0-9]|654[0-9]{{2}}|65[0-4][0-9]{{2}}|6[0-4][0-9]{{3}}|[1-5][0-9]{{4}}|[1-9][0-9]{{1,3}}|[0-9]):(6553[0-5]|655[0-2][0-9]|654[0-9]{{2}}|65[0-4][0-9]{{2}}|6[0-4][0-9]{{3}}|[1-5][0-9]{{4}}|[1-9][0-9]{{1,3}}|[0-9]))$', invert=False)])]), exts=[
+                                Ext('srl_nokia-ext', 'show-importance', arg='high')
+                            ]),
+                        DLeaf(module='srl_nokia-bgp-vpn', namespace='urn:nokia.com:srlinux:bgp:bgp-vpn', prefix='srl_nokia-bgp-vpn', name='route-distinguisher-origin', config=False, description="Origin of the operational Route Distinguisher (RD) of the bgp-vpn instance.\n\n 'Auto-derived-from-evi' refers to an RD that is automatically allocated with the format <ip-address>:<evi>\n where 'ip-address' is the ipv4 address associated to the subinterface lo0.1.\n 'Auto-derived-from-system-ip:0' refers to the RD for the EVPN Ethernet Segment routes that is automatically allocated with the format <ip-address>:0\n where 'ip-address' is the ipv4 address associated to the subinterface lo0.1.\n 'Manual' refers to an RD that is configured.\n 'None' indicates that the RD is neither configured nor auto-derived.", mandatory=False, type_=DTypeEnum(name='enumeration', description=None, reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'auto-derived-from-evi':0, 'auto-derived-from-system-ip:0':1, 'manual':2, 'none':3}), exts=[
                                 Ext('srl_nokia-ext', 'show-importance', arg='high')
                             ])
                     ]),
@@ -12533,14 +12584,16 @@ class srl_nokia_system__system__name(yang.adata.MNode):
 
 
 class srl_nokia_system__system(yang.adata.MNode):
+    features: list[str]
     trace_options: list[str]
     management: srl_nokia_system__system__management
     control_plane_traffic: srl_nokia_system__system__control_plane_traffic
     protocols: srl_nokia_system__system__protocols
     name: srl_nokia_system__system__name
 
-    mut def __init__(self, trace_options: ?list[str]=None, management: ?srl_nokia_system__system__management=None, control_plane_traffic: ?srl_nokia_system__system__control_plane_traffic=None, protocols: ?srl_nokia_system__system__protocols=None, name: ?srl_nokia_system__system__name=None):
+    mut def __init__(self, features: ?list[str]=None, trace_options: ?list[str]=None, management: ?srl_nokia_system__system__management=None, control_plane_traffic: ?srl_nokia_system__system__control_plane_traffic=None, protocols: ?srl_nokia_system__system__protocols=None, name: ?srl_nokia_system__system__name=None):
         self._ns = 'urn:nokia.com:srlinux:general:system'
+        self.features = features if features is not None else []
         self.trace_options = trace_options if trace_options is not None else []
         self.management = management if management is not None else srl_nokia_system__system__management()
         self.control_plane_traffic = control_plane_traffic if control_plane_traffic is not None else srl_nokia_system__system__control_plane_traffic()
@@ -12548,6 +12601,8 @@ class srl_nokia_system__system(yang.adata.MNode):
         self.name = name if name is not None else srl_nokia_system__system__name()
 
     def _get_attr(self, name: str) -> ?value:
+        if name == 'features':
+            return self.features
         if name == 'trace_options':
             return self.trace_options
         if name == 'management':
@@ -12566,7 +12621,7 @@ class srl_nokia_system__system(yang.adata.MNode):
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_system__system:
         if n is not None:
-            return srl_nokia_system__system(trace_options=n.get_opt_strs(yang.gdata.Id(NS_srl_nokia_system, 'trace-options')), management=srl_nokia_system__system__management.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_system, 'management'))), control_plane_traffic=srl_nokia_system__system__control_plane_traffic.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_system, 'control-plane-traffic'))), protocols=srl_nokia_system__system__protocols.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_system_protocols, 'protocols'))), name=srl_nokia_system__system__name.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_system_name, 'name'))))
+            return srl_nokia_system__system(features=n.get_opt_strs(yang.gdata.Id(NS_srl_nokia_system, 'features')), trace_options=n.get_opt_strs(yang.gdata.Id(NS_srl_nokia_system, 'trace-options')), management=srl_nokia_system__system__management.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_system, 'management'))), control_plane_traffic=srl_nokia_system__system__control_plane_traffic.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_system, 'control-plane-traffic'))), protocols=srl_nokia_system__system__protocols.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_system_protocols, 'protocols'))), name=srl_nokia_system__system__name.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_system_name, 'name'))))
         return srl_nokia_system__system()
 
     def copy(self):
@@ -12577,21 +12632,29 @@ class srl_nokia_system__system(yang.adata.MNode):
 class srl_nokia_interfaces__interface__subinterface__ipv4__address_entry(yang.adata.MNode):
     ip_prefix: str
     anycast_gw: ?bool
+    origin: ?str
     primary: ?bool
+    status: ?str
 
-    mut def __init__(self, ip_prefix: str, anycast_gw: ?bool, primary: ?bool):
+    mut def __init__(self, ip_prefix: str, anycast_gw: ?bool, origin: ?str, primary: ?bool, status: ?str):
         self._ns = 'urn:nokia.com:srlinux:chassis:interfaces'
         self.ip_prefix = ip_prefix
         self.anycast_gw = anycast_gw
+        self.origin = origin
         self.primary = primary
+        self.status = status
 
     def _get_attr(self, name: str) -> ?value:
         if name == 'ip_prefix':
             return self.ip_prefix
         if name == 'anycast_gw':
             return self.anycast_gw
+        if name == 'origin':
+            return self.origin
         if name == 'primary':
             return self.primary
+        if name == 'status':
+            return self.status
         raise ValueError('Attribute {name} not found in srl_nokia_interfaces__interface__subinterface__ipv4__address')
 
     mut def to_gdata(self) -> yang.gdata.Node:
@@ -12599,7 +12662,7 @@ class srl_nokia_interfaces__interface__subinterface__ipv4__address_entry(yang.ad
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> srl_nokia_interfaces__interface__subinterface__ipv4__address_entry:
-        return srl_nokia_interfaces__interface__subinterface__ipv4__address_entry(ip_prefix=n.get_str(yang.gdata.Id(NS_srl_nokia_interfaces, 'ip-prefix')), anycast_gw=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_interfaces, 'anycast-gw')), primary=n.get_opt_empty(yang.gdata.Id(NS_srl_nokia_interfaces, 'primary')))
+        return srl_nokia_interfaces__interface__subinterface__ipv4__address_entry(ip_prefix=n.get_str(yang.gdata.Id(NS_srl_nokia_interfaces, 'ip-prefix')), anycast_gw=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_interfaces, 'anycast-gw')), origin=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_interfaces, 'origin')), primary=n.get_opt_empty(yang.gdata.Id(NS_srl_nokia_interfaces, 'primary')), status=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_interfaces, 'status')))
 
     def copy(self):
         """Create a deep copy of this adata object"""
@@ -12648,17 +12711,25 @@ extension srl_nokia_interfaces__interface__subinterface__ipv4__address(Iterable[
 class srl_nokia_interfaces__interface__subinterface__ipv4__unnumbered(yang.adata.MNode):
     admin_state: ?str
     interface: ?str
+    address: ?str
+    unavailable_address_reason: ?str
 
-    mut def __init__(self, admin_state: ?str, interface: ?str):
+    mut def __init__(self, admin_state: ?str, interface: ?str, address: ?str, unavailable_address_reason: ?str):
         self._ns = 'urn:nokia.com:srlinux:chassis:interfaces'
         self.admin_state = admin_state
         self.interface = interface
+        self.address = address
+        self.unavailable_address_reason = unavailable_address_reason
 
     def _get_attr(self, name: str) -> ?value:
         if name == 'admin_state':
             return self.admin_state
         if name == 'interface':
             return self.interface
+        if name == 'address':
+            return self.address
+        if name == 'unavailable_address_reason':
+            return self.unavailable_address_reason
         raise ValueError('Attribute {name} not found in srl_nokia_interfaces__interface__subinterface__ipv4__unnumbered')
 
     mut def to_gdata(self) -> yang.gdata.Node:
@@ -12667,7 +12738,7 @@ class srl_nokia_interfaces__interface__subinterface__ipv4__unnumbered(yang.adata
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_interfaces__interface__subinterface__ipv4__unnumbered:
         if n is not None:
-            return srl_nokia_interfaces__interface__subinterface__ipv4__unnumbered(admin_state=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_interfaces, 'admin-state')), interface=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_interfaces, 'interface')))
+            return srl_nokia_interfaces__interface__subinterface__ipv4__unnumbered(admin_state=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_interfaces, 'admin-state')), interface=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_interfaces, 'interface')), address=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_interfaces, 'address')), unavailable_address_reason=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_interfaces, 'unavailable-address-reason')))
         return srl_nokia_interfaces__interface__subinterface__ipv4__unnumbered()
 
     def copy(self):
@@ -12717,14 +12788,18 @@ class srl_nokia_interfaces__interface__subinterface__ipv6__address_entry(yang.ad
     ip_prefix: str
     type: ?str
     anycast_gw: ?bool
+    origin: ?str
     primary: ?bool
+    status: ?str
 
-    mut def __init__(self, ip_prefix: str, type: ?str, anycast_gw: ?bool, primary: ?bool):
+    mut def __init__(self, ip_prefix: str, type: ?str, anycast_gw: ?bool, origin: ?str, primary: ?bool, status: ?str):
         self._ns = 'urn:nokia.com:srlinux:chassis:interfaces'
         self.ip_prefix = ip_prefix
         self.type = type
         self.anycast_gw = anycast_gw
+        self.origin = origin
         self.primary = primary
+        self.status = status
 
     def _get_attr(self, name: str) -> ?value:
         if name == 'ip_prefix':
@@ -12733,8 +12808,12 @@ class srl_nokia_interfaces__interface__subinterface__ipv6__address_entry(yang.ad
             return self.type
         if name == 'anycast_gw':
             return self.anycast_gw
+        if name == 'origin':
+            return self.origin
         if name == 'primary':
             return self.primary
+        if name == 'status':
+            return self.status
         raise ValueError('Attribute {name} not found in srl_nokia_interfaces__interface__subinterface__ipv6__address')
 
     mut def to_gdata(self) -> yang.gdata.Node:
@@ -12742,7 +12821,7 @@ class srl_nokia_interfaces__interface__subinterface__ipv6__address_entry(yang.ad
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> srl_nokia_interfaces__interface__subinterface__ipv6__address_entry:
-        return srl_nokia_interfaces__interface__subinterface__ipv6__address_entry(ip_prefix=n.get_str(yang.gdata.Id(NS_srl_nokia_interfaces, 'ip-prefix')), type=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_interfaces, 'type')), anycast_gw=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_interfaces, 'anycast-gw')), primary=n.get_opt_empty(yang.gdata.Id(NS_srl_nokia_interfaces, 'primary')))
+        return srl_nokia_interfaces__interface__subinterface__ipv6__address_entry(ip_prefix=n.get_str(yang.gdata.Id(NS_srl_nokia_interfaces, 'ip-prefix')), type=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_interfaces, 'type')), anycast_gw=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_interfaces, 'anycast-gw')), origin=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_interfaces, 'origin')), primary=n.get_opt_empty(yang.gdata.Id(NS_srl_nokia_interfaces, 'primary')), status=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_interfaces, 'status')))
 
     def copy(self):
         """Create a deep copy of this adata object"""
@@ -13647,7 +13726,7 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance__a
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__isis__instance__authentication__key:
         if n is not None:
             return srl_nokia_network_instance__network_instance__protocols__isis__instance__authentication__key(crypto_algorithm=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'crypto-algorithm')), auth_password=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'auth-password')))
-        raise ValueError('Missing required subtree srl_nokia_network_instance__network_instance__protocols__isis__instance__authentication__key')
+        return srl_nokia_network_instance__network_instance__protocols__isis__instance__authentication__key()
 
     def copy(self):
         """Create a deep copy of this adata object"""
@@ -13732,14 +13811,18 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance__i
 
 class srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__delay(yang.adata.MNode):
     delay_selection: ?str
+    unidirectional_minimum_link_delay: ?u64
 
-    mut def __init__(self, delay_selection: ?str):
+    mut def __init__(self, delay_selection: ?str, unidirectional_minimum_link_delay: ?u64):
         self._ns = 'urn:nokia.com:srlinux:isis:isis'
         self.delay_selection = delay_selection
+        self.unidirectional_minimum_link_delay = unidirectional_minimum_link_delay
 
     def _get_attr(self, name: str) -> ?value:
         if name == 'delay_selection':
             return self.delay_selection
+        if name == 'unidirectional_minimum_link_delay':
+            return self.unidirectional_minimum_link_delay
         raise ValueError('Attribute {name} not found in srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__delay')
 
     mut def to_gdata(self) -> yang.gdata.Node:
@@ -13748,7 +13831,7 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance__i
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__delay:
         if n is not None:
-            return srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__delay(delay_selection=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'delay-selection')))
+            return srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__delay(delay_selection=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'delay-selection')), unidirectional_minimum_link_delay=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_isis, 'unidirectional-minimum-link-delay')))
         return srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__delay()
 
     def copy(self):
@@ -13877,7 +13960,7 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance__i
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level__authentication__key:
         if n is not None:
             return srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level__authentication__key(crypto_algorithm=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'crypto-algorithm')), auth_password=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'auth-password')))
-        raise ValueError('Missing required subtree srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level__authentication__key')
+        return srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level__authentication__key()
 
     def copy(self):
         """Create a deep copy of this adata object"""
@@ -14058,7 +14141,7 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance__i
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__authentication__key:
         if n is not None:
             return srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__authentication__key(crypto_algorithm=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'crypto-algorithm')), auth_password=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'auth-password')))
-        raise ValueError('Missing required subtree srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__authentication__key')
+        return srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__authentication__key()
 
     def copy(self):
         """Create a deep copy of this adata object"""
@@ -14375,7 +14458,7 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance__l
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__isis__instance__level__authentication__key:
         if n is not None:
             return srl_nokia_network_instance__network_instance__protocols__isis__instance__level__authentication__key(crypto_algorithm=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'crypto-algorithm')), auth_password=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'auth-password')))
-        raise ValueError('Missing required subtree srl_nokia_network_instance__network_instance__protocols__isis__instance__level__authentication__key')
+        return srl_nokia_network_instance__network_instance__protocols__isis__instance__level__authentication__key()
 
     def copy(self):
         """Create a deep copy of this adata object"""
@@ -14507,6 +14590,99 @@ extension srl_nokia_network_instance__network_instance__protocols__isis__instanc
     def __iter__(self) -> Iterator[srl_nokia_network_instance__network_instance__protocols__isis__instance__level_entry]:
         return self.elements.__iter__()
 
+class srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id_entry(yang.adata.MNode):
+    host_system_id: str
+    hostname: ?str
+
+    mut def __init__(self, host_system_id: str, hostname: ?str):
+        self._ns = 'urn:nokia.com:srlinux:isis:isis'
+        self.host_system_id = host_system_id
+        self.hostname = hostname
+
+    def _get_attr(self, name: str) -> ?value:
+        if name == 'host_system_id':
+            return self.host_system_id
+        if name == 'hostname':
+            return self.hostname
+        raise ValueError('Attribute {name} not found in srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id')
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        return yang.adata.from_adata(SRC_DNODE, self, loose=True, root_path=['srl_nokia-network-instance:network-instance', 'protocols', 'srl_nokia-isis:isis', 'instance', 'hostnames', 'system-id'])
+
+    @staticmethod
+    mut def from_gdata(n: yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id_entry:
+        return srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id_entry(host_system_id=n.get_str(yang.gdata.Id(NS_srl_nokia_isis, 'host-system-id')), hostname=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'hostname')))
+
+    def copy(self):
+        """Create a deep copy of this adata object"""
+        return srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id_entry.from_gdata(self.to_gdata())
+
+class srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id(yang.adata.MNode):
+    elements: list[srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id_entry]
+    mut def __init__(self, elements=[]):
+        self._ns = 'urn:nokia.com:srlinux:isis:isis'
+        self._name = 'system-id'
+        self.elements = elements
+
+    mut def create(self, host_system_id):
+        for e in self:
+            match = True
+            if e.host_system_id != host_system_id:
+                match = False
+                continue
+            if match:
+                return e
+
+        res = srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id_entry(host_system_id)
+        self.elements.append(res)
+        return res
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.List) -> list[srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id_entry]:
+        if n is not None:
+            return [srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id_entry.from_gdata(e) for e in n.elements]
+        return []
+
+    def copy(self):
+        """Create a deep copy of this list object"""
+        # Copy each element in the list
+        copied_elements = []
+        for e in self:
+            ce = e.copy()
+            if ce is not None:
+                copied_elements.append(ce)
+        return srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id(elements=copied_elements)
+
+extension srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id(Iterable[srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id_entry]):
+    def __iter__(self) -> Iterator[srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id_entry]:
+        return self.elements.__iter__()
+
+class srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames(yang.adata.MNode):
+    system_id: srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id
+
+    mut def __init__(self, system_id: list[srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id_entry]=[]):
+        self._ns = 'urn:nokia.com:srlinux:isis:isis'
+        self.system_id = srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id(elements=system_id)
+
+    def _get_attr(self, name: str) -> ?value:
+        if name == 'system_id':
+            return iter(self.system_id)
+        raise ValueError('Attribute {name} not found in srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames')
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        return yang.adata.from_adata(SRC_DNODE, self, loose=True, root_path=['srl_nokia-network-instance:network-instance', 'protocols', 'srl_nokia-isis:isis', 'instance', 'hostnames'])
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames:
+        if n is not None:
+            return srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames(system_id=srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id.from_gdata(n.get_opt_list(yang.gdata.Id(NS_srl_nokia_isis, 'system-id'))))
+        return srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames()
+
+    def copy(self):
+        """Create a deep copy of this adata object"""
+        return srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames.from_gdata(self.to_gdata())
+
+
 class srl_nokia_network_instance__network_instance__protocols__isis__instance_entry(yang.adata.MNode):
     name: str
     admin_state: ?str
@@ -14528,8 +14704,9 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance_en
     authentication: srl_nokia_network_instance__network_instance__protocols__isis__instance__authentication
     interface: srl_nokia_network_instance__network_instance__protocols__isis__instance__interface
     level: srl_nokia_network_instance__network_instance__protocols__isis__instance__level
+    hostnames: srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames
 
-    mut def __init__(self, name: str, admin_state: ?str, instance_id: ?u64, net: ?list[str]=None, level_capability: ?str, max_ecmp_paths: ?u64, poi_tlv: ?bool, iid_tlv: ?bool, advertise_router_capability: ?bool, prefix_attributes_tlv: ?bool, export_policy: ?str, hello_padding: ?str, enable_csnp_on_p2p_links: ?bool, attached_bit: ?srl_nokia_network_instance__network_instance__protocols__isis__instance__attached_bit=None, transport: ?srl_nokia_network_instance__network_instance__protocols__isis__instance__transport=None, ipv4_unicast: ?srl_nokia_network_instance__network_instance__protocols__isis__instance__ipv4_unicast=None, ipv6_unicast: ?srl_nokia_network_instance__network_instance__protocols__isis__instance__ipv6_unicast=None, authentication: ?srl_nokia_network_instance__network_instance__protocols__isis__instance__authentication=None, interface: list[srl_nokia_network_instance__network_instance__protocols__isis__instance__interface_entry]=[], level: list[srl_nokia_network_instance__network_instance__protocols__isis__instance__level_entry]=[]):
+    mut def __init__(self, name: str, admin_state: ?str, instance_id: ?u64, net: ?list[str]=None, level_capability: ?str, max_ecmp_paths: ?u64, poi_tlv: ?bool, iid_tlv: ?bool, advertise_router_capability: ?bool, prefix_attributes_tlv: ?bool, export_policy: ?str, hello_padding: ?str, enable_csnp_on_p2p_links: ?bool, attached_bit: ?srl_nokia_network_instance__network_instance__protocols__isis__instance__attached_bit=None, transport: ?srl_nokia_network_instance__network_instance__protocols__isis__instance__transport=None, ipv4_unicast: ?srl_nokia_network_instance__network_instance__protocols__isis__instance__ipv4_unicast=None, ipv6_unicast: ?srl_nokia_network_instance__network_instance__protocols__isis__instance__ipv6_unicast=None, authentication: ?srl_nokia_network_instance__network_instance__protocols__isis__instance__authentication=None, interface: list[srl_nokia_network_instance__network_instance__protocols__isis__instance__interface_entry]=[], level: list[srl_nokia_network_instance__network_instance__protocols__isis__instance__level_entry]=[], hostnames: ?srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames=None):
         self._ns = 'urn:nokia.com:srlinux:isis:isis'
         self.name = name
         self.admin_state = admin_state
@@ -14551,6 +14728,7 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance_en
         self.authentication = authentication if authentication is not None else srl_nokia_network_instance__network_instance__protocols__isis__instance__authentication()
         self.interface = srl_nokia_network_instance__network_instance__protocols__isis__instance__interface(elements=interface)
         self.level = srl_nokia_network_instance__network_instance__protocols__isis__instance__level(elements=level)
+        self.hostnames = hostnames if hostnames is not None else srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames()
 
     def _get_attr(self, name: str) -> ?value:
         if name == 'name':
@@ -14593,6 +14771,8 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance_en
             return iter(self.interface)
         if name == 'level':
             return iter(self.level)
+        if name == 'hostnames':
+            return self.hostnames
         raise ValueError('Attribute {name} not found in srl_nokia_network_instance__network_instance__protocols__isis__instance')
 
     mut def to_gdata(self) -> yang.gdata.Node:
@@ -14600,7 +14780,7 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance_en
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__isis__instance_entry:
-        return srl_nokia_network_instance__network_instance__protocols__isis__instance_entry(name=n.get_str(yang.gdata.Id(NS_srl_nokia_isis, 'name')), admin_state=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'admin-state')), instance_id=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_isis, 'instance-id')), net=n.get_opt_strs(yang.gdata.Id(NS_srl_nokia_isis, 'net')), level_capability=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'level-capability')), max_ecmp_paths=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_isis, 'max-ecmp-paths')), poi_tlv=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_isis, 'poi-tlv')), iid_tlv=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_isis, 'iid-tlv')), advertise_router_capability=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_isis, 'advertise-router-capability')), prefix_attributes_tlv=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_isis, 'prefix-attributes-tlv')), export_policy=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'export-policy')), hello_padding=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'hello-padding')), enable_csnp_on_p2p_links=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_isis, 'enable-csnp-on-p2p-links')), attached_bit=srl_nokia_network_instance__network_instance__protocols__isis__instance__attached_bit.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_isis, 'attached-bit'))), transport=srl_nokia_network_instance__network_instance__protocols__isis__instance__transport.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_isis, 'transport'))), ipv4_unicast=srl_nokia_network_instance__network_instance__protocols__isis__instance__ipv4_unicast.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_isis, 'ipv4-unicast'))), ipv6_unicast=srl_nokia_network_instance__network_instance__protocols__isis__instance__ipv6_unicast.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_isis, 'ipv6-unicast'))), authentication=srl_nokia_network_instance__network_instance__protocols__isis__instance__authentication.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_isis, 'authentication'))), interface=srl_nokia_network_instance__network_instance__protocols__isis__instance__interface.from_gdata(n.get_opt_list(yang.gdata.Id(NS_srl_nokia_isis, 'interface'))), level=srl_nokia_network_instance__network_instance__protocols__isis__instance__level.from_gdata(n.get_opt_list(yang.gdata.Id(NS_srl_nokia_isis, 'level'))))
+        return srl_nokia_network_instance__network_instance__protocols__isis__instance_entry(name=n.get_str(yang.gdata.Id(NS_srl_nokia_isis, 'name')), admin_state=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'admin-state')), instance_id=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_isis, 'instance-id')), net=n.get_opt_strs(yang.gdata.Id(NS_srl_nokia_isis, 'net')), level_capability=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'level-capability')), max_ecmp_paths=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_isis, 'max-ecmp-paths')), poi_tlv=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_isis, 'poi-tlv')), iid_tlv=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_isis, 'iid-tlv')), advertise_router_capability=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_isis, 'advertise-router-capability')), prefix_attributes_tlv=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_isis, 'prefix-attributes-tlv')), export_policy=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'export-policy')), hello_padding=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_isis, 'hello-padding')), enable_csnp_on_p2p_links=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_isis, 'enable-csnp-on-p2p-links')), attached_bit=srl_nokia_network_instance__network_instance__protocols__isis__instance__attached_bit.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_isis, 'attached-bit'))), transport=srl_nokia_network_instance__network_instance__protocols__isis__instance__transport.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_isis, 'transport'))), ipv4_unicast=srl_nokia_network_instance__network_instance__protocols__isis__instance__ipv4_unicast.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_isis, 'ipv4-unicast'))), ipv6_unicast=srl_nokia_network_instance__network_instance__protocols__isis__instance__ipv6_unicast.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_isis, 'ipv6-unicast'))), authentication=srl_nokia_network_instance__network_instance__protocols__isis__instance__authentication.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_isis, 'authentication'))), interface=srl_nokia_network_instance__network_instance__protocols__isis__instance__interface.from_gdata(n.get_opt_list(yang.gdata.Id(NS_srl_nokia_isis, 'interface'))), level=srl_nokia_network_instance__network_instance__protocols__isis__instance__level.from_gdata(n.get_opt_list(yang.gdata.Id(NS_srl_nokia_isis, 'level'))), hostnames=srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_isis, 'hostnames'))))
 
     def copy(self):
         """Create a deep copy of this adata object"""
@@ -15746,17 +15926,21 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__as
 class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication(yang.adata.MNode):
     keychain: ?str
     password: ?str
+    transmit_active: ?bool
 
-    mut def __init__(self, keychain: ?str, password: ?str):
+    mut def __init__(self, keychain: ?str, password: ?str, transmit_active: ?bool):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.keychain = keychain
         self.password = password
+        self.transmit_active = transmit_active
 
     def _get_attr(self, name: str) -> ?value:
         if name == 'keychain':
             return self.keychain
         if name == 'password':
             return self.password
+        if name == 'transmit_active':
+            return self.transmit_active
         raise ValueError('Attribute {name} not found in srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication')
 
     mut def to_gdata(self) -> yang.gdata.Node:
@@ -15765,7 +15949,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__au
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication:
         if n is not None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication(keychain=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'keychain')), password=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'password')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication(keychain=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'keychain')), password=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'password')), transmit_active=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_bgp, 'transmit-active')))
         return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication()
 
     def copy(self):
@@ -15803,16 +15987,214 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__fa
         return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__failure_detection.from_gdata(self.to_gdata())
 
 
+class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi_entry(yang.adata.MNode):
+    name: Identityref
+    forwarding_preserved: ?bool
+
+    mut def __init__(self, name: Identityref, forwarding_preserved: ?bool):
+        self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
+        self.name = name
+        self.forwarding_preserved = forwarding_preserved
+
+    def _get_attr(self, name: str) -> ?value:
+        if name == 'name':
+            return self.name
+        if name == 'forwarding_preserved':
+            return self.forwarding_preserved
+        raise ValueError('Attribute {name} not found in srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi')
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        return yang.adata.from_adata(SRC_DNODE, self, loose=True, root_path=['srl_nokia-network-instance:network-instance', 'protocols', 'srl_nokia-bgp:bgp', 'neighbor', 'graceful-restart', 'neighbor-capability', 'afi-safi'])
+
+    @staticmethod
+    mut def from_gdata(n: yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi_entry:
+        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi_entry(name=n.get_Identityref(yang.gdata.Id(NS_srl_nokia_bgp, 'name')), forwarding_preserved=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_bgp, 'forwarding-preserved')))
+
+    def copy(self):
+        """Create a deep copy of this adata object"""
+        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi_entry.from_gdata(self.to_gdata())
+
+class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi(yang.adata.MNode):
+    elements: list[srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi_entry]
+    mut def __init__(self, elements=[]):
+        self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
+        self._name = 'afi-safi'
+        self.elements = elements
+
+    mut def create(self, name):
+        for e in self:
+            match = True
+            if e.name != name:
+                match = False
+                continue
+            if match:
+                return e
+
+        res = srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi_entry(name)
+        self.elements.append(res)
+        return res
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.List) -> list[srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi_entry]:
+        if n is not None:
+            return [srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi_entry.from_gdata(e) for e in n.elements]
+        return []
+
+    def copy(self):
+        """Create a deep copy of this list object"""
+        # Copy each element in the list
+        copied_elements = []
+        for e in self:
+            ce = e.copy()
+            if ce is not None:
+                copied_elements.append(ce)
+        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi(elements=copied_elements)
+
+extension srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi(Iterable[srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi_entry]):
+    def __iter__(self) -> Iterator[srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi_entry]:
+        return self.elements.__iter__()
+
+class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability(yang.adata.MNode):
+    restart_time: ?u64
+    afi_safi: srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi
+
+    mut def __init__(self, restart_time: ?u64, afi_safi: list[srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi_entry]=[]):
+        self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
+        self.restart_time = restart_time
+        self.afi_safi = srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi(elements=afi_safi)
+
+    def _get_attr(self, name: str) -> ?value:
+        if name == 'restart_time':
+            return self.restart_time
+        if name == 'afi_safi':
+            return iter(self.afi_safi)
+        raise ValueError('Attribute {name} not found in srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability')
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        return yang.adata.from_adata(SRC_DNODE, self, loose=True, root_path=['srl_nokia-network-instance:network-instance', 'protocols', 'srl_nokia-bgp:bgp', 'neighbor', 'graceful-restart', 'neighbor-capability'])
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability:
+        if n is not None:
+            return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability(restart_time=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'restart-time')), afi_safi=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi.from_gdata(n.get_opt_list(yang.gdata.Id(NS_srl_nokia_bgp, 'afi-safi'))))
+        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability()
+
+    def copy(self):
+        """Create a deep copy of this adata object"""
+        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability.from_gdata(self.to_gdata())
+
+
+class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi_entry(yang.adata.MNode):
+    name: Identityref
+
+    mut def __init__(self, name: Identityref):
+        self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
+        self.name = name
+
+    def _get_attr(self, name: str) -> ?value:
+        if name == 'name':
+            return self.name
+        raise ValueError('Attribute {name} not found in srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi')
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        return yang.adata.from_adata(SRC_DNODE, self, loose=True, root_path=['srl_nokia-network-instance:network-instance', 'protocols', 'srl_nokia-bgp:bgp', 'neighbor', 'graceful-restart', 'local-capability', 'afi-safi'])
+
+    @staticmethod
+    mut def from_gdata(n: yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi_entry:
+        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi_entry(name=n.get_Identityref(yang.gdata.Id(NS_srl_nokia_bgp, 'name')))
+
+    def copy(self):
+        """Create a deep copy of this adata object"""
+        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi_entry.from_gdata(self.to_gdata())
+
+class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi(yang.adata.MNode):
+    elements: list[srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi_entry]
+    mut def __init__(self, elements=[]):
+        self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
+        self._name = 'afi-safi'
+        self.elements = elements
+
+    mut def create(self, name):
+        for e in self:
+            match = True
+            if e.name != name:
+                match = False
+                continue
+            if match:
+                return e
+
+        res = srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi_entry(name)
+        self.elements.append(res)
+        return res
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.List) -> list[srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi_entry]:
+        if n is not None:
+            return [srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi_entry.from_gdata(e) for e in n.elements]
+        return []
+
+    def copy(self):
+        """Create a deep copy of this list object"""
+        # Copy each element in the list
+        copied_elements = []
+        for e in self:
+            ce = e.copy()
+            if ce is not None:
+                copied_elements.append(ce)
+        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi(elements=copied_elements)
+
+extension srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi(Iterable[srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi_entry]):
+    def __iter__(self) -> Iterator[srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi_entry]:
+        return self.elements.__iter__()
+
+class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability(yang.adata.MNode):
+    afi_safi: srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi
+
+    mut def __init__(self, afi_safi: list[srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi_entry]=[]):
+        self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
+        self.afi_safi = srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi(elements=afi_safi)
+
+    def _get_attr(self, name: str) -> ?value:
+        if name == 'afi_safi':
+            return iter(self.afi_safi)
+        raise ValueError('Attribute {name} not found in srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability')
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        return yang.adata.from_adata(SRC_DNODE, self, loose=True, root_path=['srl_nokia-network-instance:network-instance', 'protocols', 'srl_nokia-bgp:bgp', 'neighbor', 'graceful-restart', 'local-capability'])
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability:
+        if n is not None:
+            return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability(afi_safi=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi.from_gdata(n.get_opt_list(yang.gdata.Id(NS_srl_nokia_bgp, 'afi-safi'))))
+        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability()
+
+    def copy(self):
+        """Create a deep copy of this adata object"""
+        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability.from_gdata(self.to_gdata())
+
+
 class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart(yang.adata.MNode):
     admin_state: ?str
     stale_routes_time: ?u64
     requested_restart_time: ?u64
+    number_of_restarts: ?u64
+    last_restart_time: ?str
+    helper_active: ?bool
+    local_restarting: ?bool
+    neighbor_capability: srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability
+    local_capability: srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability
 
-    mut def __init__(self, admin_state: ?str, stale_routes_time: ?u64, requested_restart_time: ?u64):
+    mut def __init__(self, admin_state: ?str, stale_routes_time: ?u64, requested_restart_time: ?u64, number_of_restarts: ?u64, last_restart_time: ?str, helper_active: ?bool, local_restarting: ?bool, neighbor_capability: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability=None, local_capability: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.admin_state = admin_state
         self.stale_routes_time = stale_routes_time
         self.requested_restart_time = requested_restart_time
+        self.number_of_restarts = number_of_restarts
+        self.last_restart_time = last_restart_time
+        self.helper_active = helper_active
+        self.local_restarting = local_restarting
+        self.neighbor_capability = neighbor_capability if neighbor_capability is not None else srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability()
+        self.local_capability = local_capability if local_capability is not None else srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability()
 
     def _get_attr(self, name: str) -> ?value:
         if name == 'admin_state':
@@ -15821,6 +16203,18 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__gr
             return self.stale_routes_time
         if name == 'requested_restart_time':
             return self.requested_restart_time
+        if name == 'number_of_restarts':
+            return self.number_of_restarts
+        if name == 'last_restart_time':
+            return self.last_restart_time
+        if name == 'helper_active':
+            return self.helper_active
+        if name == 'local_restarting':
+            return self.local_restarting
+        if name == 'neighbor_capability':
+            return self.neighbor_capability
+        if name == 'local_capability':
+            return self.local_capability
         raise ValueError('Attribute {name} not found in srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart')
 
     mut def to_gdata(self) -> yang.gdata.Node:
@@ -15829,7 +16223,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__gr
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart:
         if n is not None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart(admin_state=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'admin-state')), stale_routes_time=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'stale-routes-time')), requested_restart_time=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'requested-restart-time')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart(admin_state=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'admin-state')), stale_routes_time=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'stale-routes-time')), requested_restart_time=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'requested-restart-time')), number_of_restarts=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'number-of-restarts')), last_restart_time=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'last-restart-time')), helper_active=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_bgp, 'helper-active')), local_restarting=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_bgp, 'local-restarting')), neighbor_capability=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'neighbor-capability'))), local_capability=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'local-capability'))))
         return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart()
 
     def copy(self):
@@ -16068,14 +16462,20 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__ti
     keepalive_interval: ?u64
     minimum_advertisement_interval: ?u64
     prefix_limit_restart_timer: ?u64
+    next_connect_retry_time: ?str
+    negotiated_hold_time: ?u64
+    negotiated_keepalive_interval: ?u64
 
-    mut def __init__(self, connect_retry: ?u64, hold_time: ?u64, keepalive_interval: ?u64, minimum_advertisement_interval: ?u64, prefix_limit_restart_timer: ?u64):
+    mut def __init__(self, connect_retry: ?u64, hold_time: ?u64, keepalive_interval: ?u64, minimum_advertisement_interval: ?u64, prefix_limit_restart_timer: ?u64, next_connect_retry_time: ?str, negotiated_hold_time: ?u64, negotiated_keepalive_interval: ?u64):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.connect_retry = connect_retry
         self.hold_time = hold_time
         self.keepalive_interval = keepalive_interval
         self.minimum_advertisement_interval = minimum_advertisement_interval
         self.prefix_limit_restart_timer = prefix_limit_restart_timer
+        self.next_connect_retry_time = next_connect_retry_time
+        self.negotiated_hold_time = negotiated_hold_time
+        self.negotiated_keepalive_interval = negotiated_keepalive_interval
 
     def _get_attr(self, name: str) -> ?value:
         if name == 'connect_retry':
@@ -16088,6 +16488,12 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__ti
             return self.minimum_advertisement_interval
         if name == 'prefix_limit_restart_timer':
             return self.prefix_limit_restart_timer
+        if name == 'next_connect_retry_time':
+            return self.next_connect_retry_time
+        if name == 'negotiated_hold_time':
+            return self.negotiated_hold_time
+        if name == 'negotiated_keepalive_interval':
+            return self.negotiated_keepalive_interval
         raise ValueError('Attribute {name} not found in srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers')
 
     mut def to_gdata(self) -> yang.gdata.Node:
@@ -16096,7 +16502,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__ti
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers:
         if n is not None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers(connect_retry=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'connect-retry')), hold_time=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'hold-time')), keepalive_interval=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'keepalive-interval')), minimum_advertisement_interval=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'minimum-advertisement-interval')), prefix_limit_restart_timer=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'prefix-limit-restart-timer')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers(connect_retry=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'connect-retry')), hold_time=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'hold-time')), keepalive_interval=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'keepalive-interval')), minimum_advertisement_interval=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'minimum-advertisement-interval')), prefix_limit_restart_timer=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'prefix-limit-restart-timer')), next_connect_retry_time=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'next-connect-retry-time')), negotiated_hold_time=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'negotiated-hold-time')), negotiated_keepalive_interval=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'negotiated-keepalive-interval')))
         return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers()
 
     def copy(self):
@@ -16109,13 +16515,17 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__tr
     tcp_mss: ?u64
     passive_mode: ?bool
     local_address: ?str
+    local_port: ?u64
+    remote_port: ?u64
 
-    mut def __init__(self, mtu_discovery: ?bool, tcp_mss: ?u64, passive_mode: ?bool, local_address: ?str):
+    mut def __init__(self, mtu_discovery: ?bool, tcp_mss: ?u64, passive_mode: ?bool, local_address: ?str, local_port: ?u64, remote_port: ?u64):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.mtu_discovery = mtu_discovery
         self.tcp_mss = tcp_mss
         self.passive_mode = passive_mode
         self.local_address = local_address
+        self.local_port = local_port
+        self.remote_port = remote_port
 
     def _get_attr(self, name: str) -> ?value:
         if name == 'mtu_discovery':
@@ -16126,6 +16536,10 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__tr
             return self.passive_mode
         if name == 'local_address':
             return self.local_address
+        if name == 'local_port':
+            return self.local_port
+        if name == 'remote_port':
+            return self.remote_port
         raise ValueError('Attribute {name} not found in srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__transport')
 
     mut def to_gdata(self) -> yang.gdata.Node:
@@ -16134,7 +16548,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__tr
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__transport:
         if n is not None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__transport(mtu_discovery=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_bgp, 'mtu-discovery')), tcp_mss=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'tcp-mss')), passive_mode=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_bgp, 'passive-mode')), local_address=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'local-address')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__transport(mtu_discovery=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_bgp, 'mtu-discovery')), tcp_mss=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'tcp-mss')), passive_mode=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_bgp, 'passive-mode')), local_address=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'local-address')), local_port=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'local-port')), remote_port=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'remote-port')))
         return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__transport()
 
     def copy(self):
@@ -16146,10 +16560,14 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_ent
     peer_address: str
     admin_state: ?str
     description: ?str
+    under_maintenance: ?bool
+    maintenance_group: ?str
+    peer_type: ?str
     local_preference: ?u64
     next_hop_self: ?bool
     peer_as: ?u64
     peer_group: ?str
+    last_prefix_limit_exceeded: ?str
     as_path_options: srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__as_path_options
     authentication: srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication
     failure_detection: srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__failure_detection
@@ -16164,15 +16582,19 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_ent
     timers: srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers
     transport: srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__transport
 
-    mut def __init__(self, peer_address: str, admin_state: ?str, description: ?str, local_preference: ?u64, next_hop_self: ?bool, peer_as: ?u64, peer_group: ?str, as_path_options: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__as_path_options=None, authentication: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication=None, failure_detection: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__failure_detection=None, graceful_restart: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart=None, multihop: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__multihop=None, afi_safi: list[srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi_entry]=[], local_as: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__local_as=None, route_flap_damping: ?bool, route_reflector: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__route_reflector=None, send_community: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__send_community=None, send_default_route: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__send_default_route=None, timers: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers=None, transport: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__transport=None):
+    mut def __init__(self, peer_address: str, admin_state: ?str, description: ?str, under_maintenance: ?bool, maintenance_group: ?str, peer_type: ?str, local_preference: ?u64, next_hop_self: ?bool, peer_as: ?u64, peer_group: ?str, last_prefix_limit_exceeded: ?str, as_path_options: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__as_path_options=None, authentication: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication=None, failure_detection: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__failure_detection=None, graceful_restart: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart=None, multihop: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__multihop=None, afi_safi: list[srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi_entry]=[], local_as: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__local_as=None, route_flap_damping: ?bool, route_reflector: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__route_reflector=None, send_community: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__send_community=None, send_default_route: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__send_default_route=None, timers: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers=None, transport: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__transport=None):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp'
         self.peer_address = peer_address
         self.admin_state = admin_state
         self.description = description
+        self.under_maintenance = under_maintenance
+        self.maintenance_group = maintenance_group
+        self.peer_type = peer_type
         self.local_preference = local_preference
         self.next_hop_self = next_hop_self
         self.peer_as = peer_as
         self.peer_group = peer_group
+        self.last_prefix_limit_exceeded = last_prefix_limit_exceeded
         self.as_path_options = as_path_options if as_path_options is not None else srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__as_path_options()
         self.authentication = authentication if authentication is not None else srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication()
         self.failure_detection = failure_detection if failure_detection is not None else srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__failure_detection()
@@ -16194,6 +16616,12 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_ent
             return self.admin_state
         if name == 'description':
             return self.description
+        if name == 'under_maintenance':
+            return self.under_maintenance
+        if name == 'maintenance_group':
+            return self.maintenance_group
+        if name == 'peer_type':
+            return self.peer_type
         if name == 'local_preference':
             return self.local_preference
         if name == 'next_hop_self':
@@ -16202,6 +16630,8 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_ent
             return self.peer_as
         if name == 'peer_group':
             return self.peer_group
+        if name == 'last_prefix_limit_exceeded':
+            return self.last_prefix_limit_exceeded
         if name == 'as_path_options':
             return self.as_path_options
         if name == 'authentication':
@@ -16235,7 +16665,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_ent
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry:
-        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry(peer_address=n.get_str(yang.gdata.Id(NS_srl_nokia_bgp, 'peer-address')), admin_state=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'admin-state')), description=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'description')), local_preference=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'local-preference')), next_hop_self=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_bgp, 'next-hop-self')), peer_as=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'peer-as')), peer_group=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'peer-group')), as_path_options=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__as_path_options.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'as-path-options'))), authentication=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'authentication'))), failure_detection=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__failure_detection.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'failure-detection'))), graceful_restart=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'graceful-restart'))), multihop=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__multihop.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'multihop'))), afi_safi=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi.from_gdata(n.get_opt_list(yang.gdata.Id(NS_srl_nokia_bgp, 'afi-safi'))), local_as=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__local_as.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'local-as'))), route_flap_damping=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_bgp, 'route-flap-damping')), route_reflector=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__route_reflector.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'route-reflector'))), send_community=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__send_community.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'send-community'))), send_default_route=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__send_default_route.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'send-default-route'))), timers=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'timers'))), transport=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__transport.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'transport'))))
+        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry(peer_address=n.get_str(yang.gdata.Id(NS_srl_nokia_bgp, 'peer-address')), admin_state=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'admin-state')), description=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'description')), under_maintenance=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_bgp, 'under-maintenance')), maintenance_group=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'maintenance-group')), peer_type=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'peer-type')), local_preference=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'local-preference')), next_hop_self=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_bgp, 'next-hop-self')), peer_as=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_bgp, 'peer-as')), peer_group=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'peer-group')), last_prefix_limit_exceeded=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp, 'last-prefix-limit-exceeded')), as_path_options=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__as_path_options.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'as-path-options'))), authentication=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'authentication'))), failure_detection=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__failure_detection.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'failure-detection'))), graceful_restart=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'graceful-restart'))), multihop=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__multihop.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'multihop'))), afi_safi=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi.from_gdata(n.get_opt_list(yang.gdata.Id(NS_srl_nokia_bgp, 'afi-safi'))), local_as=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__local_as.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'local-as'))), route_flap_damping=n.get_opt_bool(yang.gdata.Id(NS_srl_nokia_bgp, 'route-flap-damping')), route_reflector=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__route_reflector.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'route-reflector'))), send_community=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__send_community.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'send-community'))), send_default_route=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__send_default_route.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'send-default-route'))), timers=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'timers'))), transport=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__transport.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_srl_nokia_bgp, 'transport'))))
 
     def copy(self):
         """Create a deep copy of this adata object"""
@@ -16380,14 +16810,18 @@ class srl_nokia_network_instance__network_instance__protocols__bgp(yang.adata.MN
 
 class srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance__route_distinguisher(yang.adata.MNode):
     rd: ?str
+    route_distinguisher_origin: ?str
 
-    mut def __init__(self, rd: ?str):
+    mut def __init__(self, rd: ?str, route_distinguisher_origin: ?str):
         self._ns = 'urn:nokia.com:srlinux:bgp:bgp-vpn'
         self.rd = rd
+        self.route_distinguisher_origin = route_distinguisher_origin
 
     def _get_attr(self, name: str) -> ?value:
         if name == 'rd':
             return self.rd
+        if name == 'route_distinguisher_origin':
+            return self.route_distinguisher_origin
         raise ValueError('Attribute {name} not found in srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance__route_distinguisher')
 
     mut def to_gdata(self) -> yang.gdata.Node:
@@ -16396,7 +16830,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_inst
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance__route_distinguisher:
         if n is not None:
-            return srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance__route_distinguisher(rd=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp_vpn, 'rd')))
+            return srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance__route_distinguisher(rd=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp_vpn, 'rd')), route_distinguisher_origin=n.get_opt_str(yang.gdata.Id(NS_srl_nokia_bgp_vpn, 'route-distinguisher-origin')))
         return srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance__route_distinguisher()
 
     def copy(self):
@@ -16730,7 +17164,7 @@ class srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress(ya
     mut def from_gdata(n: ?yang.gdata.Node) -> srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress:
         if n is not None:
             return srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress(vni=n.get_opt_u64(yang.gdata.Id(NS_srl_nokia_tunnel_interfaces, 'vni')))
-        raise ValueError('Missing required subtree srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress')
+        return srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress()
 
     def copy(self):
         """Create a deep copy of this adata object"""
