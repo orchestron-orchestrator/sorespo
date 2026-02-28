@@ -218,7 +218,7 @@ Part of the output will be a configuration instance for the `vrf-interface` on `
 ```
 
 This RFS instance at present does not have an input for MTU configuration.
-Review the YANG model for this layer in `sorespo/gen/yang/rfs/sorespo-rfs.yang`.
+Review the YANG model for this layer in `sorespo/spec/yang/rfs/sorespo-rfs.yang`.
 ```yang
 ...
 list vrf-interface {
