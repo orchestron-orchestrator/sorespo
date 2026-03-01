@@ -180,7 +180,7 @@ relevant RESTCONF requests.
 
 The Customer Facing Service (top-level) YANG model defines SORESPO's northbound
 interface for users and/or BSS/OSS platforms. The YANG modules for `layer0` are
-located in `sorespo/gen/yang/cfs`.
+located in `sorespo/spec/yang/cfs`.
 
 Retrieve the top-level (CFS) configuration (`layer0`) from SORESPO:
 
@@ -319,7 +319,7 @@ links to customer's sites, as follows:
 In SORESPO, the next layer down is the *Intermediate* layer. At this layer,
 the implemented YANG modules are less abstracted than at `layer0`. Additional
 parameters are calculated by the service automation. The YANG modules for `layer1` are
-located in `sorespo/gen/yang/inter`.
+located in `sorespo/spec/yang/inter`.
 
 The `layer1` configuration can be retrieved with the following command:
 
@@ -425,7 +425,7 @@ Intermediate or CFS layers above. All RFS transforms are written per device,
 that is, a single RFS transform only writes to a single device. This enables
 RFS transforms to be re-run in order to react to changes on the device.
 
-The YANG modules for `layer2` are located in `sorespo/gen/yang/rfs`.
+The YANG modules for `layer2` are located in `sorespo/spec/yang/rfs`.
 
 At this layer, there is an instance of `<device>` container per managed device
 and a corresponding `<rfs>` container defining the devices SORESPO is
@@ -509,7 +509,7 @@ Which gives the following output:
 The vendor proprietary device YANG models are located on this layer. The YANG
 modules are organized in directories by device and software version:
 
-* For Cisco IOS-XR: `sorespo/gen/yang/CiscoIosXr_24_1_ncs55a1`
+* For Cisco IOS-XR: `sorespo/spec/yang/CiscoIosXr_24_1_ncs55a1`
 * For Jupiper JUNOS: `JuniperCRPD_23_4R1_9`
 * For Nokia SR-Linux: `NokiaSRLinux_25_3_2`
 

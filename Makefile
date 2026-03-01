@@ -32,7 +32,7 @@ test-ldep:
 
 .PHONY: gen
 gen:
-	cd gen && acton build $(DEP_OVERRIDES) && out/bin/sorespo_gen
+	cd spec && acton build $(DEP_OVERRIDES) && out/bin/sorespo_gen
 
 .PHONY: gen-ldep
 gen-ldep:
@@ -41,7 +41,7 @@ gen-ldep:
 .PHONY: pkg-upgrade
 pkg-upgrade:
 	acton pkg upgrade
-	cd gen && acton pkg upgrade
+	cd spec && acton pkg upgrade
 
 .PHONY: check-dep-consistency
 check-dep-consistency:
