@@ -56,8 +56,8 @@ run-and-configure:
 
 .PHONY: configure
 configure:
-	$(MAKE) FILE="netinfra.xml" send-config
-	$(MAKE) FILE="l3vpn-svc.xml" send-config
+	$(MAKE) send-config-wait FILE="netinfra.xml"
+	$(MAKE) send-config-wait FILE="l3vpn-svc.xml"
 
 .PHONY: tutorial
 tutorial:
