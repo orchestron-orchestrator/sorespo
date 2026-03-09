@@ -5,7 +5,7 @@ build:
 
 .PHONY: build-ldep
 build-ldep:
-	$(MAKE) build DEP_OVERRIDES="--dep netconf=../netconf --dep orchestron=../orchestron --dep yang=../acton-yang --dep actmf=../actmf"
+	$(MAKE) build DEP_OVERRIDES="--dep netconf=../netconf --dep orchestron=../orchestron --dep yang=../acton-yang --dep actmf=../actmf --dep http_router=../http-router"
 
 .PHONY: build-linux-x86_64
 build-linux-x86_64:
