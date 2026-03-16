@@ -13,12 +13,7 @@ class Router(base.Router):
     def transform(self, i):
         o = base.o_root()
         print("CFS router transform running", i.name, i.id)
-        o_router = o.netinfra.router.create(i.name)
-        o_router.type = i.type
-        o_router.id = i.id
-        o_router.role = i.role
-        o_router.mock = i.mock
-        o_router.approval_required = i.approval_required
+        o_router = o.netinfra.router.create(i.name, id=i.id, type=i.type, role=i.role, mock=i.mock, approval_required=i.approval_required)
         o_router.feature_flags.runtime_schema_fetch = i.feature_flags.runtime_schema_fetch
 
         # Assign the loopback interface addresses
@@ -28,7 +23,7 @@ class Router(base.Router):
         bc.asn = i.asn
 
         fm = o.netinfra.ibgp_fullmesh.create(i.asn, IGBP_AUTHENTICATION_KEY)
-        fmr = fm.router.create(i.name, bc.ipv4_address)
+        fm.router.create(i.name, bc.ipv4_address)
 
         return o
 
@@ -37,8 +32,7 @@ class BBLink(base.BBLink):
     def transform(self, i):
         print("CFS backbonelink transform running %s [%s] <-> %s [%s]" % (i.left_router, i.left_interface, i.right_router, i.right_interface))
         o = base.o_root()
-        bbl = o.netinfra.backbone_link.create(i.left_router, i.left_interface, i.right_router, i.right_interface)
-        bbl.monitor_health = i.monitor_health
+        o.netinfra.backbone_link.create(i.left_router, i.left_interface, i.right_router, i.right_interface, monitor_health=i.monitor_health)
         return o
 
 
@@ -47,8 +41,7 @@ class L3VpnVpnService(base.L3VpnVpnService):
         print("CFS L3VPN VPN Service transform running %s" % (i.vpn_id))
         customer_name = i.customer_name
         o = base.o_root()
-        o_vpn = o.l3vpns.l3vpn.create(i.vpn_id)
-        o_vpn.description = "Customer VPN for %s" % customer_name if customer_name is not None else ""
+        o.l3vpns.l3vpn.create(i.vpn_id, description="Customer VPN for %s" % customer_name if customer_name is not None else "")
         return o
 
 
@@ -70,20 +63,18 @@ class L3VpnSite(base.L3VpnSite):
             ipv4_len = sna.ip_connection.ipv4.addresses.prefix_length
             if vpn_id is not None and device is not None and interface is not None and provider_ipv4_address is not None and ipv4_len is not None:
                 o_vpn = o.l3vpns.l3vpn.create(vpn_id)
-                o_ep = o_vpn.endpoint.create(device, interface)
-                o_ep.site = i.site_id
-                o_ep.site_network_access = sna.site_network_access_id
-                o_ep.provider_ipv4_address = provider_ipv4_address
-                o_ep.ipv4_prefix_length = ipv4_len
+                o_ep = o_vpn.endpoint.create(device, interface,
+                    site=i.site_id,
+                    site_network_access=sna.site_network_access_id,
+                    provider_ipv4_address=provider_ipv4_address,
+                    customer_ipv4_address=customer_ipv4_address,
+                    ipv4_prefix_length=ipv4_len)
 
                 for rp in sna.routing_protocols.routing_protocol:
                     if rp.type == y_0.ietf_l3vpn_svc_bgp:
                         bgp = rp.bgp
                         if bgp is not None:
-                            o_bgp = o_ep.create_bgp()
-                            o_bgp.as_number = bgp.autonomous_system
-                if customer_ipv4_address is not None:
-                    o_ep.customer_ipv4_address = customer_ipv4_address
+                            o_ep.create_bgp(as_number=bgp.autonomous_system)
 
                 # TODO: do the VRF ID split here too?! vpn-id acme-65501 -> 65501
                 inter_l3vpn = o.netinfra.router.create(device).l3vpn_vrf.create(vpn_id)

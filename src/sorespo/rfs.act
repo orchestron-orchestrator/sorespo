@@ -71,18 +71,16 @@ class BaseConfig(base.BaseConfig):
             # Loopback0 IS-IS interface config
             lo0 = ip.interfaces.interface.create("Loopback0")
             lo0.create_passive()
-            lo0_af = lo0.address_families.address_family.create("ipv4", "unicast")
+            lo0.address_families.address_family.create("ipv4", "unicast")
 
             # BGP global config
             bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(i.asn)
             bgp_as.bgp.router_id = i.ipv4_address
             # Create neighbor-group: IPV4-IBGP
-            bgp_ng = bgp_as.neighbor_groups.neighbor_group.create("IPV4-IBGP")
+            bgp_ng = bgp_as.neighbor_groups.neighbor_group.create("IPV4-IBGP", remote_as=i.asn, update_source="Loopback0")
             bgp_ng.address_families.address_family.create("vpnv4-unicast")
             bgp_ng.address_families.address_family.create("vpnv6-unicast")
-            bgp_ng.remote_as = i.asn
-            bgp_ng.create_password().encrypted = sorespo.cisco_vigenere.encrypt(i.ibgp_authentication_key, 4)
-            bgp_ng.update_source = "Loopback0"
+            bgp_ng.create_password(encrypted=sorespo.cisco_vigenere.encrypt(i.ibgp_authentication_key, 4))
 
             bgp_as.address_families.address_family.create("vpnv4-unicast")
             bgp_as.address_families.address_family.create("vpnv6-unicast")
@@ -92,7 +90,7 @@ class BaseConfig(base.BaseConfig):
   done
 end-policy
 """
-            rp = dev.routing_policy.route_policies.route_policy.create("ACCEPT", rpl)
+            dev.routing_policy.route_policies.route_policy.create("ACCEPT", rpl)
 
             return dev
 
@@ -114,10 +112,8 @@ end-policy
             # IS-IS global config
             dcpi = dev.configuration.protocols.isis
             dcpi.lsp_lifetime = 65535
-            il1 = dcpi.level.create(1)
-            il1.disable = True
-            il2 = dcpi.level.create(2)
-            il2.wide_metrics_only = True
+            dcpi.level.create(1, disable=True)
+            dcpi.level.create(2, wide_metrics_only=True)
             ilo0 = dcpi.interface.create("lo0.0")
             ilo0.create_passive()
 
@@ -127,12 +123,10 @@ end-policy
             bgp.log_updown = True
 
             # Create neighbor-group: IPV4-IBGP
-            g1 = bgp.group.create("IPV4-IBGP", type="internal", local_address=i.ipv4_address)
-            g1.hold_time = 90
+            g1 = bgp.group.create("IPV4-IBGP", type="internal", local_address=i.ipv4_address, hold_time=90, authentication_key=junos_encrypt(i.ibgp_authentication_key, "4"))
             g1.family.inet_vpn.create_unicast()
             g1.family.inet6_vpn.create_unicast()
             g1.family.create_route_target()
-            g1.authentication_key = junos_encrypt(i.ibgp_authentication_key, "4")
 
             return dev
             
@@ -150,19 +144,14 @@ end-policy
             intf_mgmt0.ipv6.admin_state = "enable"
 
             # mgmt network-instance is required
-            ni_mgmt = dev.network_instance.create("mgmt")
-            ni_mgmt.type = srl25.srl_nokia_network_instance_ip_vrf
-            ni_mgmt.admin_state = "enable"
-            ni_mgmt.description = "Management network instance"
+            ni_mgmt = dev.network_instance.create("mgmt", type=srl25.srl_nokia_network_instance_ip_vrf, admin_state="enable", description="Management network instance")
             ni_mgmt.interface.create("mgmt0.0")
 
             # IS-IS global config
             ni = dev.network_instance.create("default")
             ni.interface.create("system0.0")
             isis = ni.protocols.create_isis()
-            instance = isis.instance.create("quicklab")
-            instance.level_capability = "L2"
-            instance.admin_state = "enable"
+            instance = isis.instance.create("quicklab", level_capability="L2", admin_state="enable")
             if i.name == "AMS-CORE-1":
                 instance.net = [ "49.0001.0100.0000.0001.00" ]
             elif i.name == "FRA-CORE-1":
@@ -172,15 +161,15 @@ end-policy
             else:
                 instance.net = [ "49.0001.0100.0000.0004.00" ]
             instance.ipv4_unicast.admin_state = "enable"
-            ii = instance.interface.create("system0.0", admin_state="enable", passive=True)
+            instance.interface.create("system0.0", admin_state="enable", passive=True)
 
             # BGP global config
             bgp = ni.protocols.create_bgp(autonomous_system=i.asn, router_id=i.ipv4_address)
-            ipv4_afi = bgp.afi_safi.create(srl25.srl_nokia_common_ipv4_unicast, admin_state="enable")
-            evpn_afi = bgp.afi_safi.create(srl25.srl_nokia_common_evpn, admin_state="enable")
+            bgp.afi_safi.create(srl25.srl_nokia_common_ipv4_unicast, admin_state="enable")
+            bgp.afi_safi.create(srl25.srl_nokia_common_evpn, admin_state="enable")
 
             # Create neighbor-group: IPV4-IBGP
-            group = bgp.group.create("IPV4-IBGP", peer_as=i.asn)
+            bgp.group.create("IPV4-IBGP", peer_as=i.asn)
 
             return dev
 
@@ -296,20 +285,17 @@ class BBInterface(base.BBInterface):
             dev = xr24.root()
 
             # Create the interface
-            intf = dev.interfaces.interface.create(i.name)
-            intf.description = "Link to {i.remote.device} [{i.remote.interface}]"
-            intf.shutdown = False
+            intf = dev.interfaces.interface.create(i.name, description="Link to {i.remote.device} [{i.remote.interface}]", shutdown=False)
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(int(i.ipv4_prefix_length)))
 
             # IS-IS config for this interface
             ip = dev.um_router_isis_cfg_router.isis.processes.process.create("1")
-            ci = ip.interfaces.interface.create(i.name)
-            ci.circuit_type = "level-2-only"
+            ci = ip.interfaces.interface.create(i.name, circuit_type="level-2-only")
             ci.create_point_to_point()
             af = ci.address_families.address_family.create("ipv4", "unicast")
-            af.metric.levels.level.create(2).default_metric = 5000
+            af.metric.levels.level.create(2, default_metric=5000)
 
             # MPLS and LDP config for this interface
             ldp = dev.mpls.create_ldp()
@@ -343,10 +329,8 @@ class BBInterface(base.BBInterface):
                     interface = i.name
                 isis_intf = dcpi.interface.create(interface)
                 isis_intf.point_to_point = True
-                il1 = isis_intf.level.create(1)
-                il1.disable = True
-                il2 = isis_intf.level.create(2)
-                il2.metric = 5000
+                isis_intf.level.create(1, disable=True)
+                isis_intf.level.create(2, metric=5000)
 
                 # MPLS and LDP config for this interface
                 dev.configuration.protocols.mpls.interface.create(interface)
@@ -412,25 +396,23 @@ class IbgpNeighbor(base.IbgpNeighbor):
             print("RFS /rfs{{{di.name}}}/ibgp-neighbor transform running {i.address} for Cisco IOS XR", err=True)
             dev = xr24.root()
             bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(i.asn)
-            nb = bgp_as.neighbors.neighbor.create(i.address)
+            nb = bgp_as.neighbors.neighbor.create(i.address, description=i.description)
             nb.use.neighbor_group = "IPV4-IBGP"
-            nb.description = i.description
             return dev
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
             print("RFS /rfs{{{di.name}}}/ibgp-neighbor transform running {i.address} for JUNOS", err=True)
             dev = crpd23.root()
             bgp = dev.configuration.protocols.bgp
             g = bgp.group.create("IPV4-IBGP")
-            n = g.neighbor.create(i.address)
-            n.description = i.description
+            g.neighbor.create(i.address, description=i.description)
             return dev
 
         elif "srl_nokia-system" in di.modules:
             print("RFS /rfs{{{di.name}}}/ibgp-neighbor transform running {i.address} for Nokia SRLinux", err=True)
             dev = srl25.root()
             bgp = dev.network_instance.create("default").protocols.create_bgp()
-            group = bgp.group.create("IPV4-IBGP")
-            neighbor = bgp.neighbor.create(i.address, peer_group="IPV4-IBGP", admin_state="enable")
+            bgp.group.create("IPV4-IBGP")
+            bgp.neighbor.create(i.address, peer_group="IPV4-IBGP", admin_state="enable")
             return dev
 
         raise UnsupportedDevice()
@@ -446,8 +428,7 @@ class Vrf(base.Vrf):
             dev = xr24.root()
 
             # Create global VRF
-            vrf = dev.vrfs.vrf.create(i.name)
-            vrf.description = i.description
+            vrf = dev.vrfs.vrf.create(i.name, description=i.description)
             ipv4_unicast = vrf.address_family.ipv4.create_unicast()
             ipv4_unicast.import_.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, i.id, False)
             ipv4_unicast.export.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, i.id, False)
@@ -478,9 +459,7 @@ class Vrf(base.Vrf):
             dev = srl25.root()
 
             # Create the VRF
-            ni = dev.network_instance.create(i.name)
-            ni.type = srl25.srl_nokia_network_instance_ip_vrf
-            ni.admin_state = "enable"
+            ni = dev.network_instance.create(i.name, type=srl25.srl_nokia_network_instance_ip_vrf, admin_state="enable")
 
             # VXLAN interface
             tunnel_if = dev.tunnel_interface.create("vxlan1")
@@ -498,19 +477,13 @@ class Vrf(base.Vrf):
 
             # BGP-EVPN protocol
             bgp_evpn = ni.protocols.create_bgp_evpn()
-            bgp_instance = bgp_evpn.bgp_instance.create(1)
-            bgp_instance.admin_state = "enable"
-            bgp_instance.vxlan_interface = vxlan_if_name
-            bgp_instance.evi = i.id
+            bgp_evpn.bgp_instance.create(1, admin_state="enable", vxlan_interface=vxlan_if_name, evi=i.id)
 
             # BGP protocol
-            bgp = ni.protocols.create_bgp()
-            bgp.router_id = "10.0.0.{i.router_id}"
-            bgp.autonomous_system = i.asn
+            bgp = ni.protocols.create_bgp(router_id="10.0.0.{i.router_id}", autonomous_system=i.asn)
             bgp.ebgp_default_policy.import_reject_all = False
             bgp.ebgp_default_policy.export_reject_all = False
-            afi = bgp.afi_safi.create(srl25.srl_nokia_common_ipv4_unicast)
-            afi.admin_state = "enable"
+            bgp.afi_safi.create(srl25.srl_nokia_common_ipv4_unicast, admin_state="enable")
             group = bgp.group.create("customer")
             group.send_default_route.ipv4_unicast = True
 
@@ -531,15 +504,11 @@ class VrfInterface(base.VrfInterface):
             dev = xr24.root()
 
             # Main interface config
-            intf = dev.interfaces.interface.create(main_intf)
-            intf.shutdown = False
-            sub_intf = dev.interfaces.interface.create(i.name)
-            sub_intf.description = i.description
-            sub_intf.shutdown = False
+            dev.interfaces.interface.create(main_intf, shutdown=False)
+            sub_intf = dev.interfaces.interface.create(i.name, description=i.description, shutdown=False, vrf=i.vrf)
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 sub_intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(int(i.ipv4_prefix_length)))
-            sub_intf.vrf = i.vrf
             sub_intf.um_l2_ethernet_cfg_encapsulation.dot1q.vlan_id = u64(vlan_id)
             return dev
 
@@ -548,13 +517,10 @@ class VrfInterface(base.VrfInterface):
             dev = crpd23.root()
 
             # Main interface config
-            intf = dev.configuration.interfaces.interface.create(main_intf)
-            intf.description = i.description
+            intf = dev.configuration.interfaces.interface.create(main_intf, description=i.description)
 
             # Unit config
-            unit = intf.unit.create(vlan_id)
-            unit.description = i.description
-            unit.vlan_id = vlan_id
+            unit = intf.unit.create(vlan_id, description=i.description, vlan_id=vlan_id)
 
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
@@ -568,15 +534,11 @@ class VrfInterface(base.VrfInterface):
             dev = srl25.root()
 
             # Create the main interface
-            intf = dev.interface.create(main_intf)
-            intf.admin_state = "enable"
-            intf.vlan_tagging = True
+            intf = dev.interface.create(main_intf, admin_state="enable", vlan_tagging=True)
 
             # Create the subinterface
-            subif = intf.subinterface.create(u64(vlan_id))
-            subif.admin_state = "enable"
+            subif = intf.subinterface.create(u64(vlan_id), description=i.description, admin_state="enable")
             subif.vlan.encap.create_single_tagged().vlan_id = int(vlan_id)
-            subif.description = i.description
 
             # Configure IPv4 address if present
             ipv4_address = i.ipv4_address
@@ -605,16 +567,13 @@ class EbgpCustomer(base.EbgpCustomer):
             vrf = bgp_as.vrfs.vrf.create(i.vrf)
             vrf.address_families.address_family.create("ipv4-unicast")
 
-            neighbor = vrf.neighbors.neighbor.create(i.address)
+            neighbor = vrf.neighbors.neighbor.create(i.address, remote_as=i.peer_asn, description=i.description)
             af = neighbor.address_families.address_family.create("ipv4-unicast")
             # TODO: restrict?
             af.route_policy.in_ = "ACCEPT"
             af.route_policy.out = "ACCEPT"
             af.create_as_override()
-
-            neighbor.remote_as = i.peer_asn
-            neighbor.description = i.description
-            neighbor.create_password().encrypted = sorespo.cisco_vigenere.encrypt(i.authentication_key, 4)
+            neighbor.create_password(encrypted=sorespo.cisco_vigenere.encrypt(i.authentication_key, 4))
 
             return dev
 
@@ -626,11 +585,7 @@ class EbgpCustomer(base.EbgpCustomer):
             # TODO: why group?!
             group = ri.protocols.bgp.group.create("customer")
 
-            neighbor = group.neighbor.create(i.address)
-            neighbor.description = i.description
-            neighbor.authentication_key = junos_encrypt(i.authentication_key, "4")
-            neighbor.peer_as = str(i.peer_asn)
-            neighbor.as_override = True
+            group.neighbor.create(i.address, description=i.description, authentication_key=junos_encrypt(i.authentication_key, "4"), peer_as=str(i.peer_asn), as_override=True)
 
             return dev
 
@@ -641,10 +596,8 @@ class EbgpCustomer(base.EbgpCustomer):
 
             # Neighbor config
             bgp = ni.protocols.create_bgp()
-            neighbor = bgp.neighbor.create(i.address)
+            neighbor = bgp.neighbor.create(i.address, peer_as=i.peer_asn, peer_group="customer")
             neighbor.authentication.password = i.authentication_key
-            neighbor.peer_as = i.peer_asn
-            neighbor.peer_group = "customer"
 
             return dev
 
