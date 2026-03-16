@@ -21,11 +21,8 @@ class Router(base.Router):
     def transform(self, i):
         o = base.o_root()
         print("Intermediate router transform running", i.name, i.id)
-        dev = o.device.create(i.name)
-        dev.type = i.type
-        dev.approval_required = i.approval_required
-        oob_addr = dev.address.create("oob")
-        oob_addr.address = i.name
+        dev = o.device.create(i.name, type=i.type, approval_required=i.approval_required)
+        dev.address.create("oob", address=i.name)
         dev.credentials.username = "clab"
         dev.credentials.password = "clab@123"
         mock = i.mock
@@ -35,20 +32,13 @@ class Router(base.Router):
 
         sid = i.id
         rfs = o.rfs.create(i.name)
-        bc = rfs.base_config.create(i.name) # TODO: should be P-container
-        bc.role = i.role
-        bc.ipv4_address = i.base_config.ipv4_address
-        bc.ipv6_address = i.base_config.ipv6_address
-        bc.asn = i.base_config.asn
+        bc = rfs.base_config.create(i.name, role=i.role, ipv4_address=i.base_config.ipv4_address, ipv6_address=i.base_config.ipv6_address, asn=i.base_config.asn) # TODO: should be P-container
 
         # Inject router id, asn into rfs.Vrf, rfs.EbgpCustomer transform
         for vrf in i.l3vpn_vrf:
-            o_vrf = rfs.vrf.create(vrf.vpn_id)
-            o_vrf.router_id = sid
-            o_vrf.asn = i.base_config.asn
+            o_vrf = rfs.vrf.create(vrf.vpn_id, router_id=sid, asn=i.base_config.asn)
             for ebgp_customer_address in vrf.ebgp_customer_address:
-                o_ebgp_customer = rfs.ebgp_customer.create(vrf.vpn_id, ebgp_customer_address)
-                o_ebgp_customer.local_asn = i.base_config.asn
+                o_ebgp_customer = rfs.ebgp_customer.create(vrf.vpn_id, ebgp_customer_address, local_asn=i.base_config.asn)
 
         return o
 
@@ -59,20 +49,16 @@ class BBLink(base.BBLink):
         o = base.o_root()
         link_id = letter_position(i.left_router[0]) + letter_position(i.right_router[0])
         left_rfs = o.rfs.create(i.left_router)
-        li = left_rfs.backbone_interface.create(i.left_interface)
-        li.ipv4_address = "10.0.%s.1" % (str(link_id))
+        li = left_rfs.backbone_interface.create(i.left_interface, ipv4_address="10.0.{link_id}.1", monitor_health=i.monitor_health)
         li.remote.device = i.right_router
         li.remote.interface = i.right_interface
         li.local.device = i.left_router
-        li.monitor_health = i.monitor_health
 
         right_rfs = o.rfs.create(i.right_router)
-        ri = right_rfs.backbone_interface.create(i.right_interface)
-        ri.ipv4_address = "10.0.%s.2" % (str(link_id))
+        ri = right_rfs.backbone_interface.create(i.right_interface, ipv4_address="10.0.{link_id}.2", monitor_health=i.monitor_health)
         ri.remote.device = i.left_router
         ri.remote.interface = i.left_interface
         ri.local.device = i.right_router
-        ri.monitor_health = i.monitor_health
 
         return o
 
@@ -83,13 +69,11 @@ class IbgpFullmesh(base.IbgpFullmesh):
         o = base.o_root()
         for ra in i.router:
             rfs = o.rfs.create(ra.name)
-            rfs.base_config.create(ra.name).ibgp_authentication_key = i.authentication_key
+            rfs.base_config.create(ra.name, ibgp_authentication_key=i.authentication_key)
             for rb in i.router:
                 if ra.name == rb.name:
                     continue
-                n = rfs.ibgp_neighbor.create(rb.ipv4_address)
-                n.asn = i.asn
-                n.description = rb.name
+                n = rfs.ibgp_neighbor.create(rb.ipv4_address, asn=i.asn, description=rb.name)
 
         return o
 
@@ -102,24 +86,22 @@ class L3Vpn(base.L3Vpn):
         for ep in i.endpoint:
             rfs = o.rfs.create(ep.device)
 
-            vrf = rfs.vrf.create(i.name)
-            vrf.description = i.description
             # Get VRF id from vpn-id: acme-65501 -> 65501
-            vrf.id = u64(i.name.split("-")[1])
+            vrf = rfs.vrf.create(i.name, description=i.description, id=u64(i.name.split("-")[1]))
 
-            vi = rfs.vrf_interface.create(ep.interface)
-            vi.description = "Customer VPN access %s [%s] in VPN %s" % (ep.site, ep.site_network_access, i.name)
-            vi.ipv4_address = ep.provider_ipv4_address
-            vi.ipv4_prefix_length = ep.ipv4_prefix_length
-            vi.vrf = i.name
+            vi = rfs.vrf_interface.create(ep.interface,
+                description="Customer VPN access %s [%s] in VPN %s" % (ep.site, ep.site_network_access, i.name),
+                vrf=i.name,
+                ipv4_address=ep.provider_ipv4_address,
+                ipv4_prefix_length=ep.ipv4_prefix_length)
 
             customer_ipv4_address = ep.customer_ipv4_address
             bgp = ep.bgp
             if customer_ipv4_address is not None and bgp is not None:
-                cb = rfs.ebgp_customer.create(i.name, customer_ipv4_address)
-                # cb.local_asn is set in the inter.Router transform
-                cb.peer_asn = bgp.as_number
-                cb.authentication_key = i.name
-                cb.description = "Customer eBGP %s [%s] in VPN %s to %s" % (ep.site, ep.site_network_access, i.name, customer_ipv4_address)
+                # local_asn is set in the inter.Router transform
+                rfs.ebgp_customer.create(i.name, customer_ipv4_address,
+                    peer_asn=bgp.as_number,
+                    authentication_key=i.name,
+                    description="Customer eBGP %s [%s] in VPN %s to %s" % (ep.site, ep.site_network_access, i.name, customer_ipv4_address))
 
         return o
