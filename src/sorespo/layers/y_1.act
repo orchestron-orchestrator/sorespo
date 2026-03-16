@@ -875,7 +875,7 @@ class netinfra_inter__netinfra__router__l3vpn_vrf(yang.adata.MNode):
             if match:
                 return e
 
-        res = netinfra_inter__netinfra__router__l3vpn_vrf_entry(vpn_id)
+        res = netinfra_inter__netinfra__router__l3vpn_vrf_entry(vpn_id=vpn_id)
         self.elements.append(res)
         return res
 
@@ -963,16 +963,26 @@ class netinfra_inter__netinfra__router(yang.adata.MNode):
         self._name = 'router'
         self.elements = elements
 
-    mut def create(self, name, id, base_config):
+    mut def create(self, name, id, base_config, type=None, role=None, mock=None, approval_required=None):
         for e in self:
             match = True
             if e.name != name:
                 match = False
                 continue
             if match:
+                e.id = id
+                e.base_config = base_config
+                if type is not None:
+                    e.type = type
+                if role is not None:
+                    e.role = role
+                if mock is not None:
+                    e.mock = mock
+                if approval_required is not None:
+                    e.approval_required = approval_required
                 return e
 
-        res = netinfra_inter__netinfra__router_entry(name, id, base_config)
+        res = netinfra_inter__netinfra__router_entry(name=name, id=id, base_config=base_config, type=type, role=role, mock=mock, approval_required=approval_required)
         self.elements.append(res)
         return res
 
@@ -1044,7 +1054,7 @@ class netinfra_inter__netinfra__backbone_link(yang.adata.MNode):
         self._name = 'backbone-link'
         self.elements = elements
 
-    mut def create(self, left_router, left_interface, right_router, right_interface):
+    mut def create(self, left_router, left_interface, right_router, right_interface, monitor_health=None):
         for e in self:
             match = True
             if e.left_router != left_router:
@@ -1060,9 +1070,11 @@ class netinfra_inter__netinfra__backbone_link(yang.adata.MNode):
                 match = False
                 continue
             if match:
+                if monitor_health is not None:
+                    e.monitor_health = monitor_health
                 return e
 
-        res = netinfra_inter__netinfra__backbone_link_entry(left_router, left_interface, right_router, right_interface)
+        res = netinfra_inter__netinfra__backbone_link_entry(left_router=left_router, left_interface=left_interface, right_router=right_router, right_interface=right_interface, monitor_health=monitor_health)
         self.elements.append(res)
         return res
 
@@ -1129,9 +1141,10 @@ class netinfra_inter__netinfra__ibgp_fullmesh__router(yang.adata.MNode):
                 match = False
                 continue
             if match:
+                e.ipv4_address = ipv4_address
                 return e
 
-        res = netinfra_inter__netinfra__ibgp_fullmesh__router_entry(name, ipv4_address)
+        res = netinfra_inter__netinfra__ibgp_fullmesh__router_entry(name=name, ipv4_address=ipv4_address)
         self.elements.append(res)
         return res
 
@@ -1202,9 +1215,10 @@ class netinfra_inter__netinfra__ibgp_fullmesh(yang.adata.MNode):
                 match = False
                 continue
             if match:
+                e.authentication_key = authentication_key
                 return e
 
-        res = netinfra_inter__netinfra__ibgp_fullmesh_entry(asn, authentication_key)
+        res = netinfra_inter__netinfra__ibgp_fullmesh_entry(asn=asn, authentication_key=authentication_key)
         self.elements.append(res)
         return res
 
@@ -1318,8 +1332,9 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yang.adata.MNode):
     mut def create_bgp(self, as_number):
         existing = self.bgp
         if existing is not None:
+            existing.as_number = as_number
             return existing
-        res = l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(as_number)
+        res = l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(as_number=as_number)
         self.bgp = res
         return res
 
@@ -1361,7 +1376,7 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint(yang.adata.MNode):
         self._name = 'endpoint'
         self.elements = elements
 
-    mut def create(self, device, interface, site, site_network_access, provider_ipv4_address, ipv4_prefix_length):
+    mut def create(self, device, interface, site, site_network_access, provider_ipv4_address, ipv4_prefix_length, customer_ipv4_address=None):
         for e in self:
             match = True
             if e.device != device:
@@ -1371,9 +1386,15 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint(yang.adata.MNode):
                 match = False
                 continue
             if match:
+                e.site = site
+                e.site_network_access = site_network_access
+                e.provider_ipv4_address = provider_ipv4_address
+                e.ipv4_prefix_length = ipv4_prefix_length
+                if customer_ipv4_address is not None:
+                    e.customer_ipv4_address = customer_ipv4_address
                 return e
 
-        res = l3vpn_inter__l3vpns__l3vpn__endpoint_entry(device, interface, site, site_network_access, provider_ipv4_address, ipv4_prefix_length)
+        res = l3vpn_inter__l3vpns__l3vpn__endpoint_entry(device=device, interface=interface, site=site, site_network_access=site_network_access, provider_ipv4_address=provider_ipv4_address, ipv4_prefix_length=ipv4_prefix_length, customer_ipv4_address=customer_ipv4_address)
         self.elements.append(res)
         return res
 
@@ -1437,16 +1458,18 @@ class l3vpn_inter__l3vpns__l3vpn(yang.adata.MNode):
         self._name = 'l3vpn'
         self.elements = elements
 
-    mut def create(self, name):
+    mut def create(self, name, description=None):
         for e in self:
             match = True
             if e.name != name:
                 match = False
                 continue
             if match:
+                if description is not None:
+                    e.description = description
                 return e
 
-        res = l3vpn_inter__l3vpns__l3vpn_entry(name)
+        res = l3vpn_inter__l3vpns__l3vpn_entry(name=name, description=description)
         self.elements.append(res)
         return res
 

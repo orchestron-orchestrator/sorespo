@@ -106,8 +106,7 @@ end-policy
             services.netconf.rfc_compliant = True
             services.netconf.yang_compliant = True
 
-            lo0 = dev.configuration.interfaces.interface.create("lo0")
-            lo0.description = "ROLE: {i.role}"
+            lo0 = dev.configuration.interfaces.interface.create("lo0", description="ROLE: {i.role}")
             unit = lo0.unit.create("0")
             unit.family.create_inet().address.create("{i.ipv4_address}/32")
             unit.family.create_iso().address.create(net_clns_address)
@@ -128,9 +127,7 @@ end-policy
             bgp.log_updown = True
 
             # Create neighbor-group: IPV4-IBGP
-            g1 = bgp.group.create("IPV4-IBGP")
-            g1.type = "internal"
-            g1.local_address = i.ipv4_address
+            g1 = bgp.group.create("IPV4-IBGP", type="internal", local_address=i.ipv4_address)
             g1.hold_time = 90
             g1.family.inet_vpn.create_unicast()
             g1.family.inet6_vpn.create_unicast()
@@ -147,10 +144,8 @@ end-policy
             index.ipv4.admin_state = "enable"
             index.ipv4.address.create("{i.ipv4_address}/32")
 
-            intf_mgmt = dev.interface.create("mgmt0")
-            intf_mgmt.admin_state = "enable"
-            intf_mgmt0 = intf_mgmt.subinterface.create(0)
-            intf_mgmt0.admin_state = "enable"
+            intf_mgmt = dev.interface.create("mgmt0", admin_state="enable")
+            intf_mgmt0 = intf_mgmt.subinterface.create(0, admin_state="enable")
             intf_mgmt0.ipv4.admin_state = "enable"
             intf_mgmt0.ipv6.admin_state = "enable"
 
@@ -177,22 +172,15 @@ end-policy
             else:
                 instance.net = [ "49.0001.0100.0000.0004.00" ]
             instance.ipv4_unicast.admin_state = "enable"
-            ii = instance.interface.create("system0.0")
-            ii.admin_state = "enable"
-            ii.passive = True
+            ii = instance.interface.create("system0.0", admin_state="enable", passive=True)
 
             # BGP global config
-            bgp = ni.protocols.create_bgp()
-            bgp.autonomous_system = i.asn
-            bgp.router_id = i.ipv4_address
-            ipv4_afi = bgp.afi_safi.create(srl25.srl_nokia_common_ipv4_unicast)
-            ipv4_afi.admin_state = "enable"
-            evpn_afi = bgp.afi_safi.create(srl25.srl_nokia_common_evpn)
-            evpn_afi.admin_state = "enable"
+            bgp = ni.protocols.create_bgp(autonomous_system=i.asn, router_id=i.ipv4_address)
+            ipv4_afi = bgp.afi_safi.create(srl25.srl_nokia_common_ipv4_unicast, admin_state="enable")
+            evpn_afi = bgp.afi_safi.create(srl25.srl_nokia_common_evpn, admin_state="enable")
 
             # Create neighbor-group: IPV4-IBGP
-            group = bgp.group.create("IPV4-IBGP")
-            group.peer_as = i.asn
+            group = bgp.group.create("IPV4-IBGP", peer_as=i.asn)
 
             return dev
 
@@ -442,9 +430,7 @@ class IbgpNeighbor(base.IbgpNeighbor):
             dev = srl25.root()
             bgp = dev.network_instance.create("default").protocols.create_bgp()
             group = bgp.group.create("IPV4-IBGP")
-            neighbor = bgp.neighbor.create(i.address)
-            neighbor.admin_state = "enable"
-            neighbor.peer_group = "IPV4-IBGP"
+            neighbor = bgp.neighbor.create(i.address, peer_group="IPV4-IBGP", admin_state="enable")
             return dev
 
         raise UnsupportedDevice()
