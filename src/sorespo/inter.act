@@ -32,13 +32,13 @@ class Router(base.Router):
 
         sid = i.id
         rfs = o.rfs.create(i.name)
-        bc = rfs.base_config.create(i.name, role=i.role, ipv4_address=i.base_config.ipv4_address, ipv6_address=i.base_config.ipv6_address, asn=i.base_config.asn) # TODO: should be P-container
+        rfs.base_config.create(i.name, role=i.role, ipv4_address=i.base_config.ipv4_address, ipv6_address=i.base_config.ipv6_address, asn=i.base_config.asn) # TODO: should be P-container
 
         # Inject router id, asn into rfs.Vrf, rfs.EbgpCustomer transform
         for vrf in i.l3vpn_vrf:
-            o_vrf = rfs.vrf.create(vrf.vpn_id, router_id=sid, asn=i.base_config.asn)
+            rfs.vrf.create(vrf.vpn_id, router_id=sid, asn=i.base_config.asn)
             for ebgp_customer_address in vrf.ebgp_customer_address:
-                o_ebgp_customer = rfs.ebgp_customer.create(vrf.vpn_id, ebgp_customer_address, local_asn=i.base_config.asn)
+                rfs.ebgp_customer.create(vrf.vpn_id, ebgp_customer_address, local_asn=i.base_config.asn)
 
         return o
 
@@ -73,7 +73,7 @@ class IbgpFullmesh(base.IbgpFullmesh):
             for rb in i.router:
                 if ra.name == rb.name:
                     continue
-                n = rfs.ibgp_neighbor.create(rb.ipv4_address, asn=i.asn, description=rb.name)
+                rfs.ibgp_neighbor.create(rb.ipv4_address, asn=i.asn, description=rb.name)
 
         return o
 
@@ -87,9 +87,9 @@ class L3Vpn(base.L3Vpn):
             rfs = o.rfs.create(ep.device)
 
             # Get VRF id from vpn-id: acme-65501 -> 65501
-            vrf = rfs.vrf.create(i.name, description=i.description, id=u64(i.name.split("-")[1]))
+            rfs.vrf.create(i.name, description=i.description, id=u64(i.name.split("-")[1]))
 
-            vi = rfs.vrf_interface.create(ep.interface,
+            rfs.vrf_interface.create(ep.interface,
                 description="Customer VPN access %s [%s] in VPN %s" % (ep.site, ep.site_network_access, i.name),
                 vrf=i.name,
                 ipv4_address=ep.provider_ipv4_address,
