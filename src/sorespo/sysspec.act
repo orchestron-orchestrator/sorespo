@@ -1,8 +1,25 @@
-import orchestron.device as odev
+# WARNING WARNING WARNING WARNING WARNING
+# DO NOT MODIFY THIS FILE!! This file is generated!
+# WARNING WARNING WARNING WARNING WARNING
 
+import logging
+
+import orchestron.device as odev
+import orchestron.ttt as ttt
+
+import sorespo.layers.t_3
+import sorespo.layers.y_3
+import sorespo.layers.t_2
+import sorespo.layers.y_2
+import sorespo.layers.t_1
+import sorespo.layers.y_1
+import sorespo.layers.t_0
+import sorespo.layers.y_0
 import sorespo.devices.CiscoIosXr_24_1_ncs55a1
 import sorespo.devices.JuniperCRPD_23_4R1_9
 import sorespo.devices.NokiaSRLinux_25_3_2
+
+
 device_types: dict[str, odev.DeviceType] = {
     "CiscoIosXr_24_1_ncs55a1": odev.DeviceType(name="CiscoIosXr_24_1_ncs55a1",
             adapter_type=odev.NetconfAdapter,
@@ -20,3 +37,28 @@ device_types: dict[str, odev.DeviceType] = {
             src_dnode=sorespo.devices.NokiaSRLinux_25_3_2.SRC_DNODE,
         ),
 }
+
+def get_layers(dev_registry: odev.DeviceRegistry, log_handler: ?logging.Handler=None):
+    layer3 = ttt.Layer('3', sorespo.layers.t_3.get_ttt(None, dev_registry, log_handler), None)
+    layer2 = ttt.Layer('2', sorespo.layers.t_2.get_ttt(layer3, dev_registry, log_handler), layer3)
+    layer1 = ttt.Layer('1', sorespo.layers.t_1.get_ttt(layer2, dev_registry, log_handler), layer2)
+    layer0 = ttt.Layer('0', sorespo.layers.t_0.get_ttt(layer1, dev_registry, log_handler), layer1)
+    return layer0
+
+
+def schema_for_layer(layer):
+    if layer == 3:
+        # Layer 3 is a bit special, in that there is more than one schema:
+        # 1. The device manager, defined in orchestron-device.yang
+        # 2. The device configuration, defined in the devices own YANG models
+        # and selected with the chosen device type.
+        # The contents of layer 3 (gdata) is a combination of both, here we
+        # return the device manager tree.
+        return sorespo.layers.y_3.SRC_DNODE
+    if layer == 2:
+        return sorespo.layers.y_2.SRC_DNODE
+    if layer == 1:
+        return sorespo.layers.y_1.SRC_DNODE
+    if layer == 0:
+        return sorespo.layers.y_0.SRC_DNODE
+    raise ValueError('Invalid layer: {layer}')

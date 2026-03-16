@@ -10,7 +10,7 @@ import yang.xml
 import orchestron.ttt
 import orchestron.device as odev
 
-import sorespo.layers
+import sorespo.sysspec
 import sorespo.layers.y_0 as cfs_layer
 import sorespo.devices.CiscoIosXr_24_1_ncs55a1 as xr24
 import sorespo.devices.JuniperCRPD_23_4R1_9 as crpd23
@@ -69,7 +69,7 @@ actor _test_netinfra1(t: testing.AsyncT):
     input_config = yang.xml.from_xml(cfs_layer.SRC_DNODE, xml_conf, loose=False)
 
     dev_registry = odev.DeviceRegistry(log_handler=t.log_handler)
-    cfs = sorespo.layers.get_layers(dev_registry)
+    cfs = sorespo.sysspec.get_layers(dev_registry)
     rfs = cfs.below().below()
     dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
     session = cfs.newsession()
@@ -370,7 +370,7 @@ actor l3vpn_tester(t: testing.AsyncT, output_formatter: mut(gdata.Node) -> str):
     input_config = yang.xml.from_xml(cfs_layer.SRC_DNODE, xml_conf, loose=False)
 
     dev_registry = odev.DeviceRegistry(log_handler=t.log_handler)
-    cfs = sorespo.layers.get_layers(dev_registry)
+    cfs = sorespo.sysspec.get_layers(dev_registry)
     rfs = cfs.below().below()
     dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
     session = cfs.newsession()
