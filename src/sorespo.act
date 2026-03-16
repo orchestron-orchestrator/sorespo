@@ -20,18 +20,6 @@ import yang.xml
 import tmf.tmf633
 import tmf.tmf640
 
-import sorespo.layers
-import sorespo.layers.y_0_loose as cfs_layer
-import sorespo.layers.y_0
-import sorespo.layers.y_1
-import sorespo.layers.y_2
-import sorespo.layers.y_3
-
-import sorespo.layers.y_0_loose
-import sorespo.layers.y_1_loose
-import sorespo.layers.y_2_loose
-import sorespo.layers.y_3_loose
-
 import sorespo.sysspec
 
 import testing
@@ -52,24 +40,6 @@ def rfs_for_device(dev):
             })
         ])
     })
-
-def schema_for_layer(layer):
-    if layer == 0:
-        return sorespo.layers.y_0_loose.SRC_DNODE
-    elif layer == 1:
-        return sorespo.layers.y_1_loose.SRC_DNODE
-    elif layer == 2:
-        return sorespo.layers.y_2_loose.SRC_DNODE
-    elif layer == 3:
-        # Layer 3 (device) is a bit special, in that there is more than one schema:
-        # 1. The device manager, defined in orchestron-device.yang
-        # 2. The device configuration, defined in the device's own YANG model
-        # The contents of layer 3 (gdata) is a combination of both, but to ???
-        # , we must pick whether we want the internal device
-        # manager or the device configuration. Here we return the device manager tree.
-        return sorespo.layers.y_3_loose.SRC_DNODE
-    else:
-        raise ValueError("Invalid layer: {layer}")
 
 def parse_query_params(path: str) -> dict[str, str]:
     query_params = {}
@@ -115,10 +85,10 @@ actor main(env):
 
     log = logging.Logger(logh)
 
-    top_schema = sorespo.layers.y_0.SRC_DNODE
+    top_schema = sorespo.sysspec.schema_for_layer(0)
 
     dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, env.cap, logh_dev)
-    cfs = sorespo.layers.get_layers(dev_registry, logh_ttt)
+    cfs = sorespo.sysspec.get_layers(dev_registry, logh_ttt)
     rfs = cfs.below().below()
     dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
 
@@ -138,7 +108,7 @@ actor main(env):
                 if tmf_id_str != "":
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    service_json = tmf.tmf640.get_service_json(layer_config, sorespo.layers.y_0.SRC_DNODE, tmf_id_str)
+                    service_json = tmf.tmf640.get_service_json(layer_config, top_schema, tmf_id_str)
                     if service_json is not None:
                         respond(200, {"Content-Type": "application/json"}, json.encode(service_json))
                     else:
@@ -212,7 +182,7 @@ actor main(env):
                     # GET /tmf-api/ServiceActivationAndConfiguration/v4/service
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    data = tmf.tmf640.get_service_list_json(layer_config, sorespo.layers.y_0.SRC_DNODE)
+                    data = tmf.tmf640.get_service_list_json(layer_config, top_schema)
                     respond(200, {"Content-Type": "application/json"}, json.encode_list(data))
 
             elif len(path_elements) == 6 and path_elements[2].lower() == "serviceactivationandconfiguration" and path_elements[3] == "v4" and path_elements[4] == "service":
@@ -221,7 +191,7 @@ actor main(env):
                     service_id = path_elements[5]
                     session = cfs.newsession()
                     layer_config: yang.gdata.Node = session.get()
-                    data = tmf.tmf640.get_service_json(layer_config, sorespo.layers.y_0.SRC_DNODE, service_id)
+                    data = tmf.tmf640.get_service_json(layer_config, top_schema, service_id)
                     if data is not None:
                         respond(200, {"Content-Type": "application/json"}, json.encode(data))
                         return
@@ -396,7 +366,7 @@ actor main(env):
                             config_diff = yang.gdata.diff(running_conf, target_conf)
                             if config_diff is not None:
                                 if format_type == "json":
-                                    diff_str = config_diff.to_jsonstr()
+                                    diff_str = config_diff.to_yang_jsonstr()
                                 elif format_type == "xml":
                                     diff_str = config_diff.to_xmlstr()
                                 elif format_type == "gdata":
@@ -409,7 +379,7 @@ actor main(env):
                                     else:
                                         diff_str = "# Adata format not available for diff (schemas not compiled)"
                                 else:
-                                    diff_str = config_diff.to_jsonstr()  # default to json
+                                    diff_str = config_diff.to_yang_jsonstr()  # default to json
                                 respond(200, {"Content-Type": "text/plain"}, diff_str)
                             else:
                                 respond(200, {"Content-Type": "text/plain"}, "# No differences")
@@ -424,7 +394,7 @@ actor main(env):
                         target_conf = dev.get_target_conf()
                         if target_conf is not None:
                             if format_type == "json":
-                                conf_str = target_conf.to_jsonstr()
+                                conf_str = target_conf.to_yang_jsonstr()
                             elif format_type == "xml":
                                 conf_str = target_conf.to_xmlstr()
                             elif format_type == "gdata":
@@ -436,7 +406,7 @@ actor main(env):
                                     respond(500, {}, "Schemas not compiled")
                                     return
                             else:
-                                conf_str = target_conf.to_jsonstr()  # default to json
+                                conf_str = target_conf.to_yang_jsonstr()  # default to json
                             respond(200, {"Content-Type": "text/plain"}, conf_str)
                         else:
                             respond(200, {"Content-Type": "text/plain"}, "# No target configuration available")
@@ -449,7 +419,7 @@ actor main(env):
                         running_conf = dev.get_running_conf()
                         if running_conf is not None:
                             if format_type == "json":
-                                conf_str = running_conf.to_jsonstr()
+                                conf_str = running_conf.to_yang_jsonstr()
                             elif format_type == "xml":
                                 conf_str = running_conf.to_xmlstr()
                             elif format_type == "gdata":
@@ -462,7 +432,7 @@ actor main(env):
                                 else:
                                     conf_str = "# Adata format not available (schemas not compiled)"
                             else:
-                                conf_str = running_conf.to_jsonstr()  # default to json
+                                conf_str = running_conf.to_yang_jsonstr()  # default to json
                             respond(200, {"Content-Type": "text/plain"}, conf_str)
                         else:
                             respond(200, {"Content-Type": "text/plain"}, "# No running configuration available")
@@ -548,7 +518,7 @@ actor main(env):
                             conf_diff = item.conf_diff
                             if conf_diff is not None:
                                 if format_type == "json":
-                                    diff_str = conf_diff.to_jsonstr()
+                                    diff_str = conf_diff.to_yang_jsonstr()
                                 elif format_type == "xml":
                                     diff_str = conf_diff.to_xmlstr()
                                 elif format_type == "gdata":
@@ -595,7 +565,7 @@ actor main(env):
                                     config_diff_str = None
                                     if config_diff is not None:
                                         if format_type == "json":
-                                            #config_diff_str = config_diff.to_jsonstr()
+                                            #config_diff_str = config_diff.to_yang_jsonstr()
                                             config_diff_str = "# JSON diff not available"
                                         elif format_type == "adata":
                                             #config_diff_str = str(config_diff.to_adata())
@@ -639,11 +609,11 @@ actor main(env):
                     query_params = parse_query_params(request.path)
                     loose = parse_bool(query_params.get_def("loose", ""), True)
                     if request.headers.get("accept") == "application/yang-data+json":
-                        content = layer_config.to_jsonstr()
+                        content = layer_config.to_yang_jsonstr()
                     if request.headers.get("accept") == "application/yang-data+xml":
                         content = layer_config.to_xmlstr()
                     if request.headers.get("accept") == "application/yang-data+acton-adata":
-                        src_dnode = schema_for_layer(layer_idx)
+                        src_dnode = sorespo.sysspec.schema_for_layer(layer_idx)
                         content = yang.data.pradata(src_dnode, layer_config, loose=loose)
                     respond(200, {}, content)
                     return

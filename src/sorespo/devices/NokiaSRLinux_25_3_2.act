@@ -12724,11 +12724,13 @@ class srl_nokia_system__system__protocols(yang.adata.MNode):
         self._ns = 'urn:nokia.com:srlinux:general:system-protocols'
         self.bgp = bgp
 
-    mut def create_bgp(self):
+    mut def create_bgp(self, restart_max_wait=None):
         existing = self.bgp
         if existing is not None:
+            if restart_max_wait is not None:
+                existing.restart_max_wait = restart_max_wait
             return existing
-        res = srl_nokia_system__system__protocols__bgp()
+        res = srl_nokia_system__system__protocols__bgp(restart_max_wait=restart_max_wait)
         self.bgp = res
         return res
 
@@ -12877,16 +12879,24 @@ class srl_nokia_interfaces__interface__subinterface__ipv4__address(yang.adata.MN
         self._name = 'address'
         self.elements = elements
 
-    mut def create(self, ip_prefix):
+    mut def create(self, ip_prefix, anycast_gw=None, origin=None, primary=None, status=None):
         for e in self:
             match = True
             if e.ip_prefix != ip_prefix:
                 match = False
                 continue
             if match:
+                if anycast_gw is not None:
+                    e.anycast_gw = anycast_gw
+                if origin is not None:
+                    e.origin = origin
+                if primary is not None:
+                    e.primary = primary
+                if status is not None:
+                    e.status = status
                 return e
 
-        res = srl_nokia_interfaces__interface__subinterface__ipv4__address_entry(ip_prefix)
+        res = srl_nokia_interfaces__interface__subinterface__ipv4__address_entry(ip_prefix=ip_prefix, anycast_gw=anycast_gw, origin=origin, primary=primary, status=status)
         self.elements.append(res)
         return res
 
@@ -13040,16 +13050,26 @@ class srl_nokia_interfaces__interface__subinterface__ipv6__address(yang.adata.MN
         self._name = 'address'
         self.elements = elements
 
-    mut def create(self, ip_prefix):
+    mut def create(self, ip_prefix, type=None, anycast_gw=None, origin=None, primary=None, status=None):
         for e in self:
             match = True
             if e.ip_prefix != ip_prefix:
                 match = False
                 continue
             if match:
+                if type is not None:
+                    e.type = type
+                if anycast_gw is not None:
+                    e.anycast_gw = anycast_gw
+                if origin is not None:
+                    e.origin = origin
+                if primary is not None:
+                    e.primary = primary
+                if status is not None:
+                    e.status = status
                 return e
 
-        res = srl_nokia_interfaces__interface__subinterface__ipv6__address_entry(ip_prefix)
+        res = srl_nokia_interfaces__interface__subinterface__ipv6__address_entry(ip_prefix=ip_prefix, type=type, anycast_gw=anycast_gw, origin=origin, primary=primary, status=status)
         self.elements.append(res)
         return res
 
@@ -13142,11 +13162,13 @@ class srl_nokia_interfaces__interface__subinterface__vlan__encap(yang.adata.MNod
         self._ns = 'urn:nokia.com:srlinux:chassis:interfaces-vlans'
         self.single_tagged = single_tagged
 
-    mut def create_single_tagged(self):
+    mut def create_single_tagged(self, vlan_id=None):
         existing = self.single_tagged
         if existing is not None:
+            if vlan_id is not None:
+                existing.vlan_id = vlan_id
             return existing
-        res = srl_nokia_interfaces__interface__subinterface__vlan__encap__single_tagged()
+        res = srl_nokia_interfaces__interface__subinterface__vlan__encap__single_tagged(vlan_id=vlan_id)
         self.single_tagged = res
         return res
 
@@ -13264,16 +13286,28 @@ class srl_nokia_interfaces__interface__subinterface(yang.adata.MNode):
         self._name = 'subinterface'
         self.elements = elements
 
-    mut def create(self, index):
+    mut def create(self, index, type=None, description=None, admin_state=None, ip_mtu=None, l2_mtu=None, mpls_mtu=None):
         for e in self:
             match = True
             if e.index != index:
                 match = False
                 continue
             if match:
+                if type is not None:
+                    e.type = type
+                if description is not None:
+                    e.description = description
+                if admin_state is not None:
+                    e.admin_state = admin_state
+                if ip_mtu is not None:
+                    e.ip_mtu = ip_mtu
+                if l2_mtu is not None:
+                    e.l2_mtu = l2_mtu
+                if mpls_mtu is not None:
+                    e.mpls_mtu = mpls_mtu
                 return e
 
-        res = srl_nokia_interfaces__interface__subinterface_entry(index)
+        res = srl_nokia_interfaces__interface__subinterface_entry(index=index, type=type, description=description, admin_state=admin_state, ip_mtu=ip_mtu, l2_mtu=l2_mtu, mpls_mtu=mpls_mtu)
         self.elements.append(res)
         return res
 
@@ -13349,16 +13383,24 @@ class srl_nokia_interfaces__interface(yang.adata.MNode):
         self._name = 'interface'
         self.elements = elements
 
-    mut def create(self, name):
+    mut def create(self, name, description=None, admin_state=None, mtu=None, vlan_tagging=None):
         for e in self:
             match = True
             if e.name != name:
                 match = False
                 continue
             if match:
+                if description is not None:
+                    e.description = description
+                if admin_state is not None:
+                    e.admin_state = admin_state
+                if mtu is not None:
+                    e.mtu = mtu
+                if vlan_tagging is not None:
+                    e.vlan_tagging = vlan_tagging
                 return e
 
-        res = srl_nokia_interfaces__interface_entry(name)
+        res = srl_nokia_interfaces__interface_entry(name=name, description=description, admin_state=admin_state, mtu=mtu, vlan_tagging=vlan_tagging)
         self.elements.append(res)
         return res
 
@@ -13458,7 +13500,7 @@ class srl_nokia_network_instance__network_instance__interface(yang.adata.MNode):
             if match:
                 return e
 
-        res = srl_nokia_network_instance__network_instance__interface_entry(name)
+        res = srl_nokia_network_instance__network_instance__interface_entry(name=name)
         self.elements.append(res)
         return res
 
@@ -13523,7 +13565,7 @@ class srl_nokia_network_instance__network_instance__vxlan_interface(yang.adata.M
             if match:
                 return e
 
-        res = srl_nokia_network_instance__network_instance__vxlan_interface_entry(name)
+        res = srl_nokia_network_instance__network_instance__vxlan_interface_entry(name=name)
         self.elements.append(res)
         return res
 
@@ -13591,16 +13633,22 @@ class srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_ins
         self._name = 'bgp-instance'
         self.elements = elements
 
-    mut def create(self, id, evi):
+    mut def create(self, id, admin_state=None, vxlan_interface=None, evi=None):
         for e in self:
             match = True
             if e.id != id:
                 match = False
                 continue
             if match:
+                if admin_state is not None:
+                    e.admin_state = admin_state
+                if vxlan_interface is not None:
+                    e.vxlan_interface = vxlan_interface
+                if evi is not None:
+                    e.evi = evi
                 return e
 
-        res = srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance_entry(id, evi)
+        res = srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance_entry(id=id, admin_state=admin_state, vxlan_interface=vxlan_interface, evi=evi)
         self.elements.append(res)
         return res
 
@@ -14298,16 +14346,26 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance__i
         self._name = 'level'
         self.elements = elements
 
-    mut def create(self, level_number):
+    mut def create(self, level_number, disable=None, ipv6_unicast_metric=None, metric=None, priority=None, passive=None):
         for e in self:
             match = True
             if e.level_number != level_number:
                 match = False
                 continue
             if match:
+                if disable is not None:
+                    e.disable = disable
+                if ipv6_unicast_metric is not None:
+                    e.ipv6_unicast_metric = ipv6_unicast_metric
+                if metric is not None:
+                    e.metric = metric
+                if priority is not None:
+                    e.priority = priority
+                if passive is not None:
+                    e.passive = passive
                 return e
 
-        res = srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level_entry(level_number)
+        res = srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level_entry(level_number=level_number, disable=disable, ipv6_unicast_metric=ipv6_unicast_metric, metric=metric, priority=priority, passive=passive)
         self.elements.append(res)
         return res
 
@@ -14500,16 +14558,24 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance__i
         self._name = 'interface'
         self.elements = elements
 
-    mut def create(self, interface_name):
+    mut def create(self, interface_name, admin_state=None, circuit_type=None, hello_padding=None, passive=None):
         for e in self:
             match = True
             if e.interface_name != interface_name:
                 match = False
                 continue
             if match:
+                if admin_state is not None:
+                    e.admin_state = admin_state
+                if circuit_type is not None:
+                    e.circuit_type = circuit_type
+                if hello_padding is not None:
+                    e.hello_padding = hello_padding
+                if passive is not None:
+                    e.passive = passive
                 return e
 
-        res = srl_nokia_network_instance__network_instance__protocols__isis__instance__interface_entry(interface_name)
+        res = srl_nokia_network_instance__network_instance__protocols__isis__instance__interface_entry(interface_name=interface_name, admin_state=admin_state, circuit_type=circuit_type, hello_padding=hello_padding, passive=passive)
         self.elements.append(res)
         return res
 
@@ -14814,16 +14880,20 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance__l
         self._name = 'level'
         self.elements = elements
 
-    mut def create(self, level_number):
+    mut def create(self, level_number, metric_style=None, loopfree_alternate_exclude=None):
         for e in self:
             match = True
             if e.level_number != level_number:
                 match = False
                 continue
             if match:
+                if metric_style is not None:
+                    e.metric_style = metric_style
+                if loopfree_alternate_exclude is not None:
+                    e.loopfree_alternate_exclude = loopfree_alternate_exclude
                 return e
 
-        res = srl_nokia_network_instance__network_instance__protocols__isis__instance__level_entry(level_number)
+        res = srl_nokia_network_instance__network_instance__protocols__isis__instance__level_entry(level_number=level_number, metric_style=metric_style, loopfree_alternate_exclude=loopfree_alternate_exclude)
         self.elements.append(res)
         return res
 
@@ -14883,16 +14953,18 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance__h
         self._name = 'system-id'
         self.elements = elements
 
-    mut def create(self, host_system_id):
+    mut def create(self, host_system_id, hostname=None):
         for e in self:
             match = True
             if e.host_system_id != host_system_id:
                 match = False
                 continue
             if match:
+                if hostname is not None:
+                    e.hostname = hostname
                 return e
 
-        res = srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id_entry(host_system_id)
+        res = srl_nokia_network_instance__network_instance__protocols__isis__instance__hostnames__system_id_entry(host_system_id=host_system_id, hostname=hostname)
         self.elements.append(res)
         return res
 
@@ -15055,16 +15127,38 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance(ya
         self._name = 'instance'
         self.elements = elements
 
-    mut def create(self, name):
+    mut def create(self, name, admin_state=None, instance_id=None, level_capability=None, max_ecmp_paths=None, poi_tlv=None, iid_tlv=None, advertise_router_capability=None, prefix_attributes_tlv=None, export_policy=None, hello_padding=None, enable_csnp_on_p2p_links=None):
         for e in self:
             match = True
             if e.name != name:
                 match = False
                 continue
             if match:
+                if admin_state is not None:
+                    e.admin_state = admin_state
+                if instance_id is not None:
+                    e.instance_id = instance_id
+                if level_capability is not None:
+                    e.level_capability = level_capability
+                if max_ecmp_paths is not None:
+                    e.max_ecmp_paths = max_ecmp_paths
+                if poi_tlv is not None:
+                    e.poi_tlv = poi_tlv
+                if iid_tlv is not None:
+                    e.iid_tlv = iid_tlv
+                if advertise_router_capability is not None:
+                    e.advertise_router_capability = advertise_router_capability
+                if prefix_attributes_tlv is not None:
+                    e.prefix_attributes_tlv = prefix_attributes_tlv
+                if export_policy is not None:
+                    e.export_policy = export_policy
+                if hello_padding is not None:
+                    e.hello_padding = hello_padding
+                if enable_csnp_on_p2p_links is not None:
+                    e.enable_csnp_on_p2p_links = enable_csnp_on_p2p_links
                 return e
 
-        res = srl_nokia_network_instance__network_instance__protocols__isis__instance_entry(name)
+        res = srl_nokia_network_instance__network_instance__protocols__isis__instance_entry(name=name, admin_state=admin_state, instance_id=instance_id, level_capability=level_capability, max_ecmp_paths=max_ecmp_paths, poi_tlv=poi_tlv, iid_tlv=iid_tlv, advertise_router_capability=advertise_router_capability, prefix_attributes_tlv=prefix_attributes_tlv, export_policy=export_policy, hello_padding=hello_padding, enable_csnp_on_p2p_links=enable_csnp_on_p2p_links)
         self.elements.append(res)
         return res
 
@@ -15282,16 +15376,18 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi(yan
         self._name = 'afi-safi'
         self.elements = elements
 
-    mut def create(self, afi_safi_name):
+    mut def create(self, afi_safi_name, admin_state=None):
         for e in self:
             match = True
             if e.afi_safi_name != afi_safi_name:
                 match = False
                 continue
             if match:
+                if admin_state is not None:
+                    e.admin_state = admin_state
                 return e
 
-        res = srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_entry(afi_safi_name)
+        res = srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_entry(afi_safi_name=afi_safi_name, admin_state=admin_state)
         self.elements.append(res)
         return res
 
@@ -15382,16 +15478,18 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__rib_manageme
         self._name = 'table'
         self.elements = elements
 
-    mut def create(self, address_family):
+    mut def create(self, address_family, route_table_import=None):
         for e in self:
             match = True
             if e.address_family != address_family:
                 match = False
                 continue
             if match:
+                if route_table_import is not None:
+                    e.route_table_import = route_table_import
                 return e
 
-        res = srl_nokia_network_instance__network_instance__protocols__bgp__rib_management__table_entry(address_family)
+        res = srl_nokia_network_instance__network_instance__protocols__bgp__rib_management__table_entry(address_family=address_family, route_table_import=route_table_import)
         self.elements.append(res)
         return res
 
@@ -15686,11 +15784,17 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__group__as_pa
         self.remove_private_as = remove_private_as
         self.replace_peer_as = replace_peer_as
 
-    mut def create_remove_private_as(self, mode):
+    mut def create_remove_private_as(self, mode=None, leading_only=None, ignore_peer_as=None):
         existing = self.remove_private_as
         if existing is not None:
+            if mode is not None:
+                existing.mode = mode
+            if leading_only is not None:
+                existing.leading_only = leading_only
+            if ignore_peer_as is not None:
+                existing.ignore_peer_as = ignore_peer_as
             return existing
-        res = srl_nokia_network_instance__network_instance__protocols__bgp__group__as_path_options__remove_private_as(mode)
+        res = srl_nokia_network_instance__network_instance__protocols__bgp__group__as_path_options__remove_private_as(mode=mode, leading_only=leading_only, ignore_peer_as=ignore_peer_as)
         self.remove_private_as = res
         return res
 
@@ -15846,16 +15950,18 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_s
         self._name = 'afi-safi'
         self.elements = elements
 
-    mut def create(self, afi_safi_name):
+    mut def create(self, afi_safi_name, admin_state=None):
         for e in self:
             match = True
             if e.afi_safi_name != afi_safi_name:
                 match = False
                 continue
             if match:
+                if admin_state is not None:
+                    e.admin_state = admin_state
                 return e
 
-        res = srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi_entry(afi_safi_name)
+        res = srl_nokia_network_instance__network_instance__protocols__bgp__group__afi_safi_entry(afi_safi_name=afi_safi_name, admin_state=admin_state)
         self.elements.append(res)
         return res
 
@@ -16103,16 +16209,28 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__group(yang.a
         self._name = 'group'
         self.elements = elements
 
-    mut def create(self, group_name):
+    mut def create(self, group_name, admin_state=None, description=None, local_preference=None, next_hop_self=None, peer_as=None, route_flap_damping=None):
         for e in self:
             match = True
             if e.group_name != group_name:
                 match = False
                 continue
             if match:
+                if admin_state is not None:
+                    e.admin_state = admin_state
+                if description is not None:
+                    e.description = description
+                if local_preference is not None:
+                    e.local_preference = local_preference
+                if next_hop_self is not None:
+                    e.next_hop_self = next_hop_self
+                if peer_as is not None:
+                    e.peer_as = peer_as
+                if route_flap_damping is not None:
+                    e.route_flap_damping = route_flap_damping
                 return e
 
-        res = srl_nokia_network_instance__network_instance__protocols__bgp__group_entry(group_name)
+        res = srl_nokia_network_instance__network_instance__protocols__bgp__group_entry(group_name=group_name, admin_state=admin_state, description=description, local_preference=local_preference, next_hop_self=next_hop_self, peer_as=peer_as, route_flap_damping=route_flap_damping)
         self.elements.append(res)
         return res
 
@@ -16186,11 +16304,17 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__as
         self.remove_private_as = remove_private_as
         self.replace_peer_as = replace_peer_as
 
-    mut def create_remove_private_as(self, mode):
+    mut def create_remove_private_as(self, mode=None, leading_only=None, ignore_peer_as=None):
         existing = self.remove_private_as
         if existing is not None:
+            if mode is not None:
+                existing.mode = mode
+            if leading_only is not None:
+                existing.leading_only = leading_only
+            if ignore_peer_as is not None:
+                existing.ignore_peer_as = ignore_peer_as
             return existing
-        res = srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__as_path_options__remove_private_as(mode)
+        res = srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__as_path_options__remove_private_as(mode=mode, leading_only=leading_only, ignore_peer_as=ignore_peer_as)
         self.remove_private_as = res
         return res
 
@@ -16319,16 +16443,18 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__gr
         self._name = 'afi-safi'
         self.elements = elements
 
-    mut def create(self, name):
+    mut def create(self, name, forwarding_preserved=None):
         for e in self:
             match = True
             if e.name != name:
                 match = False
                 continue
             if match:
+                if forwarding_preserved is not None:
+                    e.forwarding_preserved = forwarding_preserved
                 return e
 
-        res = srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi_entry(name)
+        res = srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__neighbor_capability__afi_safi_entry(name=name, forwarding_preserved=forwarding_preserved)
         self.elements.append(res)
         return res
 
@@ -16424,7 +16550,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__gr
             if match:
                 return e
 
-        res = srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi_entry(name)
+        res = srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__graceful_restart__local_capability__afi_safi_entry(name=name)
         self.elements.append(res)
         return res
 
@@ -16601,16 +16727,18 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__af
         self._name = 'afi-safi'
         self.elements = elements
 
-    mut def create(self, afi_safi_name):
+    mut def create(self, afi_safi_name, admin_state=None):
         for e in self:
             match = True
             if e.afi_safi_name != afi_safi_name:
                 match = False
                 continue
             if match:
+                if admin_state is not None:
+                    e.admin_state = admin_state
                 return e
 
-        res = srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi_entry(afi_safi_name)
+        res = srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__afi_safi_entry(afi_safi_name=afi_safi_name, admin_state=admin_state)
         self.elements.append(res)
         return res
 
@@ -16992,16 +17120,38 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor(yan
         self._name = 'neighbor'
         self.elements = elements
 
-    mut def create(self, peer_address, peer_group):
+    mut def create(self, peer_address, admin_state=None, description=None, under_maintenance=None, maintenance_group=None, peer_type=None, local_preference=None, next_hop_self=None, peer_as=None, peer_group=None, last_prefix_limit_exceeded=None, route_flap_damping=None):
         for e in self:
             match = True
             if e.peer_address != peer_address:
                 match = False
                 continue
             if match:
+                if admin_state is not None:
+                    e.admin_state = admin_state
+                if description is not None:
+                    e.description = description
+                if under_maintenance is not None:
+                    e.under_maintenance = under_maintenance
+                if maintenance_group is not None:
+                    e.maintenance_group = maintenance_group
+                if peer_type is not None:
+                    e.peer_type = peer_type
+                if local_preference is not None:
+                    e.local_preference = local_preference
+                if next_hop_self is not None:
+                    e.next_hop_self = next_hop_self
+                if peer_as is not None:
+                    e.peer_as = peer_as
+                if peer_group is not None:
+                    e.peer_group = peer_group
+                if last_prefix_limit_exceeded is not None:
+                    e.last_prefix_limit_exceeded = last_prefix_limit_exceeded
+                if route_flap_damping is not None:
+                    e.route_flap_damping = route_flap_damping
                 return e
 
-        res = srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry(peer_address, peer_group)
+        res = srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry(peer_address=peer_address, admin_state=admin_state, description=description, under_maintenance=under_maintenance, maintenance_group=maintenance_group, peer_type=peer_type, local_preference=local_preference, next_hop_self=next_hop_self, peer_as=peer_as, peer_group=peer_group, last_prefix_limit_exceeded=last_prefix_limit_exceeded, route_flap_damping=route_flap_damping)
         self.elements.append(res)
         return res
 
@@ -17234,7 +17384,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_inst
             if match:
                 return e
 
-        res = srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance_entry(id)
+        res = srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance_entry(id=id)
         self.elements.append(res)
         return res
 
@@ -17330,11 +17480,19 @@ class srl_nokia_network_instance__network_instance__protocols(yang.adata.MNode):
         self.isis = res
         return res
 
-    mut def create_bgp(self, autonomous_system, router_id):
+    mut def create_bgp(self, admin_state=None, autonomous_system=None, local_preference=None, router_id=None):
         existing = self.bgp
         if existing is not None:
+            if admin_state is not None:
+                existing.admin_state = admin_state
+            if autonomous_system is not None:
+                existing.autonomous_system = autonomous_system
+            if local_preference is not None:
+                existing.local_preference = local_preference
+            if router_id is not None:
+                existing.router_id = router_id
             return existing
-        res = srl_nokia_network_instance__network_instance__protocols__bgp(autonomous_system, router_id)
+        res = srl_nokia_network_instance__network_instance__protocols__bgp(admin_state=admin_state, autonomous_system=autonomous_system, local_preference=local_preference, router_id=router_id)
         self.bgp = res
         return res
 
@@ -17435,16 +17593,24 @@ class srl_nokia_network_instance__network_instance(yang.adata.MNode):
         self._name = 'network-instance'
         self.elements = elements
 
-    mut def create(self, name):
+    mut def create(self, name, type=None, admin_state=None, description=None, router_id=None):
         for e in self:
             match = True
             if e.name != name:
                 match = False
                 continue
             if match:
+                if type is not None:
+                    e.type = type
+                if admin_state is not None:
+                    e.admin_state = admin_state
+                if description is not None:
+                    e.description = description
+                if router_id is not None:
+                    e.router_id = router_id
                 return e
 
-        res = srl_nokia_network_instance__network_instance_entry(name)
+        res = srl_nokia_network_instance__network_instance_entry(name=name, type=type, admin_state=admin_state, description=description, router_id=router_id)
         self.elements.append(res)
         return res
 
@@ -17535,16 +17701,18 @@ class srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface(yang.adata.
         self._name = 'vxlan-interface'
         self.elements = elements
 
-    mut def create(self, index, type):
+    mut def create(self, index, type=None):
         for e in self:
             match = True
             if e.index != index:
                 match = False
                 continue
             if match:
+                if type is not None:
+                    e.type = type
                 return e
 
-        res = srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry(index, type)
+        res = srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry(index=index, type=type)
         self.elements.append(res)
         return res
 
@@ -17613,7 +17781,7 @@ class srl_nokia_tunnel_interfaces__tunnel_interface(yang.adata.MNode):
             if match:
                 return e
 
-        res = srl_nokia_tunnel_interfaces__tunnel_interface_entry(name)
+        res = srl_nokia_tunnel_interfaces__tunnel_interface_entry(name=name)
         self.elements.append(res)
         return res
 
