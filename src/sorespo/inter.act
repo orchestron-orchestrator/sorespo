@@ -32,7 +32,10 @@ class Router(base.Router):
 
         sid = i.id
         rfs = o.rfs.create(i.name)
-        rfs.base_config.create(i.name, role=i.role, ipv4_address=i.base_config.ipv4_address, ipv6_address=i.base_config.ipv6_address, asn=i.base_config.asn) # TODO: should be P-container
+        rfs.base_config.role = i.role
+        rfs.base_config.ipv4_address = i.base_config.ipv4_address
+        rfs.base_config.ipv6_address = i.base_config.ipv6_address
+        rfs.base_config.asn = i.base_config.asn
 
         # Inject router id, asn into rfs.Vrf, rfs.EbgpCustomer transform
         for vrf in i.l3vpn_vrf:
@@ -69,7 +72,7 @@ class IbgpFullmesh(base.IbgpFullmesh):
         o = base.o_root()
         for ra in i.router:
             rfs = o.rfs.create(ra.name)
-            rfs.base_config.create(ra.name, ibgp_authentication_key=i.authentication_key)
+            rfs.base_config.ibgp_authentication_key = i.authentication_key
             for rb in i.router:
                 if ra.name == rb.name:
                     continue
