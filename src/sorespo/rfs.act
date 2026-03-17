@@ -133,7 +133,8 @@ end-policy
         elif "srl_nokia-system" in di.modules:
             print("RFS /rfs{{{di.name}}}/base-config transform for Nokia SRLinux", err=True)
             dev = srl25.root()
-            dev.system.name.host_name = di.name
+            device_name = di.name
+            dev.system.name.host_name = device_name
             index = dev.interface.create("system0").subinterface.create(0)
             index.ipv4.admin_state = "enable"
             index.ipv4.address.create("{i.ipv4_address}/32")
@@ -152,11 +153,11 @@ end-policy
             ni.interface.create("system0.0")
             isis = ni.protocols.create_isis()
             instance = isis.instance.create("quicklab", level_capability="L2", admin_state="enable")
-            if i.name == "AMS-CORE-1":
+            if device_name == "AMS-CORE-1":
                 instance.net = [ "49.0001.0100.0000.0001.00" ]
-            elif i.name == "FRA-CORE-1":
+            elif device_name == "FRA-CORE-1":
                 instance.net = [ "49.0001.0100.0000.0002.00" ]
-            elif i.name == "STO-CORE-1":
+            elif device_name == "STO-CORE-1":
                 instance.net = [ "49.0001.0100.0000.0003.00" ]
             else:
                 instance.net = [ "49.0001.0100.0000.0004.00" ]

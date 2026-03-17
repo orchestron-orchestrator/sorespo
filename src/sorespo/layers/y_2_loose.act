@@ -86,10 +86,9 @@ SRC_DNODE_CHILD_0 = DList(module='orchestron-rfs', namespace='http://orchestron.
 
 SRC_DNODE_CHILD_12 = DLeaf(module='orchestron-rfs', namespace='http://orchestron.org/yang/orchestron-rfs.yang', prefix='orfs', name='name', config=True, description='Device name', mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
 
-SRC_DNODE_CHILD_13 = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='base-config', key=['name'], config=True, min_elements=0, ordered_by='system', exts=[
+SRC_DNODE_CHILD_13 = DContainer(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='base-config', config=True, presence=False, exts=[
         Ext('orchestron', 'rfs-transform', arg='sorespo.rfs.BaseConfig')
     ], children=[
-    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='name', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='role', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ipv4-address', config=True, mandatory=True, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ipv6-address', config=True, mandatory=True, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
@@ -186,15 +185,9 @@ def src_yang():
     }
 
     augment "/orfs:rfs" {
-        // TODO: should really be a P-container
-        list base-config {
-            key name;
+        container base-config {
 
             orchestron:rfs-transform sorespo.rfs.BaseConfig;
-
-            leaf name {
-                type string;
-            }
 
             leaf role {
                 type string;
@@ -1624,17 +1617,15 @@ extension orchestron_rfs__device(Iterable[orchestron_rfs__device_entry]):
         return self.elements.__iter__()
 
 _breaker = 1
-class orchestron_rfs__rfs__base_config_entry(yang.adata.MNode):
-    name: str
+class orchestron_rfs__rfs__base_config(yang.adata.MNode):
     role: ?str
     ipv4_address: ?str
     ipv6_address: ?str
     asn: ?u64
     ibgp_authentication_key: ?str
 
-    mut def __init__(self, name: str, role: ?str, ipv4_address: ?str, ipv6_address: ?str, asn: ?u64, ibgp_authentication_key: ?str):
+    mut def __init__(self, role: ?str, ipv4_address: ?str, ipv6_address: ?str, asn: ?u64, ibgp_authentication_key: ?str):
         self._ns = 'http://example.com/sorespo-rfs'
-        self.name = name
         self.role = role
         self.ipv4_address = ipv4_address
         self.ipv6_address = ipv6_address
@@ -1642,8 +1633,6 @@ class orchestron_rfs__rfs__base_config_entry(yang.adata.MNode):
         self.ibgp_authentication_key = ibgp_authentication_key
 
     def _get_attr(self, name: str) -> ?value:
-        if name == 'name':
-            return self.name
         if name == 'role':
             return self.role
         if name == 'ipv4_address':
@@ -1660,63 +1649,15 @@ class orchestron_rfs__rfs__base_config_entry(yang.adata.MNode):
         return yang.adata.from_adata(SRC_DNODE, self, loose=True, root_path=['orchestron-rfs:rfs', 'sorespo-rfs:base-config'])
 
     @staticmethod
-    mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__base_config_entry:
-        return orchestron_rfs__rfs__base_config_entry(name=n.get_str(yang.gdata.Id(NS_sorespo_rfs, 'name')), role=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'role')), ipv4_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv4-address')), ipv6_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv6-address')), asn=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'asn')), ibgp_authentication_key=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ibgp-authentication-key')))
+    mut def from_gdata(n: ?yang.gdata.Node) -> orchestron_rfs__rfs__base_config:
+        if n is not None:
+            return orchestron_rfs__rfs__base_config(role=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'role')), ipv4_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv4-address')), ipv6_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv6-address')), asn=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'asn')), ibgp_authentication_key=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ibgp-authentication-key')))
+        return orchestron_rfs__rfs__base_config()
 
     def copy(self):
         """Create a deep copy of this adata object"""
-        return orchestron_rfs__rfs__base_config_entry.from_gdata(self.to_gdata())
+        return orchestron_rfs__rfs__base_config.from_gdata(self.to_gdata())
 
-_breaker = 1
-class orchestron_rfs__rfs__base_config(yang.adata.MNode):
-    elements: list[orchestron_rfs__rfs__base_config_entry]
-    mut def __init__(self, elements=[]):
-        self._ns = 'http://example.com/sorespo-rfs'
-        self._name = 'base-config'
-        self.elements = elements
-
-    mut def create(self, name, role=None, ipv4_address=None, ipv6_address=None, asn=None, ibgp_authentication_key=None):
-        for e in self:
-            match = True
-            if e.name != name:
-                match = False
-                continue
-            if match:
-                if role is not None:
-                    e.role = role
-                if ipv4_address is not None:
-                    e.ipv4_address = ipv4_address
-                if ipv6_address is not None:
-                    e.ipv6_address = ipv6_address
-                if asn is not None:
-                    e.asn = asn
-                if ibgp_authentication_key is not None:
-                    e.ibgp_authentication_key = ibgp_authentication_key
-                return e
-
-        res = orchestron_rfs__rfs__base_config_entry(name=name, role=role, ipv4_address=ipv4_address, ipv6_address=ipv6_address, asn=asn, ibgp_authentication_key=ibgp_authentication_key)
-        self.elements.append(res)
-        return res
-
-    @staticmethod
-    mut def from_gdata(n: ?yang.gdata.List) -> list[orchestron_rfs__rfs__base_config_entry]:
-        if n is not None:
-            return [orchestron_rfs__rfs__base_config_entry.from_gdata(e) for e in n.elements]
-        return []
-
-    def copy(self):
-        """Create a deep copy of this list object"""
-        # Copy each element in the list
-        copied_elements = []
-        for e in self:
-            ce = e.copy()
-            if ce is not None:
-                copied_elements.append(ce)
-        return orchestron_rfs__rfs__base_config(elements=copied_elements)
-
-extension orchestron_rfs__rfs__base_config(Iterable[orchestron_rfs__rfs__base_config_entry]):
-    def __iter__(self) -> Iterator[orchestron_rfs__rfs__base_config_entry]:
-        return self.elements.__iter__()
 
 _breaker = 1
 class orchestron_rfs__rfs__backbone_interface__remote(yang.adata.MNode):
@@ -2275,10 +2216,10 @@ class orchestron_rfs__rfs_entry(yang.adata.MNode):
     vrf_interface: orchestron_rfs__rfs__vrf_interface
     ebgp_customer: orchestron_rfs__rfs__ebgp_customer
 
-    mut def __init__(self, name: str, base_config: list[orchestron_rfs__rfs__base_config_entry]=[], backbone_interface: list[orchestron_rfs__rfs__backbone_interface_entry]=[], ibgp_neighbor: list[orchestron_rfs__rfs__ibgp_neighbor_entry]=[], vrf: list[orchestron_rfs__rfs__vrf_entry]=[], vrf_interface: list[orchestron_rfs__rfs__vrf_interface_entry]=[], ebgp_customer: list[orchestron_rfs__rfs__ebgp_customer_entry]=[]):
+    mut def __init__(self, name: str, base_config: ?orchestron_rfs__rfs__base_config=None, backbone_interface: list[orchestron_rfs__rfs__backbone_interface_entry]=[], ibgp_neighbor: list[orchestron_rfs__rfs__ibgp_neighbor_entry]=[], vrf: list[orchestron_rfs__rfs__vrf_entry]=[], vrf_interface: list[orchestron_rfs__rfs__vrf_interface_entry]=[], ebgp_customer: list[orchestron_rfs__rfs__ebgp_customer_entry]=[]):
         self._ns = 'http://orchestron.org/yang/orchestron-rfs.yang'
         self.name = name
-        self.base_config = orchestron_rfs__rfs__base_config(elements=base_config)
+        self.base_config = base_config if base_config is not None else orchestron_rfs__rfs__base_config()
         self.backbone_interface = orchestron_rfs__rfs__backbone_interface(elements=backbone_interface)
         self.ibgp_neighbor = orchestron_rfs__rfs__ibgp_neighbor(elements=ibgp_neighbor)
         self.vrf = orchestron_rfs__rfs__vrf(elements=vrf)
@@ -2289,7 +2230,7 @@ class orchestron_rfs__rfs_entry(yang.adata.MNode):
         if name == 'name':
             return self.name
         if name == 'base_config':
-            return iter(self.base_config)
+            return self.base_config
         if name == 'backbone_interface':
             return iter(self.backbone_interface)
         if name == 'ibgp_neighbor':
@@ -2307,7 +2248,7 @@ class orchestron_rfs__rfs_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs_entry:
-        return orchestron_rfs__rfs_entry(name=n.get_str(yang.gdata.Id(NS_orchestron_rfs, 'name')), base_config=orchestron_rfs__rfs__base_config.from_gdata(n.get_opt_list(yang.gdata.Id(NS_sorespo_rfs, 'base-config'))), backbone_interface=orchestron_rfs__rfs__backbone_interface.from_gdata(n.get_opt_list(yang.gdata.Id(NS_sorespo_rfs, 'backbone-interface'))), ibgp_neighbor=orchestron_rfs__rfs__ibgp_neighbor.from_gdata(n.get_opt_list(yang.gdata.Id(NS_sorespo_rfs, 'ibgp-neighbor'))), vrf=orchestron_rfs__rfs__vrf.from_gdata(n.get_opt_list(yang.gdata.Id(NS_sorespo_rfs, 'vrf'))), vrf_interface=orchestron_rfs__rfs__vrf_interface.from_gdata(n.get_opt_list(yang.gdata.Id(NS_sorespo_rfs, 'vrf-interface'))), ebgp_customer=orchestron_rfs__rfs__ebgp_customer.from_gdata(n.get_opt_list(yang.gdata.Id(NS_sorespo_rfs, 'ebgp-customer'))))
+        return orchestron_rfs__rfs_entry(name=n.get_str(yang.gdata.Id(NS_orchestron_rfs, 'name')), base_config=orchestron_rfs__rfs__base_config.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_sorespo_rfs, 'base-config'))), backbone_interface=orchestron_rfs__rfs__backbone_interface.from_gdata(n.get_opt_list(yang.gdata.Id(NS_sorespo_rfs, 'backbone-interface'))), ibgp_neighbor=orchestron_rfs__rfs__ibgp_neighbor.from_gdata(n.get_opt_list(yang.gdata.Id(NS_sorespo_rfs, 'ibgp-neighbor'))), vrf=orchestron_rfs__rfs__vrf.from_gdata(n.get_opt_list(yang.gdata.Id(NS_sorespo_rfs, 'vrf'))), vrf_interface=orchestron_rfs__rfs__vrf_interface.from_gdata(n.get_opt_list(yang.gdata.Id(NS_sorespo_rfs, 'vrf-interface'))), ebgp_customer=orchestron_rfs__rfs__ebgp_customer.from_gdata(n.get_opt_list(yang.gdata.Id(NS_sorespo_rfs, 'ebgp-customer'))))
 
     def copy(self):
         """Create a deep copy of this adata object"""
