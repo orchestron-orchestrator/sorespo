@@ -9,6 +9,7 @@ import yang.data
 import yang.xml
 import orchestron.ttt
 import orchestron.device as odev
+import orchestron.app as oapp
 
 import sorespo.sysspec
 import sorespo.layers.y_0 as cfs_layer
@@ -16,18 +17,6 @@ import sorespo.devices.CiscoIosXr_24_1_ncs55a1 as xr24
 import sorespo.devices.JuniperCRPD_23_4R1_9 as crpd23
 
 NS_ODEV = "http://orchestron.org/yang/orchestron-device.yang";
-NS_ORFS = "http://orchestron.org/yang/orchestron-rfs.yang"
-def rfs_for_device(dev):
-    def q(n):
-        return gdata.Id(NS_ORFS, n)
-
-    return gdata.Container({
-        q('rfs'): gdata.List([q("name")], [
-            gdata.Container({
-                q("name"): gdata.Leaf(dev)
-            })
-        ])
-    })
 
 netinfra1_in = """<data>
     <netinfra xmlns="http://example.com/netinfra">
@@ -70,8 +59,7 @@ actor _test_netinfra1(t: testing.AsyncT):
 
     dev_registry = odev.DeviceRegistry(log_handler=t.log_handler)
     cfs = sorespo.sysspec.get_layers(dev_registry)
-    rfs = cfs.below().below()
-    dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
+    oapp.RfsReconf(dev_registry, cfs)
     session = cfs.newsession()
 
     def cont(_r: value):
@@ -371,8 +359,7 @@ actor l3vpn_tester(t: testing.AsyncT, output_formatter: mut(gdata.Node) -> str):
 
     dev_registry = odev.DeviceRegistry(log_handler=t.log_handler)
     cfs = sorespo.sysspec.get_layers(dev_registry)
-    rfs = cfs.below().below()
-    dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
+    oapp.RfsReconf(dev_registry, cfs)
     session = cfs.newsession()
 
     def cont(_r: value):

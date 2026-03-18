@@ -14,20 +14,6 @@ import yang.gdata
 import sorespo.sysspec
 
 
-NS_ORFS = "http://orchestron.org/yang/orchestron-rfs.yang"
-def rfs_for_device(dev):
-    def q(n):
-        return yang.gdata.Id(NS_ORFS, n)
-
-    return yang.gdata.Container({
-        q('rfs'): yang.gdata.List([q("name")], [
-            yang.gdata.Container({
-                q("name"): yang.gdata.Leaf(dev)
-            })
-        ])
-    })
-
-
 actor main(env):
     rfcap = file.ReadFileCap(file.FileCap(env.cap))
 
@@ -52,8 +38,7 @@ actor main(env):
 
     dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, process.ProcessCap(env.cap), logh_dev)
     cfs = sorespo.sysspec.get_layers(dev_registry, logh_ttt)
-    rfs = cfs.below().below()
-    dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
+    oapp.RfsReconf(dev_registry, cfs)
 
     tcpl_cap = net.TCPListenCap(net.TCPCap(net.NetCap(env.cap)))
 
