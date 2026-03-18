@@ -1,9 +1,10 @@
 import argparse
 import file
+import http
 import json
 import logging
-import http
 import net
+import process
 import xml
 
 import orchestron.device as odev
@@ -87,7 +88,7 @@ actor main(env):
 
     top_schema = sorespo.sysspec.schema_for_layer(0)
 
-    dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, env.cap, logh_dev)
+    dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, process.ProcessCap(env.cap), logh_dev)
     cfs = sorespo.sysspec.get_layers(dev_registry, logh_ttt)
     rfs = cfs.below().below()
     dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
