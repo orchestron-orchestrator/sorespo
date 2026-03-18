@@ -1,11 +1,13 @@
-import argparse
 import file
+import http
 import json
 import logging
-import http
 import net
+import process
 import xml
 
+import orchestron.app   # https://github.com/actonlang/acton/issues/2699
+import orchestron.app as oapp
 import orchestron.device as odev
 import orchestron.ttt as ttt
 import orchestron.device_meta_config    # TODO: remove https://github.com/actonlang/acton/issues/2390
@@ -87,7 +89,7 @@ actor main(env):
 
     top_schema = sorespo.sysspec.schema_for_layer(0)
 
-    dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, env.cap, logh_dev)
+    dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, process.ProcessCap(env.cap), logh_dev)
     cfs = sorespo.sysspec.get_layers(dev_registry, logh_ttt)
     rfs = cfs.below().below()
     dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
@@ -706,60 +708,8 @@ actor main(env):
 
     server = http.Listener(tcpl_cap, "::", 80, _on_http_accept, log_handler=logh_http)
 
-    env_exit_on_done = env.getenv("EXIT_ON_DONE")
-    exit_on_done = env_exit_on_done if env_exit_on_done is not None else ""
-
-    def _apply_startup_config(config_files):
-        # Read and apply config files; merge multiple snippets (files) into a single intent
-        input_merge = yang.gdata.Container()
-        for filename in config_files:
-            log.debug("Reading config file", {"config_file": filename})
-            f = file.ReadFile(rfcap, filename)
-            nb_input = await async f.read()
-            f.close()
-            try:
-                conf_xml = xml.decode(nb_input.decode())
-                conf_gd = yang.xml.from_xml(top_schema, conf_xml, loose=True)
-                input_merge = yang.gdata.merge(input_merge, conf_gd)
-            except Exception as e:
-                print("Error reading config file {filename}: {e}")
-                env.exit(1)
-
-        def _conf_load(input_config):
-            def _conf_load_done(result):
-                if isinstance(result, str):
-                    log.info("All config files applied")
-                else:
-                    log.error("Error applying config file(s)", {"result": result})
-                # TODO: exit_on_done.lower() once Acton bug is fixed!?
-                if exit_on_done in ["1", "true", "yes"]:
-                    log.info("No more config files to apply, exiting..")
-                    after 3: env.exit(0)
-
-            log.info("Applying config file(s)...")
-            session = cfs.newsession()
-            session.edit_config(input_config, None, _conf_load_done)
-
-        # start to apply..
-        after 0.5: _conf_load(input_merge)
-
-    # TODO: do this before starting anything else ...
-    def _parse_args():
-        p = argparse.Parser()
-        p.add_arg("file", "Config XML file(s)", False, "+")
-        return p.parse(env.argv)
-
-    try:
-        args = _parse_args()
-        config_files = args.get_strlist("file")
-        if len(config_files) > 0:
-            _apply_startup_config(config_files)
-    except argparse.PrintUsage as exc:
-        print(exc.error_message)
-        env.exit(0)
-    except argparse.ArgumentError as exc:
-        print(exc.error_message, err=True)
-        env.exit(1)
+    args = orchestron.app.AppArgs.from_args(env.argv, env.exit)
+    oapp.StartupConfigApplier(args.config_files, args.exit_on_done, top_schema, cfs, env.exit, rfcap, logh)
 
     print("Orchestron/sorespo running..")
 
