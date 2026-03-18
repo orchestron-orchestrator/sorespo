@@ -2,6 +2,8 @@ import testing
 
 import yang.gdata as gdata
 from yang.identityref import Identityref
+import orchestron.ttt
+import orchestron.app as oapp
 import orchestron.device as odev
 
 import sorespo.sysspec
@@ -137,8 +139,7 @@ actor _test_complete_prod_data(t: testing.AsyncT):
     input_config = root.to_gdata()
     dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, None, t.log_handler)
     cfs = sorespo.sysspec.get_layers(dev_registry, t.log_handler)
-    rfs = cfs.below().below()
-    dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
+    oapp.RfsReconf(dev_registry, cfs)
     session = cfs.newsession()
 
     def cont(_r: value):
@@ -160,8 +161,7 @@ actor _test_netinfra_ams_core_1(t: testing.AsyncT):
     input_config = root.to_gdata()
     dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, None, t.log_handler)
     cfs = sorespo.sysspec.get_layers(dev_registry, t.log_handler)
-    rfs = cfs.below().below()
-    dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
+    oapp.RfsReconf(dev_registry, cfs)
     session = cfs.newsession()
 
     def cont(_r: value):
@@ -183,8 +183,7 @@ actor _test_netinfra_fra_core_1(t: testing.AsyncT):
     input_config = root.to_gdata()
     dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, None, t.log_handler)
     cfs = sorespo.sysspec.get_layers(dev_registry, t.log_handler)
-    rfs = cfs.below().below()
-    dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
+    oapp.RfsReconf(dev_registry, cfs)
     session = cfs.newsession()
 
     def cont(_r: value):
@@ -206,8 +205,7 @@ actor _test_netinfra_sto_core_1(t: testing.AsyncT):
     input_config = root.to_gdata()
     dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, None, t.log_handler)
     cfs = sorespo.sysspec.get_layers(dev_registry, t.log_handler)
-    rfs = cfs.below().below()
-    dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
+    oapp.RfsReconf(dev_registry, cfs)
     session = cfs.newsession()
 
     def cont(_r: value):
@@ -229,8 +227,7 @@ actor _test_netinfra_lju_core_1(t: testing.AsyncT):
     input_config = root.to_gdata()
     dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, None, t.log_handler)
     cfs = sorespo.sysspec.get_layers(dev_registry, t.log_handler)
-    rfs = cfs.below().below()
-    dev_registry.on_reconf(lambda dev: rfs.edit_config(rfs_for_device(dev), force=True))
+    oapp.RfsReconf(dev_registry, cfs)
     session = cfs.newsession()
 
     def cont(_r: value):
@@ -241,15 +238,3 @@ actor _test_netinfra_lju_core_1(t: testing.AsyncT):
     def fail():
         t.failure(ValueError())
     after 2.5: fail()
-
-def rfs_for_device(dev):
-    def q(n):
-        return gdata.Id(NS_ORFS, n)
-
-    return gdata.Container({
-        q('rfs'): gdata.List([q("name")], [
-            gdata.Container({
-                q("name"): gdata.Leaf(dev)
-            })
-        ])
-    })
