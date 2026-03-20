@@ -1,15 +1,8 @@
 import testing
 
-import yang.gdata as gdata
-from yang.identityref import Identityref
-import orchestron.ttt
-import orchestron.app as oapp
-import orchestron.device as odev
-
 import sorespo.sysspec
 import sorespo.layers.y_0 as cfs_layer
-import sorespo.sysspec
-import orchestron.testing as ts
+import orchestron
 
 NS_ORFS = "http://orchestron.org/yang/orchestron-rfs.yang"
 
@@ -137,15 +130,12 @@ actor _test_complete_prod_data(t: testing.AsyncT):
 
 
     input_config = root.to_gdata()
-    dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, None, t.log_handler)
-    cfs = sorespo.sysspec.get_layers(dev_registry, t.log_handler)
-    oapp.RfsReconf(dev_registry, cfs)
-    session = cfs.newsession()
+    tr = orchestron.test_main(sorespo.sysspec.SYSSPEC, t.log_handler)
 
     def cont(_r: value):
-        t.success(ts.device_config_adata_snapshot(dev_registry, sorespo.sysspec.device_types))
+        t.success(tr.device_adata_snapshot())
 
-    session.edit_config(input_config, None, cont)
+    tr.edit_config(input_config, cont)
 
     def fail():
         t.failure(ValueError())
@@ -159,15 +149,12 @@ actor _test_netinfra_ams_core_1(t: testing.AsyncT):
     router.mock = True
 
     input_config = root.to_gdata()
-    dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, None, t.log_handler)
-    cfs = sorespo.sysspec.get_layers(dev_registry, t.log_handler)
-    oapp.RfsReconf(dev_registry, cfs)
-    session = cfs.newsession()
+    tr = orchestron.test_main(sorespo.sysspec.SYSSPEC, t.log_handler)
 
     def cont(_r: value):
-        t.success(ts.device_config_adata_snapshot(dev_registry, sorespo.sysspec.device_types))
+        t.success(tr.device_adata_snapshot())
 
-    session.edit_config(input_config, None, cont)
+    tr.edit_config(input_config, cont)
 
     def fail():
         t.failure(ValueError())
@@ -181,15 +168,12 @@ actor _test_netinfra_fra_core_1(t: testing.AsyncT):
     router.mock = True
 
     input_config = root.to_gdata()
-    dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, None, t.log_handler)
-    cfs = sorespo.sysspec.get_layers(dev_registry, t.log_handler)
-    oapp.RfsReconf(dev_registry, cfs)
-    session = cfs.newsession()
+    tr = orchestron.test_main(sorespo.sysspec.SYSSPEC, t.log_handler)
 
     def cont(_r: value):
-        t.success(ts.device_config_adata_snapshot(dev_registry, sorespo.sysspec.device_types))
+        t.success(tr.device_adata_snapshot())
 
-    session.edit_config(input_config, None, cont)
+    tr.edit_config(input_config, cont)
 
     def fail():
         t.failure(ValueError())
@@ -203,15 +187,12 @@ actor _test_netinfra_sto_core_1(t: testing.AsyncT):
     router.mock = True
 
     input_config = root.to_gdata()
-    dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, None, t.log_handler)
-    cfs = sorespo.sysspec.get_layers(dev_registry, t.log_handler)
-    oapp.RfsReconf(dev_registry, cfs)
-    session = cfs.newsession()
+    tr = orchestron.test_main(sorespo.sysspec.SYSSPEC, t.log_handler)
 
     def cont(_r: value):
-        t.success(ts.device_config_adata_snapshot(dev_registry, sorespo.sysspec.device_types))
+        t.success(tr.device_adata_snapshot())
 
-    session.edit_config(input_config, None, cont)
+    tr.edit_config(input_config, cont)
 
     def fail():
         t.failure(ValueError())
@@ -225,15 +206,12 @@ actor _test_netinfra_lju_core_1(t: testing.AsyncT):
     router.mock = True
 
     input_config = root.to_gdata()
-    dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, None, t.log_handler)
-    cfs = sorespo.sysspec.get_layers(dev_registry, t.log_handler)
-    oapp.RfsReconf(dev_registry, cfs)
-    session = cfs.newsession()
+    tr = orchestron.test_main(sorespo.sysspec.SYSSPEC, t.log_handler)
 
     def cont(_r: value):
-        t.success(ts.device_config_adata_snapshot(dev_registry, sorespo.sysspec.device_types))
+        t.success(tr.device_adata_snapshot())
 
-    session.edit_config(input_config, None, cont)
+    tr.edit_config(input_config, cont)
 
     def fail():
         t.failure(ValueError())

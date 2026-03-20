@@ -1,15 +1,8 @@
-
-import logging
 import testing
-import xml
 
-import yang.adata
 import yang.gdata as gdata
 import yang.data
-import yang.xml
-import orchestron.ttt
-import orchestron.device as odev
-import orchestron.app as oapp
+import orchestron
 
 import sorespo.sysspec
 import sorespo.layers.y_0 as cfs_layer
@@ -54,29 +47,21 @@ netinfra1_in = """<data>
 </data>"""
 
 actor _test_netinfra1(t: testing.AsyncT):
-    xml_conf = xml.decode(netinfra1_in)
-    input_config = yang.xml.from_xml(cfs_layer.SRC_DNODE, xml_conf, loose=False)
-
-    dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, log_handler=t.log_handler)
-    cfs = sorespo.sysspec.get_layers(dev_registry)
-    oapp.RfsReconf(dev_registry, cfs)
-    session = cfs.newsession()
+    tr = orchestron.test_main(sorespo.sysspec.SYSSPEC, t.log_handler)
 
     def cont(_r: value):
         print("Test Config applied successfully", str(_r), err=True)
         # Get XML config for all layers. We do this to check whether the gdata
         # we get from TTT is still valid and can be converted to XML.
-        lnext = session
         ln_cfg = None
         for n in range(4):
-            ln = lnext.get()
+            ln = tr.layer_config(n)
             ln_cfg = ln.to_xmlstr(deterministic=True)
             print(f"layer {n}:\n{ln_cfg}", err=True)
-            lnext = lnext.below()
         # Return last (device) layer config
         t.success(ln_cfg)
 
-    session.edit_config(input_config, None, cont)
+    tr.edit_config_xml(netinfra1_in, cont)
 
     def fail():
         print("Test Config failed", err=True)
@@ -354,20 +339,14 @@ l3vpn_in = """<data>
 """
 
 actor l3vpn_tester(t: testing.AsyncT, output_formatter: mut(gdata.Node) -> str):
-    xml_conf = xml.decode(l3vpn_in)
-    input_config = yang.xml.from_xml(cfs_layer.SRC_DNODE, xml_conf, loose=False)
-
-    dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, log_handler=t.log_handler)
-    cfs = sorespo.sysspec.get_layers(dev_registry)
-    oapp.RfsReconf(dev_registry, cfs)
-    session = cfs.newsession()
+    tr = orchestron.test_main(sorespo.sysspec.SYSSPEC, t.log_handler)
 
     def cont(_r: value):
-        res = session.below().below().below().get()
+        res = tr.layer_config(3)
         output = output_formatter(res)
         t.success(output)
 
-    session.edit_config(input_config, None, cont)
+    tr.edit_config_xml(l3vpn_in, cont)
 
 actor _test_l3vpn_svc(t: testing.AsyncT):
     l3vpn_tester(t, lambda n: n.to_xmlstr(deterministic=True))
