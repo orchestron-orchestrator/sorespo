@@ -67,6 +67,11 @@ configure-tmf640:
 	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-fra-core-1.json"
 	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-sto-core-1.json"
 	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-lju-core-1.json"
+	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-backbone-link-ams-fra.json"
+	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-backbone-link-ams-sto.json"
+	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-backbone-link-fra-sto.json"
+	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-backbone-link-fra-lju.json"
+	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-backbone-link-sto-lju.json"
 
 .PHONY: tutorial
 tutorial:
