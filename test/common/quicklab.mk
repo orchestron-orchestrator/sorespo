@@ -61,6 +61,13 @@ configure:
 	$(MAKE) send-config-wait FILE="netinfra.xml"
 	$(MAKE) send-config-wait FILE="l3vpn-svc.xml"
 
+.PHONY: configure-tmf640
+configure-tmf640:
+	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-ams-core-1.json"
+	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-fra-core-1.json"
+	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-sto-core-1.json"
+	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-lju-core-1.json"
+
 .PHONY: tutorial
 tutorial:
 	$(MAKE) -C ../../ download-release
