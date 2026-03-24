@@ -26,7 +26,7 @@ netinfra1_in = """<data>
             <type>CiscoIosXr_24_1_ncs55a1</type>
             <role>edge</role>
             <asn>65001</asn>
-            <mock>cisco-ios-xr</mock>
+            <mock>true</mock>
         </router>
         <router>
             <name>FRA-CORE-1</name>
@@ -34,7 +34,7 @@ netinfra1_in = """<data>
             <type>CiscoIosXr_24_1_ncs55a1</type>
             <role>edge</role>
             <asn>65001</asn>
-            <mock>cisco-ios-xr</mock>
+            <mock>true</mock>
         </router>
         <router>
             <name>STO-CORE-1</name>
@@ -42,7 +42,7 @@ netinfra1_in = """<data>
             <type>JuniperCRPD_23_4R1_9</type>
             <role>edge</role>
             <asn>65001</asn>
-            <mock>juniper-junos</mock>
+            <mock>true</mock>
         </router>
         <backbone-link>
             <left-router>AMS-CORE-1</left-router>
@@ -57,7 +57,7 @@ actor _test_netinfra1(t: testing.AsyncT):
     xml_conf = xml.decode(netinfra1_in)
     input_config = yang.xml.from_xml(cfs_layer.SRC_DNODE, xml_conf, loose=False)
 
-    dev_registry = odev.DeviceRegistry(log_handler=t.log_handler)
+    dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, log_handler=t.log_handler)
     cfs = sorespo.sysspec.get_layers(dev_registry)
     oapp.RfsReconf(dev_registry, cfs)
     session = cfs.newsession()
@@ -92,7 +92,7 @@ l3vpn_in = """<data>
             <type>CiscoIosXr_24_1_ncs55a1</type>
             <role>edge</role>
             <asn>65001</asn>
-            <mock>cisco-ios-xr</mock>
+            <mock>true</mock>
         </router>
         <router>
             <name>FRA-CORE-1</name>
@@ -100,15 +100,15 @@ l3vpn_in = """<data>
             <type>CiscoIosXr_24_1_ncs55a1</type>
             <role>edge</role>
             <asn>65001</asn>
-            <mock>cisco-ios-xr</mock>
+            <mock>true</mock>
         </router>
         <router>
             <name>STO-CORE-1</name>
             <id>3</id>
-            <type>CiscoIosXr_24_1_ncs55a1</type>
+            <type>JuniperCRPD_23_4R1_9</type>
             <role>edge</role>
             <asn>65001</asn>
-            <mock>juniper-junos</mock>
+            <mock>true</mock>
         </router>
         <router>
             <name>LJU-CORE-1</name>
@@ -116,7 +116,7 @@ l3vpn_in = """<data>
             <type>JuniperCRPD_23_4R1_9</type>
             <role>edge</role>
             <asn>65001</asn>
-            <mock>juniper-junos</mock>
+            <mock>true</mock>
         </router>
         <backbone-link>
             <left-router>AMS-CORE-1</left-router>
@@ -357,7 +357,7 @@ actor l3vpn_tester(t: testing.AsyncT, output_formatter: mut(gdata.Node) -> str):
     xml_conf = xml.decode(l3vpn_in)
     input_config = yang.xml.from_xml(cfs_layer.SRC_DNODE, xml_conf, loose=False)
 
-    dev_registry = odev.DeviceRegistry(log_handler=t.log_handler)
+    dev_registry = odev.DeviceRegistry(sorespo.sysspec.device_types, log_handler=t.log_handler)
     cfs = sorespo.sysspec.get_layers(dev_registry)
     oapp.RfsReconf(dev_registry, cfs)
     session = cfs.newsession()
