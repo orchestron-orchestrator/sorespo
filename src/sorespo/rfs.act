@@ -153,14 +153,7 @@ end-policy
             ni.interface.create("system0.0")
             isis = ni.protocols.create_isis()
             instance = isis.instance.create("quicklab", level_capability="L2", admin_state="enable")
-            if device_name == "AMS-CORE-1":
-                instance.net = [ "49.0001.0100.0000.0001.00" ]
-            elif device_name == "FRA-CORE-1":
-                instance.net = [ "49.0001.0100.0000.0002.00" ]
-            elif device_name == "STO-CORE-1":
-                instance.net = [ "49.0001.0100.0000.0003.00" ]
-            else:
-                instance.net = [ "49.0001.0100.0000.0004.00" ]
+            instance.net = [ net_clns_address ]
             instance.ipv4_unicast.admin_state = "enable"
             instance.interface.create("system0.0", admin_state="enable", passive=True)
 
@@ -369,15 +362,6 @@ class BBInterface(base.BBInterface):
             # IS-IS config for this interface
             isis = ni.protocols.create_isis()
             instance = isis.instance.create("quicklab")
-            # Temporarily cofigure NET to avoid the leaf-list merge issue
-            if i.local.device == "AMS-CORE-1":
-                instance.net = [ "49.0001.0100.0000.0001.00" ]
-            elif i.local.device == "FRA-CORE-1":
-                instance.net = [ "49.0001.0100.0000.0002.00" ]
-            elif i.local.device == "STO-CORE-1":
-                instance.net = [ "49.0001.0100.0000.0003.00" ]
-            else:
-                instance.net = [ "49.0001.0100.0000.0004.00" ]
             isis_intf = instance.interface.create("%s.0" % i.name)
             isis_intf.admin_state = "enable"
             isis_intf.circuit_type = "point-to-point"

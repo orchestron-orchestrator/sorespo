@@ -108,9 +108,6 @@ SRC_DNODE_CHILD_14 = DList(module='sorespo-rfs', namespace='http://example.com/s
         DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='device', config=True, mandatory=True, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
         DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='interface', config=True, mandatory=True, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
     ]),
-    DContainer(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='local', config=True, presence=False, children=[
-        DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='device', config=True, mandatory=True, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
-    ]),
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='monitor-health', config=True, default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
     DContainer(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='dynstate', config=True, presence=False, exts=[
             Ext('orchestron', 'dynstate')
@@ -251,15 +248,6 @@ def src_yang():
                     mandatory true;
                 }
                 leaf interface {
-                    type string;
-                    mandatory true;
-                }
-            }
-            // Temporaryly pass the local device name to the backbone interface
-            // to be able set the ISIS NET to work around the Acton YANG leaf-list
-            // merge issue.
-            container local {
-                leaf device {
                     type string;
                     mandatory true;
                 }
@@ -1693,33 +1681,6 @@ class orchestron_rfs__rfs__backbone_interface__remote(yang.adata.MNode):
 
 
 _breaker = 1
-class orchestron_rfs__rfs__backbone_interface__local(yang.adata.MNode):
-    device: ?str
-
-    mut def __init__(self, device: ?str):
-        self._ns = 'http://example.com/sorespo-rfs'
-        self.device = device
-
-    def _get_attr(self, name: str) -> ?value:
-        if name == 'device':
-            return self.device
-        raise ValueError('Attribute {name} not found in orchestron_rfs__rfs__backbone_interface__local')
-
-    mut def to_gdata(self) -> yang.gdata.Node:
-        return yang.adata.from_adata(SRC_DNODE, self, loose=True, root_path=['orchestron-rfs:rfs', 'sorespo-rfs:backbone-interface', 'local'])
-
-    @staticmethod
-    mut def from_gdata(n: ?yang.gdata.Node) -> orchestron_rfs__rfs__backbone_interface__local:
-        if n is not None:
-            return orchestron_rfs__rfs__backbone_interface__local(device=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'device')))
-        return orchestron_rfs__rfs__backbone_interface__local()
-
-    def copy(self):
-        """Create a deep copy of this adata object"""
-        return orchestron_rfs__rfs__backbone_interface__local.from_gdata(self.to_gdata())
-
-
-_breaker = 1
 class orchestron_rfs__rfs__backbone_interface__dynstate(yang.adata.MNode):
     protocols_enabled: ?bool
     health_state: ?str
@@ -1758,11 +1719,10 @@ class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
     ipv6_address: ?str
     ipv6_prefix_length: ?u64
     remote: orchestron_rfs__rfs__backbone_interface__remote
-    local: orchestron_rfs__rfs__backbone_interface__local
     monitor_health: ?bool
     dynstate: orchestron_rfs__rfs__backbone_interface__dynstate
 
-    mut def __init__(self, name: str, ipv4_address: ?str, ipv4_prefix_length: ?u64, ipv6_address: ?str, ipv6_prefix_length: ?u64, remote: ?orchestron_rfs__rfs__backbone_interface__remote=None, local: ?orchestron_rfs__rfs__backbone_interface__local=None, monitor_health: ?bool, dynstate: ?orchestron_rfs__rfs__backbone_interface__dynstate=None):
+    mut def __init__(self, name: str, ipv4_address: ?str, ipv4_prefix_length: ?u64, ipv6_address: ?str, ipv6_prefix_length: ?u64, remote: ?orchestron_rfs__rfs__backbone_interface__remote=None, monitor_health: ?bool, dynstate: ?orchestron_rfs__rfs__backbone_interface__dynstate=None):
         self._ns = 'http://example.com/sorespo-rfs'
         self.name = name
         self.ipv4_address = ipv4_address
@@ -1770,7 +1730,6 @@ class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
         self.ipv6_address = ipv6_address
         self.ipv6_prefix_length = ipv6_prefix_length
         self.remote = remote if remote is not None else orchestron_rfs__rfs__backbone_interface__remote()
-        self.local = local if local is not None else orchestron_rfs__rfs__backbone_interface__local()
         self.monitor_health = monitor_health
         self.dynstate = dynstate if dynstate is not None else orchestron_rfs__rfs__backbone_interface__dynstate()
 
@@ -1787,8 +1746,6 @@ class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
             return self.ipv6_prefix_length
         if name == 'remote':
             return self.remote
-        if name == 'local':
-            return self.local
         if name == 'monitor_health':
             return self.monitor_health
         if name == 'dynstate':
@@ -1800,7 +1757,7 @@ class orchestron_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> orchestron_rfs__rfs__backbone_interface_entry:
-        return orchestron_rfs__rfs__backbone_interface_entry(name=n.get_str(yang.gdata.Id(NS_sorespo_rfs, 'name')), ipv4_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv4-address')), ipv4_prefix_length=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'ipv4-prefix-length')), ipv6_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv6-address')), ipv6_prefix_length=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'ipv6-prefix-length')), remote=orchestron_rfs__rfs__backbone_interface__remote.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_sorespo_rfs, 'remote'))), local=orchestron_rfs__rfs__backbone_interface__local.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_sorespo_rfs, 'local'))), monitor_health=n.get_opt_bool(yang.gdata.Id(NS_sorespo_rfs, 'monitor-health')), dynstate=orchestron_rfs__rfs__backbone_interface__dynstate.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_sorespo_rfs, 'dynstate'))))
+        return orchestron_rfs__rfs__backbone_interface_entry(name=n.get_str(yang.gdata.Id(NS_sorespo_rfs, 'name')), ipv4_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv4-address')), ipv4_prefix_length=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'ipv4-prefix-length')), ipv6_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv6-address')), ipv6_prefix_length=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'ipv6-prefix-length')), remote=orchestron_rfs__rfs__backbone_interface__remote.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_sorespo_rfs, 'remote'))), monitor_health=n.get_opt_bool(yang.gdata.Id(NS_sorespo_rfs, 'monitor-health')), dynstate=orchestron_rfs__rfs__backbone_interface__dynstate.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_sorespo_rfs, 'dynstate'))))
 
     def copy(self):
         """Create a deep copy of this adata object"""
