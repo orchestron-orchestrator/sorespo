@@ -1,0 +1,25 @@
+module sorespo-ietf-l3vpn-svc {
+  yang-version 1.1;
+  namespace "http://example.com/sorespo-ietf-l3vpn-svc";
+  prefix sorespo-l3vpn-svc;
+
+  import ietf-l3vpn-svc {
+    prefix l3vpn-svc;
+  }
+
+  description
+    "Sorespo-specific augmentations for the standard IETF L3VPN service model.";
+
+  revision 2026-03-31 {
+    description
+      "Move transform hooks out of the standard model and into augments.";
+  }
+
+  augment "/l3vpn-svc:l3vpn-svc/l3vpn-svc:vpn-services/l3vpn-svc:vpn-service" {
+    orchestron:transform sorespo.cfs.L3VpnVpnService;
+  }
+
+  augment "/l3vpn-svc:l3vpn-svc/l3vpn-svc:sites/l3vpn-svc:site" {
+    orchestron:transform sorespo.cfs.L3VpnSite;
+  }
+}
