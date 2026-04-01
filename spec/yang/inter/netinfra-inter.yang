@@ -10,13 +10,16 @@ module netinfra-inter {
   import ietf-inet-types {
     prefix inet;
   }
+  import stratoweave {
+    prefix sw;
+  }
 
   container netinfra {
     description "Network infrastructure";
     list router {
       key name;
 
-      orchestron:transform sorespo.inter.Router;
+      sw:transform sorespo.inter.Router;
 
       leaf name {
         type string;
@@ -85,7 +88,7 @@ module netinfra-inter {
     list backbone-link {
       key "left-router left-interface right-router right-interface";
 
-      orchestron:transform sorespo.inter.BBLink;
+      sw:transform sorespo.inter.BBLink;
 
       leaf left-router {
         type string;
@@ -115,7 +118,7 @@ module netinfra-inter {
         mandatory true;
       }
 
-      orchestron:transform sorespo.inter.IbgpFullmesh;
+      sw:transform sorespo.inter.IbgpFullmesh;
 
       list router {
         key "name";
