@@ -13,7 +13,7 @@ import sorespo.layers.base_2 as base
 from sorespo.layers.y_2 import orchestron_rfs__rfs__backbone_interface_entry
 from sorespo.layers.y_2 import orchestron_rfs__rfs__backbone_interface__dynstate
 
-import sorespo.devices.CiscoIosXr_24_1_ncs55a1 as xr24
+import sorespo.devices.CiscoIosXr_25_3_1 as xr25
 import sorespo.devices.JuniperCRPD_23_4R1_9 as crpd23
 import sorespo.devices.NokiaSRLinux_25_3_2 as srl25
 
@@ -56,7 +56,7 @@ class BaseConfig(base.BaseConfig):
 
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
             print("RFS /rfs{{{di.name}}}/base-config transform for Cisco IOS XR", err=True)
-            dev = xr24.root()
+            dev = xr25.root()
             dev.hostname.system_network_name = di.name
             intf = dev.interfaces.interface.create("Loopback0")
             intf.ipv4.addresses.create_address(i.ipv4_address, "255.255.255.255")
@@ -69,8 +69,7 @@ class BaseConfig(base.BaseConfig):
             af.metric_style.create_wide()
 
             # Loopback0 IS-IS interface config
-            lo0 = ip.interfaces.interface.create("Loopback0")
-            lo0.create_passive()
+            lo0 = ip.interfaces.interface.create("Loopback0", state="passive")
             lo0.address_families.address_family.create("ipv4", "unicast")
 
             # BGP global config
@@ -80,7 +79,7 @@ class BaseConfig(base.BaseConfig):
             bgp_ng = bgp_as.neighbor_groups.neighbor_group.create("IPV4-IBGP", remote_as=i.asn, update_source="Loopback0")
             bgp_ng.address_families.address_family.create("vpnv4-unicast")
             bgp_ng.address_families.address_family.create("vpnv6-unicast")
-            bgp_ng.create_password(encrypted=sorespo.cisco_vigenere.encrypt(i.ibgp_authentication_key, 4))
+            bgp_ng.password.encrypted = sorespo.cisco_vigenere.encrypt(i.ibgp_authentication_key, 4)
 
             bgp_as.address_families.address_family.create("vpnv4-unicast")
             bgp_as.address_families.address_family.create("vpnv6-unicast")
@@ -276,20 +275,19 @@ class BBInterface(base.BBInterface):
 
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
             print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}] for Cisco IOS XR", err=True)
-            dev = xr24.root()
+            dev = xr25.root()
 
             # Create the interface
-            intf = dev.interfaces.interface.create(i.name, description="Link to {i.remote.device} [{i.remote.interface}]", shutdown=False)
+            intf = dev.interfaces.interface.create(i.name, description="Link to {i.remote.device} [{i.remote.interface}]")
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(int(i.ipv4_prefix_length)))
 
             # IS-IS config for this interface
             ip = dev.um_router_isis_cfg_router.isis.processes.process.create("1")
-            ci = ip.interfaces.interface.create(i.name, circuit_type="level-2-only")
-            ci.create_point_to_point()
+            ci = ip.interfaces.interface.create(i.name, circuit_type="level-2-only", point_to_point=True)
             af = ci.address_families.address_family.create("ipv4", "unicast")
-            af.metric.levels.level.create(2, default_metric=5000)
+            af.metric_levels.metric_level.create(2, default_metric=5000)
 
             # MPLS and LDP config for this interface
             ldp = dev.mpls.create_ldp()
@@ -379,7 +377,7 @@ class IbgpNeighbor(base.IbgpNeighbor):
 
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
             print("RFS /rfs{{{di.name}}}/ibgp-neighbor transform running {i.address} for Cisco IOS XR", err=True)
-            dev = xr24.root()
+            dev = xr25.root()
             bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(i.asn)
             nb = bgp_as.neighbors.neighbor.create(i.address, description=i.description)
             nb.use.neighbor_group = "IPV4-IBGP"
@@ -410,18 +408,18 @@ class Vrf(base.Vrf):
         route_distinguisher_id = "{i.id}{i.router_id}"
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
             print("RFS /rfs{{{di.name}}}/vrf transform running {i.name} for Cisco IOS XR", err=True)
-            dev = xr24.root()
+            dev = xr25.root()
 
             # Create global VRF
             vrf = dev.vrfs.vrf.create(i.name, description=i.description)
             ipv4_unicast = vrf.address_family.ipv4.create_unicast()
-            ipv4_unicast.import_.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, i.id, False)
-            ipv4_unicast.export.route_target.two_byte_as_rts.two_byte_as_rt.create(i.asn, i.id, False)
+            ipv4_unicast.import_.route_target.two_byte_as_route_targets.two_byte_as_route_target.create(i.asn, i.id, "disable")
+            ipv4_unicast.export.route_target.two_byte_as_route_targets.two_byte_as_route_target.create(i.asn, i.id, "disable")
 
             # Create RD in BGP VRF
             bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(i.asn)
             bgp_vrf = bgp_as.vrfs.vrf.create(i.name)
-            bgp_vrf.create_rd().create_two_byte_as(i.asn, u64(route_distinguisher_id))
+            bgp_vrf.rd.create_two_byte_as(i.asn, u64(route_distinguisher_id))
 
             return dev
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
@@ -486,15 +484,15 @@ class VrfInterface(base.VrfInterface):
 
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
             print("RFS /rfs{{{di.name}}}/vrf-interface transform running {i.name} for Cisco IOS XR", err=True)
-            dev = xr24.root()
+            dev = xr25.root()
 
             # Main interface config
-            dev.interfaces.interface.create(main_intf, shutdown=False)
-            sub_intf = dev.interfaces.interface.create(i.name, description=i.description, shutdown=False, vrf=i.vrf)
+            dev.interfaces.interface.create(main_intf)
+            sub_intf = dev.interfaces.interface.create(i.name, description=i.description, vrf=i.vrf)
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 sub_intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(int(i.ipv4_prefix_length)))
-            sub_intf.um_l2_ethernet_cfg_encapsulation.dot1q.vlan_id = u64(vlan_id)
+            sub_intf.encapsulation.dot1q.vlan_id = u64(vlan_id)
             return dev
 
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
@@ -545,7 +543,7 @@ class EbgpCustomer(base.EbgpCustomer):
 
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
             print("RFS /rfs{{{di.name}}}/ebgp-customer transform running {i.address} for Cisco IOS XR", err=True)
-            dev = xr24.root()
+            dev = xr25.root()
 
             bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(i.local_asn)
 
@@ -558,7 +556,7 @@ class EbgpCustomer(base.EbgpCustomer):
             af.route_policy.in_ = "ACCEPT"
             af.route_policy.out = "ACCEPT"
             af.create_as_override()
-            neighbor.create_password(encrypted=sorespo.cisco_vigenere.encrypt(i.authentication_key, 4))
+            neighbor.password.encrypted = sorespo.cisco_vigenere.encrypt(i.authentication_key, 4)
 
             return dev
 

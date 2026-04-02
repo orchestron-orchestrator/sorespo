@@ -6,7 +6,7 @@ import orchestron
 
 import sorespo.sysspec
 import sorespo.layers.y_0 as cfs_layer
-import sorespo.devices.CiscoIosXr_24_1_ncs55a1 as xr24
+import sorespo.devices.CiscoIosXr_25_3_1 as xr25
 import sorespo.devices.JuniperCRPD_23_4R1_9 as crpd23
 
 NS_ODEV = "http://orchestron.org/yang/orchestron-device.yang";
@@ -16,7 +16,7 @@ netinfra1_in = """<data>
         <router>
             <name>AMS-CORE-1</name>
             <id>1</id>
-            <type>CiscoIosXr_24_1_ncs55a1</type>
+            <type>CiscoIosXr_25_3_1</type>
             <role>edge</role>
             <asn>65001</asn>
             <mock>true</mock>
@@ -24,7 +24,7 @@ netinfra1_in = """<data>
         <router>
             <name>FRA-CORE-1</name>
             <id>2</id>
-            <type>CiscoIosXr_24_1_ncs55a1</type>
+            <type>CiscoIosXr_25_3_1</type>
             <role>edge</role>
             <asn>65001</asn>
             <mock>true</mock>
@@ -74,7 +74,7 @@ l3vpn_in = """<data>
         <router>
             <name>AMS-CORE-1</name>
             <id>1</id>
-            <type>CiscoIosXr_24_1_ncs55a1</type>
+            <type>CiscoIosXr_25_3_1</type>
             <role>edge</role>
             <asn>65001</asn>
             <mock>true</mock>
@@ -82,7 +82,7 @@ l3vpn_in = """<data>
         <router>
             <name>FRA-CORE-1</name>
             <id>2</id>
-            <type>CiscoIosXr_24_1_ncs55a1</type>
+            <type>CiscoIosXr_25_3_1</type>
             <role>edge</role>
             <asn>65001</asn>
             <mock>true</mock>
@@ -363,7 +363,7 @@ actor _test_l3vpn_svc_adata(t: testing.AsyncT):
             config = device_entry.get_cnt(gdata.Id(NS_ODEV, "config"))
             device_name = str(device_entry.get_leaf(gdata.Id(NS_ODEV, "name")).val)
             if device_name == "AMS-CORE-1" or device_name == "FRA-CORE-1":
-                res[device_name] = yang.data.pradata(xr24.SRC_DNODE, config, loose=True)
+                res[device_name] = yang.data.pradata(xr25.SRC_DNODE, config, loose=True)
             elif device_name == "STO-CORE-1" or device_name == "LJU-CORE-1":
                 res[device_name] = yang.data.pradata(crpd23.SRC_DNODE, config, loose=True)
             else:

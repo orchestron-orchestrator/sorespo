@@ -8,11 +8,41 @@ vrf_element = AMS_CORE_1.vrfs.vrf.create('acme-65501', description='Customer VPN
 # P-container: /vrfs/vrf[vrf-name='acme-65501']/address-family/ipv4/unicast
 unicast = vrf_element.address_family.ipv4.create_unicast()
 
-# List /vrfs/vrf[vrf-name='acme-65501']/address-family/ipv4/unicast/import/route-target/two-byte-as-rts/two-byte-as-rt element: 65001,65501,False
-two_byte_as_rt_element = unicast.import_.route_target.two_byte_as_rts.two_byte_as_rt.create(u64(65001), u64(65501), False)
+# List /vrfs/vrf[vrf-name='acme-65501']/address-family/ipv4/unicast/import/route-target/two-byte-as-route-targets/two-byte-as-route-target element: 65001,65501,disable
+two_byte_as_route_target_element = unicast.import_.route_target.two_byte_as_route_targets.two_byte_as_route_target.create(u64(65001), u64(65501), 'disable')
 
-# List /vrfs/vrf[vrf-name='acme-65501']/address-family/ipv4/unicast/export/route-target/two-byte-as-rts/two-byte-as-rt element: 65001,65501,False
-two_byte_as_rt_element_2 = unicast.export.route_target.two_byte_as_rts.two_byte_as_rt.create(u64(65001), u64(65501), False)
+# List /vrfs/vrf[vrf-name='acme-65501']/address-family/ipv4/unicast/export/route-target/two-byte-as-route-targets/two-byte-as-route-target element: 65001,65501,disable
+two_byte_as_route_target_element_2 = unicast.export.route_target.two_byte_as_route_targets.two_byte_as_route_target.create(u64(65001), u64(65501), 'disable')
+
+# List /interfaces/interface element: GigabitEthernet0/0/0/0
+interface_element = AMS_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/0', description='Link to FRA-CORE-1 [GigabitEthernet0/0/0/0]')
+
+# P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/0']/ipv4/addresses/address
+address = interface_element.ipv4.addresses.create_address(address='10.0.7.1', netmask='255.255.255.252')
+
+# List /interfaces/interface element: GigabitEthernet0/0/0/1
+interface_element = AMS_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/1', description='Link to STO-CORE-1 [eth1]')
+
+# P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/1']/ipv4/addresses/address
+address = interface_element.ipv4.addresses.create_address(address='10.0.20.1', netmask='255.255.255.252')
+
+# List /interfaces/interface element: GigabitEthernet0/0/0/2
+interface_element = AMS_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/2')
+
+# List /interfaces/interface element: GigabitEthernet0/0/0/2.100
+interface_element = AMS_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/2.100', description='Customer VPN access SITE-1 [SNA-1-1] in VPN acme-65501', vrf='acme-65501')
+
+# P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/2.100']/ipv4/addresses/address
+address = interface_element.ipv4.addresses.create_address(address='10.201.1.1', netmask='255.255.255.252')
+
+# Container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/2.100']/encapsulation/dot1q
+interface_element.encapsulation.dot1q.vlan_id = u64(100)
+
+# List /interfaces/interface element: Loopback0
+interface_element = AMS_CORE_1.interfaces.interface.create('Loopback0')
+
+# P-container: /interfaces/interface[interface-name='Loopback0']/ipv4/addresses/address
+address = interface_element.ipv4.addresses.create_address(address='10.0.0.1', netmask='255.255.255.255')
 
 # List /um-router-isis-cfg:router/isis/processes/process element: 1
 process_element = AMS_CORE_1.um_router_isis_cfg_router.isis.processes.process.create('1', is_type='level-2-only')
@@ -20,83 +50,74 @@ process_element = AMS_CORE_1.um_router_isis_cfg_router.isis.processes.process.cr
 # List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/nets/net element: 49.0001.0100.0000.0001.00
 net_element = process_element.nets.net.create('49.0001.0100.0000.0001.00')
 
-# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/address-families/address-family element: ipv4,unicast
-address_family_element = process_element.address_families.address_family.create('ipv4', 'unicast')
-
-# P-container: /um-router-isis-cfg:router/isis/processes/process[process-id='1']/address-families/address-family[af-name='ipv4',saf-name='unicast']/metric-style/wide
-wide = address_family_element.metric_style.create_wide()
-
 # List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface element: GigabitEthernet0/0/0/0
-interface_element = process_element.interfaces.interface.create('GigabitEthernet0/0/0/0', circuit_type='level-2-only')
-
-# P-container: /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/0']/point-to-point
-point_to_point = interface_element.create_point_to_point()
+interface_element_2 = process_element.interfaces.interface.create('GigabitEthernet0/0/0/0', circuit_type='level-2-only', point_to_point=True)
 
 # List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/0']/address-families/address-family element: ipv4,unicast
-address_family_element_2 = interface_element.address_families.address_family.create('ipv4', 'unicast')
+address_family_element = interface_element_2.address_families.address_family.create('ipv4', 'unicast')
 
-# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/0']/address-families/address-family[af-name='ipv4',saf-name='unicast']/metric/levels/level element: 2
-level_element = address_family_element_2.metric.levels.level.create(u64(2), default_metric=u64(5000))
+# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/0']/address-families/address-family[af-name='ipv4',saf-name='unicast']/metric-levels/metric-level element: 2
+metric_level_element = address_family_element.metric_levels.metric_level.create(u64(2), default_metric=u64(5000))
 
 # List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface element: GigabitEthernet0/0/0/1
-interface_element = process_element.interfaces.interface.create('GigabitEthernet0/0/0/1', circuit_type='level-2-only')
-
-# P-container: /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/1']/point-to-point
-point_to_point = interface_element.create_point_to_point()
+interface_element_2 = process_element.interfaces.interface.create('GigabitEthernet0/0/0/1', circuit_type='level-2-only', point_to_point=True)
 
 # List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/1']/address-families/address-family element: ipv4,unicast
-address_family_element_2 = interface_element.address_families.address_family.create('ipv4', 'unicast')
+address_family_element = interface_element_2.address_families.address_family.create('ipv4', 'unicast')
 
-# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/1']/address-families/address-family[af-name='ipv4',saf-name='unicast']/metric/levels/level element: 2
-level_element = address_family_element_2.metric.levels.level.create(u64(2), default_metric=u64(5000))
+# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/1']/address-families/address-family[af-name='ipv4',saf-name='unicast']/metric-levels/metric-level element: 2
+metric_level_element = address_family_element.metric_levels.metric_level.create(u64(2), default_metric=u64(5000))
 
 # List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface element: Loopback0
-interface_element = process_element.interfaces.interface.create('Loopback0')
-
-# P-container: /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='Loopback0']/passive
-passive = interface_element.create_passive()
+interface_element_2 = process_element.interfaces.interface.create('Loopback0', state='passive')
 
 # List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='Loopback0']/address-families/address-family element: ipv4,unicast
-address_family_element_2 = interface_element.address_families.address_family.create('ipv4', 'unicast')
+address_family_element = interface_element_2.address_families.address_family.create('ipv4', 'unicast')
+
+# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/address-families/address-family element: ipv4,unicast
+address_family_element_2 = process_element.address_families.address_family.create('ipv4', 'unicast')
+
+# P-container: /um-router-isis-cfg:router/isis/processes/process[process-id='1']/address-families/address-family[af-name='ipv4',saf-name='unicast']/metric-style/wide
+wide = address_family_element_2.metric_style.create_wide()
 
 # List /um-router-bgp-cfg:router/bgp/as element: 65001
 as__element = AMS_CORE_1.um_router_bgp_cfg_router.bgp.as_.create(u64(65001))
 
-# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/address-families/address-family element: vpnv4-unicast
-address_family_element_3 = as__element.address_families.address_family.create('vpnv4-unicast')
-
-# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/address-families/address-family element: vpnv6-unicast
-address_family_element_3 = as__element.address_families.address_family.create('vpnv6-unicast')
-
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor element: 10.0.0.2
 neighbor_element = as__element.neighbors.neighbor.create('10.0.0.2', description='FRA-CORE-1')
 
-# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor[neighbor-address='10.0.0.2']/use
+# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor[address='10.0.0.2']/use
 neighbor_element.use.neighbor_group = 'IPV4-IBGP'
 
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor element: 10.0.0.3
 neighbor_element = as__element.neighbors.neighbor.create('10.0.0.3', description='STO-CORE-1')
 
-# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor[neighbor-address='10.0.0.3']/use
+# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor[address='10.0.0.3']/use
 neighbor_element.use.neighbor_group = 'IPV4-IBGP'
 
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor element: 10.0.0.4
 neighbor_element = as__element.neighbors.neighbor.create('10.0.0.4', description='LJU-CORE-1')
 
-# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor[neighbor-address='10.0.0.4']/use
+# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor[address='10.0.0.4']/use
 neighbor_element.use.neighbor_group = 'IPV4-IBGP'
 
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbor-groups/neighbor-group element: IPV4-IBGP
 neighbor_group_element = as__element.neighbor_groups.neighbor_group.create('IPV4-IBGP', remote_as=u64(65001), update_source='Loopback0')
 
+# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbor-groups/neighbor-group[neighbor-group-name='IPV4-IBGP']/password
+neighbor_group_element.password.encrypted = '045209011F6C4D5B1D11001906020F053E222B267E3E270A'
+
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbor-groups/neighbor-group[neighbor-group-name='IPV4-IBGP']/address-families/address-family element: vpnv4-unicast
-address_family_element_4 = neighbor_group_element.address_families.address_family.create('vpnv4-unicast')
+address_family_element_3 = neighbor_group_element.address_families.address_family.create('vpnv4-unicast')
 
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbor-groups/neighbor-group[neighbor-group-name='IPV4-IBGP']/address-families/address-family element: vpnv6-unicast
-address_family_element_4 = neighbor_group_element.address_families.address_family.create('vpnv6-unicast')
+address_family_element_3 = neighbor_group_element.address_families.address_family.create('vpnv6-unicast')
 
-# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbor-groups/neighbor-group[neighbor-group-name='IPV4-IBGP']/password
-password = neighbor_group_element.create_password(encrypted='045209011F6C4D5B1D11001906020F053E222B267E3E270A')
+# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/address-families/address-family element: vpnv4-unicast
+address_family_element_4 = as__element.address_families.address_family.create('vpnv4-unicast')
+
+# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/address-families/address-family element: vpnv6-unicast
+address_family_element_4 = as__element.address_families.address_family.create('vpnv6-unicast')
 
 # Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/bgp
 as__element.bgp.router_id = '10.0.0.1'
@@ -104,30 +125,30 @@ as__element.bgp.router_id = '10.0.0.1'
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf element: acme-65501
 vrf_element_2 = as__element.vrfs.vrf.create('acme-65501')
 
+# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/rd/two-byte-as
+two_byte_as = vrf_element_2.rd.create_two_byte_as(two_byte_as_number=u64(65001), asn2_index=u64(655011))
+
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/address-families/address-family element: ipv4-unicast
 address_family_element_5 = vrf_element_2.address_families.address_family.create('ipv4-unicast')
 
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor element: 10.201.1.2
 neighbor_element_2 = vrf_element_2.neighbors.neighbor.create('10.201.1.2', remote_as=u64(65501), description='Customer eBGP SITE-1 [SNA-1-1] in VPN acme-65501 to 10.201.1.2')
 
-# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[neighbor-address='10.201.1.2']/address-families/address-family element: ipv4-unicast
+# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[address='10.201.1.2']/password
+neighbor_element_2.password.encrypted = '045A080B0A6C1A1B5C4954'
+
+# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[address='10.201.1.2']/address-families/address-family element: ipv4-unicast
 address_family_element_6 = neighbor_element_2.address_families.address_family.create('ipv4-unicast')
 
-# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[neighbor-address='10.201.1.2']/address-families/address-family[af-name='ipv4-unicast']/route-policy
-address_family_element_6.route_policy.in_ = 'ACCEPT'
+# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[address='10.201.1.2']/address-families/address-family[af-name='ipv4-unicast']/route-policy
 address_family_element_6.route_policy.out = 'ACCEPT'
+address_family_element_6.route_policy.in_ = 'ACCEPT'
 
-# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[neighbor-address='10.201.1.2']/address-families/address-family[af-name='ipv4-unicast']/as-override
+# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[address='10.201.1.2']/address-families/address-family[af-name='ipv4-unicast']/as-override
 as_override = address_family_element_6.create_as_override()
 
-# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[neighbor-address='10.201.1.2']/password
-password_2 = neighbor_element_2.create_password(encrypted='045A080B0A6C1A1B5C4954')
-
-# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/rd
-rd = vrf_element_2.create_rd()
-
-# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/rd/two-byte-as
-two_byte_as = rd.create_two_byte_as(as_number=u64(65001), index=u64(655011))
+# List /routing-policy/route-policies/route-policy element: ACCEPT
+route_policy_element = AMS_CORE_1.routing_policy.route_policies.route_policy.create('ACCEPT', rpl_route_policy='route-policy ACCEPT\n  done\nend-policy\n')
 
 # P-container: /mpls/ldp
 ldp = AMS_CORE_1.mpls.create_ldp()
@@ -136,46 +157,13 @@ ldp = AMS_CORE_1.mpls.create_ldp()
 address_family_element_7 = ldp.address_families.address_family.create('ipv4')
 
 # List /mpls/ldp/interfaces/interface element: GigabitEthernet0/0/0/0
-interface_element_2 = ldp.interfaces.interface.create('GigabitEthernet0/0/0/0')
+interface_element_3 = ldp.interfaces.interface.create('GigabitEthernet0/0/0/0')
 
 # List /mpls/ldp/interfaces/interface element: GigabitEthernet0/0/0/1
-interface_element_2 = ldp.interfaces.interface.create('GigabitEthernet0/0/0/1')
-
-# List /interfaces/interface element: GigabitEthernet0/0/0/0
-interface_element_3 = AMS_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/0', description='Link to FRA-CORE-1 [GigabitEthernet0/0/0/0]')
-
-# P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/0']/ipv4/addresses/address
-address = interface_element_3.ipv4.addresses.create_address(address='10.0.7.1', netmask='255.255.255.252')
-
-# List /interfaces/interface element: GigabitEthernet0/0/0/1
-interface_element_3 = AMS_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/1', description='Link to STO-CORE-1 [eth1]')
-
-# P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/1']/ipv4/addresses/address
-address = interface_element_3.ipv4.addresses.create_address(address='10.0.20.1', netmask='255.255.255.252')
-
-# List /interfaces/interface element: GigabitEthernet0/0/0/2
-interface_element_3 = AMS_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/2')
-
-# List /interfaces/interface element: GigabitEthernet0/0/0/2.100
-interface_element_3 = AMS_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/2.100', description='Customer VPN access SITE-1 [SNA-1-1] in VPN acme-65501', vrf='acme-65501')
-
-# P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/2.100']/ipv4/addresses/address
-address = interface_element_3.ipv4.addresses.create_address(address='10.201.1.1', netmask='255.255.255.252')
-
-# Container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/2.100']/um-l2-ethernet-cfg:encapsulation/dot1q
-interface_element_3.um_l2_ethernet_cfg_encapsulation.dot1q.vlan_id = u64(100)
-
-# List /interfaces/interface element: Loopback0
-interface_element_3 = AMS_CORE_1.interfaces.interface.create('Loopback0')
-
-# P-container: /interfaces/interface[interface-name='Loopback0']/ipv4/addresses/address
-address = interface_element_3.ipv4.addresses.create_address(address='10.0.0.1', netmask='255.255.255.255')
+interface_element_3 = ldp.interfaces.interface.create('GigabitEthernet0/0/0/1')
 
 # Container: /hostname
 AMS_CORE_1.hostname.system_network_name = 'AMS-CORE-1'
-
-# List /routing-policy/route-policies/route-policy element: ACCEPT
-route_policy_element = AMS_CORE_1.routing_policy.route_policies.route_policy.create('ACCEPT', rpl_route_policy='route-policy ACCEPT\n  done\nend-policy\n')
 
 # device FRA-CORE-1
 # Top node: /
@@ -187,11 +175,47 @@ vrf_element = FRA_CORE_1.vrfs.vrf.create('acme-65501', description='Customer VPN
 # P-container: /vrfs/vrf[vrf-name='acme-65501']/address-family/ipv4/unicast
 unicast = vrf_element.address_family.ipv4.create_unicast()
 
-# List /vrfs/vrf[vrf-name='acme-65501']/address-family/ipv4/unicast/import/route-target/two-byte-as-rts/two-byte-as-rt element: 65001,65501,False
-two_byte_as_rt_element = unicast.import_.route_target.two_byte_as_rts.two_byte_as_rt.create(u64(65001), u64(65501), False)
+# List /vrfs/vrf[vrf-name='acme-65501']/address-family/ipv4/unicast/import/route-target/two-byte-as-route-targets/two-byte-as-route-target element: 65001,65501,disable
+two_byte_as_route_target_element = unicast.import_.route_target.two_byte_as_route_targets.two_byte_as_route_target.create(u64(65001), u64(65501), 'disable')
 
-# List /vrfs/vrf[vrf-name='acme-65501']/address-family/ipv4/unicast/export/route-target/two-byte-as-rts/two-byte-as-rt element: 65001,65501,False
-two_byte_as_rt_element_2 = unicast.export.route_target.two_byte_as_rts.two_byte_as_rt.create(u64(65001), u64(65501), False)
+# List /vrfs/vrf[vrf-name='acme-65501']/address-family/ipv4/unicast/export/route-target/two-byte-as-route-targets/two-byte-as-route-target element: 65001,65501,disable
+two_byte_as_route_target_element_2 = unicast.export.route_target.two_byte_as_route_targets.two_byte_as_route_target.create(u64(65001), u64(65501), 'disable')
+
+# List /interfaces/interface element: GigabitEthernet0/0/0/0
+interface_element = FRA_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/0', description='Link to AMS-CORE-1 [GigabitEthernet0/0/0/0]')
+
+# P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/0']/ipv4/addresses/address
+address = interface_element.ipv4.addresses.create_address(address='10.0.7.2', netmask='255.255.255.252')
+
+# List /interfaces/interface element: GigabitEthernet0/0/0/1
+interface_element = FRA_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/1', description='Link to STO-CORE-1 [eth2]')
+
+# P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/1']/ipv4/addresses/address
+address = interface_element.ipv4.addresses.create_address(address='10.0.25.1', netmask='255.255.255.252')
+
+# List /interfaces/interface element: GigabitEthernet0/0/0/2
+interface_element = FRA_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/2', description='Link to LJU-CORE-1 [eth1]')
+
+# P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/2']/ipv4/addresses/address
+address = interface_element.ipv4.addresses.create_address(address='10.0.18.1', netmask='255.255.255.252')
+
+# List /interfaces/interface element: GigabitEthernet0/0/0/3
+interface_element = FRA_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/3')
+
+# List /interfaces/interface element: GigabitEthernet0/0/0/3.100
+interface_element = FRA_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/3.100', description='Customer VPN access SITE-2 [SNA-2-1] in VPN acme-65501', vrf='acme-65501')
+
+# P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/3.100']/ipv4/addresses/address
+address = interface_element.ipv4.addresses.create_address(address='10.202.1.1', netmask='255.255.255.252')
+
+# Container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/3.100']/encapsulation/dot1q
+interface_element.encapsulation.dot1q.vlan_id = u64(100)
+
+# List /interfaces/interface element: Loopback0
+interface_element = FRA_CORE_1.interfaces.interface.create('Loopback0')
+
+# P-container: /interfaces/interface[interface-name='Loopback0']/ipv4/addresses/address
+address = interface_element.ipv4.addresses.create_address(address='10.0.0.2', netmask='255.255.255.255')
 
 # List /um-router-isis-cfg:router/isis/processes/process element: 1
 process_element = FRA_CORE_1.um_router_isis_cfg_router.isis.processes.process.create('1', is_type='level-2-only')
@@ -199,95 +223,83 @@ process_element = FRA_CORE_1.um_router_isis_cfg_router.isis.processes.process.cr
 # List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/nets/net element: 49.0001.0100.0000.0002.00
 net_element = process_element.nets.net.create('49.0001.0100.0000.0002.00')
 
-# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/address-families/address-family element: ipv4,unicast
-address_family_element = process_element.address_families.address_family.create('ipv4', 'unicast')
-
-# P-container: /um-router-isis-cfg:router/isis/processes/process[process-id='1']/address-families/address-family[af-name='ipv4',saf-name='unicast']/metric-style/wide
-wide = address_family_element.metric_style.create_wide()
-
 # List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface element: GigabitEthernet0/0/0/0
-interface_element = process_element.interfaces.interface.create('GigabitEthernet0/0/0/0', circuit_type='level-2-only')
-
-# P-container: /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/0']/point-to-point
-point_to_point = interface_element.create_point_to_point()
+interface_element_2 = process_element.interfaces.interface.create('GigabitEthernet0/0/0/0', circuit_type='level-2-only', point_to_point=True)
 
 # List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/0']/address-families/address-family element: ipv4,unicast
-address_family_element_2 = interface_element.address_families.address_family.create('ipv4', 'unicast')
+address_family_element = interface_element_2.address_families.address_family.create('ipv4', 'unicast')
 
-# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/0']/address-families/address-family[af-name='ipv4',saf-name='unicast']/metric/levels/level element: 2
-level_element = address_family_element_2.metric.levels.level.create(u64(2), default_metric=u64(5000))
+# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/0']/address-families/address-family[af-name='ipv4',saf-name='unicast']/metric-levels/metric-level element: 2
+metric_level_element = address_family_element.metric_levels.metric_level.create(u64(2), default_metric=u64(5000))
 
 # List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface element: GigabitEthernet0/0/0/1
-interface_element = process_element.interfaces.interface.create('GigabitEthernet0/0/0/1', circuit_type='level-2-only')
-
-# P-container: /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/1']/point-to-point
-point_to_point = interface_element.create_point_to_point()
+interface_element_2 = process_element.interfaces.interface.create('GigabitEthernet0/0/0/1', circuit_type='level-2-only', point_to_point=True)
 
 # List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/1']/address-families/address-family element: ipv4,unicast
-address_family_element_2 = interface_element.address_families.address_family.create('ipv4', 'unicast')
+address_family_element = interface_element_2.address_families.address_family.create('ipv4', 'unicast')
 
-# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/1']/address-families/address-family[af-name='ipv4',saf-name='unicast']/metric/levels/level element: 2
-level_element = address_family_element_2.metric.levels.level.create(u64(2), default_metric=u64(5000))
+# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/1']/address-families/address-family[af-name='ipv4',saf-name='unicast']/metric-levels/metric-level element: 2
+metric_level_element = address_family_element.metric_levels.metric_level.create(u64(2), default_metric=u64(5000))
 
 # List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface element: GigabitEthernet0/0/0/2
-interface_element = process_element.interfaces.interface.create('GigabitEthernet0/0/0/2', circuit_type='level-2-only')
-
-# P-container: /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/2']/point-to-point
-point_to_point = interface_element.create_point_to_point()
+interface_element_2 = process_element.interfaces.interface.create('GigabitEthernet0/0/0/2', circuit_type='level-2-only', point_to_point=True)
 
 # List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/2']/address-families/address-family element: ipv4,unicast
-address_family_element_2 = interface_element.address_families.address_family.create('ipv4', 'unicast')
+address_family_element = interface_element_2.address_families.address_family.create('ipv4', 'unicast')
 
-# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/2']/address-families/address-family[af-name='ipv4',saf-name='unicast']/metric/levels/level element: 2
-level_element = address_family_element_2.metric.levels.level.create(u64(2), default_metric=u64(5000))
+# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='GigabitEthernet0/0/0/2']/address-families/address-family[af-name='ipv4',saf-name='unicast']/metric-levels/metric-level element: 2
+metric_level_element = address_family_element.metric_levels.metric_level.create(u64(2), default_metric=u64(5000))
 
 # List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface element: Loopback0
-interface_element = process_element.interfaces.interface.create('Loopback0')
-
-# P-container: /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='Loopback0']/passive
-passive = interface_element.create_passive()
+interface_element_2 = process_element.interfaces.interface.create('Loopback0', state='passive')
 
 # List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/interfaces/interface[interface-name='Loopback0']/address-families/address-family element: ipv4,unicast
-address_family_element_2 = interface_element.address_families.address_family.create('ipv4', 'unicast')
+address_family_element = interface_element_2.address_families.address_family.create('ipv4', 'unicast')
+
+# List /um-router-isis-cfg:router/isis/processes/process[process-id='1']/address-families/address-family element: ipv4,unicast
+address_family_element_2 = process_element.address_families.address_family.create('ipv4', 'unicast')
+
+# P-container: /um-router-isis-cfg:router/isis/processes/process[process-id='1']/address-families/address-family[af-name='ipv4',saf-name='unicast']/metric-style/wide
+wide = address_family_element_2.metric_style.create_wide()
 
 # List /um-router-bgp-cfg:router/bgp/as element: 65001
 as__element = FRA_CORE_1.um_router_bgp_cfg_router.bgp.as_.create(u64(65001))
 
-# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/address-families/address-family element: vpnv4-unicast
-address_family_element_3 = as__element.address_families.address_family.create('vpnv4-unicast')
-
-# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/address-families/address-family element: vpnv6-unicast
-address_family_element_3 = as__element.address_families.address_family.create('vpnv6-unicast')
-
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor element: 10.0.0.1
 neighbor_element = as__element.neighbors.neighbor.create('10.0.0.1', description='AMS-CORE-1')
 
-# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor[neighbor-address='10.0.0.1']/use
+# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor[address='10.0.0.1']/use
 neighbor_element.use.neighbor_group = 'IPV4-IBGP'
 
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor element: 10.0.0.3
 neighbor_element = as__element.neighbors.neighbor.create('10.0.0.3', description='STO-CORE-1')
 
-# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor[neighbor-address='10.0.0.3']/use
+# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor[address='10.0.0.3']/use
 neighbor_element.use.neighbor_group = 'IPV4-IBGP'
 
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor element: 10.0.0.4
 neighbor_element = as__element.neighbors.neighbor.create('10.0.0.4', description='LJU-CORE-1')
 
-# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor[neighbor-address='10.0.0.4']/use
+# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbors/neighbor[address='10.0.0.4']/use
 neighbor_element.use.neighbor_group = 'IPV4-IBGP'
 
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbor-groups/neighbor-group element: IPV4-IBGP
 neighbor_group_element = as__element.neighbor_groups.neighbor_group.create('IPV4-IBGP', remote_as=u64(65001), update_source='Loopback0')
 
+# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbor-groups/neighbor-group[neighbor-group-name='IPV4-IBGP']/password
+neighbor_group_element.password.encrypted = '045209011F6C4D5B1D11001906020F053E222B267E3E270A'
+
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbor-groups/neighbor-group[neighbor-group-name='IPV4-IBGP']/address-families/address-family element: vpnv4-unicast
-address_family_element_4 = neighbor_group_element.address_families.address_family.create('vpnv4-unicast')
+address_family_element_3 = neighbor_group_element.address_families.address_family.create('vpnv4-unicast')
 
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbor-groups/neighbor-group[neighbor-group-name='IPV4-IBGP']/address-families/address-family element: vpnv6-unicast
-address_family_element_4 = neighbor_group_element.address_families.address_family.create('vpnv6-unicast')
+address_family_element_3 = neighbor_group_element.address_families.address_family.create('vpnv6-unicast')
 
-# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/neighbor-groups/neighbor-group[neighbor-group-name='IPV4-IBGP']/password
-password = neighbor_group_element.create_password(encrypted='045209011F6C4D5B1D11001906020F053E222B267E3E270A')
+# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/address-families/address-family element: vpnv4-unicast
+address_family_element_4 = as__element.address_families.address_family.create('vpnv4-unicast')
+
+# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/address-families/address-family element: vpnv6-unicast
+address_family_element_4 = as__element.address_families.address_family.create('vpnv6-unicast')
 
 # Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/bgp
 as__element.bgp.router_id = '10.0.0.2'
@@ -295,30 +307,30 @@ as__element.bgp.router_id = '10.0.0.2'
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf element: acme-65501
 vrf_element_2 = as__element.vrfs.vrf.create('acme-65501')
 
+# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/rd/two-byte-as
+two_byte_as = vrf_element_2.rd.create_two_byte_as(two_byte_as_number=u64(65001), asn2_index=u64(655012))
+
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/address-families/address-family element: ipv4-unicast
 address_family_element_5 = vrf_element_2.address_families.address_family.create('ipv4-unicast')
 
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor element: 10.202.1.2
 neighbor_element_2 = vrf_element_2.neighbors.neighbor.create('10.202.1.2', remote_as=u64(65501), description='Customer eBGP SITE-2 [SNA-2-1] in VPN acme-65501 to 10.202.1.2')
 
-# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[neighbor-address='10.202.1.2']/address-families/address-family element: ipv4-unicast
+# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[address='10.202.1.2']/password
+neighbor_element_2.password.encrypted = '045A080B0A6C1A1B5C4954'
+
+# List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[address='10.202.1.2']/address-families/address-family element: ipv4-unicast
 address_family_element_6 = neighbor_element_2.address_families.address_family.create('ipv4-unicast')
 
-# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[neighbor-address='10.202.1.2']/address-families/address-family[af-name='ipv4-unicast']/route-policy
-address_family_element_6.route_policy.in_ = 'ACCEPT'
+# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[address='10.202.1.2']/address-families/address-family[af-name='ipv4-unicast']/route-policy
 address_family_element_6.route_policy.out = 'ACCEPT'
+address_family_element_6.route_policy.in_ = 'ACCEPT'
 
-# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[neighbor-address='10.202.1.2']/address-families/address-family[af-name='ipv4-unicast']/as-override
+# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[address='10.202.1.2']/address-families/address-family[af-name='ipv4-unicast']/as-override
 as_override = address_family_element_6.create_as_override()
 
-# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[neighbor-address='10.202.1.2']/password
-password_2 = neighbor_element_2.create_password(encrypted='045A080B0A6C1A1B5C4954')
-
-# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/rd
-rd = vrf_element_2.create_rd()
-
-# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/rd/two-byte-as
-two_byte_as = rd.create_two_byte_as(as_number=u64(65001), index=u64(655012))
+# List /routing-policy/route-policies/route-policy element: ACCEPT
+route_policy_element = FRA_CORE_1.routing_policy.route_policies.route_policy.create('ACCEPT', rpl_route_policy='route-policy ACCEPT\n  done\nend-policy\n')
 
 # P-container: /mpls/ldp
 ldp = FRA_CORE_1.mpls.create_ldp()
@@ -327,55 +339,16 @@ ldp = FRA_CORE_1.mpls.create_ldp()
 address_family_element_7 = ldp.address_families.address_family.create('ipv4')
 
 # List /mpls/ldp/interfaces/interface element: GigabitEthernet0/0/0/0
-interface_element_2 = ldp.interfaces.interface.create('GigabitEthernet0/0/0/0')
+interface_element_3 = ldp.interfaces.interface.create('GigabitEthernet0/0/0/0')
 
 # List /mpls/ldp/interfaces/interface element: GigabitEthernet0/0/0/1
-interface_element_2 = ldp.interfaces.interface.create('GigabitEthernet0/0/0/1')
+interface_element_3 = ldp.interfaces.interface.create('GigabitEthernet0/0/0/1')
 
 # List /mpls/ldp/interfaces/interface element: GigabitEthernet0/0/0/2
-interface_element_2 = ldp.interfaces.interface.create('GigabitEthernet0/0/0/2')
-
-# List /interfaces/interface element: GigabitEthernet0/0/0/0
-interface_element_3 = FRA_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/0', description='Link to AMS-CORE-1 [GigabitEthernet0/0/0/0]')
-
-# P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/0']/ipv4/addresses/address
-address = interface_element_3.ipv4.addresses.create_address(address='10.0.7.2', netmask='255.255.255.252')
-
-# List /interfaces/interface element: GigabitEthernet0/0/0/1
-interface_element_3 = FRA_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/1', description='Link to STO-CORE-1 [eth2]')
-
-# P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/1']/ipv4/addresses/address
-address = interface_element_3.ipv4.addresses.create_address(address='10.0.25.1', netmask='255.255.255.252')
-
-# List /interfaces/interface element: GigabitEthernet0/0/0/2
-interface_element_3 = FRA_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/2', description='Link to LJU-CORE-1 [eth1]')
-
-# P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/2']/ipv4/addresses/address
-address = interface_element_3.ipv4.addresses.create_address(address='10.0.18.1', netmask='255.255.255.252')
-
-# List /interfaces/interface element: GigabitEthernet0/0/0/3
-interface_element_3 = FRA_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/3')
-
-# List /interfaces/interface element: GigabitEthernet0/0/0/3.100
-interface_element_3 = FRA_CORE_1.interfaces.interface.create('GigabitEthernet0/0/0/3.100', description='Customer VPN access SITE-2 [SNA-2-1] in VPN acme-65501', vrf='acme-65501')
-
-# P-container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/3.100']/ipv4/addresses/address
-address = interface_element_3.ipv4.addresses.create_address(address='10.202.1.1', netmask='255.255.255.252')
-
-# Container: /interfaces/interface[interface-name='GigabitEthernet0/0/0/3.100']/um-l2-ethernet-cfg:encapsulation/dot1q
-interface_element_3.um_l2_ethernet_cfg_encapsulation.dot1q.vlan_id = u64(100)
-
-# List /interfaces/interface element: Loopback0
-interface_element_3 = FRA_CORE_1.interfaces.interface.create('Loopback0')
-
-# P-container: /interfaces/interface[interface-name='Loopback0']/ipv4/addresses/address
-address = interface_element_3.ipv4.addresses.create_address(address='10.0.0.2', netmask='255.255.255.255')
+interface_element_3 = ldp.interfaces.interface.create('GigabitEthernet0/0/0/2')
 
 # Container: /hostname
 FRA_CORE_1.hostname.system_network_name = 'FRA-CORE-1'
-
-# List /routing-policy/route-policies/route-policy element: ACCEPT
-route_policy_element = FRA_CORE_1.routing_policy.route_policies.route_policy.create('ACCEPT', rpl_route_policy='route-policy ACCEPT\n  done\nend-policy\n')
 
 # device LJU-CORE-1
 # Top node: /
