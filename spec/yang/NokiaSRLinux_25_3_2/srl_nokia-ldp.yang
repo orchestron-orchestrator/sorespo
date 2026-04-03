@@ -1,0 +1,2472 @@
+module srl_nokia-ldp {
+  yang-version 1.1;
+  namespace "urn:nokia.com:srlinux:ldp:ldp";
+  prefix srl_nokia-ldp;
+
+  import srl_nokia-common {
+    prefix srl_nokia-comm;
+  }
+  import srl_nokia-extensions {
+    prefix srl_nokia-ext;
+  }
+  import srl_nokia-network-instance {
+    prefix srl_nokia-netinst;
+  }
+  import srl_nokia-routing-policy {
+    prefix srl-rpol;
+  }
+  import srl_nokia-system {
+    prefix srl_nokia-system;
+  }
+  import srl_nokia-mpls-label-management {
+    prefix srl_nokia-mplslbl;
+  }
+  import srl_nokia-features {
+    prefix srl_nokia-feat;
+  }
+
+  organization
+    "Nokia";
+  contact
+    "Nokia SR Linux Support
+     Web: <http://www.nokia.com>";
+  description
+    "This YANG module defines the configuration and state components for the management of the MPLS Label Distribution Protocol (LDP)";
+
+  revision 2025-03-31 {
+    description
+      "SRLinux 2025.3.1";
+  }
+  revision 2024-10-31 {
+    description
+      "SRLinux 24.10.1";
+  }
+  revision 2024-07-31 {
+    description
+      "SRLinux 24.7.1";
+  }
+  revision 2024-03-31 {
+    description
+      "SRLinux 24.3.1";
+  }
+  revision 2023-10-31 {
+    description
+      "SRLinux 23.10.1";
+  }
+  revision 2023-07-31 {
+    description
+      "SRLinux 23.7.1";
+  }
+  revision 2023-03-31 {
+    description
+      "SRLinux 23.3.1";
+  }
+  revision 2021-11-30 {
+    description
+      "SRLinux 21.11.1";
+  }
+  revision 2021-06-30 {
+    description
+      "SRLinux 21.6.1";
+  }
+  revision 2021-03-31 {
+    description
+      "SRLinux 21.3.1";
+  }
+
+  grouping ldp-subintf-ref {
+    leaf name {
+      type srl_nokia-comm:subinterface-all;
+      must "starts-with(., 'ethernet') or starts-with(., 'lag')" {
+        error-message "LDP is only supported on Ethernet and LAG subinterfaces";
+      }
+      description
+        "Reference to a specific subinterface that is bound to the network instance";
+    }
+  }
+
+  grouping intf-oper-down-reason {
+    leaf intf-oper-down-reason {
+      config false;
+      description
+        "Reason for the LDP interface being down";
+      type enumeration {
+        enum ldp-interface-admin-down;
+        enum ldp-instance-oper-down;
+        enum network-instance-subinterface-down;
+        enum out-of-resources;
+        enum unknown;
+      }
+    }
+  }
+
+  grouping target-oper-down-reason {
+    leaf target-oper-down-reason {
+      config false;
+      description
+        "Reason for the targeted LDP adjacency being down";
+      type enumeration {
+        enum target-admin-down;
+        enum ldp-instance-oper-down;
+        enum out-of-resources;
+        enum unknown;
+      }
+    }
+  }
+
+  typedef label-adv-mode {
+    type enumeration {
+      enum downstream-unsolicited {
+        description
+          "Downstream Unsolicited";
+      }
+      enum downstream-on-demand {
+        description
+          "Downstream on Demand";
+      }
+    }
+    description
+      "Label Advertisement Mode";
+  }
+
+  typedef ldp-label-type {
+    type enumeration {
+      enum pop {
+        value 1;
+        description
+          "An advertised label that is programmed with a POP operation";
+      }
+      enum swap {
+        value 2;
+        description
+          "An advertised label that is programmed with a SWAP operation";
+      }
+    }
+  }
+
+  typedef session-trace-option-flags {
+    type enumeration {
+      enum all {
+        description
+          "Trace all events and packets";
+      }
+      enum events-all {
+        description
+          "Trace all events";
+      }
+      enum events-session {
+        description
+          "Trace session related events";
+      }
+      enum events-binding {
+        description
+          "Trace binding related events";
+      }
+      enum messages-all {
+        description
+          "Trace all LDP messages";
+      }
+      enum messages-all-detail {
+        description
+          "Trace all LDP messages with detailed output";
+      }
+      enum messages-initialization {
+        description
+          "Trace LDP Initialization packets";
+      }
+      enum messages-initialization-detail {
+        description
+          "Trace LDP Initialization packets with detailed output";
+      }
+      enum messages-keepalive {
+        description
+          "Trace LDP Keepalive packets";
+      }
+      enum messages-label {
+        description
+          "Trace LDP Label Mapping, Label Request, Label Abort Request, Label Withdraw and Label Release packets";
+      }
+      enum messages-label-detail {
+        description
+          "Trace LDP Label Mapping, Label Request, Label Abort Request, Label Withdraw and Label Release packets with detailed output";
+      }
+      enum messages-hello {
+        description
+          "Trace Hello packets";
+      }
+      enum messages-hello-detail {
+        description
+          "Trace LDP Hello packets with detailed output";
+      }
+    }
+  }
+
+  typedef interface-trace-option-flags {
+    type enumeration {
+      enum all {
+        description
+          "Trace all events and packets";
+      }
+      enum events-discovery {
+        description
+          "Trace session related events";
+      }
+      enum messages-hello {
+        description
+          "Trace Hello packets";
+      }
+      enum messages-hello-detail {
+        description
+          "Trace LDP Hello packets with detailed output";
+      }
+    }
+  }
+
+  typedef vc-type {
+    type enumeration {
+      enum ethernet {
+        value 2;
+      }
+      enum vlan {
+        value 4;
+      }
+    }
+    description
+      "Specifies the type of virtual circuit (VC) associated with
+       the pseudowire";
+  }
+
+  typedef vc-id {
+    type uint32 {
+      range "1..4294967295";
+    }
+    description
+      "Defines the virtual circuit identifier";
+  }
+
+  typedef pseudowire-status-bits {
+    type enumeration {
+      enum pseudowire-forwarding {
+        value 0;
+      }
+      enum pseudowire-not-forwarding {
+        value 1;
+      }
+      enum local-attachment-circuit-ingress-fault {
+        value 2;
+      }
+      enum local-attachment-circuit-egress-fault {
+        value 3;
+      }
+      enum provider-service-network-ingress-fault {
+        value 4;
+      }
+      enum provider-service-network-egress-fault {
+        value 5;
+      }
+      enum pseudowire-forwarding-standby {
+        value 6;
+      }
+      enum pseudowire-request-switchover {
+        value 7;
+      }
+    }
+    description
+      "The pseudowire status bits signaled in TLDP
+
+       The values can indicate:
+       - pseudowire-forwarding, if all the pseudowire status bits are set to zero
+       - pseudowire-not-forwarding
+       - local-attachment-circuit-ingress-fault, if the local subinterface ingress is in a fault state
+       - local-attachment-circuit-egress-fault, if the local subinterface egress is in a fault state
+       - provider-service-network-ingress-fault, if the network ingress is in a fault state
+       - provider-service-network-egress-fault, if the network egress is in a fault state
+       - pseudowire-forwarding-standby, if the pseudowire is in standby state
+       - pseudowire-request-switchover, if the pseudowire is in request switchover status";
+  }
+
+  typedef in-label-withdraw-reason {
+    type enumeration {
+      enum none {
+        value 0;
+      }
+      enum local-fault {
+        value 2;
+      }
+    }
+    description
+      "Specifies the reason why the LDP ingress label is withdrawn
+
+       The value can indicate:
+       - 'none' means no reason specified for the withdrawal of the ingress label
+       - 'local-fault' means the ingress label is withdrawn because there is a local fault";
+  }
+
+  grouping adjacency-state-attributes {
+    description
+      "The operational state attributes of an LDP hello adjacency";
+    leaf hello-received {
+      config false;
+      type srl_nokia-comm:zero-based-counter64;
+      description
+        "The number of Hello messages received";
+    }
+    leaf hello-sent {
+      config false;
+      type srl_nokia-comm:zero-based-counter64;
+      description
+        "The number of Hello messages sent";
+    }
+    container hello-holdtime {
+      config false;
+      description
+        "Container for hello holdtime state information";
+      leaf neighbor-proposed {
+        type uint16;
+        units "seconds";
+        description
+          "The holdtime value learned from the adjacent LSR";
+      }
+      leaf negotiated {
+        type uint16;
+        units "seconds";
+        description
+          "The holdtime negotiated between this LSR and the adjacent LSR";
+      }
+      leaf remaining {
+        type uint16;
+        units "seconds";
+        description
+          "The time remaining until the holdtime timer expires";
+      }
+    }
+  }
+
+  grouping discovery-timers {
+    leaf hello-holdtime {
+      type uint16 {
+        range "15..3600";
+      }
+      units "seconds";
+      must '. >= (2 * ../hello-interval)' {
+        error-message "Hello hold-time must be at least 2x the hello interval";
+      }
+      must '(../hello-interval > 0)' {
+        error-message "Both hello hold-time and interval must be configured at the same time";
+      }
+      description
+        "The time interval for which a LDP Hello adjacency is maintained in the absence of Hello messages from the LDP neighbor";
+    }
+    leaf hello-interval {
+      type uint16 {
+        range "5..1200";
+      }
+      units "seconds";
+      must '(../hello-holdtime > 0)' {
+        error-message "Both hello hold-time and interval must be configured at the same time";
+      }
+      description
+        "The interval between consecutive LDP Hello messages used in LDP discovery";
+    }
+  }
+
+  grouping hello-message-error-stats {
+    container hello-message-errors {
+      config false;
+      description
+        "Counters for received Hello message errors";
+      leaf bad-protocol-version {
+        type srl_nokia-comm:zero-based-counter64;
+        description
+          "The number of Hello messages received with a bad protocol version";
+      }
+      leaf bad-pdu-length {
+        type srl_nokia-comm:zero-based-counter64;
+        description
+          "The number of Hello messages received with a bad PDU length";
+      }
+      leaf bad-message-length {
+        type srl_nokia-comm:zero-based-counter64;
+        description
+          "The number of Hello messages received with a bad message length";
+      }
+      leaf malformed-tlv-value {
+        type srl_nokia-comm:zero-based-counter64;
+        description
+          "The number of Hello messages received with a malformed TLV value";
+      }
+    }
+  }
+
+  grouping graceful-restart-config {
+    container graceful-restart {
+      description
+        "Attributes for graceful restart";
+      leaf helper-enable {
+        type boolean;
+        default "false";
+        description
+          "Enable or disable graceful restart as a helper";
+      }
+      leaf max-reconnect-time {
+        type uint16 {
+          range "10..1800";
+        }
+        units "seconds";
+        default "120";
+        description
+          "Specifies the maximum time interval, in seconds, that this router is willing to wait for the remote LDP peer to reconnect after an LDP communication failure";
+      }
+      leaf max-recovery-time {
+        type uint16 {
+          range "30..3600";
+        }
+        units "seconds";
+        default "120";
+        description
+          "Specifies the maximum time interval, in seconds, that this router is willing to preserve its MPLS forwarding state after receiving the Initialization message from the restarted LDP peer";
+      }
+    }
+  }
+
+  grouping prefix-policy-config {
+    leaf export-prefix-policy {
+      if-feature "srl_nokia-feat:ldp-prefix-policies";
+      description
+        "Apply an export prefix policy to filter advertised label bindings";
+      type leafref {
+        path "/srl-rpol:routing-policy/srl-rpol:policy/srl-rpol:name";
+      }
+    }
+    leaf import-prefix-policy {
+      if-feature "srl_nokia-feat:ldp-prefix-policies";
+      description
+        "Apply an import prefix policy to filter received label bindings";
+      type leafref {
+        path "/srl-rpol:routing-policy/srl-rpol:policy/srl-rpol:name";
+      }
+    }
+  }
+
+  grouping ldp-peer-ref {
+    description
+      "An absolute reference to an LDP peer, by the LDP ID, which consists of the LSR ID and the Label Space ID";
+    leaf lsr-id {
+      type leafref {
+        path "/srl_nokia-netinst:network-instance/srl_nokia-netinst:protocols/srl_nokia-ldp:ldp/srl_nokia-ldp:peers/srl_nokia-ldp:peer/srl_nokia-ldp:lsr-id";
+      }
+      description
+        "The LSR ID of the peer, as a portion of the peer LDP ID";
+    }
+    leaf label-space-id {
+      type leafref {
+        path "/srl_nokia-netinst:network-instance/srl_nokia-netinst:protocols/srl_nokia-ldp:ldp/srl_nokia-ldp:peers/srl_nokia-ldp:peer/srl_nokia-ldp:label-space-id";
+      }
+      description
+        "The Label Space ID of the peer, as a portion of the peer LDP ID";
+    }
+  }
+
+  grouping session-timers {
+    description
+      "Peer configuration attributes, used in the per-peer setting can in the all-peer setting";
+    leaf session-keepalive-holdtime {
+      type uint16 {
+        range "45..3600";
+      }
+      units "seconds";
+      default "180";
+      must '. >= (2 * ../session-keepalive-interval)' {
+        error-message "Session holdtime must be at least 2x session keepalive interval";
+      }
+      description
+        "The time interval after which an inactive LDP session terminates and the corresponding TCP session closes. Inactivity is defined as not receiving LDP packets from the peer";
+    }
+    leaf session-keepalive-interval {
+      type uint16 {
+        range "15..1200";
+      }
+      units "seconds";
+      default "60";
+      description
+        "The interval between successive transmissions of keepalive packets. Keepalive packets are only sent in the absence of other LDP packets transmitted over the LDP session";
+    }
+  }
+
+  grouping tcp-transport-state {
+    description
+      "TCP connection state";
+    leaf local-address {
+      config false;
+      type srl_nokia-comm:ip-address;
+      description
+        "Local address";
+    }
+    leaf local-port {
+      config false;
+      type srl_nokia-comm:port-number;
+      description
+        "Local port number";
+    }
+    leaf remote-address {
+      config false;
+      type srl_nokia-comm:ip-address;
+      description
+        "Remote address";
+    }
+    leaf remote-port {
+      config false;
+      type srl_nokia-comm:port-number;
+      description
+        "Remote port number";
+    }
+  }
+
+  grouping peer-state {
+    description
+      "The peer state information";
+    leaf adjacency-type {
+      config false;
+      description
+        "The value indicates the adjacency type";
+      type enumeration {
+        enum link {
+          value 1;
+        }
+        enum targeted {
+          value 2;
+        }
+        enum both {
+          value 3;
+        }
+      }
+    }
+    container end-of-lib {
+      config false;
+      description
+        "Container with state information pertaining to sent and received End of LIB markers";
+      container ipv4-prefix-fecs {
+        leaf sent {
+          description
+            "When this is true, an End-of-LIB marker was sent to the LDP peer";
+          type boolean;
+        }
+        leaf received {
+          description
+            "When this is true, an End-of-LIB marker was received from the LDP peer";
+          type boolean;
+        }
+      }
+      container ipv6-prefix-fecs {
+        if-feature "srl_nokia-feat:ldp-ipv6";
+        leaf sent {
+          description
+            "When this is true, an End-of-LIB marker was sent to the LDP peer";
+          type boolean;
+        }
+        leaf received {
+          description
+            "When this is true, an End-of-LIB marker was received from the LDP peer";
+          type boolean;
+        }
+      }
+    }
+    container label-advertisement-mode {
+      config false;
+      description
+        "Label advertisement mode state";
+      leaf negotiated {
+        type label-adv-mode;
+        description
+          "Negotiated Label Advertisement Mode";
+      }
+    }
+    container graceful-restart {
+      config false;
+      description
+        "Graceful restart operational state";
+      leaf peer-reconnect-time {
+        type uint16 {
+          range "10..1800";
+        }
+        units "seconds";
+        description
+          "The requested reconnect time";
+      }
+      leaf peer-recovery-time {
+        type uint16 {
+          range "30..3600";
+        }
+        units "seconds";
+        default "120";
+        description
+          "The requested recovery time";
+      }
+      leaf peer-restarting {
+        description
+          "If true, the peer is currently in the process of restarting";
+        type boolean;
+      }
+    }
+    container overload {
+      config false;
+      description
+        "Overload state of the session";
+      leaf peer-is-overloaded {
+        description
+          "The peer has sent an overload TLV to this router requesting that we stop advertising new FECs";
+        type boolean;
+      }
+      leaf local-router-is-overloaded {
+        description
+          "This router transmitted an overload TLV requesting that the peer stop advertising new FECs";
+        type boolean;
+      }
+    }
+    container received-capabilities {
+      config false;
+      description
+        "Capabilities signalled by the peer";
+      leaf graceful-restart-capability {
+        description
+          "Fault tolerance protection TLV 0x0503";
+        type boolean;
+      }
+      leaf entropy-label-capability {
+        description
+          "Entropy label capability. TLV 0x0206";
+        type boolean;
+      }
+      leaf dynamic-capability {
+        description
+          "Dynamic capability advertisement capability. Indicates support for Capability messages. TLV 0x0506";
+        type boolean;
+      }
+      leaf point-to-multipoint-capability {
+        description
+          "Point to multipoint FEC capability. TLV 0x0508";
+        type boolean;
+      }
+      leaf multipoint-to-multipoint-capability {
+        description
+          "Multipoint to multipoint FEC capability. TLV 0x0509";
+        type boolean;
+      }
+      leaf make-before-break-capability {
+        description
+          "Make before break capability. TLV 0x050A";
+        type boolean;
+      }
+      container state-advertisement-control {
+        description
+          "State advertisement control capability. TLV 0x050D";
+        leaf ipv4-prefix-disable {
+          description
+            "Indicates desire to not receive IPv4 prefix FECs";
+          type boolean;
+        }
+        leaf ipv6-prefix-disable {
+          if-feature "srl_nokia-feat:ldp-ipv6";
+          description
+            "Indicates desire to not receive IPv6 prefix FECs";
+          type boolean;
+        }
+        leaf p2p-pseudowire-fec-128-disable {
+          description
+            "Indicates desire to not receive P2P PW FEC 128 FECs";
+          type boolean;
+        }
+        leaf p2p-pseudowire-fec-129-disable {
+          description
+            "Indicates desire to not receive P2P PW FEC 129 FECs";
+          type boolean;
+        }
+      }
+      leaf unrecognized-notification-capability {
+        description
+          "Unrecognized notification capability. TLV 0x0603";
+        type boolean;
+      }
+      leaf dual-stack-capability {
+        description
+          "Dual stack capability. TLV 0x0701";
+        type boolean;
+      }
+      leaf nokia-vendor-overload-capability {
+        description
+          "Overload capability";
+        type boolean;
+      }
+    }
+    container session-holdtime {
+      config false;
+      description
+        "Session holdtime state";
+      leaf peer-proposed {
+        type uint16;
+        units "seconds";
+        description
+          "Peer holdtime";
+      }
+      leaf negotiated {
+        type uint16;
+        units "seconds";
+        description
+          "Negotiated holdtime";
+      }
+      leaf remaining {
+        type uint16;
+        units "seconds";
+        description
+          "Remaining holdtime";
+      }
+    }
+    leaf session-state {
+      config false;
+      type enumeration {
+        enum non-existent {
+          description
+            "NON EXISTENT state. Transport disconnected";
+        }
+        enum initialized {
+          description
+            "INITIALIZED state";
+        }
+        enum openrec {
+          description
+            "OPENREC state";
+        }
+        enum opensent {
+          description
+            "OPENSENT state";
+        }
+        enum operational {
+          description
+            "OPERATIONAL state";
+        }
+      }
+      description
+        "Representing the operational status of the LDP session";
+      reference
+        "RFC5036, Sec. 2.5.4";
+    }
+    leaf last-oper-state-change {
+      config false;
+      type srl_nokia-comm:date-and-time-delta;
+      description
+        "Last time the peer state changed";
+    }
+    container statistics {
+      config false;
+      description
+        "Statistics objects";
+      container received-messages {
+        description
+          "Inbound statistics";
+        uses statistics-peer-received-sent;
+      }
+      container sent-messages {
+        description
+          "Outbound statistics";
+        uses statistics-peer-received-sent;
+      }
+      uses address-statistics;
+      uses fec-statistics;
+    }
+  }
+
+  grouping instance-level-statistics {
+    description
+      "LDP instance level statistics";
+    leaf total-discovery-interfaces {
+      type uint16;
+      description
+        "The total number of IP subinterfaces on which basic LDP discovery is active";
+    }
+    leaf total-discovery-targets {
+      if-feature "srl_nokia-feat:ldp-targeted";
+      type uint16;
+      description
+        "The total number of configured extended discovery targets";
+    }
+    leaf total-interface-hello-adjacencies {
+      type uint16;
+      description
+        "The total number of interface hello adjacencies that are up";
+    }
+    leaf total-targeted-hello-adjacencies {
+      if-feature "srl_nokia-feat:ldp-targeted";
+      type uint16;
+      description
+        "The total number of targeted hello adjacencies that are up";
+    }
+    leaf total-peers {
+      type uint16;
+      description
+        "The total number of LDP TCP sessions that are established";
+    }
+  }
+
+  grouping fec-statistics {
+    container fec-statistics {
+      container ipv4-prefix {
+        leaf received-fecs {
+          type srl_nokia-comm:zero-based-counter32;
+          description
+            "The number of received IPv4 prefix FECs from a single peer or all peers. In the overall summary the same FEC prefix from different peers counts as 1";
+        }
+        leaf advertised-fecs {
+          type srl_nokia-comm:zero-based-counter32;
+          description
+            "The number of advertised IPv4 prefix FECs to a single peer or all peers. In the overall summary the same FEC prefix advertised to multiple peers counts as 1";
+        }
+      }
+      container ipv6-prefix {
+        if-feature "srl_nokia-feat:ldp-ipv6";
+        leaf received-fecs {
+          type srl_nokia-comm:zero-based-counter32;
+          description
+            "The number of received IPv6 prefix FECs from a single peer or all peers. In the overall summary the same FEC prefix from different peers counts as 1";
+        }
+        leaf advertised-fecs {
+          type srl_nokia-comm:zero-based-counter32;
+          description
+            "The number of advertised IPv6 prefix FECs to a single peer or all peers. In the overall summary the same FEC prefix advertised to multiple peers counts as 1";
+        }
+      }
+    }
+  }
+
+  grouping address-statistics {
+    container address-statistics {
+      container ipv4 {
+        leaf received-addresses {
+          type srl_nokia-comm:zero-based-counter32;
+          description
+            "The number of IPv4 addresses received from a peer";
+        }
+        leaf advertised-addresses {
+          type srl_nokia-comm:zero-based-counter32;
+          description
+            "The number of IPv4 addresses advertised to a peer";
+        }
+      }
+      container ipv6 {
+        if-feature "srl_nokia-feat:ldp-ipv6";
+        leaf received-addresses {
+          type srl_nokia-comm:zero-based-counter32;
+          description
+            "The number of IPv6 addresses received from a peer";
+        }
+        leaf advertised-addresses {
+          type srl_nokia-comm:zero-based-counter32;
+          description
+            "The number of IPv6 addresses advertised to a peer";
+        }
+      }
+    }
+  }
+
+  grouping statistics-peer-received-sent {
+    description
+      "Inbound and outbound statistic counters";
+    leaf total-messages {
+      type srl_nokia-comm:zero-based-counter64;
+      description
+        "The number of messages sent or received";
+    }
+    leaf address {
+      type srl_nokia-comm:zero-based-counter64;
+      description
+        "The number of address messages sent or received";
+    }
+    leaf address-withdraw {
+      type srl_nokia-comm:zero-based-counter64;
+      description
+        "The number of address-withdraw messages sent or received";
+    }
+    leaf initialization {
+      type srl_nokia-comm:zero-based-counter64;
+      description
+        "The number of initialization messages sent or received";
+    }
+    leaf keepalive {
+      type srl_nokia-comm:zero-based-counter64;
+      description
+        "The number of keepalive messages sent or received";
+    }
+    leaf label-abort-request {
+      type srl_nokia-comm:zero-based-counter64;
+      description
+        "The number of label-abort-request messages sent or received";
+    }
+    leaf label-mapping {
+      type srl_nokia-comm:zero-based-counter64;
+      description
+        "The number of label-mapping messages sent or received";
+    }
+    leaf label-release {
+      type srl_nokia-comm:zero-based-counter64;
+      description
+        "The number of label-release messages sent or received";
+    }
+    leaf label-request {
+      type srl_nokia-comm:zero-based-counter64;
+      description
+        "The number of label-request messages sent or received";
+    }
+    leaf label-withdraw {
+      type srl_nokia-comm:zero-based-counter64;
+      description
+        "The number of label-withdraw messages sent or received";
+    }
+    leaf notification {
+      type srl_nokia-comm:zero-based-counter64;
+      description
+        "The number of messages sent or received";
+    }
+    leaf capability {
+      type srl_nokia-comm:zero-based-counter64;
+      description
+        "The number of messages sent or received";
+    }
+  }
+
+  grouping ldp-entropy-label {
+    container entropy-label {
+      if-feature "srl_nokia-feat:ldp-entropy-label";
+      description
+        "Options for configuring control and data plane aspects of entropy label";
+      leaf advertise-capability {
+        description
+          "Advertise the Entropy Label Capability";
+        type boolean;
+        default "false";
+      }
+    }
+  }
+
+  grouping service-fec128-top {
+    description
+      "Configuration and state for service type 128 FECs";
+    list service-fec128 {
+      key "virtual-circuit-type virtual-circuit-identifier peer-lsr-id";
+      description
+        "Service FEC128 binding";
+      leaf virtual-circuit-type {
+        type vc-type;
+        description
+          "The virtual circuit (VC) type of the pseudowire";
+      }
+      leaf virtual-circuit-identifier {
+        type vc-id;
+        description
+          "The virtual circuit identifier of the pseudowire";
+      }
+      leaf peer-lsr-id {
+        type srl_nokia-comm:ip-address;
+        description
+          "Peer IP address, LSR-id";
+      }
+      leaf binding-oper-state {
+        srl_nokia-ext:show-importance "high";
+        description
+          "Operational state of the binding";
+        type enumeration {
+          enum up;
+          enum down;
+        }
+      }
+      leaf binding-oper-down-reason {
+        srl_nokia-ext:show-importance "high";
+        description
+          "The reason why the binding is operationally down";
+        type enumeration {
+          enum vc-type-mismatch;
+          enum control-word-mismatch;
+          enum transport-tunnel-oper-down;
+          enum ldp-resource-exhausted;
+          enum no-egress-label;
+        }
+      }
+      container advertised {
+        description
+          "Configuration and state related to advertised service FECs";
+        leaf label {
+          srl_nokia-ext:show-importance "high";
+          type srl_nokia-comm:mpls-label-with-implicit-and-explicit-null;
+          description
+            "The received label from the remote peer";
+        }
+        leaf-list label-status {
+          srl_nokia-ext:show-importance "high";
+          description
+            "The status of the advertised label";
+          type enumeration {
+            enum in-use-pop;
+            enum released;
+            enum withdrawn;
+            enum withdraw-pending;
+          }
+        }
+        leaf l2-mtu {
+          type uint16;
+          units "bytes";
+          description
+            "Layer-2 MTU advertised to the remote peer in bytes";
+        }
+        leaf control-word {
+          type boolean;
+          description
+            "Whether control word capability is advertised";
+        }
+        leaf flow-aware-transport-label-transmit-capability {
+          if-feature "srl_nokia-feat:flow-aware-transport-label";
+          type boolean;
+          description
+            "Whether the capability to transmit the flow-aware transport label is advertised to the peer";
+        }
+        leaf flow-aware-transport-label-receive-capability {
+          if-feature "srl_nokia-feat:flow-aware-transport-label";
+          type boolean;
+          description
+            "Whether the capability to receive the flow-aware transport label is advertised to the peer";
+        }
+        leaf pw-status {
+          type boolean;
+          description
+            "Whether or not the router advertising the associated label
+             supports pseudowire status signaling";
+        }
+        leaf-list signaling-status {
+          srl_nokia-ext:show-importance "high";
+          type pseudowire-status-bits;
+          description
+            "Indicates the signaling status";
+        }
+        leaf withdraw-reason {
+          type in-label-withdraw-reason;
+          description
+            "Indicates the reason of withdrawl of the ingress label";
+        }
+      }
+      container received {
+        description
+          "Configuration and state related to received service FECs";
+        leaf label {
+          srl_nokia-ext:show-importance "high";
+          type srl_nokia-comm:mpls-label-with-implicit-and-explicit-null;
+          description
+            "The received label from the remote peer";
+        }
+        leaf-list label-status {
+          srl_nokia-ext:show-importance "high";
+          description
+            "The status of the received label";
+          type enumeration {
+            enum in-use-push;
+            enum released;
+            enum withdrawn;
+            enum withdraw-pending;
+          }
+        }
+        leaf l2-mtu {
+          type uint16;
+          units "bytes";
+          description
+            "Layer-2 MTU received from the remote peer in bytes";
+        }
+        leaf control-word {
+          type boolean;
+          description
+            "Whether control word capability is received";
+        }
+        leaf flow-aware-transport-label-transmit-capability {
+          if-feature "srl_nokia-feat:flow-aware-transport-label";
+          type boolean;
+          description
+            "Whether the capability to transmit the flow-aware transport label is received from the peer";
+        }
+        leaf flow-aware-transport-label-receive-capability {
+          if-feature "srl_nokia-feat:flow-aware-transport-label";
+          type boolean;
+          description
+            "Whether the capability to receive the flow-aware transport label is received from the peer";
+        }
+        leaf pw-status {
+          type boolean;
+          description
+            "Whether or not the router advertising the associated label
+             supports pseudowire status signaling";
+        }
+        leaf-list signaling-status {
+          srl_nokia-ext:show-importance "high";
+          type pseudowire-status-bits;
+          description
+            "Indicates the signaling status";
+        }
+      }
+    }
+  }
+
+  grouping ldp-top {
+    container ldp {
+      if-feature "srl_nokia-feat:ldp";
+      presence "Configure the LDP protocol";
+      must '(/srl_nokia-netinst:network-instance[srl_nokia-netinst:name = current()/../../srl_nokia-netinst:name]/srl_nokia-netinst:type = "srl_nokia-netinst:default")' {
+        error-message "LDP only supported in default network-instance";
+      }
+      description
+        "Container for LDP configuration and state";
+      leaf admin-state {
+        type srl_nokia-comm:admin-state;
+        description
+          "Administratively enable or disable LDP";
+        default "disable";
+      }
+      leaf dynamic-label-block {
+        if-feature "srl_nokia-feat:label-management";
+        mandatory true;
+        type leafref {
+          path "/srl_nokia-system:system/srl_nokia-mplslbl:mpls/srl_nokia-mplslbl:label-ranges/srl_nokia-mplslbl:dynamic/srl_nokia-mplslbl:name";
+        }
+        description
+          "Reference to a dynamic label block";
+      }
+      leaf dynamic-label-block-status {
+        config false;
+        if-feature "srl_nokia-feat:label-management";
+        type enumeration {
+          enum available;
+          enum unavailable;
+        }
+        description
+          "Status of the label block
+
+           The label block may show as unavailable if there is pending cleanup";
+      }
+      leaf tunnel-down-damp-time {
+        if-feature "srl_nokia-feat:ldp-tunnel-down-damp-time";
+        type uint32 {
+          range "0..20";
+        }
+        default "3";
+        units "seconds";
+        description
+          "Configure the time interval that LDP damps a tunnel down event";
+      }
+      leaf label-withdrawal-delay {
+        if-feature "srl_nokia-feat:ldp-label-wdraw-delay";
+        type uint32 {
+          range "3..120";
+        }
+        units "seconds";
+        description
+          "Configure the time interval that LDP delays the withdrawal of its label";
+      }
+      uses ldp-entropy-label;
+      container loopfree-alternate {
+        if-feature "srl_nokia-feat:ldp-lfa";
+        leaf admin-state {
+          type srl_nokia-comm:admin-state;
+          default "disable";
+          description
+            "Administratively enable or disable Loop Free Alternates";
+        }
+      }
+      container fec-resolution {
+        description
+          "Container with options for controlling IP prefix FEC resolution";
+        leaf longest-prefix {
+          type boolean;
+          default "false";
+          description
+            "When this is set to true IPv4/IPv6 prefix FECs can be resolved by less-specific IPv4/IPv6 routes in the route table, as long as the prefix bits of the route match the prefix bits of the FEC; the IP route with the longest prefix match is the route that is used to resolve the FEC.
+
+             When this is set to false, IPv4/IPv6 prefix FECs can only be resolved by routes that are an exact match of the FEC in terms of prefix length";
+        }
+      }
+      list static-fec {
+        if-feature "srl_nokia-feat:ldp-static-fec-pop";
+        description
+          "Configure static FEC";
+        key "fec-prefix";
+        leaf fec-prefix {
+          description
+            "Static FEC IP prefix";
+          type srl_nokia-comm:ip-prefix;
+          must "not(contains(.,'::') or contains(.,':'))" {
+            srl_nokia-ext:if-feature "not srl_nokia-feat:ldp-ipv6";
+            error-message "Only IPv4 prefix is supported";
+          }
+        }
+        leaf swap {
+          description
+            "Swap label. If false, label is popped";
+          type boolean;
+          must '. = false()' {
+            error-message "Only pop operation is supported. Swap must be set to false";
+          }
+        }
+      }
+      uses graceful-restart-config;
+      uses prefix-policy-config;
+      container multipath {
+        description
+          "Container with options to configure load-balancing over equal-cost paths";
+        leaf max-paths {
+          type uint8 {
+            range "1..64";
+          }
+          default "1";
+          description
+            "Specifies the maximum number of next-hops used for load-balancing toward towards a given FEC";
+        }
+      }
+      leaf null-label {
+        if-feature "srl_nokia-feat:ldp-implicit-null-label";
+        description
+          "Null label signalling at egress";
+        type enumeration {
+          enum implicit {
+            value 1;
+            description
+              "Triggers signalling of implicit null label for all prefix FECs";
+          }
+        }
+      }
+      container ipv4 {
+        description
+          "Container for configuration and state related to the IPv4 address family";
+        leaf oper-state {
+          config false;
+          description
+            "The operational state of LDP for IPv4";
+          type srl_nokia-comm:oper-state;
+        }
+        leaf oper-down-reason {
+          config false;
+          description
+            "The reason for the LDP for IPv4 being operationally down";
+          type enumeration {
+            enum ldp-admin-disabled {
+              value 1;
+            }
+            enum mpls-admin-disabled {
+              value 2;
+            }
+            enum no-system-ipv4-address {
+              value 3;
+              description
+                "System IPv4 address is used as the LSR ID. If this depedency is missing LDP is down";
+            }
+            enum net-instance-mgr-down {
+              value 4;
+            }
+            enum label-block-unavailable {
+              value 5;
+            }
+            enum no-resource {
+              value 6;
+              description
+                "Memory allocation failure";
+            }
+            enum unknown {
+              value 7;
+              description
+                "Other failure reason";
+            }
+          }
+        }
+        leaf last-oper-state-change {
+          config false;
+          description
+            "The last time that the IPv4 oper-state changed";
+          type srl_nokia-comm:date-and-time-delta;
+        }
+        leaf oper-up-to-down-transitions {
+          config false;
+          type uint16;
+          description
+            "The number of times the oper state for IPv4 has transitioned from up to down";
+        }
+        leaf lsr-id {
+          config false;
+          type srl_nokia-comm:ipv4-address;
+          description
+            "Returns the value that is being used as the LDP LSR ID";
+        }
+        container bindings {
+          config false;
+          description
+            "LDP address and label binding information";
+          container received-address {
+            list peer {
+              description
+                "List of LDP peers from which IPv4 address bindings have been received";
+              key "lsr-id label-space-id";
+              uses ldp-peer-ref;
+              leaf-list ip-address {
+                description
+                  "The list of IPv4 address bindings received from the peer";
+                type srl_nokia-comm:ipv4-address;
+              }
+            }
+          }
+          container advertised-address {
+            list peer {
+              description
+                "List of LDP peers towards which IPv4 address bindings have been sent";
+              key "lsr-id label-space-id";
+              uses ldp-peer-ref;
+              leaf-list ip-address {
+                description
+                  "The list of IPv4 address bindings sent to the peer";
+                type srl_nokia-comm:ipv4-address;
+              }
+            }
+          }
+          container received-prefix-fec {
+            list prefix-fec {
+              description
+                "List of IPv4 FEC-label bindings received from LDP peers";
+              key "fec lsr-id label-space-id";
+              leaf fec {
+                type srl_nokia-comm:ipv4-prefix;
+                description
+                  "The prefix FEC value in the FEC-label binding, learned in a Label Mapping message received from a peer";
+              }
+              uses ldp-peer-ref {
+                description
+                  "The LDP peer from which this binding was received. The peer is identified by its LDP ID, which consists of the LSR ID and the Label Space ID";
+              }
+              leaf label {
+                type srl_nokia-comm:mpls-label-with-implicit-and-explicit-null;
+                description
+                  "Received label value";
+              }
+              leaf entropy-label-transmit {
+                description
+                  "Entropy label (EL/ELI) is pushed when transmitting to this peer";
+                type boolean;
+              }
+              leaf ingress-lsr-fec {
+                description
+                  "When set true, the router is an ingress LSR for the FEC";
+                type boolean;
+              }
+              list next-hop {
+                description
+                  "List of ECMP next-hops towards the LDP peer";
+                key "index";
+                leaf index {
+                  description
+                    "Label ID index entry";
+                  type uint32;
+                }
+                leaf next-hop {
+                  type srl_nokia-comm:ip-address;
+                  description
+                    "The IP next-hop towards the LDP peer";
+                }
+                leaf next-hop-type {
+                  description
+                    "Type of next-hop";
+                  type enumeration {
+                    enum primary;
+                    enum alternate;
+                    enum rlfa;
+                  }
+                }
+                leaf interface {
+                  type srl_nokia-comm:subinterface-eth-lag;
+                  description
+                    "The outgoing interface towards the LDP peer";
+                }
+                leaf outer-label {
+                  type srl_nokia-comm:mpls-label-with-implicit-and-explicit-null;
+                  description
+                    "Outer label value for RLFA";
+                }
+              }
+              leaf used-in-forwarding {
+                type boolean;
+                description
+                  "Reads true if the label is used in forwarding and has been programmed for a push operation";
+              }
+              leaf not-used-reason {
+                description
+                  "The reason why the label mapping is not being used in the dataplane";
+                type enumeration {
+                  enum rejected-on-rx {
+                    description
+                      "The received FEC was rejected either because non-host FEC or rejected by import policy";
+                  }
+                  enum exceeds-multipath-limit {
+                    description
+                      "The LDP multipath ECMP limit has been reached";
+                  }
+                  enum exceeds-fec-limit {
+                    description
+                      "The FEC limit has been reached";
+                  }
+                  enum fec-unresolved {
+                    description
+                      "The IP prefix FEC is unused because there is no resolving route matching the IP prefix";
+                  }
+                }
+              }
+            }
+          }
+          container advertised-prefix-fec {
+            list prefix-fec {
+              description
+                "List of IPv4 FEC-label bindings advertised to LDP peers";
+              key "fec lsr-id label-space-id";
+              leaf fec {
+                type srl_nokia-comm:ipv4-prefix;
+                description
+                  "The prefix FEC value in the FEC-label binding, advertised in a Label Mapping message sent to a peer";
+              }
+              leaf egress-lsr-fec {
+                description
+                  "When set true, the router is the egress LSR for the FEC (the FEC is locally originated)";
+                type boolean;
+              }
+              uses ldp-peer-ref {
+                description
+                  "The LDP peer towards which this binding was sent. The peer is identified by its LDP ID, which consists of the LSR ID and the Label Space ID";
+              }
+              leaf label {
+                type srl_nokia-comm:mpls-label-with-implicit-and-explicit-null;
+                description
+                  "Advertised label value";
+              }
+              leaf label-type {
+                type ldp-label-type;
+                description
+                  "The label type of the advertised label";
+              }
+              leaf-list label-status {
+                description
+                  "Label status";
+                type enumeration {
+                  enum released;
+                  enum withdrawn;
+                  enum wdraw-pending;
+                }
+              }
+            }
+          }
+          uses service-fec128-top;
+        }
+      }
+      container ipv6 {
+        if-feature "srl_nokia-feat:ldp-ipv6";
+        description
+          "Container for configuration and state related to the IPv6 address family";
+        leaf oper-state {
+          config false;
+          description
+            "The operational state of LDP for IPv6";
+          type srl_nokia-comm:oper-state;
+        }
+        leaf oper-down-reason {
+          config false;
+          description
+            "The reason for the LDP for IPv6 being operationally down";
+          type enumeration {
+            enum ldp-admin-disabled {
+              value 1;
+            }
+            enum mpls-admin-disabled {
+              value 2;
+            }
+            enum no-system-ipv6-address {
+              value 3;
+              description
+                "System IPv6 address is used as the LSR ID. If this depedency is missing LDP is down";
+            }
+            enum net-instance-mgr-down {
+              value 4;
+            }
+            enum label-block-unavailable {
+              value 5;
+            }
+            enum no-resource {
+              value 6;
+              description
+                "Memory allocation failure";
+            }
+            enum unknown {
+              value 7;
+              description
+                "Other failure reason";
+            }
+          }
+        }
+        leaf last-oper-state-change {
+          config false;
+          description
+            "The last time that the IPv6 oper-state changed";
+          type srl_nokia-comm:date-and-time-delta;
+        }
+        leaf oper-up-to-down-transitions {
+          config false;
+          type uint16;
+          description
+            "The number of times the oper state for IPv6 has transitioned from up to down";
+        }
+        leaf lsr-id {
+          config false;
+          type srl_nokia-comm:ipv6-address;
+          description
+            "Returns the value that is being used as the LDP LSR ID";
+        }
+        container bindings {
+          config false;
+          description
+            "LDP address and label binding information";
+          container received-address {
+            list peer {
+              description
+                "List of LDP peers from which IPv6 address bindings have been received";
+              key "lsr-id label-space-id";
+              uses ldp-peer-ref;
+              leaf-list ip-address {
+                description
+                  "The list of IPv6 address bindings received from the peer";
+                type srl_nokia-comm:ipv6-address;
+              }
+            }
+          }
+          container advertised-address {
+            list peer {
+              description
+                "List of LDP peers towards which IPv6 address bindings have been sent";
+              key "lsr-id label-space-id";
+              uses ldp-peer-ref;
+              leaf-list ip-address {
+                description
+                  "The list of IPv6 address bindings sent to the peer";
+                type srl_nokia-comm:ipv6-address;
+              }
+            }
+          }
+          container received-prefix-fec {
+            list prefix-fec {
+              description
+                "List of IPv6 FEC-label bindings received from LDP peers";
+              key "fec lsr-id label-space-id";
+              leaf fec {
+                type srl_nokia-comm:ipv6-prefix;
+                description
+                  "The prefix FEC value in the FEC-label binding, learned in a Label Mapping message received from a peer";
+              }
+              uses ldp-peer-ref {
+                description
+                  "The LDP peer from which this binding was received. The peer is identified by its LDP ID, which consists of the LSR ID and the Label Space ID";
+              }
+              leaf label {
+                type srl_nokia-comm:mpls-label-with-implicit-and-explicit-null;
+                description
+                  "Received label value";
+              }
+              leaf entropy-label-transmit {
+                description
+                  "Entropy label (EL/ELI) is pushed when transmitting to this peer";
+                type boolean;
+              }
+              leaf ingress-lsr-fec {
+                description
+                  "When set true, the router is an ingress LSR for the FEC";
+                type boolean;
+              }
+              list next-hop {
+                description
+                  "List of ECMP next-hops towards the LDP peer";
+                key "index";
+                leaf index {
+                  description
+                    "Label ID index entry";
+                  type uint32;
+                }
+                leaf next-hop {
+                  type srl_nokia-comm:ip-address;
+                  description
+                    "The IP next-hop towards the LDP peer";
+                }
+                leaf next-hop-type {
+                  description
+                    "Type of next-hop";
+                  type enumeration {
+                    enum primary;
+                    enum alternate;
+                    enum rlfa;
+                  }
+                }
+                leaf interface {
+                  type srl_nokia-comm:subinterface-eth-lag;
+                  description
+                    "The outgoing interface towards the LDP peer";
+                }
+                leaf outer-label {
+                  type srl_nokia-comm:mpls-label-with-implicit-and-explicit-null;
+                  description
+                    "Outer label value for RLFA";
+                }
+              }
+              leaf used-in-forwarding {
+                type boolean;
+                description
+                  "Reads true if the label is used in forwarding and has been programmed for a push operation";
+              }
+              leaf not-used-reason {
+                description
+                  "The reason why the label mapping is not being used in the dataplane";
+                type enumeration {
+                  enum rejected-on-rx {
+                    description
+                      "The received FEC was rejected either because non-host FEC or rejected by import policy";
+                  }
+                  enum exceeds-multipath-limit {
+                    description
+                      "The LDP multipath ECMP limit has been reached";
+                  }
+                  enum exceeds-fec-limit {
+                    description
+                      "The FEC limit has been reached";
+                  }
+                  enum fec-unresolved {
+                    description
+                      "The IP prefix FEC is unused because there is no resolving route matching the IP prefix";
+                  }
+                }
+              }
+            }
+          }
+          container advertised-prefix-fec {
+            list prefix-fec {
+              description
+                "List of IPv6 FEC-label bindings advertised to LDP peers";
+              key "fec lsr-id label-space-id";
+              leaf fec {
+                type srl_nokia-comm:ipv6-prefix;
+                description
+                  "The prefix FEC value in the FEC-label binding, advertised in a Label Mapping message sent to a peer";
+              }
+              leaf egress-lsr-fec {
+                description
+                  "When set true, the router is the egress LSR for the FEC (the FEC is locally originated)";
+                type boolean;
+              }
+              uses ldp-peer-ref {
+                description
+                  "The LDP peer towards which this binding was sent. The peer is identified by its LDP ID, which consists of the LSR ID and the Label Space ID";
+              }
+              leaf label {
+                type srl_nokia-comm:mpls-label-with-implicit-and-explicit-null;
+                description
+                  "Advertised label value";
+              }
+              leaf label-type {
+                type ldp-label-type;
+                description
+                  "The label type of the advertised label";
+              }
+              leaf-list label-status {
+                description
+                  "Label status";
+                type enumeration {
+                  enum released;
+                  enum withdrawn;
+                  enum wdraw-pending;
+                }
+              }
+            }
+          }
+          uses service-fec128-top;
+        }
+      }
+      container discovery {
+        description
+          "Neighbor discovery configuration and operational state";
+        container interfaces {
+          description
+            "The complete set of interfaces used for LDP Basic Discovery";
+          uses discovery-timers {
+            refine "hello-holdtime" {
+              default "15";
+            }
+            refine "hello-interval" {
+              default "5";
+            }
+          }
+          container trace-options {
+            description
+              "Configure event/packet tracing for all LDP interfaces";
+            leaf-list trace {
+              description
+                "Specifies the trace information to be captured";
+              type interface-trace-option-flags;
+            }
+          }
+          list interface {
+            key "name";
+            description
+              "List of LDP interfaces used for LDP Basic Discovery";
+            uses ldp-subintf-ref;
+            uses discovery-timers;
+            container ipv4 {
+              uses intf-oper-down-reason;
+              leaf admin-state {
+                type srl_nokia-comm:admin-state;
+                default "disable";
+                description
+                  "Administratively enable or disable LDP discovery for IPv4 on a particular interface";
+              }
+              leaf oper-state {
+                config false;
+                description
+                  "Operational state of IPv4 on the LDP interface";
+                type enumeration {
+                  enum up;
+                  enum down;
+                }
+              }
+              leaf last-oper-state-change {
+                config false;
+                description
+                  "The last time when the IPv4 oper-state changed";
+                type srl_nokia-comm:date-and-time-delta;
+              }
+              container override-lsr-id {
+                if-feature "srl_nokia-feat:ldp-local-lsr-id";
+                description
+                  "Options to override the LSR ID";
+                leaf local-subinterface {
+                  type enumeration {
+                    enum ipv4 {
+                      description
+                        "Use the IPv4 address of the subinterface as the LSR ID";
+                    }
+                  }
+                  description
+                    "Use local subinterface IP address as LSR ID for interface LDP session";
+                }
+              }
+              leaf enable-bfd {
+                if-feature "srl_nokia-feat:ldp-bfd";
+                description
+                  "Enable BFD";
+                type boolean;
+                default "false";
+              }
+              container hello-adjacencies {
+                config false;
+                description
+                  "Container with a list of hello adjacencies";
+                list adjacency {
+                  description
+                    "List of hello adjacencies";
+                  key "lsr-id label-space-id";
+                  uses ldp-peer-ref {
+                    description
+                      "The LDP peer with which the adjacency was formed. The peer is identified by its LDP ID, which consists of the LSR ID and the Label Space ID";
+                  }
+                  leaf local-address {
+                    type srl_nokia-comm:ipv4-address;
+                    description
+                      "Local address of the hello adjacency";
+                  }
+                  leaf remote-address {
+                    type srl_nokia-comm:ipv4-address;
+                    description
+                      "Remote address of the hello adjacency";
+                  }
+                  uses adjacency-state-attributes;
+                }
+              }
+              container statistics {
+                config false;
+                description
+                  "Statistics objects";
+                leaf hello-received {
+                  type srl_nokia-comm:zero-based-counter64;
+                  description
+                    "The number of Hello messages received";
+                }
+                leaf hello-sent {
+                  type srl_nokia-comm:zero-based-counter64;
+                  description
+                    "The number of Hello messages sent";
+                }
+                uses hello-message-error-stats;
+              }
+              container trace-options {
+                description
+                  "Configure event/packet tracing for one specific LDP interface";
+                leaf-list trace {
+                  description
+                    "Specifies the trace information to be captured";
+                  type interface-trace-option-flags;
+                }
+              }
+            }
+            container ipv6 {
+              if-feature "srl_nokia-feat:ldp-ipv6";
+              uses intf-oper-down-reason;
+              leaf admin-state {
+                type srl_nokia-comm:admin-state;
+                default "disable";
+                description
+                  "Administratively enable or disable LDP discovery for IPv6 on a particular interface";
+              }
+              leaf oper-state {
+                config false;
+                description
+                  "Operational state of IPv6 on the LDP interface";
+                type enumeration {
+                  enum up;
+                  enum down;
+                }
+              }
+              leaf last-oper-state-change {
+                config false;
+                description
+                  "The last time when the IPv6 oper-state changed";
+                type srl_nokia-comm:date-and-time-delta;
+              }
+              container override-lsr-id {
+                if-feature "srl_nokia-feat:ldp-local-lsr-id";
+                description
+                  "Options to override the LSR ID";
+                leaf local-subinterface {
+                  type enumeration {
+                    enum ipv4 {
+                      description
+                        "Use the IPv4 address of the subinterface as the LSR ID";
+                    }
+                    enum ipv6 {
+                      description
+                        "Use the IPv6 address of the subinterface as the LSR ID";
+                    }
+                  }
+                  description
+                    "Use local subinterface IP address as LSR ID for interface LDP session";
+                  must "(. = 'ipv6') or not(../../../ipv4/override-lsr-id/local-subinterface)" {
+                    error-message "IPv4 and IPv6 are mutually exclusive options";
+                  }
+                }
+              }
+              leaf enable-bfd {
+                if-feature "srl_nokia-feat:ldp-bfd";
+                description
+                  "Enable BFD";
+                type boolean;
+                default "false";
+              }
+              container hello-adjacencies {
+                config false;
+                description
+                  "Container with a list of hello adjacencies";
+                list adjacency {
+                  description
+                    "List of hello adjacencies";
+                  key "lsr-id label-space-id";
+                  uses ldp-peer-ref {
+                    description
+                      "The LDP peer with which the adjacency was formed. The peer is identified by its LDP ID, which consists of the LSR ID and the Label Space ID";
+                  }
+                  leaf local-address {
+                    type srl_nokia-comm:ipv6-address;
+                    description
+                      "Local address of the hello adjacency";
+                  }
+                  leaf remote-address {
+                    type srl_nokia-comm:ipv6-address;
+                    description
+                      "Remote address of the hello adjacency";
+                  }
+                  uses adjacency-state-attributes;
+                }
+              }
+              container statistics {
+                config false;
+                description
+                  "Statistics objects";
+                leaf hello-received {
+                  type srl_nokia-comm:zero-based-counter64;
+                  description
+                    "The number of Hello messages received";
+                }
+                leaf hello-sent {
+                  type srl_nokia-comm:zero-based-counter64;
+                  description
+                    "The number of Hello messages sent";
+                }
+                uses hello-message-error-stats;
+              }
+              container trace-options {
+                description
+                  "Configure event/packet tracing for one specific LDP interface";
+                leaf-list trace {
+                  description
+                    "Specifies the trace information to be captured";
+                  type interface-trace-option-flags;
+                }
+              }
+            }
+          }
+        }
+        container targeted {
+          if-feature "srl_nokia-feat:ldp-targeted";
+          description
+            "List of targeted peers for extended discovery";
+          uses discovery-timers {
+            refine "hello-holdtime" {
+              default "45";
+            }
+            refine "hello-interval" {
+              default "15";
+            }
+          }
+          container ipv4 {
+            list target {
+              key "remote-address";
+              description
+                "List of configured targeted LDP peers";
+              uses target-oper-down-reason;
+              leaf remote-address {
+                type srl_nokia-comm:ipv4-address-unicast;
+                description
+                  "Configuration of neighbor address of the targeted LDP adjacency";
+              }
+              leaf admin-state {
+                type srl_nokia-comm:admin-state;
+                default "disable";
+                description
+                  "Administratively enable or disable the targeted LDP adjacency";
+              }
+              leaf oper-state {
+                config false;
+                description
+                  "Operational state of the targeted LDP adjacency";
+                type enumeration {
+                  enum up;
+                  enum down;
+                }
+              }
+              leaf oper-type {
+                config false;
+                description
+                  "The value indicates the operational type of this targeted LDP session.
+                   Session creation can be triggered by a service or can be manually configured as an example.
+                   A session that is originally triggered by service configuration may change to a manual session.";
+                type enumeration {
+                  enum manual {
+                    value 1;
+                  }
+                  enum service {
+                    value 2;
+                  }
+                  enum auto-tx {
+                    value 3;
+                  }
+                  enum auto-rx {
+                    value 4;
+                  }
+                }
+              }
+              leaf last-oper-state-change {
+                config false;
+                description
+                  "The last time when the adjacency oper-state changed";
+                type srl_nokia-comm:date-and-time-delta;
+              }
+              container override-lsr-id {
+                if-feature "srl_nokia-feat:ldp-local-lsr-id";
+                description
+                  "Options to override the LSR ID";
+                leaf subinterface-ipv4 {
+                  type srl_nokia-comm:subinterface-all;
+                  description
+                    "Set to use configured subinterface IPv4 address as LSR ID for Targeted LDP session
+
+                     Configured sub-interface must either be an LDP or a loopback interface.";
+                }
+              }
+              leaf enable-bfd {
+                if-feature "srl_nokia-feat:ldp-bfd";
+                description
+                  "Enable BFD";
+                type boolean;
+                default "false";
+              }
+              leaf advertise-fec {
+                if-feature "srl_nokia-feat:ldp-rlfa";
+                description
+                  "Enable advertisement of FECs to target";
+                type boolean;
+                default "false";
+              }
+              uses discovery-timers;
+              container hello-adjacencies {
+                config false;
+                description
+                  "Container with a list of hello adjacencies";
+                list adjacency {
+                  description
+                    "List of hello adjacencies";
+                  key "lsr-id label-space-id";
+                  uses ldp-peer-ref {
+                    description
+                      "The LDP peer with which the adjacency was formed. The peer is identified by its LDP ID, which consists of the LSR ID and the Label Space ID";
+                  }
+                  leaf local-address {
+                    type srl_nokia-comm:ipv4-address;
+                    description
+                      "Local address of the hello adjacency";
+                  }
+                  leaf remote-address {
+                    type srl_nokia-comm:ipv4-address;
+                    description
+                      "Remote address of the hello adjacency";
+                  }
+                  uses adjacency-state-attributes;
+                }
+              }
+              container statistics {
+                config false;
+                description
+                  "Statistics objects";
+                uses hello-message-error-stats;
+              }
+            }
+            container auto-rx {
+              if-feature "srl_nokia-feat:ldp-ipv4-auto-rx-tx-targeted";
+              description
+                "Auto-rx targeted LDP";
+              leaf admin-state {
+                type srl_nokia-comm:admin-state;
+                default "disable";
+                description
+                  "Administratively enable or disable auto-rx targeted LDP adjacencies";
+              }
+              leaf advertise-fec {
+                description
+                  "Enable advertisement of FECs to auto-rx targets";
+                type boolean;
+                default "false";
+              }
+            }
+            container auto-tx {
+              if-feature "srl_nokia-feat:ldp-ipv4-auto-rx-tx-targeted";
+              description
+                "Auto-tx targeted LDP";
+              leaf admin-state {
+                type srl_nokia-comm:admin-state;
+                default "disable";
+                description
+                  "Administratively enable or disable auto-tx targeted LDP adjacencies";
+              }
+              leaf advertise-fec {
+                description
+                  "Enable advertisement of FECs to auto-tx targets";
+                type boolean;
+                default "false";
+              }
+            }
+          }
+          container ipv6 {
+            if-feature "srl_nokia-feat:ldp-ipv6";
+            list target {
+              key "remote-address";
+              description
+                "List of configured targeted LDP peers";
+              uses target-oper-down-reason;
+              leaf remote-address {
+                type srl_nokia-comm:ipv6-address-unicast-without-local;
+                description
+                  "Configuration of IPv6 neighbor address of the targeted LDP adjacency";
+              }
+              leaf admin-state {
+                type srl_nokia-comm:admin-state;
+                default "disable";
+                description
+                  "Administratively enable or disable the targeted LDP adjacency";
+              }
+              leaf oper-state {
+                config false;
+                description
+                  "Operational state of the targeted LDP adjacency";
+                type enumeration {
+                  enum up;
+                  enum down;
+                }
+              }
+              leaf oper-type {
+                config false;
+                description
+                  "The value indicates the operational type of this targeted LDP session.
+                   Session creation can be triggered by a service or can be manually configured as an example.
+                   A session that is originally triggered by service configuration may change to a manual session.";
+                type enumeration {
+                  enum manual {
+                    value 1;
+                  }
+                  enum service {
+                    value 2;
+                  }
+                  enum auto-tx {
+                    value 3;
+                  }
+                  enum auto-rx {
+                    value 4;
+                  }
+                }
+              }
+              leaf last-oper-state-change {
+                config false;
+                description
+                  "The last time when the adjacency oper-state changed";
+                type srl_nokia-comm:date-and-time-delta;
+              }
+              container override-lsr-id {
+                if-feature "srl_nokia-feat:ldp-local-lsr-id";
+                description
+                  "Options to override the LSR ID";
+                leaf subinterface-ipv4 {
+                  type srl_nokia-comm:subinterface-all;
+                  description
+                    "Set to use configured subinterface IPv4 address as LSR ID for Targeted LDP session
+
+                     Configured sub-interface must either be an LDP or a loopback interface.";
+                  must 'not(../subinterface-ipv6)' {
+                    error-message "IPv4 and IPv6 are mutually exclusive options";
+                  }
+                }
+                leaf subinterface-ipv6 {
+                  type srl_nokia-comm:subinterface-all;
+                  description
+                    "Set to use configured subinterface IPv6 address as LSR ID for Targeted LDP session
+
+                     Configured sub-interface must either be an LDP or a loopback interface.";
+                }
+              }
+              leaf enable-bfd {
+                if-feature "srl_nokia-feat:ldp-bfd";
+                description
+                  "Enable BFD";
+                type boolean;
+                default "false";
+              }
+              leaf advertise-fec {
+                if-feature "srl_nokia-feat:ldp-rlfa";
+                description
+                  "Enable advertisement of FECs to target";
+                type boolean;
+                default "false";
+              }
+              uses discovery-timers;
+              container hello-adjacencies {
+                config false;
+                description
+                  "Container with a list of hello adjacencies";
+                list adjacency {
+                  description
+                    "List of hello adjacencies";
+                  key "lsr-id label-space-id";
+                  uses ldp-peer-ref {
+                    description
+                      "The LDP peer with which the adjacency was formed. The peer is identified by its LDP ID, which consists of the LSR ID and the Label Space ID";
+                  }
+                  leaf local-address {
+                    type srl_nokia-comm:ipv6-address;
+                    description
+                      "Local address of the hello adjacency";
+                  }
+                  leaf remote-address {
+                    type srl_nokia-comm:ipv6-address;
+                    description
+                      "Remote address of the hello adjacency";
+                  }
+                  uses adjacency-state-attributes;
+                }
+              }
+              container statistics {
+                config false;
+                description
+                  "Statistics objects";
+                uses hello-message-error-stats;
+              }
+            }
+          }
+        }
+      }
+      container peers {
+        description
+          "Configuration and state related to peers";
+        uses session-timers;
+        container trace-options {
+          description
+            "Configure event/packet tracing for all sessions (configured and dynamic)";
+          leaf-list trace {
+            description
+              "Specifies the trace information to be captured";
+            type session-trace-option-flags;
+          }
+        }
+        list peer {
+          key "lsr-id label-space-id";
+          description
+            "List of peers";
+          leaf lsr-id {
+            type srl_nokia-comm:ip-address-unicast-without-local;
+            description
+              "The LSR ID of the peer, to identify the globally unique LSR. This leaf is used together with the leaf 'label-space-id' to form the LDP ID";
+          }
+          leaf label-space-id {
+            type uint16;
+            must '. = 0' {
+              error-message "Label space-id must be 0";
+            }
+            description
+              "The Label Space ID of the peer, to identify a specific label space within the LSR. This is the last two octets of the LDP ID. This leaf is used together with the leaf 'lsr-id' to form the LDP ID";
+          }
+          container tcp-transport {
+            uses tcp-transport-state;
+          }
+          container trace-options {
+            description
+              "Configure event/packet tracing for one specific session";
+            leaf-list trace {
+              description
+                "Specifies the trace information to be captured";
+              type session-trace-option-flags;
+            }
+          }
+          leaf fec-limit {
+            type uint32;
+            default "0";
+            description
+              "The maximum number of FECs of all types combined that will be accepted from the peer
+
+               The value 0 implies no limit";
+          }
+          leaf fec-limit-exceeded {
+            config false;
+            type boolean;
+            description
+              "Reads true when the peer has sent more FECs than the configured limit";
+          }
+          leaf adv-local-lsr-id {
+            if-feature "srl_nokia-feat:ldp-local-lsr-id";
+            type boolean;
+            default "false";
+            description
+              "When set to true, the FEC for the local LSR ID is advertised.
+
+               When set to false, the FEC for the local LSR ID is not advertised";
+          }
+          uses prefix-policy-config;
+          uses peer-state;
+        }
+      }
+      container statistics {
+        config false;
+        description
+          "LDP instance level statistics";
+        container ipv4 {
+          uses instance-level-statistics;
+        }
+        container ipv6 {
+          uses instance-level-statistics;
+        }
+        leaf sessions-terminated-holdtime-expiry {
+          type uint16;
+          description
+            "The total number of LDP sessions that were terminated due to keepalive holdtime expiry";
+        }
+        uses fec-statistics;
+        container protocol-errors {
+          leaf bad-ldp-identifier {
+            type srl_nokia-comm:zero-based-counter64;
+            description
+              "The number of notification messages sent to advise of a bad LDP identifier";
+          }
+          leaf bad-protocol-version {
+            type srl_nokia-comm:zero-based-counter64;
+            description
+              "The number of notification messages sent to advise of a bad protocol version";
+          }
+          leaf bad-pdu-length {
+            type srl_nokia-comm:zero-based-counter64;
+            description
+              "The number of notification messages sent to advise of a bad PDU length";
+          }
+          leaf unknown-message-type {
+            type srl_nokia-comm:zero-based-counter64;
+            description
+              "The number of notification messages sent to advise of an unknown message type";
+          }
+          leaf bad-message-length {
+            type srl_nokia-comm:zero-based-counter64;
+            description
+              "The number of notification messages sent to advise of a bad message length";
+          }
+          leaf unknown-tlv {
+            type srl_nokia-comm:zero-based-counter64;
+            description
+              "The number of notification messages sent to advise of an unknown TLV";
+          }
+          leaf bad-tlv-length {
+            type srl_nokia-comm:zero-based-counter64;
+            description
+              "The number of notification messages sent to advise of a bad TLV length";
+          }
+          leaf malformed-tlv-value {
+            type srl_nokia-comm:zero-based-counter64;
+            description
+              "The number of notification messages sent to advise of a malformed TLV value";
+          }
+          leaf missing-message-parameters {
+            type srl_nokia-comm:zero-based-counter64;
+            description
+              "The number of notification messages sent to advise of missing mandatory parameters";
+          }
+          leaf session-rejected-no-hello {
+            type srl_nokia-comm:zero-based-counter64;
+            description
+              "The number of notification messages sent to advise that a TCP connection was closed because there was no matching Hello adjacency";
+          }
+          leaf session-rejected-parameters-adv-mode {
+            type srl_nokia-comm:zero-based-counter64;
+            description
+              "The number of notification messages sent to advise that a TCP connection was closed because the requested label advertisement mode is not acceptable";
+          }
+          leaf session-rejected-parameters-max-pdu-length {
+            type srl_nokia-comm:zero-based-counter64;
+            description
+              "The number of notification messages sent to advise that a TCP connection was closed because the requested Maximum PDU Length is not acceptable";
+          }
+          leaf session-rejected-parameters-label-range {
+            type srl_nokia-comm:zero-based-counter64;
+            description
+              "The number of notification messages sent to advise that a TCP connection was closed because the requested label range is not acceptable";
+          }
+          leaf session-rejected-bad-keepalive-time {
+            type srl_nokia-comm:zero-based-counter64;
+            description
+              "The number of notification messages sent to advise that a TCP connection was closed because the requested keepalive time is not acceptable";
+          }
+          leaf unsupported-address-family {
+            type srl_nokia-comm:zero-based-counter64;
+            description
+              "The number of notification messages sent to advise that a TCP connection was closed because the FEC type is not IPv4 or IPv6";
+          }
+        }
+      }
+    }
+  }
+
+  grouping ldp-sync-global-config {
+    container ldp-synchronization {
+      if-feature "srl_nokia-feat:ldp";
+      presence "Enable LDP-IGP synchronization procedures on all interfaces";
+      description
+        "Enable LDP-IGP synchronization procedures on all P2P interfaces and all LAN interfaces with a single adjancency, except on interfaces where the functionality is explicitly disabled";
+      leaf hold-down-timer {
+        description
+          "The maximum amount of time that the IGP advertises a maximum metric for an interface, measured from the time that the LDP adjacency is re-established after going down";
+        units "seconds";
+        type uint16 {
+          range "1..1800";
+        }
+        default "60";
+      }
+      leaf end-of-lib {
+        description
+          "When set to true, the IGP restores the normal metric for the IGP adjacency when learning from LDP that all label-FEC mappings have been received from the LDP peer, even if there is remaining time on the hold-down-timer.
+
+           When set to false, the IGP always waits for the full duration of the hold-down-timer to restore the normal metric for the IGP adjacency";
+        type boolean;
+        default "false";
+      }
+    }
+  }
+
+  grouping ldp-sync-interface {
+    container ldp-synchronization {
+      if-feature "srl_nokia-feat:ldp";
+      description
+        "Container with configuration options and state that pertains to the operation of LDP-IGP synchronization on this interface";
+      leaf disable {
+        type empty;
+        description
+          "Disable LDP-IGP synchronization procedures on this interface, even if synchronization is enabled globally";
+      }
+      leaf hold-down-timer {
+        description
+          "The maximum amount of time that the IGP advertises a maximum metric for an interface, measured from the time that the LDP adjacency is re-established after going down.
+
+           This overrides the global/instance level setting";
+        units "seconds";
+        type uint16 {
+          range "1..1800";
+        }
+      }
+      leaf end-of-lib {
+        description
+          "When set to true, the IGP restores the normal metric for the IGP adjacency when learning from LDP that all label-FEC mappings have been received from the LDP peer, even if there is remaining time on the hold-down-timer.
+
+           When set to false, the IGP always waits for the full duration of the hold-down-timer to restore the normal metric for the IGP adjacency.
+
+           This overrides the global/instance level setting";
+        type boolean;
+      }
+      leaf sync-state {
+        config false;
+        description
+          "The current state of the interface with respect to LDP-IGP sync";
+        type enumeration {
+          enum wait-for-LDP-adjacency {
+            description
+              "The IGP is waiting for the LDP adjacency to come up. The interface is being advertised with max-metric";
+          }
+          enum hold-down-timer-active {
+            description
+              "The LDP adjacency has come up and the IGP has started the hold-down-timer, waiting for either end-of-lib or hold-down-timer expiry. The interface is being advertised with max-metric";
+          }
+          enum end-of-lib-received {
+            description
+              "The IGP received end-of-lib and has switched to normal operation. The interface is being aadveertised with a normal metric";
+          }
+          enum hold-down-timer-expired {
+            description
+              "The IGP did not receive end-of-lib (or was configured to ignore it) but hold-down-timer has expired and normal metric is restored";
+          }
+          enum manual-exit {
+            description
+              "A tools command was performed to exit ldp-sync. Normal operation is resumed, max-metric is removed";
+          }
+          enum disabled {
+            description
+              "ldp-sync is not applicable on this interface";
+          }
+        }
+      }
+      leaf duration {
+        config false;
+        description
+          "The length of time that the IGP interface has been in sync or out of sync";
+        type uint32;
+        units "seconds";
+      }
+    }
+  }
+
+  augment "/srl_nokia-netinst:network-instance/srl_nokia-netinst:protocols" {
+    uses ldp-top;
+  }
+}
