@@ -26,10 +26,8 @@ topology:
     sto-core-1:
       kind: linux
       image: ghcr.io/notconf/notconf
-      # image: ghcr.io/notconf/notconf-junos:23.4R1
-      # The ghcr.io/notconf/notconf-junos:23.4R1 was built using the "native"
-      # YANG modules obtained from
-      # https://github.com/Juniper/yang/tree/master/23.4/23.4R1/native/conf-and-rpcs/junos/conf/models.
+      # A version-specific notconf-junos image would be built using the
+      # matching native Juniper YANG modules for the target cRPD release.
       # The modules are structured such that they augment the root module
       # junos-conf-root with their own structures. This means different parts
       # of the tree use different XML namespaces. In contrast, on cRPD it
@@ -40,13 +38,13 @@ topology:
       # regarding namespacing, so we instead use the exact same YANG modules
       # that were used to build adata for sorespo.
       binds:
-        - ../../spec/yang/JuniperCRPD_23_4R1_9:/yang-modules
+        - ../../spec/yang/JuniperCRPD_24_4R1_9:/yang-modules
         - clab-admin.xml:/yang-modules/startup/clab-admin.xml
     lju-core-1:
       kind: linux
       image: ghcr.io/notconf/notconf
       binds:
-        - ../../spec/yang/JuniperCRPD_23_4R1_9:/yang-modules
+        - ../../spec/yang/JuniperCRPD_24_4R1_9:/yang-modules
         - clab-admin.xml:/yang-modules/startup/clab-admin.xml
     otron:
       kind: linux

@@ -14,7 +14,7 @@ from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface_entry
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface__dynstate
 
 import sorespo.devices.CiscoIosXr_25_3_1 as xr25
-import sorespo.devices.JuniperCRPD_23_4R1_9 as crpd23
+import sorespo.devices.JuniperCRPD_24_4R1_9 as crpd24
 import sorespo.devices.NokiaSRLinux_25_3_2 as srl25
 
 CRPD = True
@@ -95,7 +95,7 @@ end-policy
 
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
             print("RFS /rfs{{{di.name}}}/base-config transform for JUNOS", err=True)
-            dev = crpd23.root()
+            dev = crpd24.root()
 
             dev.configuration.system.host_name = di.name
 
@@ -174,7 +174,7 @@ actor BBInterfaceTransform(update_dynstate: proc(?stratoweave_rfs__rfs__backbone
     IF_STATE_PROTOCOLS_ENABLED = "protocols-enabled"
     IF_STATE_ALL_OK = "all-ok"
 
-    rpc_root = crpd23.rpc_root(odev.DeviceTreeProvider(dev))
+    rpc_root = crpd24.rpc_root(odev.DeviceTreeProvider(dev))
     var interface_name = None
     var healthcheck_enabled = False
     var healthcheck_running = False
@@ -207,7 +207,7 @@ actor BBInterfaceTransform(update_dynstate: proc(?stratoweave_rfs__rfs__backbone
                 dynstate.protocols_enabled = protocols_enabled
                 update_dynstate(dynstate)
 
-        def on_if_stats_response(output: ?crpd23.junos_rpc_interfaces__get_interface_information__output, error):
+        def on_if_stats_response(output: ?crpd24.junos_rpc_interfaces__get_interface_information__output, error):
             if output is not None:
                 counters.append(sorespo.crpd_stats.parse(output))
                 if len(counters) > 2:
@@ -228,7 +228,7 @@ actor BBInterfaceTransform(update_dynstate: proc(?stratoweave_rfs__rfs__backbone
                         return
                 after 12: do_healthcheck()
 
-        def on_isis_response(output: ?crpd23.junos_rpc_isis__get_isis_adjacency_information__output, error):
+        def on_isis_response(output: ?crpd24.junos_rpc_isis__get_isis_adjacency_information__output, error):
             if output is not None:
                 # print("BBInterfaceTransform.isis_response: {output.to_gdata().to_xmlstr()}, {error}")
                 iai = output.isis_adjacency_information
@@ -239,7 +239,7 @@ actor BBInterfaceTransform(update_dynstate: proc(?stratoweave_rfs__rfs__backbone
                             update_health_state()
                             break
 
-        def on_ldp_response(output: ?crpd23.junos_rpc_ldp__get_ldp_neighbor_information__output, error):
+        def on_ldp_response(output: ?crpd24.junos_rpc_ldp__get_ldp_neighbor_information__output, error):
             if output is not None:
                 # print("BBInterfaceTransform.ldp_response: {output.to_gdata().to_xmlstr()}, {error}")
                 lni = output.ldp_neighbor_information
@@ -251,7 +251,7 @@ actor BBInterfaceTransform(update_dynstate: proc(?stratoweave_rfs__rfs__backbone
                             break
 
         if interface_name is not None and not protocols_enabled:
-            if_input = crpd23.junos_rpc_interfaces__get_interface_information__input()
+            if_input = crpd24.junos_rpc_interfaces__get_interface_information__input()
             if_input.interface_name = interface_name
             if_input.level = "statistics"
             rpc_root.get_interface_information(on_if_stats_response, if_input)
@@ -297,7 +297,7 @@ class BBInterface(base.BBInterface):
             return dev
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
             print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}] for JUNOS", err=True)
-            dev = crpd23.root()
+            dev = crpd24.root()
 
             # Create the interface
             unit = dev.configuration.interfaces.interface.create(i.name).unit.create("0")
@@ -384,7 +384,7 @@ class IbgpNeighbor(base.IbgpNeighbor):
             return dev
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
             print("RFS /rfs{{{di.name}}}/ibgp-neighbor transform running {i.address} for JUNOS", err=True)
-            dev = crpd23.root()
+            dev = crpd24.root()
             bgp = dev.configuration.protocols.bgp
             g = bgp.group.create("IPV4-IBGP")
             g.neighbor.create(i.address, description=i.description)
@@ -424,7 +424,7 @@ class Vrf(base.Vrf):
             return dev
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
             print("RFS /rfs{{{di.name}}}/vrf transform running {i.name} for JUNOS", err=True)
-            dev = crpd23.root()
+            dev = crpd24.root()
             ri = dev.configuration.routing_instances.instance.create(i.name)
             ri.instance_type = "vrf"
             ri.route_distinguisher.rd_type = "{i.asn}:{route_distinguisher_id}"
@@ -497,7 +497,7 @@ class VrfInterface(base.VrfInterface):
 
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
             print("RFS /rfs{{{di.name}}}/vrf-interface transform running {i.name} for JUNOS", err=True)
-            dev = crpd23.root()
+            dev = crpd24.root()
 
             # Main interface config
             intf = dev.configuration.interfaces.interface.create(main_intf, description=i.description)
@@ -562,7 +562,7 @@ class EbgpCustomer(base.EbgpCustomer):
 
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
             print("RFS /rfs{{{di.name}}}/ebgp-customer transform running {i.address} for JUNOS", err=True)
-            dev = crpd23.root()
+            dev = crpd24.root()
 
             ri = dev.configuration.routing_instances.instance.create(i.vrf)
             # TODO: why group?!
