@@ -1,0 +1,82 @@
+module srl_nokia-flexible-algorithms-types {
+  yang-version 1.1;
+  namespace "urn:nokia.com:srlinux:flexible-algorithms-types";
+  prefix srl_nokia-flexible-algorithms-types;
+
+  organization
+    "Nokia";
+  contact
+    "Nokia SR Linux Support
+     Web: <http://www.nokia.com>";
+  description
+    "This yang file models configuration and state of Segment Routing Flexible Algorithms";
+
+  revision 2025-03-31 {
+    description
+      "SRLinux 2025.3.1";
+  }
+
+  typedef flex-algo-metric-type {
+    description
+      "Type of metric to be used during a Flex Algo path
+       computation";
+    type enumeration {
+      enum igp {
+        value 0;
+      }
+      enum delay {
+        value 1;
+      }
+      enum te-metric {
+        value 2;
+      }
+    }
+  }
+
+  typedef flex-algo-isis-level {
+    description
+      "The ISIS level in which the flexible algorithms binding is valid";
+    type enumeration {
+      enum l1l2 {
+        value 0;
+      }
+    }
+  }
+
+  typedef flex-algo-id {
+    description
+      "Flex-Algorithm identifier to identify which algorithm should be
+       used during path computation";
+    type uint8 {
+      range "128..255";
+    }
+  }
+
+  typedef flex-algo-calc-type {
+    description
+      "The calculation-type, a value from 0 to 127 inclusive (RFC9350)
+
+       The value is taken from the IANA -IGP Algorithm Types- registry
+       defined under the -Interior Gateway Protocol (IGP) Parameters-
+       registry. If the required calculation-type is Shortest Path
+       First, the value 0 MUST appear in this field.";
+    type uint8 {
+      range "0..127";
+    }
+    default "0";
+  }
+
+  typedef fad-flags {
+    description
+      "The flags within a fad-tlv
+
+       This field displays the flags within a IS-IS Flexible Algorithm
+       Definition Flags sub-TLV, which is a sub-TLV of the IS-IS
+       FAD sub-TLV.";
+    type enumeration {
+      enum M-flag {
+        value 0;
+      }
+    }
+  }
+}

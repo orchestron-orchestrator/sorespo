@@ -1,0 +1,2464 @@
+module srl_nokia-isis-lsdb {
+  yang-version 1.1;
+  namespace "urn:nokia.com:srlinux:isis:isis-lsdb";
+  prefix srl_nokia-isis-lsdb;
+
+  import srl_nokia-common {
+    prefix srl_nokia-comm;
+  }
+  import srl_nokia-isis-lsdb-types {
+    prefix srl_nokia-isis-lsdb-types;
+  }
+  import srl_nokia-features {
+    prefix srl-feat;
+  }
+
+  organization
+    "Nokia";
+  contact
+    "Nokia SR Linux Support
+     Web: <http://www.nokia.com>";
+  description
+    "This yang file models configuration and state of the IS-IS protocol";
+
+  revision 2025-03-31 {
+    description
+      "SRLinux 2025.3.1";
+  }
+  revision 2024-10-31 {
+    description
+      "SRLinux 24.10.1";
+  }
+  revision 2024-03-31 {
+    description
+      "SRLinux 24.3.1";
+  }
+  revision 2023-10-31 {
+    description
+      "SRLinux 23.10.1";
+  }
+  revision 2023-07-31 {
+    description
+      "SRLinux 23.7.1";
+  }
+  revision 2023-03-31 {
+    description
+      "SRLinux 23.3.1";
+  }
+
+  typedef isis-narrow-metric {
+    description
+      "This type defines ISIS narrow metric.";
+    type uint32 {
+      range "1..63";
+    }
+  }
+
+  typedef isis-wide-metric {
+    description
+      "This type defines ISIS wide metric.";
+    type uint32 {
+      range "1..16777215";
+    }
+  }
+
+  typedef isis-tlv-narrow-metric {
+    description
+      "This type defines ISIS narrow metric value inside a TLV.";
+    type uint32 {
+      range "0..63";
+    }
+  }
+
+  typedef isis-tlv-wide-metric {
+    description
+      "This type defines ISIS wide metric value inside a TLV.";
+    type uint32 {
+      range "0..16777215";
+    }
+  }
+
+  typedef isis-level-number {
+    description
+      "This type defines ISIS level number.";
+    type uint8 {
+      range "1..3";
+    }
+  }
+
+  typedef isis-area-address {
+    description
+      "This type defines the ISIS area address.";
+    type string {
+      pattern '[0-9A-Fa-f]{2}(\.[0-9A-Fa-f]{4}){0,6}';
+      length "2..38";
+    }
+  }
+
+  typedef isis-metric-flags {
+    type enumeration {
+      enum internal {
+        description
+          "When this flag is not set, internal metrics are in use.";
+      }
+      enum unsupported {
+        description
+          "When this flag (referred to as the S-bit) is set, then the metric is unsupported.";
+      }
+    }
+    description
+      "Type definition for flags used in IS-IS metrics";
+  }
+
+  grouping new-link-state-database {
+    container link-state-database {
+      if-feature "srl-feat:isis-lsdb";
+      config false;
+      description
+        "State representation of the ISIS LSDB.";
+      list lsp {
+        key "lsp-id";
+        description
+          "List of LSPs in the LSDB.";
+        uses lsp-state;
+      }
+    }
+  }
+
+  grouping isis-lsdb-common-metric-specification {
+    description
+      "Common definitions of the metric in IS-IS.";
+    container default-metric {
+      description
+        "This container defines ISIS Default Metric.";
+      leaf flags {
+        type enumeration {
+          enum internal {
+            description
+              "When set to zero, indicates internal metrics.";
+          }
+        }
+        description
+          "ISIS Default-Metric Flags.";
+      }
+      leaf metric {
+        type isis-narrow-metric;
+        description
+          "ISIS default metric value
+
+           This is a metric understood by every Intermediate system in the domain. Each circuit shall have a positive  integral value assigned for this metric. The value may be associated with any  objective function of the circuit, but by convention is intended to measure the capacity of the circuit for handling traffic, for example, its throughput in  bits-per-second. Higher values indicate a lower capacity.";
+      }
+    }
+    container delay-metric {
+      description
+        "This container defines the ISIS delay metric.";
+      leaf metric {
+        type isis-narrow-metric;
+        description
+          "ISIS delay metric value
+
+           This metric measures the transit delay of the associated circuit. It is an optional metric, which if assigned to a circuit shall have a positive integral value. Higher values indicate a longer transit delay.";
+      }
+      leaf-list flags {
+        type isis-metric-flags;
+        description
+          "ISIS Delay Metric Flags.";
+      }
+    }
+    container expense-metric {
+      description
+        "This container defines the ISIS expense metric.";
+      leaf metric {
+        type isis-narrow-metric;
+        description
+          "ISIS expense metric value
+
+           This metric measures the monetary cost of utilising the associated circuit. It is an optional metric, which if assigned to a circuit shall have a positive integral value1). Higher values indicate a larger monetary expense.";
+      }
+      leaf-list flags {
+        type isis-metric-flags;
+        description
+          "ISIS Expense Metric Flags.";
+      }
+    }
+    container error-metric {
+      description
+        "This container defines the ISIS error metric.";
+      leaf metric {
+        type isis-narrow-metric;
+        description
+          "ISIS error metric value
+
+           This metric measures the residual error probability of the associated circuit. It is an optional metric, which if assigned to a circuit shall have a non-zero value. Higher values indicate a larger probability of undetected errors on the circuit.";
+      }
+      leaf-list flags {
+        type isis-metric-flags;
+        description
+          "IS-IS error metric flags.";
+      }
+    }
+  }
+
+  grouping ipv4-prefix-attributes-state {
+    description
+      "This group defines attributes of an IPv4 standard prefix.";
+    leaf prefix {
+      type srl_nokia-comm:ipv4-prefix;
+      description
+        "IPv4 prefix contained within reachability TLVs.";
+    }
+    leaf up-down {
+      type boolean;
+      description
+        "The up/down bit
+
+         Set if a prefix is advertised from a higher level to a lower level (e.g., level 2 to level 1), indicating that the prefix has traveled down the hierarchy. Prefixes that have the up/down bit set may only be advertised down the hierarchy, i.e., to lower levels. When a prefix is first injected into IS-IS, the bit is UNSET.";
+    }
+    uses isis-lsdb-common-metric-specification;
+  }
+
+  grouping isis-lsdb-undefined-tlv {
+    description
+      "Grouping for unknown TLVs in the IS-IS LSDB";
+    container undefined-tlvs {
+      description
+        "Surrounding container for a list of unknown TLVs.";
+      list undefined-tlv {
+        key "type";
+        description
+          "List of TLVs that are not defined within the model, or are not recognised by the system.";
+        leaf type {
+          type uint8;
+          description
+            "TLV Type.";
+        }
+        leaf length {
+          type uint8;
+          description
+            "TLV length.";
+        }
+        leaf value {
+          type binary;
+          description
+            "TLV value.";
+        }
+      }
+    }
+  }
+
+  grouping isis-lsdb-undefined-subtlv {
+    description
+      "Grouping for unknown Sub-TLVs in the IS-IS LSDB.";
+    container undefined-subtlvs {
+      description
+        "This container describes undefined ISIS TLVs.";
+      list undefined-subtlv {
+        key "type";
+        description
+          "Sub-TLVs that are not defined in the model or not recognised by system.";
+        leaf type {
+          type uint8;
+          description
+            "TLV Type.";
+        }
+        leaf length {
+          type uint8;
+          description
+            "TLV length.";
+        }
+        leaf value {
+          type binary;
+          description
+            "TLV value.";
+        }
+      }
+    }
+  }
+
+  grouping isis-lsdb-application-specific-link-attributes {
+    description
+      "Structure for the Extended IS Reachability and MT-ISN Reachability Neighbour attributes.";
+    container application-specific-link-attributes {
+      when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-application-specific-link-attributes'";
+      if-feature "srl-feat:traffic-engineering";
+      description
+        "Application Specific Link Attributes. Sub-TLV = 16.";
+      reference
+        "RFC8919";
+      leaf legacy {
+        description
+          "When the legacy flag is set, all of the applications specified in the bit mask MUST use the legacy advertisements for the corresponding link found in TLVs 22, 23, 25, 141, 222, and 223, in TLV 138, or in TLV 139 as appropriate.";
+        type boolean;
+      }
+      leaf rsvp-te {
+        description
+          "R bit is set in the Standard Application Identifier Bit Mask";
+        type boolean;
+      }
+      leaf sr-policy {
+        description
+          "S bit is set in the Standard Application Identifier Bit Mask";
+        type boolean;
+      }
+      leaf loop-free-alternate {
+        description
+          "F bit is set in the Standard Application Identifier Bit Mask";
+        type boolean;
+      }
+      container sub-sub-tlvs {
+        list sub-sub-tlv {
+          if-feature "srl-feat:isis-lsdb-te-extensions";
+          key "type";
+          description
+            "List of subsubTLV types in the LSDB for the specified TLV.";
+          leaf type {
+            type identityref {
+              base srl_nokia-isis-lsdb-types:is-reachability-subtlvs-type;
+            }
+            description
+              "The type of subsubTLV being described. The type of subsubTLV is expressed as a canonical name.";
+          }
+          container admin-group {
+            when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-admin-group'";
+            description
+              "This container defines sub-TLV 3.";
+            leaf-list admin-group {
+              type uint32;
+              description
+                "The administrative group sub-TLV contains a 4-octet bit mask assigned by the network administrator
+
+                 Each set bit corresponds to one administrative group assigned to the interface. By convention, the least significant bit is referred to as group 0, and the most significant bit is referred to as group 31.";
+            }
+          }
+          container extended-admin-group {
+            when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-extended-admin-group'";
+            description
+              "This container defines sub-TLV 14.";
+            leaf-list extended-admin-group {
+              type uint32;
+              description
+                "The extended-admin-group sub-TLV is used in addition to the Administrative Groups when it is desirable to make more than 32 colors available for advertisement in a network.";
+            }
+          }
+          container max-link-bandwidth {
+            when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-max-link-bandwidth'";
+            description
+              "This container defines sub-TLV 9.";
+            leaf bandwidth {
+              type uint64;
+              units "bytes per second";
+              description
+                "The maximum bandwidth that can be used on this link in this direction (from the system originating the LSP to its neighbors).  It is encoded in 32 bits in IEEE floating point format.  The units are bytes (not bits!) per second.";
+            }
+          }
+          container te-default-metric {
+            when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-te-default-metric'";
+            description
+              "This container defines sub-TLV 18.";
+            leaf metric {
+              type uint32;
+              description
+                "This metric is administratively assigned and can be used to present a differently weighted topology to traffic engineering SPF calculations. To preclude overflow within a traffic engineering SPF implementation, all metrics greater than or equal to MAX_PATH_METRIC SHALL be considered to have a metric of MAX_PATH_METRIC.";
+            }
+          }
+          container min-max-link-delay {
+            when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-min-max-link-delay'";
+            description
+              "This container defines min/max link delay.";
+            leaf a-bit {
+              type boolean;
+              description
+                "The A bit is set when the measured value of this parameter exceeds its configured maximum threshold. The A bit is cleared when the measured value falls below its configured reuse threshold.";
+            }
+            leaf min-delay {
+              type uint32;
+              units "microseconds";
+              description
+                "Minimum measured link delay value(in microseconds) between two directly connected IS-IS neighbors over a configurable interval.";
+            }
+            leaf max-delay {
+              type uint32;
+              units "microseconds";
+              description
+                "Maximum measured link delay value(in microseconds) between two directly connected IS-IS neighbors over a configurable interval.";
+            }
+          }
+        }
+        leaf admin-group {
+          description
+            "A bit mask representing the administrative groups to which the interface belongs. Sub-Sub-TLV = 3.";
+          type uint32;
+        }
+        leaf maximum-link-bandwidth {
+          description
+            "The (LAG aware) bandwidth of the interface to the neighbor. Sub-Sub-TLV = 9.";
+          type uint32;
+          units "bytes-per-second";
+        }
+        leaf te-default-metric {
+          description
+            "An administratively assigned metric used as an alternative to the normal SPF metric based (typically) on link bandwidth.";
+          type uint32 {
+            range "0..16777215";
+          }
+        }
+        container min-max-unidirectional-link-delay {
+          description
+            "The minimum and maximum delay between two directly connected IS-IS neighbors.";
+          leaf anomolous {
+            description
+              "If the A bit is cleared, the values represent steady-state link performance.";
+            type boolean;
+          }
+          leaf min-delay {
+            description
+              "Minimum forward-path delay (from the advertising router to the remote neighbor)";
+            type uint32;
+            units "microseconds";
+          }
+          leaf max-delay {
+            description
+              "Maximum forward-path delay (from the advertising router to the remote neighbor)";
+            type uint32;
+            units "microseconds";
+          }
+        }
+      }
+    }
+  }
+
+  grouping extended-is-reachability-neighbor-state {
+    description
+      "This grouping defines is-reachability neighbor.";
+    container subtlvs {
+      description
+        "This container describes IS Neighbor sub-TLVs.";
+      list subtlv {
+        key "type";
+        description
+          "List of subTLV types in the LSDB for the specified TLV.";
+        leaf type {
+          type identityref {
+            base srl_nokia-isis-lsdb-types:isis-subtlv-type;
+          }
+          description
+            "The type of subTLV being described. The type of subTLV is expressed as a canonical name.";
+        }
+        container admin-group {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-admin-group'";
+          description
+            "This container defines sub-TLV 3.";
+          leaf-list admin-group {
+            type uint32;
+            description
+              "The administrative group sub-TLV contains a 4-octet bit mask assigned by the network administrator
+
+               Each set bit corresponds to one administrative group assigned to the interface. By convention, the least significant bit is referred to as group 0, and the most significant bit is referred to as group 31.";
+          }
+        }
+        container link-id {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-link-id'";
+          description
+            "This container defines sub-TLV 4.";
+          leaf local {
+            type uint32;
+            description
+              "The value field of this sub-TLV contains 4 octets of Link Local Identifier followed by 4 octets of Link Remote Identifier.";
+          }
+          leaf remote {
+            type uint32;
+            description
+              "If the Link Remote Identifier is unknown, it is set to 0.";
+          }
+        }
+        container ipv4-interface-address {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-ipv4-interface-address'";
+          description
+            "This container defines sub-TLV 6.";
+          leaf-list address {
+            type srl_nokia-comm:ipv4-address;
+            description
+              "A 4-octet IPv4 address for the interface described by the (main) TLV. This sub-TLV can occur multiple times.";
+          }
+        }
+        container ipv4-neighbor-address {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-ipv4-neighbor-address'";
+          description
+            "This container defines sub-TLV 8.";
+          leaf-list address {
+            type srl_nokia-comm:ipv4-address;
+            description
+              "A single IPv4 address for a neighboring router on this link. This sub-TLV can occur multiple times.";
+          }
+        }
+        container max-link-bandwidth {
+          if-feature "srl-feat:isis-lsdb-te-extensions";
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-max-link-bandwidth'";
+          description
+            "This container defines sub-TLV 9.";
+          leaf bandwidth {
+            type uint64;
+            units "bytes per second";
+            description
+              "The maximum bandwidth that can be used on this link in this direction (from the system originating the LSP to its neighbors).  The units are bytes (not bits!) per second.";
+          }
+        }
+        container max-reservable-link-bandwidth {
+          if-feature "srl-feat:isis-lsdb-te-extensions";
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-max-reservable-bandwidth'";
+          description
+            "This container defines sub-TLV 10.";
+          leaf bandwidth {
+            type uint64;
+            units "bytes per second";
+            description
+              "The maximum amount of bandwidth that can be reserved in this direction on this link.  Note that for oversubscription purposes,  this can be greater than the bandwidth of the link. The units are bytes (not bits!) per second.";
+          }
+        }
+        container unreserved-bandwidth {
+          if-feature "srl-feat:isis-lsdb-te-extensions";
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-unreserved-bandwidth'";
+          description
+            "This container defines unreserved-bandwidth. The units are bytes per second.";
+          list setup-priority {
+            key "priority";
+            leaf priority {
+              type uint8 {
+                range "0..7";
+              }
+              description
+                "Setup priority level of 0 through 7 to be used by Unreserved Bandwidth sub-TLV 11.";
+            }
+            leaf bandwidth {
+              type uint64;
+              units "bytes per second";
+              description
+                "The amount of bandwidth reservable in this direction on this link. Note that for oversubscription purposes, this can be greater than the bandwidth of the link. The units are bytes (not bits!) per second. The values correspond to the bandwidth that can be reserved with a setup priority of 0 through 7, arranged in increasing order with priority 0 occurring at the start of the sub-TLV, and priority 7 at the end of the sub-TLV.";
+            }
+          }
+        }
+        container ipv6-interface-address {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-ipv6-interface-address'";
+          description
+            "This container defines sub-TLV 12.";
+          leaf-list address {
+            type srl_nokia-comm:ipv6-address;
+            description
+              "Contains a 16-octet IPv6 address for the interface described by the containing  Extended IS Reachability TLV. This sub-TLV can occur multiple times.";
+          }
+        }
+        container ipv6-neighbor-address {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-ipv6-neighbor-address'";
+          description
+            "This container defines sub-TLV 13.";
+          leaf-list address {
+            type srl_nokia-comm:ipv6-address;
+            description
+              "Contains a 16-octet IPv6 address for a neighboring router on the link described by the (main) TLV. This sub-TLV can occur multiple times.";
+          }
+        }
+        container extended-admin-group {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-extended-admin-group'";
+          description
+            "This container defines sub-TLV 14.";
+          leaf-list extended-admin-group {
+            type uint32;
+            description
+              "The extended-admin-group sub-TLV is used in addition to the Administrative Groups when it is desirable to make more than 32 colors available for advertisement in a network.";
+          }
+        }
+        container te-default-metric {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-te-default-metric'";
+          description
+            "This container defines sub-TLV 18.";
+          leaf metric {
+            type uint32;
+            description
+              "This metric is administratively assigned and can be used to present a differently weighted topology to traffic engineering SPF calculations. To preclude overflow within a traffic engineering SPF implementation, all metrics greater than or equal to MAX_PATH_METRIC SHALL be considered to have a metric of MAX_PATH_METRIC.";
+          }
+        }
+        container link-attributes {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-link-attributes'";
+          description
+            "This container defines link-attributes.";
+          leaf-list local-protection {
+            type enumeration {
+              enum local-protection {
+                description
+                  "If set, local protection is available for the link.";
+              }
+              enum link-excluded {
+                description
+                  "If set, the link is excluded from local protection.";
+              }
+            }
+            description
+              "Link local-protection attributes.";
+          }
+        }
+        container link-protection-type {
+          if-feature "srl-feat:isis-lsdb-te-extensions";
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-link-protection-type'";
+          description
+            "ISIS LSDB parameters relating to the type of link protection offered.";
+          leaf-list type {
+            type enumeration {
+              enum extra-traffic {
+                description
+                  "If set the link has extra traffic protection. If the link is of type Extra Traffic, it means that the link is protecting another link or links. The LSPs on a link of this type will be lost if any of the links it is protecting fail.";
+              }
+              enum unprotected {
+                description
+                  "If set, the link is unprotected. If the link is of type Unprotected, it means that there is no other link protecting this link.  The LSPs on a link of this type will be lost if the link fails.";
+              }
+              enum shared {
+                description
+                  "If set, the link has shared protection. If the link is of type Shared, it means that there are one or more disjoint links of type Extra Traffic that are protecting this link.  These Extra Traffic links are shared between one or more links of type Shared.";
+              }
+              enum one-one {
+                description
+                  "If set, the link has dedicated 1:1 protection. If the link is of type Dedicated 1:1, it means that there is one dedicated disjoint link of type Extra Traffic that is protecting this link.";
+              }
+              enum plus-one {
+                description
+                  "If set, the link has dedicated 1+1 protection. If the link is of type Dedicated 1+1, it means that a dedicated disjoint link is protecting this link. However, the protecting link is not advertised in the link state database and is therefore not available for the routing of LSPs.";
+              }
+              enum enhanced {
+                description
+                  "If set the link has enhanced protection.  If the link is of type Enhanced, it means that a protection scheme that is more reliable than Dedicated 1+1, e.g., 4 fiber BLSR/MS-SPRING, is being used to protect this link.";
+              }
+            }
+            description
+              "Link protection capabilities.";
+          }
+        }
+        container bandwidth-constraints {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-bandwidth-constraints'";
+          description
+            "This container defines bandwidth-constraints. For DS-TE, the existing Maximum Reservable link bandwidth parameter is retained, but its semantics is generalized and interpreted as the aggregate bandwidth constraint across all Class-Types";
+          list bandwidth-constraint {
+            key "model-id";
+            description
+              "List of the Bandwidth Constraints sub-TLV instances present in the TLV.";
+            leaf model-id {
+              type uint8;
+              description
+                "Identifier for the Bandwidth Constraints  Model currently in use by the LSR initiating the IGP advertisement.";
+            }
+            container constraints {
+              description
+                "Constraints contained within the Bandwidth Constraints sub-TLV";
+              list constraint {
+                key "constraint-id";
+                description
+                  "List of the constraints within the Bandwidth Constraints sub-TLV. The BC0 level is indicated by the constraint-id leaf being set to 0, with BCN being indicated by constraint-id N.";
+                leaf constraint-id {
+                  type uint32;
+                  description
+                    "Unique reference for the bandwidth constraint level. BC0 is indicated by this leaf being set to zero, with BCN represented by this leaf being set to N.";
+                }
+                leaf bandwidth {
+                  type srl_nokia-comm:ieeefloat32;
+                  units "bytes per second";
+                  description
+                    "The bandwidth constraint, expressed as a 32-bit IEEE floating point number expressed in bytes per second.";
+                }
+              }
+            }
+          }
+        }
+        container unconstrained-lsp {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-unconstrained-lsp'";
+          description
+            "This container defines sub-TLV 23.";
+          leaf type {
+            type identityref {
+              base srl_nokia-isis-lsdb-types:isis-subtlv-type;
+            }
+            description
+              "The type of subTLV being described. The type of subTLV is expressed as a canonical name.";
+          }
+          leaf count {
+            type uint16;
+            description
+              "Unconstrained TE LSP count(TE Label Switched Paths (LSPs) signalled with zero bandwidth).";
+          }
+        }
+        container adjacency-sids {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-adj-sid'";
+          description
+            "This container defines segment routing adjacency SIDs.";
+          list adjacency-sid {
+            key "value";
+            description
+              "Adjacency Segment-IDs List. An IGP-Adjacency Segment is an IGP segment attached to a unidirectional adjacency or a set of unidirectional adjacencies. By default, an IGP- Adjacency Segment is local to the node which advertises it.";
+            leaf value {
+              type uint32;
+              description
+                "Adjacency-SID value.";
+            }
+            leaf-list flags {
+              type enumeration {
+                enum address-family {
+                  description
+                    "Address-family flag. When unset, the Adj-SID refers to an adjacency with outgoing IPv4 encapsulation. If set then the Adj-SID refers to an adjacency with outgoing IPv6 encapsulation.";
+                }
+                enum backup {
+                  description
+                    "Backup flag. When set, the Adj-SID refers to an adjacency being protected (e.g.: using IPFRR or MPLS-FRR).";
+                }
+                enum value {
+                  description
+                    "Value flag. When set, the SID carries a value (instead of an index). By default the flag is SET.";
+                }
+                enum local {
+                  description
+                    "Local flag. When set, the value/index carried by the SID has local significance. By default the flag is SET.";
+                }
+                enum set {
+                  description
+                    "Set flag. When set, the S-Flag indicates that the Adj-SID refers to a set of adjacencies.";
+                }
+              }
+              description
+                "Flags associated with Adj-Segment-ID.";
+            }
+            leaf weight {
+              type uint8;
+              description
+                "Value that represents the weight of the Adj-SID for the purpose of load balancing.";
+            }
+          }
+        }
+        container lan-adjacency-sids {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-adj-lan-sid'";
+          description
+            "This container defines segment routing LAN adjacency SIDs";
+          list lan-adjacency-sid {
+            key "value";
+            description
+              "Adjacency Segment-IDs List. An IGP-Adjacency Segment is an IGP segment attached to a unidirectional adjacency or a set of unidirectional adjacencies. By default, an IGP- Adjacency Segment is local to the node which advertises it.";
+            leaf value {
+              type uint32;
+              description
+                "LAN Adjacency-SID value.";
+            }
+            leaf-list flags {
+              type enumeration {
+                enum address-family {
+                  description
+                    "Address-family flag. When unset, the Adj-SID refers to an adjacency with outgoing IPv4 encapsulation. If set then the Adj-SID refers to an adjacency with outgoing IPv6 encapsulation.";
+                }
+                enum backup {
+                  description
+                    "Backup flag. When set, the Adj-SID refers to an adjacency being protected (e.g.: using IPFRR or MPLS-FRR).";
+                }
+                enum value {
+                  description
+                    "Value flag. When set, the SID carries a value (instead of an index). By default the flag is SET.";
+                }
+                enum local {
+                  description
+                    "Local flag. When set, the value/index carried by the SID has local significance. By default the flag is SET.";
+                }
+                enum set {
+                  description
+                    "Set flag. When set, the S-Flag indicates that the Adj-SID refers to a set of adjacencies.";
+                }
+              }
+              description
+                "Flags associated with LAN-Adj-Segment-ID.";
+            }
+            leaf weight {
+              type uint8;
+              description
+                "Value that represents the weight of the Adj-SID for the purpose of load balancing.";
+            }
+            leaf neighbor-id {
+              type srl_nokia-comm:isis-system-id;
+              description
+                "System ID of the neighbor associated with the LAN- Adj-Segment-ID value.";
+            }
+          }
+        }
+        container link-delay {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-link-delay'";
+          description
+            "This container defines unidirectional link delay.";
+          leaf a-bit {
+            type boolean;
+            description
+              "The A bit is set when the measured value of this parameter exceeds its configured maximum threshold. The A bit is cleared when the measured value falls below its configured reuse threshold.";
+          }
+          leaf delay {
+            type uint32;
+            units "microseconds";
+            description
+              "Average link delay value (in microseconds) between two directly connected IS-IS neighbors over a configurable interval.";
+          }
+        }
+        container min-max-link-delay {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-min-max-link-delay'";
+          description
+            "This container defines min/max link delay.";
+          leaf a-bit {
+            type boolean;
+            description
+              "The A bit is set when the measured value of this parameter exceeds its configured maximum threshold. The A bit is cleared when the measured value falls below its configured reuse threshold.";
+          }
+          leaf min-delay {
+            type uint32;
+            units "microseconds";
+            description
+              "Minimum measured link delay value(in microseconds) between two directly connected IS-IS neighbors over a configurable interval.";
+          }
+          leaf max-delay {
+            type uint32;
+            units "microseconds";
+            description
+              "Maximum measured link delay value(in microseconds) between two directly connected IS-IS neighbors over a configurable interval.";
+          }
+        }
+        container link-delay-variation {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-link-delay-variation'";
+          description
+            "This container defines unidirectional link delay variation.";
+          leaf delay {
+            type uint32;
+            units "microseconds";
+            description
+              "Average link delay between two directly connected IS-IS neighbors over a configurable interval.";
+          }
+        }
+        container link-loss {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-link-loss'";
+          description
+            "This container defines unidirectional link loss delay.";
+          leaf a-bit {
+            type boolean;
+            description
+              "The A bit is set when the measured value of this parameter exceeds its configured maximum threshold. The A bit is cleared when the measured value falls below its configured reuse threshold.";
+          }
+          leaf link-loss {
+            type uint32;
+            description
+              "Link packet loss as a percentage of the total traffic sent over a configurable interval. The basic unit is 0.000003%, where (2^24 - 2) is 50.331642%. This value s the highest packet-loss percentage that can be expressed (the assumption being that precision is more important on high-speed links than the ability to advertise loss rates greater than this, and that high- peed links with over 50% loss are unusable). Therefore, measured values that are larger than the field maximum SHOULD be encoded as the maximum value.";
+          }
+        }
+        container residual-bandwidth {
+          if-feature "srl-feat:isis-lsdb-te-extensions";
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-residual-bandwidth'";
+          description
+            "This container defines unidirectional residual bandwidth.";
+          leaf bandwidth {
+            type uint64;
+            units "bytes per second";
+            description
+              "Residual bandwidth on a link,forwarding adjacency [RFC4206], or bundled link with units of bytes per second. For a link or forwarding adjacency, residual bandwidth is defined to be the Maximum Bandwidth [RFC5305] minus the bandwidth currently allocated to RSVP-TE label switched paths. For a bundled link, residual bandwidth is defined to be the sum of the component link residual bandwidths.";
+          }
+        }
+        container available-bandwidth {
+          if-feature "srl-feat:isis-lsdb-te-extensions";
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-available-bandwidth'";
+          description
+            "This container defines unidirectional lavailable bandwidth.";
+          leaf type {
+            type identityref {
+              base srl_nokia-isis-lsdb-types:isis-subtlv-type;
+            }
+            description
+              "The type of subTLV being described. The type of subTLV is expressed as a canonical name.";
+          }
+          leaf bandwidth {
+            type uint64;
+            units "bytes per second";
+            description
+              "The available bandwidth on a link, forwarding adjacency, or bundled link with units of bytes per second. For a link or forwarding adjacency, available bandwidth is defined to be residual bandwidth minus the measured bandwidth used for the actual forwarding of non-RSVP-TE label switched path packets.  For a bundled link, available bandwidth is defined to be the sum of the component link available bandwidths minus the measured bandwidth used for the actual forwarding of non-RSVP-TE label switched path packets.  For a bundled link, available bandwidth is defined to be the sum of the component link available bandwidths.";
+          }
+        }
+        container utilized-bandwidth {
+          if-feature "srl-feat:isis-lsdb-te-extensions";
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-utilized-bandwidth'";
+          description
+            "This container defines unidirectional utilized bandwidth.";
+          leaf type {
+            type identityref {
+              base srl_nokia-isis-lsdb-types:isis-subtlv-type;
+            }
+            description
+              "The type of subTLV being described. The type of subTLV is expressed as a canonical name.";
+          }
+          leaf bandwidth {
+            type uint64;
+            units "bytes per second";
+            description
+              "The bandwidth utilization on a link, forwarding adjacency, or bundled link with units of bytes per second.  For a link or forwarding adjacency, bandwidth utilization represents the actual utilization of the link (i.e., as measured by the advertising node).  For a bundled link, bandwidth utilization is defined to be the sum of the component link bandwidth utilizations.";
+          }
+        }
+        uses isis-lsdb-application-specific-link-attributes;
+      }
+    }
+    uses isis-lsdb-undefined-subtlv;
+  }
+
+  grouping is-reachability-neighbor-state {
+    description
+      "This grouping defines is-reachability neighbor.";
+    container subtlvs {
+      description
+        "This container describes IS Neighbor sub-TLVs.";
+      list subtlv {
+        key "type";
+        description
+          "List of subTLV types in the LSDB for the specified TLV.";
+        leaf type {
+          type identityref {
+            base srl_nokia-isis-lsdb-types:isis-subtlv-type;
+          }
+          description
+            "The type of subTLV being described. The type of subTLV is expressed as a canonical name.";
+        }
+        container admin-group {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-admin-group'";
+          description
+            "This container defines sub-TLV 3.";
+          leaf-list admin-group {
+            type uint32;
+            description
+              "The administrative group sub-TLV contains a 4-octet bit mask assigned by the network administrator
+
+               Each set bit corresponds to one administrative group assigned to the interface. By convention, the least significant bit is referred to as group 0, and the most significant bit is referred to as group 31.";
+          }
+        }
+        container link-id {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-link-id'";
+          description
+            "This container defines sub-TLV 4.";
+          leaf local {
+            type uint32;
+            description
+              "The value field of this sub-TLV contains 4 octets of Link Local Identifier followed by 4 octets of Link Remote Identifier.";
+          }
+          leaf remote {
+            type uint32;
+            description
+              "If the Link Remote Identifier is unknown, it is set to 0.";
+          }
+        }
+        container ipv4-interface-address {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-ipv4-interface-address'";
+          description
+            "This container defines sub-TLV 6.";
+          leaf-list address {
+            type srl_nokia-comm:ipv4-address;
+            description
+              "A 4-octet IPv4 address for the interface described by the (main) TLV. This sub-TLV can occur multiple times.";
+          }
+        }
+        container ipv4-neighbor-address {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-ipv4-neighbor-address'";
+          description
+            "This container defines sub-TLV 8.";
+          leaf-list address {
+            type srl_nokia-comm:ipv4-address;
+            description
+              "A single IPv4 address for a neighboring router on this link. This sub-TLV can occur multiple times.";
+          }
+        }
+        container max-link-bandwidth {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-max-link-bandwidth'";
+          description
+            "This container defines sub-TLV 9.";
+          leaf bandwidth {
+            type srl_nokia-comm:ieeefloat32;
+            units "bytes per second";
+            description
+              "The maximum bandwidth that can be used on this link in this direction (from the system originating the LSP to its neighbors).  It is encoded in 32 bits in IEEE floating point format.  The units are bytes (not bits!) per second.";
+          }
+        }
+        container max-reservable-link-bandwidth {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-max-reservable-bandwidth'";
+          description
+            "This container defines sub-TLV 10.";
+          leaf bandwidth {
+            type srl_nokia-comm:ieeefloat32;
+            units "bytes per second";
+            description
+              "The maximum amount of bandwidth that can be reserved in this direction on this link.  Note that for oversubscription purposes,  this can be greater than the bandwidth of the link. It is encoded  in 32 bits in IEEE floating point format.  The units are bytes (not bits!) per second.";
+          }
+        }
+        container unreserved-bandwidth {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-unreserved-bandwidth'";
+          description
+            "This container defines unreserved-bandwidth. The units are bytes per second.";
+          list setup-priority {
+            key "priority";
+            leaf priority {
+              type uint8 {
+                range "0..7";
+              }
+              description
+                "Setup priority level of 0 through 7 to be used by Unreserved Bandwidth sub-TLV 11.";
+            }
+            leaf bandwidth {
+              type srl_nokia-comm:ieeefloat32;
+              units "bytes per second";
+              description
+                "The amount of bandwidth reservable in this direction on this link. Note that for oversubscription purposes, this can be greater than the bandwidth of the link. It contains eight 32-bit IEEE floating point numbers(one for each priority). The units are bytes (not bits!) per second. The values correspond to the bandwidth that can be reserved with a setup priority of 0 through 7, arranged in increasing order with priority 0 occurring at the start of the sub-TLV, and priority 7 at the end of the sub-TLV.";
+            }
+          }
+        }
+        container ipv6-interface-address {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-ipv6-interface-address'";
+          description
+            "This container defines sub-TLV 12.";
+          leaf-list address {
+            type srl_nokia-comm:ipv6-address;
+            description
+              "Contains a 16-octet IPv6 address for the interface described by the containing  Extended IS Reachability TLV. This sub-TLV can occur multiple times.";
+          }
+        }
+        container ipv6-neighbor-address {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-ipv6-neighbor-address'";
+          description
+            "This container defines sub-TLV 13.";
+          leaf-list address {
+            type srl_nokia-comm:ipv6-address;
+            description
+              "Contains a 16-octet IPv6 address for a neighboring router on the link described by the (main) TLV. This sub-TLV can occur multiple times.";
+          }
+        }
+        container extended-admin-group {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-extended-admin-group'";
+          description
+            "This container defines sub-TLV 14.";
+          leaf-list extended-admin-group {
+            type uint32;
+            description
+              "The extended-admin-group sub-TLV is used in addition to the Administrative Groups when it is desirable to make more than 32 colors available for advertisement in a network.";
+          }
+        }
+        container te-default-metric {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-te-default-metric'";
+          description
+            "This container defines sub-TLV 18.";
+          leaf metric {
+            type uint32;
+            description
+              "This metric is administratively assigned and can be used to present a differently weighted topology to traffic engineering SPF calculations. To preclude overflow within a traffic engineering SPF implementation, all metrics greater than or equal to MAX_PATH_METRIC SHALL be considered to have a metric of MAX_PATH_METRIC.";
+          }
+        }
+        container link-attributes {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-link-attributes'";
+          description
+            "This container defines link-attributes.";
+          leaf-list local-protection {
+            type enumeration {
+              enum local-protection {
+                description
+                  "If set, local protection is available for the link.";
+              }
+              enum link-excluded {
+                description
+                  "If set, the link is excluded from local protection.";
+              }
+            }
+            description
+              "Link local-protection attributes.";
+          }
+        }
+        container link-protection-type {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-link-protection-type'";
+          description
+            "ISIS LSDB parameters relating to the type of link protection offered.";
+          leaf-list type {
+            type enumeration {
+              enum extra-traffic {
+                description
+                  "If set the link has extra traffic protection. If the link is of type Extra Traffic, it means that the link is protecting another link or links. The LSPs on a link of this type will be lost if any of the links it is protecting fail.";
+              }
+              enum unprotected {
+                description
+                  "If set, the link is unprotected. If the link is of type Unprotected, it means that there is no other link protecting this link.  The LSPs on a link of this type will be lost if the link fails.";
+              }
+              enum shared {
+                description
+                  "If set, the link has shared protection. If the link is of type Shared, it means that there are one or more disjoint links of type Extra Traffic that are protecting this link.  These Extra Traffic links are shared between one or more links of type Shared.";
+              }
+              enum one-one {
+                description
+                  "If set, the link has dedicated 1:1 protection. If the link is of type Dedicated 1:1, it means that there is one dedicated disjoint link of type Extra Traffic that is protecting this link.";
+              }
+              enum plus-one {
+                description
+                  "If set, the link has dedicated 1+1 protection. If the link is of type Dedicated 1+1, it means that a dedicated disjoint link is protecting this link. However, the protecting link is not advertised in the link state database and is therefore not available for the routing of LSPs.";
+              }
+              enum enhanced {
+                description
+                  "If set the link has enhanced protection.  If the link is of type Enhanced, it means that a protection scheme that is more reliable than Dedicated 1+1, e.g., 4 fiber BLSR/MS-SPRING, is being used to protect this link.";
+              }
+            }
+            description
+              "Link protection capabilities.";
+          }
+        }
+        container bandwidth-constraints {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-bandwidth-constraints'";
+          description
+            "This container defines bandwidth-constraints. For DS-TE, the existing Maximum Reservable link bandwidth parameter is retained, but its semantics is generalized and interpreted as the aggregate bandwidth constraint across all Class-Types";
+          list bandwidth-constraint {
+            key "model-id";
+            description
+              "List of the Bandwidth Constraints sub-TLV instances present in the TLV.";
+            leaf model-id {
+              type uint8;
+              description
+                "Identifier for the Bandwidth Constraints  Model currently in use by the LSR initiating the IGP advertisement.";
+            }
+            container constraints {
+              description
+                "Constraints contained within the Bandwidth Constraints sub-TLV";
+              list constraint {
+                key "constraint-id";
+                description
+                  "List of the constraints within the Bandwidth Constraints sub-TLV. The BC0 level is indicated by the constraint-id leaf being set to 0, with BCN being indicated by constraint-id N.";
+                leaf constraint-id {
+                  type uint32;
+                  description
+                    "Unique reference for the bandwidth constraint level. BC0 is indicated by this leaf being set to zero, with BCN represented by this leaf being set to N.";
+                }
+                leaf bandwidth {
+                  type srl_nokia-comm:ieeefloat32;
+                  units "bytes per second";
+                  description
+                    "The bandwidth constraint, expressed as a 32-bit IEEE floating point number expressed in bytes per second.";
+                }
+              }
+            }
+          }
+        }
+        container unconstrained-lsp {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-unconstrained-lsp'";
+          description
+            "This container defines sub-TLV 23.";
+          leaf type {
+            type identityref {
+              base srl_nokia-isis-lsdb-types:isis-subtlv-type;
+            }
+            description
+              "The type of subTLV being described. The type of subTLV is expressed as a canonical name.";
+          }
+          leaf count {
+            type uint16;
+            description
+              "Unconstrained TE LSP count(TE Label Switched Paths (LSPs) signalled with zero bandwidth).";
+          }
+        }
+        container adjacency-sids {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-adj-sid'";
+          description
+            "This container defines segment routing adjacency SIDs.";
+          list adjacency-sid {
+            key "value";
+            description
+              "Adjacency Segment-IDs List. An IGP-Adjacency Segment is an IGP segment attached to a unidirectional adjacency or a set of unidirectional adjacencies. By default, an IGP- Adjacency Segment is local to the node which advertises it.";
+            leaf value {
+              type uint32;
+              description
+                "Adjacency-SID value.";
+            }
+            leaf-list flags {
+              type enumeration {
+                enum address-family {
+                  description
+                    "Address-family flag. When unset, the Adj-SID refers to an adjacency with outgoing IPv4 encapsulation. If set then the Adj-SID refers to an adjacency with outgoing IPv6 encapsulation.";
+                }
+                enum backup {
+                  description
+                    "Backup flag. When set, the Adj-SID refers to an adjacency being protected (e.g.: using IPFRR or MPLS-FRR).";
+                }
+                enum value {
+                  description
+                    "Value flag. When set, the SID carries a value (instead of an index). By default the flag is SET.";
+                }
+                enum local {
+                  description
+                    "Local flag. When set, the value/index carried by the SID has local significance. By default the flag is SET.";
+                }
+                enum set {
+                  description
+                    "Set flag. When set, the S-Flag indicates that the Adj-SID refers to a set of adjacencies.";
+                }
+              }
+              description
+                "Flags associated with Adj-Segment-ID.";
+            }
+            leaf weight {
+              type uint8;
+              description
+                "Value that represents the weight of the Adj-SID for the purpose of load balancing.";
+            }
+          }
+        }
+        container lan-adjacency-sids {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-adj-lan-sid'";
+          description
+            "This container defines segment routing LAN adjacency SIDs";
+          list lan-adjacency-sid {
+            key "value";
+            description
+              "Adjacency Segment-IDs List. An IGP-Adjacency Segment is an IGP segment attached to a unidirectional adjacency or a set of unidirectional adjacencies. By default, an IGP- Adjacency Segment is local to the node which advertises it.";
+            leaf value {
+              type uint32;
+              description
+                "LAN Adjacency-SID value.";
+            }
+            leaf-list flags {
+              type enumeration {
+                enum address-family {
+                  description
+                    "Address-family flag. When unset, the Adj-SID refers to an adjacency with outgoing IPv4 encapsulation. If set then the Adj-SID refers to an adjacency with outgoing IPv6 encapsulation.";
+                }
+                enum backup {
+                  description
+                    "Backup flag. When set, the Adj-SID refers to an adjacency being protected (e.g.: using IPFRR or MPLS-FRR).";
+                }
+                enum value {
+                  description
+                    "Value flag. When set, the SID carries a value (instead of an index). By default the flag is SET.";
+                }
+                enum local {
+                  description
+                    "Local flag. When set, the value/index carried by the SID has local significance. By default the flag is SET.";
+                }
+                enum set {
+                  description
+                    "Set flag. When set, the S-Flag indicates that the Adj-SID refers to a set of adjacencies.";
+                }
+              }
+              description
+                "Flags associated with LAN-Adj-Segment-ID.";
+            }
+            leaf weight {
+              type uint8;
+              description
+                "Value that represents the weight of the Adj-SID for the purpose of load balancing.";
+            }
+            leaf neighbor-id {
+              type srl_nokia-comm:isis-system-id;
+              description
+                "System ID of the neighbor associated with the LAN- Adj-Segment-ID value.";
+            }
+          }
+        }
+        container link-delay {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-link-delay'";
+          description
+            "This container defines unidirectional link delay.";
+          leaf a-bit {
+            type boolean;
+            description
+              "The A bit is set when the measured value of this parameter exceeds its configured maximum threshold. The A bit is cleared when the measured value falls below its configured reuse threshold.";
+          }
+          leaf delay {
+            type uint32;
+            units "microseconds";
+            description
+              "Average link delay value (in microseconds) between two directly connected IS-IS neighbors over a configurable interval.";
+          }
+        }
+        container min-max-link-delay {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-min-max-link-delay'";
+          description
+            "This container defines min/max link delay.";
+          leaf a-bit {
+            type boolean;
+            description
+              "The A bit is set when the measured value of this parameter exceeds its configured maximum threshold. The A bit is cleared when the measured value falls below its configured reuse threshold.";
+          }
+          leaf min-delay {
+            type uint32;
+            units "microseconds";
+            description
+              "Minimum measured link delay value(in microseconds) between two directly connected IS-IS neighbors over a configurable interval.";
+          }
+          leaf max-delay {
+            type uint32;
+            units "microseconds";
+            description
+              "Maximum measured link delay value(in microseconds) between two directly connected IS-IS neighbors over a configurable interval.";
+          }
+        }
+        container link-delay-variation {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-link-delay-variation'";
+          description
+            "This container defines unidirectional link delay variation.";
+          leaf delay {
+            type uint32;
+            units "microseconds";
+            description
+              "Average link delay between two directly connected IS-IS neighbors over a configurable interval.";
+          }
+        }
+        container link-loss {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-link-loss'";
+          description
+            "This container defines unidirectional link loss delay.";
+          leaf a-bit {
+            type boolean;
+            description
+              "The A bit is set when the measured value of this parameter exceeds its configured maximum threshold. The A bit is cleared when the measured value falls below its configured reuse threshold.";
+          }
+          leaf link-loss {
+            type uint32;
+            description
+              "Link packet loss as a percentage of the total traffic sent over a configurable interval. The basic unit is 0.000003%, where (2^24 - 2) is 50.331642%. This value s the highest packet-loss percentage that can be expressed (the assumption being that precision is more important on high-speed links than the ability to advertise loss rates greater than this, and that high- peed links with over 50% loss are unusable). Therefore, measured values that are larger than the field maximum SHOULD be encoded as the maximum value.";
+          }
+        }
+        container residual-bandwidth {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-residual-bandwidth'";
+          description
+            "This container defines unidirectional residual bandwidth.";
+          leaf bandwidth {
+            type uint64;
+            units "bytes per second";
+            description
+              "Residual bandwidth on a link,forwarding adjacency [RFC4206], or bundled link in IEEE floating-point format with units of bytes per second. For a link or forwarding adjacency, residual bandwidth is defined to be the Maximum Bandwidth [RFC5305] minus the bandwidth currently allocated to RSVP-TE label switched paths. For a bundled link, residual bandwidth is defined to be the sum of the component link residual bandwidths.";
+          }
+        }
+        container available-bandwidth {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-available-bandwidth'";
+          description
+            "This container defines unidirectional lavailable bandwidth.";
+          leaf type {
+            type identityref {
+              base srl_nokia-isis-lsdb-types:isis-subtlv-type;
+            }
+            description
+              "The type of subTLV being described. The type of subTLV is expressed as a canonical name.";
+          }
+          leaf bandwidth {
+            type srl_nokia-comm:ieeefloat32;
+            units "bytes per second";
+            description
+              "The available bandwidth on a link, forwarding adjacency, or bundled link in IEEE floating-point format with units of bytes per second. For a link or forwarding adjacency, available bandwidth is defined to be residual bandwidth minus the measured bandwidth used for the actual forwarding of non-RSVP-TE label switched path packets.  For a bundled link, available bandwidth is defined to be the sum of the component link available bandwidths minus the measured bandwidth used for the actual forwarding of non-RSVP-TE label switched path packets.  For a bundled link, available bandwidth is defined to be the sum of the component link available bandwidths.";
+          }
+        }
+        container utilized-bandwidth {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-reachability-utilized-bandwidth'";
+          description
+            "This container defines unidirectional utilized bandwidth.";
+          leaf type {
+            type identityref {
+              base srl_nokia-isis-lsdb-types:isis-subtlv-type;
+            }
+            description
+              "The type of subTLV being described. The type of subTLV is expressed as a canonical name.";
+          }
+          leaf bandwidth {
+            type srl_nokia-comm:ieeefloat32;
+            units "bytes per second";
+            description
+              "The bandwidth utilization on a link, forwarding adjacency, or bundled link in IEEE floating-point format with units of bytes per second.  For a link or forwarding adjacency, bandwidth utilization represents the actual utilization of the link (i.e., as measured by the advertising node).  For a bundled link, bandwidth utilization is defined to be the sum of the component link bandwidth utilizations.";
+          }
+        }
+      }
+    }
+    uses isis-lsdb-undefined-subtlv;
+  }
+
+  grouping isis-lsdb-common-isreach-neighbors {
+    description
+      "Common structure for the Extended IS Reachability and IS Reachability Neighbour attributes.";
+    container neighbors {
+      description
+        "This container describes IS neighbors.";
+      list neighbor {
+        key "system-id";
+        description
+          "This list describes ISIS extended neighbors and reachability attributes.";
+        leaf system-id {
+          type srl_nokia-comm:isis-system-id;
+          description
+            "System-id of the neighbor.";
+        }
+        container instances {
+          description
+            "This list contains all instances of an adjacency between the originating IS and the remote IS. Multiple instances are used where there are parallel adjacencies between two systems.";
+          list instance {
+            key "id";
+            description
+              "Instance of the TLV to the remote IS neighbor.";
+            leaf id {
+              type uint64;
+              description
+                "Unique identifier for the instance of the TLV for the IS neighbor. The instance ID is not required to be consistent across across readvertisements of the LSP.";
+            }
+            leaf metric {
+              type isis-wide-metric;
+              description
+                "Metric value.";
+            }
+            uses is-reachability-neighbor-state;
+          }
+        }
+      }
+    }
+  }
+
+  grouping isis-lsdb-common-extisreach-neighbors {
+    description
+      "Common structure for the Extended IS Reachability and IS Reachability Neighbour attributes.";
+    container neighbors {
+      description
+        "This container describes IS neighbors.";
+      list neighbor {
+        key "system-id";
+        description
+          "This list describes ISIS extended neighbors and reachability attributes.";
+        leaf system-id {
+          type srl_nokia-comm:isis-system-id;
+          description
+            "System-id of the neighbor.";
+        }
+        container instances {
+          description
+            "This list contains all instances of an adjacency between the originating IS and the remote IS. Multiple instances are used where there are parallel adjacencies between two systems.";
+          list instance {
+            key "id";
+            description
+              "Instance of the TLV to the remote IS neighbor.";
+            leaf id {
+              type uint64;
+              description
+                "Unique identifier for the instance of the TLV for the IS neighbor. The instance ID is not required to be consistent across across readvertisements of the LSP.";
+            }
+            leaf metric {
+              type isis-wide-metric;
+              description
+                "Metric value.";
+            }
+            uses extended-is-reachability-neighbor-state;
+          }
+        }
+      }
+    }
+  }
+
+  grouping ipv4-prefix-extended-params-state {
+    description
+      "State parameters that relate to an IPv4 prefix";
+    leaf up-down {
+      type boolean;
+      description
+        "The up/down bit. Set if a prefix is advertised from a higher level to a lower level (e.g., level 2 to level 1), indicating that the prefix has traveled down the hierarchy. Prefixes that have the up/down bit set may only be advertised down the hierarchy, i.e., to lower levels. When a prefix is first injected into IS-IS, the bit is UNSET.";
+    }
+    leaf s-bit {
+      type boolean;
+      description
+        "The Sub-TLV present bit. If UNSET, the octets of Sub-TLVs are not present. Otherwise, the bit is set and the octet following the prefix will contain the length of the Sub-TLV portion of the structure.";
+    }
+    leaf prefix {
+      type srl_nokia-comm:ipv4-prefix;
+      description
+        "IPv4 prefix contained within extended reachability TLVs.";
+    }
+    leaf metric {
+      type isis-tlv-wide-metric;
+      description
+        "ISIS metric value.";
+    }
+  }
+
+  grouping ipv6-prefix-extended-params-state {
+    description
+      "Common parameters of an IPv6 extended prefix.";
+    leaf up-down {
+      type boolean;
+      description
+        "The up/down bit. Set if a prefix is advertised from a higher level to a lower level (e.g., level 2 to level 1), indicating that the prefix has traveled down the hierarchy. Prefixes that have the up/down bit set may only be advertised down the hierarchy, i.e., to lower levels. When a prefix is first injected into IS-IS, the bit is UNSET.";
+    }
+    leaf x-bit {
+      type boolean;
+      description
+        "The external bit. Set when the prefix was distributed into IS-IS from another routing protocol.";
+    }
+    leaf s-bit {
+      type boolean;
+      description
+        "The sub-tlv present bit. If UNSET, the octets of Sub-TLVs are not present. Otherwise, the bit is set and the octet following the prefix will contain the length of the Sub-TLV portion of the structure.";
+    }
+    leaf prefix {
+      type srl_nokia-comm:ipv6-prefix;
+      description
+        "IPv6 prefix contained within extended reachability TLVs.";
+    }
+    leaf metric {
+      type isis-tlv-wide-metric;
+      description
+        "ISIS metric value.";
+    }
+  }
+
+  grouping isis-lsdb-prefix-sid-state {
+    description
+      "This grouping defines ISIS Prefix SID.";
+    container prefix-sids {
+      when "../type = 'srl_nokia-isis-lsdb-types:ip-reachability-prefix-sid'";
+      description
+        "This container defines segment routing extensions for prefixes.";
+      list prefix-sid {
+        key "value";
+        description
+          "Prefix Segment-ID list. IGP-Prefix Segment is an IGP segment attached to an IGP prefix. An IGP-Prefix Segment is global (unless explicitly advertised otherwise) within the SR/IGP domain.";
+        leaf value {
+          type uint32;
+          description
+            "IGP Prefix-SID value.";
+        }
+        leaf-list flags {
+          type enumeration {
+            enum readvertisement {
+              description
+                "Readvertisment flag. When set, the prefix to which this Prefix-SID is attached, has been propagated by the router either from another level or from redistribution.";
+            }
+            enum node {
+              description
+                "Node flag. When set, the Prefix-SID refers to the router identified by the prefix. Typically, the N-Flag is set on Prefix-SIDs attached to a router loopback address.";
+            }
+            enum no-php {
+              description
+                "Penultimate-Hop-Popping flag. When set, then the penultimate hop MUST NOT pop the Prefix-SID before delivering the packet to the node that advertised the Prefix-SID.";
+            }
+            enum explicit-null {
+              description
+                "Explicit-Null flag. When set, any upstream neighbor of the Prefix-SID originator MUST replace the Prefix-SID with a Prefix-SID having an Explicit-NULL value (0 for IPv4 and 2 for IPv6) before forwarding the packet.";
+            }
+            enum value {
+              description
+                "Value flag. When set, the Prefix-SID carries a value (instead of an index). By default the flag is UNSET.";
+            }
+            enum local {
+              description
+                "Local flag. When set, the value/index carried by the Prefix-SID has local significance. By default the flag is UNSET.";
+            }
+          }
+          description
+            "Flags associated with Prefix Segment-ID.";
+        }
+        leaf algorithm {
+          type uint8;
+          description
+            "Prefix-SID algorithm to be used for path computation.";
+        }
+      }
+    }
+  }
+
+  grouping isis-lsdb-prefix-state {
+    description
+      "This grouping defines prefix reachability.";
+    container subtlvs {
+      description
+        "This container describes IS prefix sub-TLVs.";
+      list subtlv {
+        key "type";
+        description
+          "List of subTLV types in the LSDB for the specified TLV.";
+        leaf type {
+          type identityref {
+            base srl_nokia-isis-lsdb-types:isis-subtlv-type;
+          }
+          description
+            "The type of subTLV being described. The type of subTLV is expressed as a canonical name.";
+        }
+        container tag {
+          when "../type = 'srl_nokia-isis-lsdb-types:ip-reachability-tag'";
+          description
+            "This container defines sub-TLV 1.";
+          leaf-list tag32 {
+            type uint32;
+            description
+              "List of 32-bit tags associated with the prefix. Example uses of these tags include carrying BGP standard (or extended) communities and controlling redistribution between levels and areas, different routing protocols, or multiple instances of IS-IS running on the same router.";
+          }
+        }
+        container tag64 {
+          when "../type = 'srl_nokia-isis-lsdb-types:ip-reachability-tag64'";
+          description
+            "This container defines sub-TLV 2.";
+          leaf-list tag64 {
+            type uint64;
+            description
+              "List of 64-bit tags associated with the prefix. Example uses of these tags include carrying BGP standard (or extended) communities and controlling redistribution between levels and areas, different routing protocols, or multiple instances of IS-IS running on the same router.";
+          }
+        }
+        container flags {
+          when "../type = 'srl_nokia-isis-lsdb-types:ip-reachability-prefix-flags'";
+          description
+            "This container defines sub-TLV 4.";
+          leaf type {
+            type identityref {
+              base srl_nokia-isis-lsdb-types:isis-subtlv-type;
+            }
+            description
+              "The type of subTLV being described. The type of subTLV is expressed as a canonical name.";
+          }
+          leaf-list flags {
+            type enumeration {
+              enum external-flag {
+                description
+                  "External prefix flag. Set if the prefix has been redistributed from another protocol. This includes the case where multiple virtual routers are supported and the source of the redistributed prefix is another IS-IS instance.";
+              }
+              enum readvertisement-flag {
+                description
+                  "Readvertisement flag. Set when the prefix has been leaked from one level to another (upwards or downwards).";
+              }
+              enum node-flag {
+                description
+                  "Node flag. Set when the prefix identifies the advertising router, i.e., the prefix is a host prefix advertising  a globally reachable address typically associated with a loopback address.";
+              }
+              enum elc-flag {
+                description
+                  "Elc flag. Set for local host prefix of the originating node if it supports ELC on all interfaces";
+              }
+            }
+            description
+              "Additional prefix reachability flags.";
+          }
+        }
+        container ipv4-source-router-id {
+          when "../type = 'srl_nokia-isis-lsdb-types:ip-reachability-ipv4-router-id'";
+          description
+            "This container defines sub-TLV 11.";
+          leaf type {
+            type identityref {
+              base srl_nokia-isis-lsdb-types:isis-subtlv-type;
+            }
+            description
+              "The type of subTLV being described. The type of subTLV is expressed as a canonical name.";
+          }
+          leaf router-id {
+            type srl_nokia-comm:ipv4-address;
+            description
+              "IPv4 Source router ID address. In cases where the advertisement is an identifier for the advertising router (e.g., with the N-flag set in the Prefix Attribute Flags sub-TLV), it may be useful for other routers to know the source of the advertisement. When reachability advertisement is leaked from one level to another, Router ID advertised is always the Router ID of the IS-IS instance that originated the advertisement. This would be true even if the prefix had been learned from another protocol.";
+          }
+        }
+        container ipv6-source-router-id {
+          when "../type = 'srl_nokia-isis-lsdb-types:ip-reachability-ipv6-router-id'";
+          description
+            "This container defines sub-TLV 12.";
+          leaf type {
+            type identityref {
+              base srl_nokia-isis-lsdb-types:isis-subtlv-type;
+            }
+            description
+              "The type of subTLV being described. The type of subTLV is expressed as a canonical name.";
+          }
+          leaf router-id {
+            type srl_nokia-comm:ipv6-address;
+            description
+              "IPv6 Source router ID address. In cases where the advertisement is an identifier for the advertising router (e.g., with the N-flag set in the Prefix Attribute Flags sub-TLV), it may be useful for other routers to know the source of the advertisement. When reachability advertisement is leaked from one level to another, Router ID advertised is always the Router ID of the IS-IS instance that originated the advertisement. This would be true even if the prefix had been learned from another protocol.";
+          }
+        }
+        uses isis-lsdb-prefix-sid-state;
+      }
+    }
+    uses isis-lsdb-undefined-subtlv;
+  }
+
+  grouping ipv4-prefix-extended-state {
+    description
+      "This grouping defines attributes of an IPv4 extended prefix.";
+    uses ipv4-prefix-extended-params-state;
+    uses isis-lsdb-prefix-state;
+  }
+
+  grouping ipv4-mt-prefix-extended-state {
+    description
+      "State parameters that relate to an IPv4 prefix in a multi-topology context.";
+    uses ipv4-prefix-extended-params-state;
+    leaf mt-id {
+      type uint16 {
+        range "0..4095";
+      }
+      description
+        "Multi-topology ID";
+    }
+    uses isis-lsdb-prefix-state;
+  }
+
+  grouping ipv6-prefix-extended-state {
+    description
+      "State parameters relating to an IPv6 prefix.";
+    uses ipv6-prefix-extended-params-state;
+    uses isis-lsdb-prefix-state;
+  }
+
+  grouping ipv6-mt-prefix-extended-state {
+    description
+      "State parameters relating to a multi-topology IPv6 prefix.";
+    uses ipv6-prefix-extended-params-state;
+    leaf mt-id {
+      type uint16 {
+        range "0..4095";
+      }
+      description
+        "Multi-topology ID";
+    }
+    uses isis-lsdb-prefix-state;
+  }
+
+  grouping mt-isis-neighbor-state {
+    description
+      "This grouping defines state parameters that are related to each neighbour entry for the MT ISN TLV.";
+    leaf mt-id {
+      type uint16 {
+        range "0..4095";
+      }
+      description
+        "Identifier of a topology being announced.";
+    }
+    leaf system-id {
+      type srl_nokia-comm:isis-system-id;
+      description
+        "System-id of the IS neighbor.";
+    }
+  }
+
+  grouping mt-isis-neighbor-instance {
+    description
+      "This grouping defines list of ISIS multi-topology neighbors for extended ISIS LSP (multiple system IDs).";
+    leaf metric {
+      type isis-tlv-wide-metric;
+      description
+        "ISIS metric value.";
+    }
+    leaf id {
+      type uint64;
+      description
+        "Unique identifier for the TLV instance for the neighbor. The ID is not required to be consistent across readvertisements of the LSP.";
+    }
+    uses extended-is-reachability-neighbor-state;
+  }
+
+  grouping isis-lsdb-mtis-common {
+    description
+      "Common grouping for structure used within the multi-topology IS neighbour and multi-topology IS neighbour attribute TLVs.";
+    container neighbors {
+      description
+        "MT-IS neigbor attributes.";
+      list neighbor {
+        key "mt-id system-id";
+        description
+          "This container describes IS neighbors.";
+        uses mt-isis-neighbor-state;
+        container instances {
+          description
+            "This list contains all instances of an adjacency between the originating and remote IS. Multiple instances are used to indicate where there are arallel adjacencies between systems.";
+          list instance {
+            key "id";
+            description
+              "Instance of TLV-222 between the originating and remote IS.";
+            uses mt-isis-neighbor-instance;
+          }
+        }
+      }
+    }
+  }
+
+  grouping lsp-state {
+    description
+      "This grouping defines ISIS LSP state information.";
+    leaf lsp-id {
+      description
+        "The value specifies the LSP Id and is given in the format as 6 octets of adjacency system-id followed by 1 octet Lan-ID and 1 octet LSP Number.";
+      type srl_nokia-comm:isis-lsp-id;
+    }
+    leaf maximum-area-addresses {
+      type uint8;
+      description
+        "Number of area addresses permitted for this ISs area
+
+         0 indicates the IS only supports three area addresses (by default). Any number inclusive of 1 and 254 indicates the number of areas allowed.";
+    }
+    leaf version {
+      type uint8;
+      description
+        "PDU version. This is set to 1.";
+    }
+    leaf version2 {
+      type uint8;
+      description
+        "PDU version2. This is set to 1";
+    }
+    leaf id-length {
+      type uint8;
+      description
+        "Length of the ID field of NSAP addresses and NETs used in this routing domain.";
+    }
+    leaf pdu-type {
+      type enumeration {
+        enum level-1 {
+          description
+            "This enum describes ISIS level 1 PDU.";
+        }
+        enum level-2 {
+          description
+            "This enum describes ISIS level 2 PDU.";
+        }
+      }
+      description
+        "Link State PDU type.";
+    }
+    leaf remaining-lifetime {
+      type uint16;
+      units "seconds";
+      description
+        "Remaining lifetime in seconds before the LSP expiration.";
+    }
+    leaf sequence-number {
+      type uint32;
+      description
+        "Sequence number of the LSP.";
+    }
+    leaf checksum {
+      type uint16;
+      description
+        "Checksum of the LSP.";
+    }
+    leaf pdu-length {
+      type uint16;
+      description
+        "Total length of the LSP.";
+    }
+    leaf-list flags {
+      type enumeration {
+        enum partition-repair {
+          description
+            "When set, the originator supports partition repair.";
+        }
+        enum attached-error {
+          description
+            "When set, the originator is attached to another area using the referred metric.";
+        }
+        enum attached-expense {
+          description
+            "When set, the originator is attached to another area using the referred metric.";
+        }
+        enum attached-delay {
+          description
+            "When set, the originator is attached to another area using the referred metric.";
+        }
+        enum attached-default {
+          description
+            "When set, the originator is attached to another area using the referred metric.";
+        }
+        enum overload {
+          description
+            "When set, the originator is overloaded, and must be avoided in path calculation.";
+        }
+      }
+      description
+        "LSP Type-Block flags.";
+    }
+    leaf is-type {
+      type isis-level-number;
+      description
+        "Type of neighboring system.";
+    }
+    container tlvs {
+      description
+        "This container defines Link State PDU State TLVs.";
+      list tlv {
+        key "type";
+        description
+          "List of TLV types in the LSDB for the specified LSP.";
+        leaf type {
+          type identityref {
+            base srl_nokia-isis-lsdb-types:isis-tlv-type;
+          }
+          description
+            "The type of TLV being described. The type of TLV is expressed as a canonical name.";
+        }
+        container area-address {
+          when "../type = 'srl_nokia-isis-lsdb-types:area-addresses'";
+          description
+            "This container defines TLV 1.";
+          leaf-list address {
+            type isis-area-address;
+            description
+              "Area adress(es) of the IS. Set of manual area addresses of this IS.";
+          }
+        }
+        container lsp-buffer-size {
+          when "../type = 'srl_nokia-isis-lsdb-types:lsp-buffer-size'";
+          description
+            "This container defines TLV 14 - the LSP Buffer Size TLV.";
+          leaf size {
+            type uint16;
+            units "bytes";
+            description
+              "The maximum MTU that the advertising system can receive, expressed in bytes.";
+          }
+        }
+        container nlpid {
+          when "../type = 'srl_nokia-isis-lsdb-types:nlpid'";
+          description
+            "This container defines TLV 129.";
+          leaf-list nlpid {
+            type enumeration {
+              enum ipv4 {
+                description
+                  "IPv4 Address family.";
+              }
+              enum ipv6 {
+                description
+                  "IPv6 Address family.";
+              }
+            }
+            description
+              "Protocol supported. IPv4 is defined as (0xcc) and IPv6 -(0x8e)";
+          }
+        }
+        container hostname {
+          when "../type = 'srl_nokia-isis-lsdb-types:dynamic-name'";
+          description
+            "This container defines TLV 137.";
+          leaf-list hostname {
+            type string;
+            description
+              "Name of the node.";
+          }
+        }
+        container ipv4-interface-addresses {
+          when "../type = 'srl_nokia-isis-lsdb-types:ipv4-interface-addresses'";
+          description
+            "This container defines TLV 132.";
+          leaf-list address {
+            type srl_nokia-comm:ipv4-address;
+            description
+              "IPv4 address(es) of the interface corresponding to the SNPA over which this PDU is to be transmitted.";
+          }
+        }
+        container ipv6-interface-addresses {
+          when "../type = 'srl_nokia-isis-lsdb-types:ipv6-interface-addresses'";
+          description
+            "This container defines TLV 232.";
+          leaf-list address {
+            type srl_nokia-comm:ipv6-address;
+            description
+              "IPv6 interface addresses of the node.  MUST contain only the non-link-local IPv6 addresses assigned to the IS.";
+          }
+        }
+        container ipv4-te-router-id {
+          when "../type = 'srl_nokia-isis-lsdb-types:ipv4-te-router-id'";
+          description
+            "This container defines TLV 134.";
+          leaf-list router-id {
+            type srl_nokia-comm:ipv4-address;
+            description
+              "IPv4 Traffic Engineering router ID of the node. For traffic engineering, it guarantees that we have a single stable address that can always be referenced in a path that will be reachable from multiple hops away, regardless of the state of the node's interfaces.";
+          }
+        }
+        container ipv6-te-router-id {
+          when "../type = 'srl_nokia-isis-lsdb-types:ipv6-te-router-id'";
+          description
+            "This container defines TLV 140.";
+          leaf-list router-id {
+            type srl_nokia-comm:ipv6-address;
+            description
+              "IPv6 Traffic Engineering router ID of the node. For traffic engineering, it guarantees that we have a single stable address that can always be referenced in a path that will be reachable from multiple hops away, regardless of the state of the node's interfaces.";
+          }
+        }
+        container instance-ids {
+          when "../type = 'srl_nokia-isis-lsdb-types:instance-id'";
+          description
+            "This container defines ISIS Instance Identifier TLV.";
+          list instance-id {
+            key "instance-id";
+            description
+              "A list of instance IDs received within TLV 7 within an IS-IS LSP. In the case that more than one instance of TLV 7 is included in the LSP, the instance IDs specified within the instances are concatenated within this list.";
+            leaf instance-id {
+              type uint16;
+              description
+                "An Instance Identifier (IID) to uniquely identify an IS-IS instance. When the IID = 0, the list of supported ITIDs MUST NOT be present. An IID-TLV with IID = 0 MUST NOT appear in an SNP or LSP. When the TLV appears (with a non-zero IID) in an SNP or LSP, exactly one ITID. MUST be present indicating the topology with which the PDU is associated. If no ITIDs or multiple ITIDs are present or the IID is zero, then the PDU MUST be ignored.";
+            }
+            leaf-list topology-id {
+              type uint16;
+              description
+                "Instance-Specific Topology Identifiers (ITIDs).";
+            }
+          }
+        }
+        container ipv4-srlgs {
+          when "../type = 'srl_nokia-isis-lsdb-types:ipv4-srlg'";
+          description
+            "This container defines ISIS SRLG TLV 138.";
+          list ipv4-srlg {
+            key "instance-number";
+            description
+              "Instance of the IPv4 SRLG TLV";
+            leaf instance-number {
+              type uint32;
+              description
+                "An arbitrary unsigned 32-bit integer used to disambiguate the instance of TLV 138. The instance identifier is synthesised by the system and may be renumbered for the same SRLG definition in subsequent advertised LSPs if (and only if) the entire list of SRLGs is replaced.";
+            }
+            leaf system-id {
+              type srl_nokia-comm:isis-system-id;
+              description
+                "Neighbor system ID.";
+            }
+            leaf psn-number {
+              type uint8;
+              description
+                "Pseudonode number if the neighbor is on a LAN interface.";
+            }
+            leaf-list flags {
+              type enumeration {
+                enum numbered {
+                  description
+                    "When set, the interface is numbered, whereas if unset indicates that the interface is unnumbered.";
+                }
+              }
+              description
+                "SRLG flags.";
+            }
+            leaf ipv4-interface-address {
+              type srl_nokia-comm:ipv4-address;
+              description
+                "IPv4 interface address.";
+            }
+            leaf ipv4-neighbor-address {
+              type srl_nokia-comm:ipv4-address;
+              description
+                "IPv4 neighbor address.";
+            }
+            leaf-list srlg-value {
+              type uint32;
+              description
+                "List of SRLG values.";
+            }
+          }
+        }
+        container ipv6-srlgs {
+          when "../type = 'srl_nokia-isis-lsdb-types:ipv6-srlg'";
+          description
+            "This container defines ISIS SRLG TLV.";
+          list ipv6-srlg {
+            key "instance-number";
+            description
+              "Instance of the IPv6 SRLG TLV.";
+            leaf instance-number {
+              type uint32;
+              description
+                "An arbitrary unsigned 32-bit integer used to disambiguate the instance of TLV 138. The instance identifier is synthesised by the system and may be renumbered for the same SRLG definition in subsequent advertised LSPs if (and only if) the entire list of SRLGs is replaced.";
+            }
+            leaf system-id {
+              type srl_nokia-comm:isis-system-id;
+              description
+                "Neighbor system ID.";
+            }
+            leaf psn-number {
+              type uint8;
+              description
+                "Pseudonode number if the neighbor is on a LAN interface.";
+            }
+            leaf-list flags {
+              type enumeration {
+                enum na {
+                  description
+                    "When set, the IPv6 neighbour address is included, whereas if unset, it is omitted";
+                }
+              }
+              description
+                "IPv6 SRLG flags.";
+            }
+            leaf ipv6-interface-address {
+              type srl_nokia-comm:ipv6-address;
+              description
+                "IPv6 interface address or Link Local Identifier.";
+            }
+            leaf ipv6-neighbor-address {
+              type srl_nokia-comm:ipv6-address;
+              description
+                "IPv6 neighbor address or Link Remote Identifier.";
+            }
+            leaf-list srlg-value {
+              type uint32;
+              description
+                "SRLG values.";
+            }
+          }
+        }
+        container purge-oi {
+          when "../type = 'srl_nokia-isis-lsdb-types:purge-oi'";
+          description
+            "This container defines ISIS purge TLV.";
+          leaf system-id-count {
+            type uint8;
+            description
+              "Number of system IDs carried in this TLV.";
+          }
+          leaf source-system-id {
+            type srl_nokia-comm:isis-system-id;
+            description
+              "System ID of the Intermediate System that inserted this TLV.";
+          }
+          leaf received-system-id {
+            type srl_nokia-comm:isis-system-id;
+            description
+              "System ID of the Intermediate System from which the purge was received.";
+          }
+        }
+        container router-capabilities {
+          when "../type = 'srl_nokia-isis-lsdb-types:router-capability'";
+          description
+            "This container defines router capabilities.";
+          list capability {
+            key "instance-number";
+            description
+              "This list describes IS Router capabilities.";
+            leaf instance-number {
+              type uint32;
+              description
+                "A unique instance number for the instance of the router capabilities TLV. The instance number should be autogenerated by the producer of the data and may be renumbered if the entire LSP contents are replaced in subsequent advertisements.";
+            }
+            leaf router-id {
+              type srl_nokia-comm:ipv4-address;
+              description
+                "IPv4 router-id.";
+            }
+            leaf-list flags {
+              type enumeration {
+                enum flood {
+                  description
+                    "When the S bit is set(1), the IS - IS Router CAPABILITY TLV MUST be flooded across the entire routing domain. When the S bit is not set(0), the TLV MUST NOT be leaked between levels . This bit MUST NOT be altered during the TLV leaking.";
+                }
+                enum down {
+                  description
+                    "When the IS-IS Router CAPABILITY TLV is leaked from level - 2 to level-1, the Down bit MUST be set. Otherwise, this bit MUST be clear. IS - IS Router capability TLVs with the Down bit set MUST NOT be leaked from level - 1 to level-2. This is to prevent TLV looping.";
+                }
+              }
+              description
+                "Router capability flags.";
+            }
+            container subtlvs {
+              description
+                "This container describes router capability TLV sub-TLVs";
+              list subtlv {
+                key "type";
+                description
+                  "List of subTLV types in the LSDB for the specified TLV";
+                leaf type {
+                  type identityref {
+                    base srl_nokia-isis-lsdb-types:isis-subtlv-type;
+                  }
+                  description
+                    "The type of subTLV being described. The type of subTLV is expressed as a canonical name.";
+                }
+                container segment-routing-algorithms {
+                  when "../type = 'srl_nokia-isis-lsdb-types:router-capability-sr-algorithm'";
+                  description
+                    "This container defines SR algorithm sub-TLV 19.";
+                  leaf-list algorithm {
+                    type enumeration {
+                      enum spf {
+                        value 0;
+                        description
+                          "Shortest Path First (SPF) algorithm based on link metric.  This is the well-known shortest path algorithm as computed by the IS-IS Decision process. Consistent with the deployed practice for link-state protocols, algorithm 0 permits any node to overwrite the SPF path with a different path based on local policy.";
+                      }
+                      enum strict-spf {
+                        value 1;
+                        description
+                          "Strict Shortest Path First (SPF) algorithm based on link metric. The algorithm is identical to algorithm 0 but algorithm 1 requires that all nodes along the path will honor the SPF routing decision. Local policy MUST NOT alter the forwarding decision computed by algorithm 1 at the node claiming to support algorithm 1.";
+                      }
+                    }
+                    description
+                      "The Segment Routing algorithm that is described by the TLV.";
+                  }
+                }
+                container segment-routing-capability {
+                  when "../type = 'srl_nokia-isis-lsdb-types:router-capability-sr-capability'";
+                  description
+                    "This container defines SR Capability sub-TLV 2.";
+                  leaf-list flags {
+                    type enumeration {
+                      enum ipv4-mpls {
+                        description
+                          "When set, the router is capable of processing SR MPLS encapsulated IPv4 packets on all interfaces.";
+                      }
+                      enum ipv6-mpls {
+                        description
+                          "When set, the router is capable of processing SR MPLS encapsulated IPv6 packets on all interfaces.";
+                      }
+                      enum ipv6-sr {
+                        description
+                          "When set, the router is capable of processing the IPv6 Segment Routing Header on all interfaces.";
+                      }
+                    }
+                    description
+                      "Segment Routing Capability Flags.";
+                  }
+                  container srgb-descriptors {
+                    description
+                      "SRGB Descriptors included within the SR capability sub-TLV";
+                    list srgb-descriptor {
+                      key "range";
+                      description
+                        "Descriptor entry within the SR capabilty sub-TLV";
+                      leaf range {
+                        type uint32;
+                        description
+                          "Number of SRGB elements. The range value MUST be greater than 0.";
+                      }
+                      leaf label {
+                        type srl_nokia-comm:mpls-label-non-reserved;
+                        description
+                          "The first value of the SRGB when expressed as an MPLS label.";
+                      }
+                    }
+                  }
+                }
+                container node-msds {
+                  when "../type = 'srl_nokia-isis-lsdb-types:router-capability-node-msd'";
+                  description
+                    "The Maximum Segment Depth (MSD) values supported by the advertising node. sub-tlv 23.";
+                  leaf-list bmi-msd {
+                    type uint16;
+                    description
+                      "Base MPLS Imposition MSD (BMI-MSD) signals the total number of MPLS
+                       labels that can be imposed, including all service/transport/special
+                       labels. sub-tlv 1";
+                  }
+                  leaf-list erld-msd {
+                    type uint16;
+                    description
+                      "Entropy capable Readable Label Depth MSD (ERLD-MSD), is defined to advertise
+                       the ERLD [RFC8662] of a given router. sub-tlv 2.";
+                  }
+                }
+                container sbfd-discriminators {
+                  when "../type = 'srl_nokia-isis-lsdb-types:router-capability-seamless-bfd-discriminator'";
+                  description
+                    "This container defines sbfd discriminators sub-TLV 20.";
+                  leaf-list discriminator {
+                    type uint32;
+                    description
+                      "Advertised Seamless BFD (S-BFD) Discriminator.";
+                  }
+                }
+              }
+            }
+          }
+        }
+        container is-reachability {
+          when "../type = 'srl_nokia-isis-lsdb-types:iis-neighbors'";
+          description
+            "This container describes list of ISIS neighbors and attributes.";
+          container neighbors {
+            description
+              "This container describes IS neighbors.";
+            list neighbor {
+              key "system-id";
+              description
+                "IS reachability neighbor attributes.";
+              leaf system-id {
+                type srl_nokia-comm:isis-system-id;
+                description
+                  "System-ID of IS neighbor.";
+              }
+              uses isis-lsdb-common-metric-specification;
+            }
+          }
+        }
+        container ipv4-internal-reachability {
+          when "../type = 'srl_nokia-isis-lsdb-types:ipv4-internal-reachability'";
+          description
+            "This container defines list of IPv4 internal reachability information.";
+          container prefixes {
+            description
+              "This container describes IS prefixes.";
+            list prefix {
+              key "prefix";
+              description
+                "IPv4 prefixes and internal reachability attributes.";
+              uses ipv4-prefix-attributes-state;
+            }
+          }
+        }
+        container ipv4-external-reachability {
+          when "../type = 'srl_nokia-isis-lsdb-types:ipv4-external-reachability'";
+          description
+            "This container defines list of IPv4 external reachability information.";
+          container prefixes {
+            description
+              "This container describes IS neighbors.";
+            list prefix {
+              key "prefix";
+              description
+                "IPv4 external prefixes and reachability attributes.";
+              uses ipv4-prefix-attributes-state;
+            }
+          }
+        }
+        container authentication {
+          when "../type = 'srl_nokia-isis-lsdb-types:authentication'";
+          description
+            "This container defines authentication information of the node.";
+          leaf crypto-type {
+            type enumeration {
+              enum cleartext {
+                value 1;
+              }
+              enum crypto {
+                value 3;
+                reference
+                  "RFC 5310";
+              }
+              enum hmac-md5 {
+                value 54;
+                reference
+                  "RFC 5304";
+              }
+            }
+          }
+          leaf authentication-key {
+            type srl_nokia-comm:routing-password;
+            description
+              "Authentication key to be used.";
+          }
+        }
+        container extended-is-reachability {
+          when "../type = 'srl_nokia-isis-lsdb-types:extended-is-reachability'";
+          description
+            "This container defines list of ISIS extended reachability neighbors.";
+          uses isis-lsdb-common-extisreach-neighbors;
+        }
+        container extended-ipv4-reachability {
+          when "../type = 'srl_nokia-isis-lsdb-types:extended-ipv4-reachability'";
+          description
+            "This container defines list of IPv4 extended reachability information.";
+          container prefixes {
+            description
+              "This container describes IS prefixes.";
+            list prefix {
+              key "prefix";
+              description
+                "This list describes IPv4 extended prefixes and attributes.";
+              uses ipv4-prefix-extended-state;
+            }
+          }
+        }
+        container ipv6-reachability {
+          when "../type = 'srl_nokia-isis-lsdb-types:ipv6-reachability'";
+          description
+            "This container defines list of IPv6 reachability information.";
+          container prefixes {
+            description
+              "This container describes IS prefixes.";
+            list prefix {
+              key "prefix";
+              description
+                "This list defines IPv6 extended prefix attributes.";
+              uses ipv6-prefix-extended-state;
+            }
+          }
+        }
+        container multi-topology {
+          when "../type = 'srl_nokia-isis-lsdb-types:multi-topology'";
+          description
+            "This container defines the topology supported.";
+          container topologies {
+            description
+              "This container describes IS topologies.";
+            list topology {
+              key "mt-id";
+              description
+                "This list describes a topology.";
+              leaf mt-id {
+                type uint16 {
+                  range "0 .. 4095";
+                }
+                description
+                  "Multi-topology ID.";
+              }
+              leaf attributes {
+                type enumeration {
+                  enum overload {
+                    description
+                      "When set, node is overloaded, still part of the topology but cannot be used for transit.";
+                  }
+                  enum attached {
+                    description
+                      "When set, node is attached to another area using the referred metric and can be used as default gateway.";
+                  }
+                }
+                description
+                  "Attributes of the LSP for the associated topology.";
+              }
+            }
+          }
+        }
+        container isis-neighbor-attribute {
+          when "../type = 'srl_nokia-isis-lsdb-types:is-neighbor-attribute'";
+          description
+            "This container defines list of ISIS topology neighbors for extended ISIS LSP (multiple system IDs). ";
+          uses isis-lsdb-common-isreach-neighbors;
+        }
+        container is-alias-id {
+          when "../type = 'srl_nokia-isis-lsdb-types:isis-alias-id'";
+          description
+            "This container defines the IS-Alias TLV which allows extension-capable ISs to recognize the Originating System of an Extended LSP set. It identifies the Normal system-id of the Originating System.";
+          leaf alias-id {
+            type srl_nokia-comm:isis-system-id;
+            description
+              "List of alias ID(s).";
+          }
+        }
+        container mt-isn {
+          when "../type = 'srl_nokia-isis-lsdb-types:mt-isn'";
+          description
+            "This container defines list of ISIS multi-topology neighbors.";
+          uses isis-lsdb-mtis-common;
+        }
+        container mt-isis-neighbor-attribute {
+          when "../type = 'srl_nokia-isis-lsdb-types:mt-is-neighbor-attribute'";
+          description
+            "This container defines list of ISIS multi-topology neighbors.";
+          uses isis-lsdb-mtis-common;
+        }
+        container mt-ipv4-reachability {
+          when "../type = 'srl_nokia-isis-lsdb-types:mt-ipv4-reachability'";
+          description
+            "This container defines list of IPv4 reachability Information in multi-topology environment.";
+          container prefixes {
+            description
+              "This container describes IS prefixes.";
+            list prefix {
+              key "mt-id prefix";
+              description
+                "IPv4 prefixes that are contained within MT reachability TLV.";
+              uses ipv4-mt-prefix-extended-state;
+            }
+          }
+        }
+        container mt-ipv6-reachability {
+          when "../type = 'srl_nokia-isis-lsdb-types:mt-ipv6-reachability'";
+          description
+            "This container defines list of IPv6 reachability information in multi - topology environment.";
+          container prefixes {
+            description
+              "This container describes IS prefixes.";
+            list prefix {
+              key "prefix mt-id";
+              description
+                "List of IPv6 prefixes contained within MT reachability TLV.";
+              uses ipv6-mt-prefix-extended-state;
+            }
+          }
+        }
+      }
+    }
+    uses isis-lsdb-undefined-tlv;
+  }
+}
