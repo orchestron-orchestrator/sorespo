@@ -11,16 +11,21 @@ SORESPO, you might want to start out with the tutorial on
 ## Preparing the Environment
 
 * Install the following prerequisites:
-  * [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+  * [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or
+    [Colima](../colima.md) for an open-source alternative)
   * [Git](https://git-scm.com/downloads/mac) and *coreutils* , both of which
     you can install with [Homebrew](https://brew.sh/):
   ```shell
   brew install git coreutils
   ```
   * [Acton](https://acton.guide/install_tip.html) (*Note:* This is an additional prerequite compared to [running SORESPO](run-on-macos.md))
-* After the installation has completed, start *Docker Desktop* and open the
-  *Settings*. In the *Resources* section, make sure you've allocate at least 4
-  CPU cores and 8GB of RAM to Docker.
+* After the installation has completed, start your container runtime.
+    * For *Docker Desktop*, open *Settings* and in the *Resources* section make
+        sure you've allocated at least 4 CPU cores and 8GB of RAM to Docker.
+    * Or, start your Colima VM with the appropriate resources:
+      ```shell
+      colima start --cpu 4 --memory 8
+      ```
 
 ## Starting the SORESPO Network
 *NOTE*: If you already completed the tutorial on [running SORESPO](run-on-macos.md),

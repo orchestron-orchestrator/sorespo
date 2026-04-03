@@ -21,15 +21,20 @@ likely need more CPU cores and memory allocated to Docker than described here.
 ## Preparing the Environment
 
 * Install the following prerequisites:
-  * [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+  * [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or
+    [Colima](../colima.md) if you prefer an open-source alternative)
   * [Git](https://git-scm.com/downloads/mac) and *coreutils* , both of which
     you can install with [Homebrew](https://brew.sh/):
   ```shell
   brew install git coreutils
   ```
-* After the installation has completed, start *Docker Desktop* and open the
-  *Settings*. In the *Resources* section, make sure you've allocate at least 4
-  CPU cores and 8GB of RAM to Docker.
+* After the installation has completed, start your container runtime.
+    * For *Docker Desktop*, open *Settings* and in the *Resources* section make
+        sure you've allocated at least 4 CPU cores and 8GB of RAM to Docker.
+    * Or, start your Colima VM with the appropriate resources:
+      ```shell
+      colima start --cpu 4 --memory 8
+      ```
 
 ## Starting the SORESPO Network
 
