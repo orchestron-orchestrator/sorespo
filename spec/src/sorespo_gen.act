@@ -11,7 +11,7 @@ actor main(env):
     fc = file.FileCap(env.cap)
     pc = process.ProcessCap(env.cap)
 
-    orchestron.build.apply_schema_transforms_to_dir(fc, "yang/CiscoIosXr_24_1_ncs55a1", [
+    orchestron.build.apply_schema_transforms_to_dir(fc, "yang/CiscoIosXr_25_3_1", [
         orchestron.build.SchemaTransformChain(".*yang.orig", [orchestron.build.SchemaTransformNoComments()])
     ])
     orchestron.build.apply_schema_transforms_to_dir(fc, "yang/NokiaSRLinux_25_3_2", [
@@ -37,6 +37,142 @@ actor main(env):
             "/jc:configuration/protocols/mpls/interface",
         ]
         remove_list_user_order(dt.root, paths)
+        return dt
+
+    def transform_filter_xr(dt):
+        # Keep only the XR configuration nodes that sorespo's RFS transforms
+        # actively write to.
+        paths = [
+    "/um-hostname-cfg:hostname",
+    "/um-hostname-cfg:hostname/system-network-name",
+    "/um-interface-cfg:interfaces",
+    "/um-interface-cfg:interfaces/interface",
+    "/um-interface-cfg:interfaces/interface/interface-name",
+    "/um-interface-cfg:interfaces/interface/description",
+    "/um-interface-cfg:interfaces/interface/shutdown",
+    "/um-interface-cfg:interfaces/interface/ipv4",
+    "/um-interface-cfg:interfaces/interface/ipv4/um-if-ip-address-cfg:addresses",
+    "/um-interface-cfg:interfaces/interface/ipv4/um-if-ip-address-cfg:addresses/address",
+    "/um-interface-cfg:interfaces/interface/ipv4/um-if-ip-address-cfg:addresses/address/address",
+    "/um-interface-cfg:interfaces/interface/ipv4/um-if-ip-address-cfg:addresses/address/netmask",
+    "/um-interface-cfg:interfaces/interface/um-if-vrf-cfg:vrf",
+    "/um-interface-cfg:interfaces/interface/um-l2-ethernet-cfg:encapsulation",
+    "/um-interface-cfg:interfaces/interface/um-l2-ethernet-cfg:encapsulation/dot1q",
+    "/um-interface-cfg:interfaces/interface/um-l2-ethernet-cfg:encapsulation/dot1q/vlan-id",
+    "/um-router-isis-cfg:router",
+    "/um-router-isis-cfg:router/isis",
+    "/um-router-isis-cfg:router/isis/processes",
+    "/um-router-isis-cfg:router/isis/processes/process",
+    "/um-router-isis-cfg:router/isis/processes/process/process-id",
+    "/um-router-isis-cfg:router/isis/processes/process/is-type",
+    "/um-router-isis-cfg:router/isis/processes/process/nets",
+    "/um-router-isis-cfg:router/isis/processes/process/nets/net",
+    "/um-router-isis-cfg:router/isis/processes/process/nets/net/net-id",
+    "/um-router-isis-cfg:router/isis/processes/process/address-families",
+    "/um-router-isis-cfg:router/isis/processes/process/address-families/address-family",
+    "/um-router-isis-cfg:router/isis/processes/process/address-families/address-family/af-name",
+    "/um-router-isis-cfg:router/isis/processes/process/address-families/address-family/saf-name",
+    "/um-router-isis-cfg:router/isis/processes/process/address-families/address-family/metric-style",
+    "/um-router-isis-cfg:router/isis/processes/process/address-families/address-family/metric-style/wide",
+    "/um-router-isis-cfg:router/isis/processes/process/interfaces",
+    "/um-router-isis-cfg:router/isis/processes/process/interfaces/interface",
+    "/um-router-isis-cfg:router/isis/processes/process/interfaces/interface/interface-name",
+    "/um-router-isis-cfg:router/isis/processes/process/interfaces/interface/circuit-type",
+    "/um-router-isis-cfg:router/isis/processes/process/interfaces/interface/point-to-point",
+    "/um-router-isis-cfg:router/isis/processes/process/interfaces/interface/state",
+    "/um-router-isis-cfg:router/isis/processes/process/interfaces/interface/address-families",
+    "/um-router-isis-cfg:router/isis/processes/process/interfaces/interface/address-families/address-family",
+    "/um-router-isis-cfg:router/isis/processes/process/interfaces/interface/address-families/address-family/af-name",
+    "/um-router-isis-cfg:router/isis/processes/process/interfaces/interface/address-families/address-family/saf-name",
+    "/um-router-isis-cfg:router/isis/processes/process/interfaces/interface/address-families/address-family/metric-levels",
+    "/um-router-isis-cfg:router/isis/processes/process/interfaces/interface/address-families/address-family/metric-levels/metric-level",
+    "/um-router-isis-cfg:router/isis/processes/process/interfaces/interface/address-families/address-family/metric-levels/metric-level/level-number",
+    "/um-router-isis-cfg:router/isis/processes/process/interfaces/interface/address-families/address-family/metric-levels/metric-level/default-metric",
+    "/um-mpls-ldp-cfg:mpls",
+    "/um-mpls-ldp-cfg:mpls/ldp",
+    "/um-mpls-ldp-cfg:mpls/ldp/interfaces",
+    "/um-mpls-ldp-cfg:mpls/ldp/interfaces/interface",
+    "/um-mpls-ldp-cfg:mpls/ldp/interfaces/interface/interface-name",
+    "/um-mpls-ldp-cfg:mpls/ldp/address-families",
+    "/um-mpls-ldp-cfg:mpls/ldp/address-families/address-family",
+    "/um-mpls-ldp-cfg:mpls/ldp/address-families/address-family/af-name",
+    "/um-router-bgp-cfg:router",
+    "/um-router-bgp-cfg:router/bgp",
+    "/um-router-bgp-cfg:router/bgp/as",
+    "/um-router-bgp-cfg:router/bgp/as/as-number",
+    "/um-router-bgp-cfg:router/bgp/as/bgp",
+    "/um-router-bgp-cfg:router/bgp/as/bgp/router-id",
+    "/um-router-bgp-cfg:router/bgp/as/address-families",
+    "/um-router-bgp-cfg:router/bgp/as/address-families/address-family",
+    "/um-router-bgp-cfg:router/bgp/as/address-families/address-family/af-name",
+    "/um-router-bgp-cfg:router/bgp/as/neighbor-groups",
+    "/um-router-bgp-cfg:router/bgp/as/neighbor-groups/neighbor-group",
+    "/um-router-bgp-cfg:router/bgp/as/neighbor-groups/neighbor-group/neighbor-group-name",
+    "/um-router-bgp-cfg:router/bgp/as/neighbor-groups/neighbor-group/remote-as",
+    "/um-router-bgp-cfg:router/bgp/as/neighbor-groups/neighbor-group/update-source",
+    "/um-router-bgp-cfg:router/bgp/as/neighbor-groups/neighbor-group/password",
+    "/um-router-bgp-cfg:router/bgp/as/neighbor-groups/neighbor-group/password/encrypted",
+    "/um-router-bgp-cfg:router/bgp/as/neighbor-groups/neighbor-group/address-families",
+    "/um-router-bgp-cfg:router/bgp/as/neighbor-groups/neighbor-group/address-families/address-family",
+    "/um-router-bgp-cfg:router/bgp/as/neighbor-groups/neighbor-group/address-families/address-family/af-name",
+    "/um-router-bgp-cfg:router/bgp/as/neighbors",
+    "/um-router-bgp-cfg:router/bgp/as/neighbors/neighbor",
+    "/um-router-bgp-cfg:router/bgp/as/neighbors/neighbor/address",
+    "/um-router-bgp-cfg:router/bgp/as/neighbors/neighbor/description",
+    "/um-router-bgp-cfg:router/bgp/as/neighbors/neighbor/use",
+    "/um-router-bgp-cfg:router/bgp/as/neighbors/neighbor/use/neighbor-group",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/vrf-name",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/rd",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/rd/two-byte-as",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/rd/two-byte-as/two-byte-as-number",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/rd/two-byte-as/asn2-index",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/address-families",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/address-families/address-family",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/address-families/address-family/af-name",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/neighbors",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/neighbors/neighbor",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/neighbors/neighbor/address",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/neighbors/neighbor/remote-as",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/neighbors/neighbor/description",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/neighbors/neighbor/password",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/neighbors/neighbor/password/encrypted",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/neighbors/neighbor/address-families",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/neighbors/neighbor/address-families/address-family",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/neighbors/neighbor/address-families/address-family/af-name",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/neighbors/neighbor/address-families/address-family/route-policy",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/neighbors/neighbor/address-families/address-family/route-policy/in",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/neighbors/neighbor/address-families/address-family/route-policy/out",
+    "/um-router-bgp-cfg:router/bgp/as/vrfs/vrf/neighbors/neighbor/address-families/address-family/as-override",
+    "/um-vrf-cfg:vrfs",
+    "/um-vrf-cfg:vrfs/vrf",
+    "/um-vrf-cfg:vrfs/vrf/vrf-name",
+    "/um-vrf-cfg:vrfs/vrf/description",
+    "/um-vrf-cfg:vrfs/vrf/address-family",
+    "/um-vrf-cfg:vrfs/vrf/address-family/ipv4",
+    "/um-vrf-cfg:vrfs/vrf/address-family/ipv4/unicast",
+    "/um-vrf-cfg:vrfs/vrf/address-family/ipv4/unicast/um-router-bgp-cfg:import",
+    "/um-vrf-cfg:vrfs/vrf/address-family/ipv4/unicast/um-router-bgp-cfg:import/route-target",
+    "/um-vrf-cfg:vrfs/vrf/address-family/ipv4/unicast/um-router-bgp-cfg:import/route-target/two-byte-as-route-targets",
+    "/um-vrf-cfg:vrfs/vrf/address-family/ipv4/unicast/um-router-bgp-cfg:import/route-target/two-byte-as-route-targets/two-byte-as-route-target",
+    "/um-vrf-cfg:vrfs/vrf/address-family/ipv4/unicast/um-router-bgp-cfg:import/route-target/two-byte-as-route-targets/two-byte-as-route-target/two-byte-as-number",
+    "/um-vrf-cfg:vrfs/vrf/address-family/ipv4/unicast/um-router-bgp-cfg:import/route-target/two-byte-as-route-targets/two-byte-as-route-target/asn2-index",
+    "/um-vrf-cfg:vrfs/vrf/address-family/ipv4/unicast/um-router-bgp-cfg:import/route-target/two-byte-as-route-targets/two-byte-as-route-target/stitching",
+    "/um-vrf-cfg:vrfs/vrf/address-family/ipv4/unicast/um-router-bgp-cfg:export",
+    "/um-vrf-cfg:vrfs/vrf/address-family/ipv4/unicast/um-router-bgp-cfg:export/route-target",
+    "/um-vrf-cfg:vrfs/vrf/address-family/ipv4/unicast/um-router-bgp-cfg:export/route-target/two-byte-as-route-targets",
+    "/um-vrf-cfg:vrfs/vrf/address-family/ipv4/unicast/um-router-bgp-cfg:export/route-target/two-byte-as-route-targets/two-byte-as-route-target",
+    "/um-vrf-cfg:vrfs/vrf/address-family/ipv4/unicast/um-router-bgp-cfg:export/route-target/two-byte-as-route-targets/two-byte-as-route-target/two-byte-as-number",
+    "/um-vrf-cfg:vrfs/vrf/address-family/ipv4/unicast/um-router-bgp-cfg:export/route-target/two-byte-as-route-targets/two-byte-as-route-target/asn2-index",
+    "/um-vrf-cfg:vrfs/vrf/address-family/ipv4/unicast/um-router-bgp-cfg:export/route-target/two-byte-as-route-targets/two-byte-as-route-target/stitching",
+    "/um-route-policy-cfg:routing-policy",
+    "/um-route-policy-cfg:routing-policy/route-policies",
+    "/um-route-policy-cfg:routing-policy/route-policies/route-policy",
+    "/um-route-policy-cfg:routing-policy/route-policies/route-policy/route-policy-name",
+    "/um-route-policy-cfg:routing-policy/route-policies/route-policy/rpl-route-policy",
+]
+        filter_schema(dt.root, paths)
         return dt
 
     def transform_filter_crpd(dt):
@@ -234,13 +370,14 @@ actor main(env):
         inter_layer,
         rfs_layer,
     ], [
-        orchestron.build.DeviceType.from_dir(fc, "CiscoIosXr_24_1_ncs55a1", "yang/CiscoIosXr_24_1_ncs55a1"),
+        orchestron.build.DeviceType.from_dir(fc, "CiscoIosXr_25_3_1", "yang/CiscoIosXr_25_3_1"),
         orchestron.build.DeviceType.from_dir(fc, "JuniperCRPD_23_4R1_9", "yang/JuniperCRPD_23_4R1_9"),
         orchestron.build.DeviceType.from_dir(fc, "NokiaSRLinux_25_3_2", "yang/NokiaSRLinux_25_3_2"),
     ])
     compiled_spec = spec.compile(broken_leafrefs)
-    transform_list_order(transform_filter_crpd(compiled_spec.dev_types["JuniperCRPD_23_4R1_9"]))
     transform_filter_srl(compiled_spec.dev_types["NokiaSRLinux_25_3_2"])
+    transform_filter_xr(compiled_spec.dev_types["CiscoIosXr_25_3_1"])
+    transform_list_order(transform_filter_crpd(compiled_spec.dev_types["JuniperCRPD_23_4R1_9"]))
     compiled_spec.gen_app(fc, "../src/")
 
     env.exit(0)
