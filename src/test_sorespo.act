@@ -9,7 +9,7 @@ import sorespo.layers.y_0 as cfs_layer
 import sorespo.devices.CiscoIosXr_25_3_1 as xr25
 import sorespo.devices.JuniperCRPD_23_4R1_9 as crpd23
 
-NS_ODEV = "http://orchestron.org/yang/orchestron-device.yang";
+NS_SW_DEV = "http://stratoweave.org/yang/stratoweave-device.yang";
 
 netinfra1_in = """<data>
     <netinfra xmlns="http://example.com/netinfra">
@@ -357,11 +357,11 @@ actor _test_l3vpn_svc_json(t: testing.AsyncT):
 actor _test_l3vpn_svc_adata(t: testing.AsyncT):
     def _adata_formatter(n: gdata.Node) -> str:
         res = {}
-        device_list = n.get_cnt(gdata.Id(NS_ODEV, "devices")).get_list(gdata.Id(NS_ODEV, "device"))
+        device_list = n.get_cnt(gdata.Id(NS_SW_DEV, "devices")).get_list(gdata.Id(NS_SW_DEV, "device"))
         # We must sort the elements to ensure the output is deterministic
         for device_entry in gdata.sorted_elements(device_list.elements, device_list.keys):
-            config = device_entry.get_cnt(gdata.Id(NS_ODEV, "config"))
-            device_name = str(device_entry.get_leaf(gdata.Id(NS_ODEV, "name")).val)
+            config = device_entry.get_cnt(gdata.Id(NS_SW_DEV, "config"))
+            device_name = str(device_entry.get_leaf(gdata.Id(NS_SW_DEV, "name")).val)
             if device_name == "AMS-CORE-1" or device_name == "FRA-CORE-1":
                 res[device_name] = yang.data.pradata(xr25.SRC_DNODE, config, loose=True)
             elif device_name == "STO-CORE-1" or device_name == "LJU-CORE-1":
