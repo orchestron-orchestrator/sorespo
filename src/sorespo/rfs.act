@@ -10,8 +10,8 @@ import sorespo.crpd_stats
 
 import sorespo.layers.base_2 as base
 
-from sorespo.layers.y_2 import orchestron_rfs__rfs__backbone_interface_entry
-from sorespo.layers.y_2 import orchestron_rfs__rfs__backbone_interface__dynstate
+from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface_entry
+from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface__dynstate
 
 import sorespo.devices.CiscoIosXr_25_3_1 as xr25
 import sorespo.devices.JuniperCRPD_23_4R1_9 as crpd23
@@ -169,7 +169,7 @@ end-policy
         raise UnsupportedDevice()
 
 
-actor BBInterfaceTransform(update_dynstate: proc(?orchestron_rfs__rfs__backbone_interface__dynstate) -> None, dev: odev.DeviceMgr):
+actor BBInterfaceTransform(update_dynstate: proc(?stratoweave_rfs__rfs__backbone_interface__dynstate) -> None, dev: odev.DeviceMgr):
     IF_STATE_INTERFACE_MONITOR = "monitor-interface-counters"
     IF_STATE_PROTOCOLS_ENABLED = "protocols-enabled"
     IF_STATE_ALL_OK = "all-ok"
@@ -202,7 +202,7 @@ actor BBInterfaceTransform(update_dynstate: proc(?orchestron_rfs__rfs__backbone_
             if health_state != next_state:
                 print("Health state changed for {interface_name}: {health_state} -> {next_state}")
                 health_state = next_state
-                dynstate = orchestron_rfs__rfs__backbone_interface__dynstate()
+                dynstate = stratoweave_rfs__rfs__backbone_interface__dynstate()
                 dynstate.health_state = health_state
                 dynstate.protocols_enabled = protocols_enabled
                 update_dynstate(dynstate)
@@ -260,7 +260,7 @@ actor BBInterfaceTransform(update_dynstate: proc(?orchestron_rfs__rfs__backbone_
             rpc_root.get_ldp_neighbor_information(on_ldp_response)
             after 3: do_healthcheck()
  
-    def on_conf(conf: orchestron_rfs__rfs__backbone_interface_entry):
+    def on_conf(conf: stratoweave_rfs__rfs__backbone_interface_entry):
         print("BBInterfaceTransform.on_conf:{conf.name}")
         interface_name = conf.name
         healthcheck_enabled = conf.monitor_health

@@ -9,13 +9,13 @@ import yang.adata
 import yang.gdata
 import yang.xml
 
-from sorespo.layers.y_2 import orchestron_rfs__rfs__base_config
-from sorespo.layers.y_2 import orchestron_rfs__rfs__backbone_interface_entry
-from sorespo.layers.y_2 import orchestron_rfs__rfs__backbone_interface__dynstate
-from sorespo.layers.y_2 import orchestron_rfs__rfs__ibgp_neighbor_entry
-from sorespo.layers.y_2 import orchestron_rfs__rfs__vrf_entry
-from sorespo.layers.y_2 import orchestron_rfs__rfs__vrf_interface_entry
-from sorespo.layers.y_2 import orchestron_rfs__rfs__ebgp_customer_entry
+from sorespo.layers.y_2 import stratoweave_rfs__rfs__base_config
+from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface_entry
+from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface__dynstate
+from sorespo.layers.y_2 import stratoweave_rfs__rfs__ibgp_neighbor_entry
+from sorespo.layers.y_2 import stratoweave_rfs__rfs__vrf_entry
+from sorespo.layers.y_2 import stratoweave_rfs__rfs__vrf_interface_entry
+from sorespo.layers.y_2 import stratoweave_rfs__rfs__ebgp_customer_entry
 from sorespo.layers.y_2 import SRC_DNODE
 from sorespo.layers.y_3_loose import root as output_root
 
@@ -24,18 +24,18 @@ def o_root():
 
 
 class BaseConfig(ttt.RFSFunction):
-    transform: mut(orchestron_rfs__rfs__base_config, ttt.DeviceInfo) -> yang.adata.MNode
+    transform: mut(stratoweave_rfs__rfs__base_config, ttt.DeviceInfo) -> yang.adata.MNode
 
     @staticmethod
     def input_type():
         """Return the modeled input type for this transform"""
-        return orchestron_rfs__rfs__base_config
+        return stratoweave_rfs__rfs__base_config
 
     mut def transform_wrapper(self, i: yang.gdata.Node, device_info: ttt.DeviceInfo, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from gdata to
         modeled input and back to gdata
         """
-        modeled_input = orchestron_rfs__rfs__base_config.from_gdata(i)
+        modeled_input = stratoweave_rfs__rfs__base_config.from_gdata(i)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
 
@@ -43,25 +43,25 @@ class BaseConfig(ttt.RFSFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = yang.xml.from_xml(SRC_DNODE, i, loose=True, root_path=['orchestron-rfs:rfs', 'sorespo-rfs:base-config'])
-        modeled_input = orchestron_rfs__rfs__base_config.from_gdata(gdata_input)
+        gdata_input = yang.xml.from_xml(SRC_DNODE, i, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:base-config'])
+        modeled_input = stratoweave_rfs__rfs__base_config.from_gdata(gdata_input)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
 
 class BBInterface(ttt.RFSFunction):
-    transform: mut(orchestron_rfs__rfs__backbone_interface_entry, ttt.DeviceInfo, dynstate: ?orchestron_rfs__rfs__backbone_interface__dynstate) -> yang.adata.MNode
+    transform: mut(stratoweave_rfs__rfs__backbone_interface_entry, ttt.DeviceInfo, dynstate: ?stratoweave_rfs__rfs__backbone_interface__dynstate) -> yang.adata.MNode
 
     @staticmethod
     def input_type():
         """Return the modeled input type for this transform"""
-        return orchestron_rfs__rfs__backbone_interface_entry
+        return stratoweave_rfs__rfs__backbone_interface_entry
 
     mut def transform_wrapper(self, i: yang.gdata.Node, device_info: ttt.DeviceInfo, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from gdata to
         modeled input and back to gdata
         """
-        modeled_input = orchestron_rfs__rfs__backbone_interface_entry.from_gdata(i)
-        modeled_dynstate = orchestron_rfs__rfs__backbone_interface__dynstate.from_gdata(dynstate) if dynstate is not None else None
+        modeled_input = stratoweave_rfs__rfs__backbone_interface_entry.from_gdata(i)
+        modeled_dynstate = stratoweave_rfs__rfs__backbone_interface__dynstate.from_gdata(dynstate) if dynstate is not None else None
 
         return self.transform(modeled_input, device_info, modeled_dynstate).to_gdata(), None
 
@@ -69,25 +69,25 @@ class BBInterface(ttt.RFSFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = yang.xml.from_xml(SRC_DNODE, i, loose=True, root_path=['orchestron-rfs:rfs', 'sorespo-rfs:backbone-interface'])
-        modeled_input = orchestron_rfs__rfs__backbone_interface_entry.from_gdata(gdata_input)
-        modeled_dynstate = orchestron_rfs__rfs__backbone_interface__dynstate.from_gdata(dynstate) if dynstate is not None else None
+        gdata_input = yang.xml.from_xml(SRC_DNODE, i, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:backbone-interface'])
+        modeled_input = stratoweave_rfs__rfs__backbone_interface_entry.from_gdata(gdata_input)
+        modeled_dynstate = stratoweave_rfs__rfs__backbone_interface__dynstate.from_gdata(dynstate) if dynstate is not None else None
 
         return self.transform(modeled_input, device_info, modeled_dynstate).to_gdata(), None
 
 class IbgpNeighbor(ttt.RFSFunction):
-    transform: mut(orchestron_rfs__rfs__ibgp_neighbor_entry, ttt.DeviceInfo) -> yang.adata.MNode
+    transform: mut(stratoweave_rfs__rfs__ibgp_neighbor_entry, ttt.DeviceInfo) -> yang.adata.MNode
 
     @staticmethod
     def input_type():
         """Return the modeled input type for this transform"""
-        return orchestron_rfs__rfs__ibgp_neighbor_entry
+        return stratoweave_rfs__rfs__ibgp_neighbor_entry
 
     mut def transform_wrapper(self, i: yang.gdata.Node, device_info: ttt.DeviceInfo, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from gdata to
         modeled input and back to gdata
         """
-        modeled_input = orchestron_rfs__rfs__ibgp_neighbor_entry.from_gdata(i)
+        modeled_input = stratoweave_rfs__rfs__ibgp_neighbor_entry.from_gdata(i)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
 
@@ -95,24 +95,24 @@ class IbgpNeighbor(ttt.RFSFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = yang.xml.from_xml(SRC_DNODE, i, loose=True, root_path=['orchestron-rfs:rfs', 'sorespo-rfs:ibgp-neighbor'])
-        modeled_input = orchestron_rfs__rfs__ibgp_neighbor_entry.from_gdata(gdata_input)
+        gdata_input = yang.xml.from_xml(SRC_DNODE, i, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:ibgp-neighbor'])
+        modeled_input = stratoweave_rfs__rfs__ibgp_neighbor_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
 
 class Vrf(ttt.RFSFunction):
-    transform: mut(orchestron_rfs__rfs__vrf_entry, ttt.DeviceInfo) -> yang.adata.MNode
+    transform: mut(stratoweave_rfs__rfs__vrf_entry, ttt.DeviceInfo) -> yang.adata.MNode
 
     @staticmethod
     def input_type():
         """Return the modeled input type for this transform"""
-        return orchestron_rfs__rfs__vrf_entry
+        return stratoweave_rfs__rfs__vrf_entry
 
     mut def transform_wrapper(self, i: yang.gdata.Node, device_info: ttt.DeviceInfo, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from gdata to
         modeled input and back to gdata
         """
-        modeled_input = orchestron_rfs__rfs__vrf_entry.from_gdata(i)
+        modeled_input = stratoweave_rfs__rfs__vrf_entry.from_gdata(i)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
 
@@ -120,24 +120,24 @@ class Vrf(ttt.RFSFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = yang.xml.from_xml(SRC_DNODE, i, loose=True, root_path=['orchestron-rfs:rfs', 'sorespo-rfs:vrf'])
-        modeled_input = orchestron_rfs__rfs__vrf_entry.from_gdata(gdata_input)
+        gdata_input = yang.xml.from_xml(SRC_DNODE, i, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:vrf'])
+        modeled_input = stratoweave_rfs__rfs__vrf_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
 
 class VrfInterface(ttt.RFSFunction):
-    transform: mut(orchestron_rfs__rfs__vrf_interface_entry, ttt.DeviceInfo) -> yang.adata.MNode
+    transform: mut(stratoweave_rfs__rfs__vrf_interface_entry, ttt.DeviceInfo) -> yang.adata.MNode
 
     @staticmethod
     def input_type():
         """Return the modeled input type for this transform"""
-        return orchestron_rfs__rfs__vrf_interface_entry
+        return stratoweave_rfs__rfs__vrf_interface_entry
 
     mut def transform_wrapper(self, i: yang.gdata.Node, device_info: ttt.DeviceInfo, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from gdata to
         modeled input and back to gdata
         """
-        modeled_input = orchestron_rfs__rfs__vrf_interface_entry.from_gdata(i)
+        modeled_input = stratoweave_rfs__rfs__vrf_interface_entry.from_gdata(i)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
 
@@ -145,24 +145,24 @@ class VrfInterface(ttt.RFSFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = yang.xml.from_xml(SRC_DNODE, i, loose=True, root_path=['orchestron-rfs:rfs', 'sorespo-rfs:vrf-interface'])
-        modeled_input = orchestron_rfs__rfs__vrf_interface_entry.from_gdata(gdata_input)
+        gdata_input = yang.xml.from_xml(SRC_DNODE, i, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:vrf-interface'])
+        modeled_input = stratoweave_rfs__rfs__vrf_interface_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
 
 class EbgpCustomer(ttt.RFSFunction):
-    transform: mut(orchestron_rfs__rfs__ebgp_customer_entry, ttt.DeviceInfo) -> yang.adata.MNode
+    transform: mut(stratoweave_rfs__rfs__ebgp_customer_entry, ttt.DeviceInfo) -> yang.adata.MNode
 
     @staticmethod
     def input_type():
         """Return the modeled input type for this transform"""
-        return orchestron_rfs__rfs__ebgp_customer_entry
+        return stratoweave_rfs__rfs__ebgp_customer_entry
 
     mut def transform_wrapper(self, i: yang.gdata.Node, device_info: ttt.DeviceInfo, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from gdata to
         modeled input and back to gdata
         """
-        modeled_input = orchestron_rfs__rfs__ebgp_customer_entry.from_gdata(i)
+        modeled_input = stratoweave_rfs__rfs__ebgp_customer_entry.from_gdata(i)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
 
@@ -170,7 +170,7 @@ class EbgpCustomer(ttt.RFSFunction):
         """Wrap the user provided transform method to convert from XML to
         modeled input and return gdata
         """
-        gdata_input = yang.xml.from_xml(SRC_DNODE, i, loose=True, root_path=['orchestron-rfs:rfs', 'sorespo-rfs:ebgp-customer'])
-        modeled_input = orchestron_rfs__rfs__ebgp_customer_entry.from_gdata(gdata_input)
+        gdata_input = yang.xml.from_xml(SRC_DNODE, i, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:ebgp-customer'])
+        modeled_input = stratoweave_rfs__rfs__ebgp_customer_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
