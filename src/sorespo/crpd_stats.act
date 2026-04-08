@@ -3,9 +3,9 @@ import testing
 
 import yang.adata
 
-import sorespo.devices.JuniperCRPD_23_4R1_9 as crpd23
+import sorespo.devices.JuniperCRPD_24_4R1_9 as crpd24
 
-def parse(output: crpd23.junos_rpc_interfaces__get_interface_information__output) -> (rx_errors: int, rx_dropped: int, rx_over_errors: int, tx_errors: int, tx_dropped: int, tx_carrier_errors: int):
+def parse(output: crpd24.junos_rpc_interfaces__get_interface_information__output) -> (rx_errors: int, rx_dropped: int, rx_over_errors: int, tx_errors: int, tx_dropped: int, tx_carrier_errors: int):
     o = output.output
     if o is not None:
         c = o.strip().lstrip("[").rstrip("]")
@@ -27,7 +27,7 @@ def parse(output: crpd23.junos_rpc_interfaces__get_interface_information__output
     raise ValueError("Invalid stats64 format from cRPD")
 
 def _test_parse_stats64(t: testing.SyncT):
-    input_data = crpd23.junos_rpc_interfaces__get_interface_information__output(
+    input_data = crpd24.junos_rpc_interfaces__get_interface_information__output(
         output=json.encode({
             "stats64": {
                 "rx": {

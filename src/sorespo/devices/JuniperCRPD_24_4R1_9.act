@@ -884,8 +884,9 @@ SRC_DNODE = DRoot(
 
 def src_yang():
     res = []
-    res.append(r"""/*
- * Copyright (c) 2025 Juniper Networks, Inc.
+    res.append(r"""
+/*
+ * Copyright (c) 2026 Juniper Networks, Inc.
  * All rights reserved.
  */
  module junos-common-types {
@@ -1093,7 +1094,7 @@ def src_yang():
 """)
     res.append(r"""
 /*
- * Copyright (c) 2025 Juniper Networks, Inc.
+ * Copyright (c) 2026 Juniper Networks, Inc.
  * All rights reserved.
  */
  module junos-conf-root {
@@ -2927,6 +2928,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -3001,7 +3003,8 @@ def src_yang():
        }
      }
      container forwarding-options {
-       presence "enable forwarding-options";
+       description "Configure options to control packet forwarding";
+       uses juniper-forwarding-options;
      }
      container event-options {
        description "Event processing configuration";
@@ -4092,6 +4095,7 @@ def src_yang():
                leaf filter-name {
                  description "Name of the filter";
                  type string;
+                 //mandatory true;
                }
              }
            }
@@ -4124,7 +4128,7 @@ def src_yang():
                leaf filter-name {
                  description "Name of the filter";
                  type string;
-                 mandatory true;
+                 //mandatory true;
                }
              }
            }
@@ -4171,7 +4175,7 @@ def src_yang():
                leaf filter-name {
                  description "Name of the filter";
                  type string;
-                 mandatory true;
+                 //mandatory true;
                }
              }
            }
@@ -5097,6 +5101,2540 @@ def src_yang():
        type jt:ipv4prefix;
      }
    }
+   grouping juniper-forwarding-options {
+     uses apply-advanced;
+     container dhcp-relay {
+       description "Dynamic Host Configuration Protocol relay configuration";
+       uses jdhcp-relay-type;
+     }
+   }
+   grouping jdhcp-relay-type {
+     description "Dynamic Host Configuration Protocol relay configuration";
+     uses apply-advanced;
+     container traceoptions {
+       description "DHCP relay trace options";
+       status deprecated;
+       uses jdhcp-traceoptions-type;
+     }
+     container persistent-storage {
+       description "Trigger to enable flat file storage";
+       leaf automatic {
+         description "Trigger automatically";
+         type empty;
+       }
+     }
+     leaf duplicate-clients-on-interface {
+       description "Allow duplicate clients on different interfaces in a subnet";
+       status deprecated;
+       type empty;
+     }
+     container duplicate-clients-in-subnet {
+       description "Allow duplicate clients in a subnet";
+       uses jdhcp-duplicate-clients-in-subnet-type;
+     }
+     container interface-traceoptions {
+       description "DHCP relay interface trace options";
+       status deprecated;
+       uses jdhcp-interface-traceoptions-type;
+     }
+     container dhcpv6 {
+       description "DHCPv6 configuration";
+       uses dhcpv6-relay-type;
+     }
+     leaf arp-inspection {
+       description "Enable Dynamic ARP Inspection";
+       type empty;
+     }
+     container liveness-detection {
+       description "DHCP client liveness detection processing";
+       uses dhcp-liveness-detection-type;
+     }
+     leaf service-profile {
+       description "Dynamic profile to use for default service activation";
+       type string {
+         length "1 .. 128";
+       }
+     }
+     leaf access-profile {
+       description "Access profile to use for AAA services";
+       type string {
+         length "1 .. 128";
+       }
+     }
+     container short-cycle-protection {
+       description "Short cycle lockout configuration";
+       leaf lockout-min-time {
+         description "Short cycle lockout time in seconds";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "1 .. 86400";
+           }
+         }
+       }
+       leaf lockout-max-time {
+         description "Short cycle lockout time in seconds";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "1 .. 86400";
+           }
+         }
+       }
+     }
+     container overrides {
+       description "DHCP override processing";
+       presence "enable overrides";
+       uses override-type;
+     }
+     container relay-option {
+       description "DHCP option processing";
+       presence "enable relay-option";
+       uses dhcp-generic-v4-option;
+     }
+     container server-match {
+       description "Server match processing";
+       uses apply-advanced;
+       container default-action {
+         description "Server match default action";
+         presence "enable default-action";
+         uses server-match-action-choice;
+       }
+       list address {
+         key name;
+         description "Server address";
+         leaf name {
+           description "Server address for matching";
+           type jt:ipv4prefix;
+         }
+         uses apply-advanced;
+         choice server-match-action-choice {
+           case case_1 {
+             leaf forward-only {
+               description "Forward without subscriber services when a match is made";
+               type empty;
+             }
+           }
+           case case_2 {
+             leaf create-relay-entry {
+               description "Create relay entry and allow subscriber services";
+               type empty;
+             }
+           }
+         }
+       }
+     }
+     container relay-option-60 {
+       description "DHCP option-60 processing";
+       presence "enable relay-option-60";
+       status deprecated;
+       uses relay-option-60-type-top;
+     }
+     container relay-option-82 {
+       description "DHCP option-82 processing";
+       presence "enable relay-option-82";
+       uses relay-option-82-type;
+     }
+     container forward-only {
+       description "Forward DHCP packets without creating binding";
+       presence "enable forward-only";
+       uses forward-only-to-rc-type;
+     }
+     leaf description {
+       description "Text description of servers";
+       type string;
+     }
+     leaf maximum-hop-count {
+       description "Maximum number of hops per packet";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "1 .. 16";
+         }
+       }
+     }
+     leaf minimum-wait-time {
+       description "Minimum number of seconds before requests are forwarded";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "0 .. 30000";
+         }
+       }
+     }
+     leaf client-response-ttl {
+       description "IP time-to-live value to set in responses to client";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "1 .. 255";
+         }
+       }
+     }
+     leaf source-ip-change {
+       description "Use address of egress interface as source ip";
+       type empty;
+     }
+     leaf forward-only-replies {
+       description "Forward-only replies from server to appropriate logical-system:routing-instance based on options";
+       type empty;
+     }
+     container server-group {
+       description "Define a DHCP server group";
+       uses server-group-type;
+     }
+     container active-server-group {
+       description "Name of DHCP server group";
+       uses dhcpv4-gbl-active-sg-type;
+     }
+     container route-suppression {
+       description "Suppress access-internal and/or destination route addition";
+       uses dhcp-route-suppression-type;
+     }
+     list group {
+       key name;
+       description "Define a DHCP group";
+       uses dhcp-group;
+     }
+     list dual-stack-group {
+       key name;
+       description "Define a DHCP dual stack group";
+       uses dhcp-dual-stack-group;
+     }
+     leaf no-snoop {
+       description "Do not snoop DHCP packets";
+       type empty;
+     }
+     leaf server-response-time {
+       description "Number of seconds in a period of activity between the last server response and an unaswered request";
+       default "0";
+       type union {
+         type uint32;
+         type string {
+           pattern "<.*>|$.*";
+         }
+       }
+     }
+     container lease-time-validation {
+       presence "enable lease-time-validation";
+       description "Configure lease time violation validation";
+       uses apply-advanced;
+       leaf lease-time-threshold {
+         description "Threshold for lease time violation in seconds";
+         units "seconds";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "60 .. 2147483647";
+           }
+         }
+       }
+       container violation-action {
+         description "Lease time validation violation action";
+         leaf drop {
+           description "Drop dhcpv4 offer and ack packets";
+           type empty;
+         }
+       }
+     }
+     container leasequery {
+       description "DHCP leasequery configuration";
+       presence "enable leasequery";
+       uses relay-leasequery-type;
+     }
+     container bulk-leasequery {
+       description "DHCP bulk leasequery configuration";
+       presence "enable bulk-leasequery";
+       uses relay-bulk-leasequery-v4-type;
+     }
+     container active-leasequery {
+       description "DHCPv4 active leasequery configuration";
+       presence "enable active-leasequery";
+       uses active-leasequery-v4-type;
+     }
+     container remote-id-mismatch {
+       description "DHCP client remote-id mismatch";
+       presence "enable remote-id-mismatch";
+       uses dhcp-remote-id-mismatch-type;
+     }
+   }
+   grouping active-leasequery-v4-type {
+     description "Configure active leasequery";
+     uses apply-advanced;
+     leaf topology-discover {
+       description "Topology discovery";
+       type empty;
+     }
+     list peer-address {
+       key name;
+       description "Server ip address";
+       leaf name {
+         description "Peer ip address";
+         type jt:ipaddr;
+       }
+       uses apply-advanced;
+     }
+     list exclude-interface {
+       key name;
+       ordered-by user;
+       description "Exclude interface participating in active leasequery";
+       leaf name {
+         description "Interface name";
+         type union {
+           type jt:interface-name;
+           type string {
+             pattern "<.*>|$.*";
+           }
+         }
+       }
+       uses apply-advanced;
+     }
+     leaf timeout {
+       description "Read/write timeout in seconds";
+       default "120";
+       units "seconds";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "10 .. 3600";
+         }
+       }
+     }
+     leaf idle-timeout {
+       description "Idle timeout in seconds";
+       default "60";
+       units "seconds";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "10 .. 3600";
+         }
+       }
+     }
+   }
+   grouping dhcp-dual-stack-group {
+     description "DHCP dual stack groups";
+     leaf name {
+       description "Dual stack group name";
+       type string {
+         length "1 .. 64";
+       }
+     }
+     uses apply-advanced;
+     container authentication {
+       description "DHCP authentication";
+       uses dual-stack-authentication-type;
+     }
+     leaf service-profile {
+       description "Dynamic profile to use for default service activation";
+       type string {
+         length "1 .. 128";
+       }
+     }
+     leaf access-profile {
+       description "Access profile to be used for jdhcpd";
+       type string {
+         length "1 .. 128";
+       }
+     }
+     container dynamic-profile {
+       description "Dynamic profile to use";
+       uses dynamic-profile-type;
+     }
+     container liveness-detection {
+       description "DHCP client liveness detection processing";
+       uses dhcp-liveness-detection-dualstack-type;
+     }
+     container relay-agent-interface-id {
+       description "Interface-id option processing";
+       presence "enable relay-agent-interface-id";
+       uses v6-relay-option-interface-id-type;
+     }
+     container relay-agent-remote-id {
+       description "Remote-id option processing";
+       presence "enable relay-agent-remote-id";
+       uses v6-relay-option-remote-id-type;
+     }
+     container classification-key {
+       description "Classification key for identifying dual stack household";
+       uses classification-types;
+     }
+     leaf dual-stack-interface-client-limit {
+       description "Limit the number of client allowed on an interface";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "1 .. 500000";
+         }
+       }
+     }
+     container protocol-master {
+       description "Select family as protocol master";
+       uses jdhcp-dual-stack-protocol-mstr-type;
+     }
+     container short-cycle-protection {
+       description "Short cycle lockout configuration";
+       leaf lockout-min-time {
+         description "Short cycle lockout time in seconds";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "1 .. 86400";
+           }
+         }
+       }
+       leaf lockout-max-time {
+         description "Short cycle lockout time in seconds";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "1 .. 86400";
+           }
+         }
+       }
+     }
+   }
+   grouping classification-types {
+     description "Different mechanisms to identify a single household";
+     uses apply-advanced;
+     leaf mac-address {
+       description "MAC address of client";
+       type empty;
+     }
+     leaf circuit-id {
+       description "Circuit-id as key";
+       type empty;
+     }
+     leaf remote-id {
+       description "Remote-id as key";
+       type empty;
+     }
+   }
+   grouping dhcp-generic-v4-option {
+     description "Generic DHCP options processing";
+     uses apply-advanced;
+     leaf option-number {
+       description "Option number";
+       status deprecated;
+       type enumeration {
+         enum "60" {
+           description "Option 60";
+           status deprecated;
+         }
+         enum "77" {
+           description "Option 77";
+           status deprecated;
+         }
+       }
+     }
+     container equals {
+       description "Generic option equals";
+       status deprecated;
+       uses relay-v4-option-ascii-hex;
+     }
+     container default-action {
+       description "Generic option default action";
+       status deprecated;
+       uses dhcp-v4-option-default-action;
+     }
+     container starts-with {
+       description "Generic option starts with";
+       status deprecated;
+       uses relay-v4-option-ascii-hex;
+     }
+     container option-60 {
+       description "Add option 60 processing";
+       presence "enable option-60";
+       uses dhcp-generic-v4-option-type;
+     }
+     container option-77 {
+       description "Add option 77 processing";
+       presence "enable option-77";
+       uses dhcp-generic-v4-option-type;
+     }
+     list option-order {
+       key name;
+       ordered-by user;
+       description "Options precedence order";
+       leaf name {
+         description "Option number";
+         type enumeration {
+           enum "60" {
+             description "Option 60";
+           }
+           enum "77" {
+             description "Option 77";
+           }
+         }
+       }
+       uses apply-advanced;
+     }
+   }
+   grouping dhcp-generic-v4-option-type {
+     uses apply-advanced;
+     container equals {
+       description "Generic option equals";
+       uses relay-v4-option-ascii-hex;
+     }
+     container default-action {
+       description "Generic option default action";
+       uses dhcp-v4-option-default-action;
+     }
+     container starts-with {
+       description "Generic option starts with";
+       uses relay-v4-option-ascii-hex;
+     }
+   }
+   grouping dhcp-group {
+     description "DHCP groups";
+     leaf name {
+       description "Group name";
+       type string {
+         length "1 .. 64";
+       }
+     }
+     uses apply-advanced;
+     container active-server-group {
+       description "Name of DHCP server group";
+       uses dhcpv4-gp-active-sg-type;
+     }
+     container liveness-detection {
+       description "DHCP client liveness detection processing";
+       uses dhcp-liveness-detection-type;
+     }
+     leaf service-profile {
+       description "Dynamic profile to use for default service activation";
+       type string {
+         length "1 .. 128";
+       }
+     }
+     leaf access-profile {
+       description "Access profile to use for AAA services";
+       type string {
+         length "1 .. 128";
+       }
+     }
+     container overrides {
+       description "DHCP override processing";
+       presence "enable overrides";
+       uses override-type;
+     }
+     container short-cycle-protection {
+       description "Short cycle lockout configuration";
+       leaf lockout-min-time {
+         description "Short cycle lockout time in seconds";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "1 .. 86400";
+           }
+         }
+       }
+       leaf lockout-max-time {
+         description "Short cycle lockout time in seconds";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "1 .. 86400";
+           }
+         }
+       }
+     }
+     container server-match {
+       description "Server match processing";
+       uses apply-advanced;
+       container default-action {
+         description "Server match default action";
+         presence "enable default-action";
+         uses server-match-action-choice;
+       }
+       list address {
+         key name;
+         description "Server address";
+         leaf name {
+           description "Server address for matching";
+           type jt:ipv4prefix;
+         }
+         uses apply-advanced;
+         choice server-match-action-choice {
+           case case_1 {
+             leaf forward-only {
+               description "Forward without subscriber services when a match is made";
+               type empty;
+             }
+           }
+           case case_2 {
+             leaf create-relay-entry {
+               description "Create relay entry and allow subscriber services";
+               type empty;
+             }
+           }
+         }
+       }
+     }
+     container relay-option {
+       description "DHCP option processing";
+       presence "enable relay-option";
+       uses dhcp-generic-v4-option;
+     }
+     container relay-option-60 {
+       description "DHCP option-60 processing";
+       presence "enable relay-option-60";
+       status deprecated;
+       uses relay-option-60-type-group;
+     }
+     container relay-option-82 {
+       description "DHCP option-82 processing";
+       presence "enable relay-option-82";
+       uses relay-option-82-type;
+     }
+     container forward-only {
+       description "Forward DHCP packets without creating binding";
+       presence "enable forward-only";
+       uses forward-only-to-rc-type;
+     }
+     container route-suppression {
+       description "Suppress access-internal and/or destination route addition";
+       uses dhcp-route-suppression-type;
+     }
+     leaf description {
+       description "Text description of servers";
+       type string;
+     }
+     leaf maximum-hop-count {
+       description "Maximum number of hops per packet";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "1 .. 16";
+         }
+       }
+     }
+     leaf minimum-wait-time {
+       description "Minimum number of seconds before requests are forwarded";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "0 .. 30000";
+         }
+       }
+     }
+     leaf client-response-ttl {
+       description "IP time-to-live value to set in responses to client";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "1 .. 255";
+         }
+       }
+     }
+     leaf source-ip-change {
+       description "Use address of egress interface as source ip";
+       type empty;
+     }
+     list interface {
+       key name;
+       description "One or more interfaces";
+       leaf name {
+         description "Interface name";
+         type union {
+           type jt:interface-name;
+           type string {
+             pattern "<.*>|$.*";
+           }
+         }
+       }
+       uses apply-advanced;
+       leaf upto {
+         description "Interface up to";
+         type union {
+           type jt:interface-name;
+           type string {
+             pattern "<.*>|$.*";
+           }
+         }
+       }
+       leaf exclude {
+         description "Exclude this interface range";
+         type empty;
+       }
+       leaf trace {
+         description "Enable tracing for this interface";
+         type empty;
+       }
+       container overrides {
+         description "DHCP override processing";
+         uses override-type;
+       }
+       container dynamic-profile {
+         description "Dynamic profile to use";
+         uses dynamic-profile-type;
+       }
+       leaf service-profile {
+         description "Dynamic profile to use for default service activation";
+         type string {
+           length "1 .. 128";
+         }
+       }
+       leaf access-profile {
+         description "Access profile to use for AAA services";
+         type string {
+           length "1 .. 128";
+         }
+       }
+       container short-cycle-protection {
+         description "Short cycle lockout configuration";
+         leaf lockout-min-time {
+           description "Short cycle lockout time in seconds";
+           type union {
+             type string {
+               pattern "<.*>|$.*";
+             }
+             type uint32 {
+               range "1 .. 86400";
+             }
+           }
+         }
+         leaf lockout-max-time {
+           description "Short cycle lockout time in seconds";
+           type union {
+             type string {
+               pattern "<.*>|$.*";
+             }
+             type uint32 {
+               range "1 .. 86400";
+             }
+           }
+         }
+       }
+     }
+     list interface-tag {
+       key name;
+       description "Interfae tag configuration";
+       leaf name {
+         description "Interface tag name";
+         type string {
+           length "1 .. 64";
+         }
+       }
+       uses apply-advanced;
+       container overrides {
+         description "DHCP override processing";
+         uses override-type;
+       }
+       container dynamic-profile {
+         description "Dynamic profile to use";
+         uses dynamic-profile-type;
+       }
+       leaf service-profile {
+         description "Dynamic profile to use for default service activation";
+         type string {
+           length "1 .. 128";
+         }
+       }
+       leaf access-profile {
+         description "Access profile to use for AAA services";
+         type string {
+           length "1 .. 128";
+         }
+       }
+       container short-cycle-protection {
+         description "Short cycle lockout configuration";
+         leaf lockout-min-time {
+           description "Short cycle lockout time in seconds";
+           type union {
+             type string {
+               pattern "<.*>|$.*";
+             }
+             type uint32 {
+               range "1 .. 86400";
+             }
+           }
+         }
+         leaf lockout-max-time {
+           description "Short cycle lockout time in seconds";
+           type union {
+             type string {
+               pattern "<.*>|$.*";
+             }
+             type uint32 {
+               range "1 .. 86400";
+             }
+           }
+         }
+       }
+     }
+     container remote-id-mismatch {
+       description "DHCP client remote-id mismatch";
+       presence "enable remote-id-mismatch";
+       uses dhcp-remote-id-mismatch-type;
+     }
+     container lease-time-validation {
+       presence "enable lease-time-validation";
+       description "Configure lease time violation validation";
+       uses apply-advanced;
+       leaf lease-time-threshold {
+         description "Threshold for lease time violation in seconds";
+         units "seconds";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "60 .. 2147483647";
+           }
+         }
+       }
+       container violation-action {
+         description "Lease time validation violation action";
+         leaf drop {
+           description "Drop dhcpv4 offer and ack packets";
+           type empty;
+         }
+       }
+     }
+   }
+   grouping dhcp-liveness-detection-dualstack-type {
+     description "DHCP client liveness detection processing";
+     uses apply-advanced;
+     container failure-action {
+       description "Liveness detection failure action options";
+       uses dhcp-liveness-detection-failure-action-type;
+     }
+     container method {
+       description "Liveness detection method options";
+       uses apply-advanced;
+       choice method-choice {
+         case case_1 {
+           container layer2-liveness-detection {
+             description "Address resolution options";
+             uses dhcp-arp-nud-liveness-detection-type;
+           }
+         }
+       }
+     }
+   }
+   grouping dhcp-arp-nud-liveness-detection-type {
+     description "Address Resolution detection options";
+     uses apply-advanced;
+     leaf transmit-interval {
+       description "Transmit interval for address resolution";
+       default "300";
+       units "seconds";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "300 .. 1800";
+         }
+       }
+     }
+     leaf max-consecutive-retries {
+       description "Retry attempts";
+       default "3";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "3 .. 6";
+         }
+       }
+     }
+   }
+   grouping dhcp-liveness-detection-failure-action-type {
+     description "Liveness detection failure action options";
+     uses apply-advanced;
+     choice failure-action-type {
+       case case_1 {
+         leaf clear-binding {
+           description "Clear the client binding";
+           type empty;
+         }
+       }
+       case case_2 {
+         leaf clear-binding-if-interface-up {
+           description "Clear the client binding only if the incoming interface is up";
+           type empty;
+         }
+       }
+       case case_3 {
+         leaf log-only {
+           description "Maintain the client binding and log the failure event";
+           type empty;
+         }
+       }
+     }
+   }
+   grouping dhcp-liveness-detection-type {
+     description "DHCP client liveness detection processing";
+     uses apply-advanced;
+     container failure-action {
+       description "Liveness detection failure action options";
+       uses dhcp-liveness-detection-failure-action-type;
+     }
+     container method {
+       description "Liveness detection method options";
+       uses apply-advanced;
+       choice method-choice {
+         case case_1 {
+           container bfd {
+             description "Bidirectional Forwarding Detection (BFD) options";
+             uses dhcp-bfd-liveness-detection-type;
+           }
+         }
+         case case_2 {
+           container layer2-liveness-detection {
+             description "Address resolution options";
+             uses dhcp-arp-nud-liveness-detection-type;
+           }
+         }
+       }
+     }
+   }
+   grouping dhcp-bfd-liveness-detection-type {
+     description "Bidirectional Forwarding Detection (BFD) options";
+     uses apply-advanced;
+     leaf version {
+       description "BFD protocol version number";
+       default "automatic";
+       type enumeration {
+         enum "0" {
+           description "BFD version 0 (deprecated)";
+         }
+         enum "1" {
+           description "BFD version 1";
+         }
+         enum "automatic" {
+           description "Choose BFD version automatically";
+         }
+       }
+     }
+     leaf minimum-interval {
+       description "Minimum transmit and receive interval";
+       units "milliseconds";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "30000 .. 255000";
+         }
+       }
+     }
+     leaf minimum-transmit-interval {
+       description "Minimum transmit interval";
+       status deprecated;
+       units "milliseconds";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "30000 .. 255000";
+         }
+       }
+     }
+     leaf minimum-receive-interval {
+       description "Minimum receive interval";
+       units "milliseconds";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "30000 .. 255000";
+         }
+       }
+     }
+     leaf multiplier {
+       description "Detection time multiplier";
+       default "3";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "1 .. 255";
+         }
+       }
+     }
+     leaf inline-disable {
+       description "Disable inline mode for this BFD session";
+       type empty;
+     }
+     leaf pdu-size {
+       description "BFD transport protocol payload size";
+       default "24";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "24 .. 16000";
+         }
+       }
+     }
+     choice adaptation-choice {
+       case case_1 {
+         leaf no-adaptation {
+           description "Disable adaptation";
+           type empty;
+         }
+       }
+     }
+     container transmit-interval {
+       description "Transmit-interval options";
+       uses apply-advanced;
+       leaf minimum-interval {
+         description "Minimum transmit interval";
+         units "milliseconds";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "30000 .. 255000";
+           }
+         }
+       }
+       leaf threshold {
+         description "High transmit interval triggering a trap";
+         units "milliseconds";
+         type union {
+           type uint32;
+           type string {
+             pattern "<.*>|$.*";
+           }
+         }
+       }
+     }
+     container detection-time {
+       description "Detection-time options";
+       uses apply-advanced;
+       leaf threshold {
+         description "High detection-time triggering a trap";
+         units "milliseconds";
+         type union {
+           type uint32;
+           type string {
+             pattern "<.*>|$.*";
+           }
+         }
+       }
+     }
+     leaf session-mode {
+       description "BFD single-hop or multihop session-mode";
+       default "automatic";
+       type enumeration {
+         enum "automatic" {
+           description "Choose session-mode automatically";
+         }
+         enum "single-hop" {
+           description "Use single-hop";
+         }
+         enum "multihop" {
+           description "Use multihop";
+         }
+       }
+     }
+     leaf holddown-interval {
+       description "Time to hold the session-UP notification to the client";
+       default "0";
+       units "milliseconds";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "0 .. 255000";
+         }
+       }
+     }
+   }
+   grouping dhcp-remote-id-mismatch-type {
+     description "DHCP client remote-id-mismatch processing";
+     uses apply-advanced;
+     leaf disconnect {
+       description "Disconnect session on remote-id mismatch";
+       type empty;
+       mandatory true;
+     }
+   }
+   grouping dhcp-route-suppression-type {
+     uses apply-advanced;
+   }
+   grouping dhcp-v4-option-default-action {
+     description "Default action";
+     uses apply-advanced;
+     choice server-group-choice {
+       case case_1 {
+         leaf relay-server-group {
+           description "Name of DHCP relay server group when match is made";
+           type string {
+             length "1 .. 64";
+           }
+         }
+       }
+       case case_2 {
+         leaf local-server-group {
+           description "Name of DHCP local server group when match is made";
+           type string {
+             length "1 .. 64";
+           }
+         }
+       }
+       case case_3 {
+         leaf drop {
+           description "Discard when a match is made";
+           type empty;
+         }
+       }
+       case case_4 {
+         leaf forward-only {
+           description "Forward without subscriber services when a match is made";
+           type empty;
+         }
+       }
+     }
+   }
+   grouping dhcpv4-gbl-active-sg-type {
+     leaf active-server-group {
+       description "Name of DHCP server group";
+       type string {
+         length "1 .. 64";
+       }
+     }
+     leaf allow-server-change {
+       description "Accept DHCP-ACK from any server in this group";
+       type empty;
+     }
+   }
+   grouping dhcpv4-gp-active-sg-type {
+     leaf active-server-group {
+       description "Name of DHCP server group";
+       type string {
+         length "1 .. 64";
+       }
+     }
+     leaf allow-server-change {
+       description "Accept DHCP-ACK from any server in this group";
+       type empty;
+     }
+   }
+   grouping dhcpv6-relay-type {
+     description "DHCPv6 relay configuration";
+     uses apply-advanced;
+     container authentication {
+       description "DHCPv6 authentication";
+       uses dhcpv6-authentication-type;
+     }
+     container persistent-storage {
+       description "Trigger to enable flat file storage";
+       leaf automatic {
+         description "Trigger automatically";
+         type empty;
+       }
+     }
+     container liveness-detection {
+       description "DHCPv6 client liveness detection processing";
+       uses dhcpv6-liveness-detection-type;
+     }
+     container dynamic-profile {
+       description "Dynamic profile to use";
+       uses dynamic-profile-type;
+     }
+     leaf service-profile {
+       description "Dynamic profile to use for default service activation";
+       type string {
+         length "1 .. 128";
+       }
+     }
+     leaf access-profile {
+       description "Access profile to use for AAA services";
+       type string {
+         length "1 .. 128";
+       }
+     }
+     container short-cycle-protection {
+       description "Short cycle lockout configuration";
+       leaf lockout-min-time {
+         description "Short cycle lockout time in seconds";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "1 .. 86400";
+           }
+         }
+       }
+       leaf lockout-max-time {
+         description "Short cycle lockout time in seconds";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "1 .. 86400";
+           }
+         }
+       }
+     }
+     container overrides {
+       description "DHCPv6 override processing";
+       presence "enable overrides";
+       uses dhcpv6-override-relay-type;
+     }
+     container relay-option {
+       description "DHCPv6 option processing";
+       presence "enable relay-option";
+       uses dhcp-generic-v6-option;
+     }
+     leaf exclude-relay-agent-identifier {
+       description "Exclude relay agent identifier from packets to server";
+       type empty;
+     }
+     container server-match {
+       description "Server match processing";
+       uses apply-advanced;
+       container default-action {
+         description "Server match default action";
+         uses server-match-action-choice;
+       }
+       container duid {
+         description "Match duid processing";
+         uses apply-advanced;
+         container equals {
+           description "Duid equals";
+           uses server-match-v6-ascii-hex;
+         }
+         container starts-with {
+           description "Duid starts with";
+           uses server-match-v6-ascii-hex;
+         }
+       }
+       list address {
+         key name;
+         description "Server ipv6 address";
+         leaf name {
+           description "Server ipv6 address for matching";
+           type jt:ipv6prefix;
+         }
+         uses apply-advanced;
+         choice server-match-action-choice {
+           case case_1 {
+             leaf forward-only {
+               description "Forward without subscriber services when a match is made";
+               type empty;
+             }
+           }
+           case case_2 {
+             leaf create-relay-entry {
+               description "Create relay entry and allow subscriber services";
+               type empty;
+             }
+           }
+         }
+       }
+     }
+     leaf relay-agent-option-79 {
+       description "Add the client MAC address to the Relay Forward header.";
+       type empty;
+     }
+     container vendor-specific-information {
+       description "DHCPv6 option 17 vendor-specific processing";
+       uses jdhcp-vendor-specific-type;
+     }
+     container forward-only {
+       description "Forward DHCPv6 packets without creating binding";
+       presence "enable forward-only";
+       uses forward-only-to-rc-type;
+     }
+     leaf forward-only-replies {
+       description "Forward-only replies from server to appropriate logical-system:routing-instance based on options";
+       type empty;
+     }
+     container route-suppression {
+       description "Suppress access-internal and/or access route addition";
+       uses dhcpv6-route-suppression-type;
+     }
+     list group {
+       key name;
+       description "Define a DHCPv6 relay group";
+       uses dhcpv6-relay-group;
+     }
+     container relay-agent-interface-id {
+       description "DHCPv6 interface-id option processing";
+       presence "enable relay-agent-interface-id";
+       uses v6-relay-option-interface-id-type;
+     }
+     container relay-agent-remote-id {
+       description "DHCPv6 remote-id option processing";
+       presence "enable relay-agent-remote-id";
+       uses v6-relay-option-remote-id-type;
+     }
+     container server-group {
+       description "Define a DHCPv6 server group";
+       uses v6-server-group-type;
+     }
+     container active-server-group {
+       description "Name of DHCPv6 server group";
+       uses dhcpv6-gbl-active-sg-type;
+     }
+     leaf server-response-time {
+       description "Number of seconds in a period of activity between the last server response and an unaswered request";
+       default "0";
+       type union {
+         type uint32;
+         type string {
+           pattern "<.*>|$.*";
+         }
+       }
+     }
+     container lease-time-validation {
+       presence "enable lease-time-validation";
+       description "Configure lease time violation validation";
+       uses apply-advanced;
+       leaf lease-time-threshold {
+         description "Threshold for lease time violation in seconds";
+         units "seconds";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "60 .. 2147483647";
+           }
+         }
+       }
+       container violation-action {
+         description "Lease time validation violation action";
+         leaf drop {
+           description "Drop dhcpv6 advertise and reply packets";
+           type empty;
+         }
+       }
+     }
+     leaf no-snoop {
+       description "Do not snoop DHCPV6 packets";
+       type empty;
+     }
+     container leasequery {
+       description "DHCPv6 leasequery configuration";
+       presence "enable leasequery";
+       uses relay-leasequery-type;
+     }
+     container bulk-leasequery {
+       description "DHCPv6 bulk leasequery configuration";
+       presence "enable bulk-leasequery";
+       uses relay-bulk-leasequery-v6-type;
+     }
+     container active-leasequery {
+       description "DHCPv6 active leasequery configuration";
+       presence "enable active-leasequery";
+       uses active-leasequery-v6-type;
+     }
+     container remote-id-mismatch {
+       description "DHCP client remote-id mismatch";
+       presence "enable remote-id-mismatch";
+       uses dhcp-remote-id-mismatch-type;
+     }
+     container duplicate-clients {
+       description "Allow duplicate clients";
+       uses dhcpv6-duplicate-clients-type;
+     }
+   }
+   grouping active-leasequery-v6-type {
+     description "Configure active leasequery";
+     uses apply-advanced;
+     leaf topology-discover {
+       description "Topology discovery";
+       type empty;
+     }
+     list exclude-interface {
+       key name;
+       ordered-by user;
+       description "Exclude interface participating in active leasequery";
+       leaf name {
+         description "Interface name";
+         type union {
+           type jt:interface-name;
+           type string {
+             pattern "<.*>|$.*";
+           }
+         }
+       }
+       uses apply-advanced;
+     }
+     leaf timeout {
+       description "Read/write timeout in seconds";
+       default "120";
+       units "seconds";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "10 .. 3600";
+         }
+       }
+     }
+     leaf idle-timeout {
+       description "Idle timeout in seconds";
+       default "60";
+       units "seconds";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "10 .. 3600";
+         }
+       }
+     }
+     list peer-address {
+       key name;
+       description "Peer ipv6 address";
+       leaf name {
+         description "Peer ipv6 address";
+         type jt:ipv6addr;
+       }
+       uses apply-advanced;
+     }
+   }
+   grouping dhcp-generic-v6-option {
+     description "Generic DHCPv6 options processing";
+     uses apply-advanced;
+     leaf option-number {
+       description "Option number";
+       status deprecated;
+       type enumeration {
+         enum "15" {
+           description "Option 15";
+           status deprecated;
+         }
+         enum "16" {
+           description "Option 16";
+           status deprecated;
+         }
+       }
+     }
+     container equals {
+       description "Generic option equals";
+       status deprecated;
+       uses relay-v6-option-ascii-hex;
+     }
+     container default-action {
+       description "Generic option default action";
+       status deprecated;
+       uses dhcp-v6-option-default-action;
+     }
+     container starts-with {
+       description "Generic option starts with";
+       status deprecated;
+       uses relay-v6-option-ascii-hex;
+     }
+     container option-15 {
+       description "Add option 15 processing";
+       presence "enable option-15";
+       uses dhcp-generic-v6-option-type;
+     }
+     container option-16 {
+       description "Add option 16 processing";
+       presence "enable option-16";
+       uses dhcp-generic-v6-option-type;
+     }
+     list option-order {
+       key name;
+       ordered-by user;
+       description "Options precedence order";
+       leaf name {
+         description "Option number";
+         type enumeration {
+           enum "15" {
+             description "Option 15";
+           }
+           enum "16" {
+             description "Option 16";
+           }
+         }
+       }
+       uses apply-advanced;
+     }
+   }
+   grouping dhcp-generic-v6-option-type {
+     uses apply-advanced;
+     container equals {
+       description "Generic option equals";
+       uses relay-v6-option-ascii-hex;
+     }
+     container default-action {
+       description "Generic option default action";
+       uses dhcp-v6-option-default-action;
+     }
+     container starts-with {
+       description "Generic option starts with";
+       uses relay-v6-option-ascii-hex;
+     }
+   }
+   grouping dhcp-v6-option-default-action {
+     description "Default action";
+     uses apply-advanced;
+     choice server-group-choice {
+       case case_1 {
+         leaf relay-server-group {
+           description "Name of DHCP relay server group when match is made";
+           type string {
+             length "1 .. 64";
+           }
+         }
+       }
+       case case_2 {
+         leaf drop {
+           description "Discard when a match is made";
+           type empty;
+         }
+       }
+       case case_3 {
+         leaf forward-only {
+           description "Forward without subscriber services when a match is made";
+           type empty;
+         }
+       }
+     }
+   }
+   grouping dhcpv6-authentication-type {
+     description "DHCPv6 authentication";
+     uses apply-advanced;
+     leaf password {
+       description "Username password to use";
+       type string {
+         length "1 .. 64";
+       }
+     }
+     container username-include {
+       description "Add username options";
+       uses apply-advanced;
+       leaf delimiter {
+         description "Change delimiter/separator character";
+         type string {
+           length 1;
+         }
+       }
+       leaf domain-name {
+         description "Add domain name";
+         type string {
+           length "1 .. 64";
+         }
+       }
+       leaf user-prefix {
+         description "Add user defined prefix";
+         type string {
+           length "1 .. 64";
+         }
+       }
+       leaf mac-address {
+         description "Include MAC address";
+         type empty;
+       }
+       container client-id {
+         presence "enable client-id";
+         description "Include client ID";
+         leaf exclude-headers {
+           description "Exclude all the headers";
+           type empty;
+         }
+         leaf use-automatic-ascii-hex-encoding {
+           description "Use automatic ascii hex username encoding";
+           type empty;
+         }
+       }
+       container relay-agent-remote-id {
+         presence "enable relay-agent-remote-id";
+         description "Include the relay agent remote ID";
+         uses apply-advanced;
+         choice relay-agent-remote-id-choice {
+           case case_1 {
+             leaf enterprise-id {
+               description "Only use enterprise-id portion of option-37";
+               status deprecated;
+               type empty;
+             }
+           }
+           case case_2 {
+             leaf remote-id {
+               description "Only use remote-id portion of option-37";
+               status deprecated;
+               type empty;
+             }
+           }
+         }
+       }
+       leaf logical-system-name {
+         description "Include logical system name";
+         type empty;
+       }
+       leaf routing-instance-name {
+         description "Include routing instance name";
+         type empty;
+       }
+       leaf relay-agent-subscriber-id {
+         description "Include the relay agent subscriber ID";
+         type empty;
+       }
+       leaf relay-agent-interface-id {
+         description "Include the relay agent interface ID";
+         type empty;
+       }
+       leaf circuit-type {
+         description "Include circuit type";
+         type empty;
+       }
+       leaf interface-name {
+         description "Include interface name";
+         type empty;
+       }
+       leaf interface-description {
+         description "Include interface description";
+         type enumeration {
+           enum "device" {
+             description "Add the device interface description";
+           }
+           enum "logical" {
+             description "Add the logical interface description";
+           }
+         }
+       }
+       leaf vlan-tags {
+         description "Include the vlan tag(s)";
+         type empty;
+       }
+     }
+   }
+   grouping dhcpv6-duplicate-clients-type {
+     description "Allow duplicate clients";
+     choice distinguish-with {
+       case case_1 {
+         leaf incoming-interface {
+           description "Allow duplicate clients on different underlying interfaces";
+           type empty;
+         }
+       }
+     }
+   }
+   grouping dhcpv6-gbl-active-sg-type {
+     uses apply-advanced;
+     leaf active-server-group {
+       description "Name of DHCPv6 server group";
+       type string {
+         length "1 .. 64";
+       }
+     }
+   }
+   grouping dhcpv6-liveness-detection-type {
+     description "DHCPv6 client liveness detection processing";
+     uses apply-advanced;
+     container failure-action {
+       description "Liveness detection failure action options";
+       uses dhcp-liveness-detection-failure-action-type;
+     }
+     container method {
+       description "Liveness detection method options";
+       uses apply-advanced;
+       choice method-choice {
+         case case_1 {
+           container bfd {
+             description "Bidirectional Forwarding Detection (BFD) options";
+             uses dhcp-bfd-liveness-detection-type;
+           }
+         }
+         case case_2 {
+           container layer2-liveness-detection {
+             description "Neighbor discovery options";
+             uses dhcp-arp-nud-liveness-detection-type;
+           }
+         }
+       }
+     }
+   }
+   grouping dhcpv6-override-relay-type {
+     description "DHCPv6 relay override processing";
+     uses apply-advanced;
+     choice allow-snooped-clients-choice {
+       leaf allow-snooped-clients {
+         description "Allow client creation from snooped PDUs";
+         type empty;
+       }
+       leaf no-allow-snooped-clients {
+         description "Don't allow client creation from snooped PDUs";
+         type empty;
+       }
+     }
+     leaf delay-authentication {
+       description "Delay subscriber authentication in DHCP protocol processing until request packet";
+       type empty;
+     }
+     leaf interface-client-limit {
+       description "Limit the number of clients allowed on an interface";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "1 .. 500000";
+         }
+       }
+     }
+     leaf dual-stack {
+       description "Dual stack group to use.";
+       type string {
+         length "1 .. 64";
+       }
+     }
+     leaf no-bind-on-request {
+       description "Do not bind if stray DHCPv6 RENEW, REBIND is received";
+       type empty;
+     }
+     container client-negotiation-match {
+       description "Use secondary match criteria for SOLICIT PDU";
+       choice match-with {
+         case case_1 {
+           leaf incoming-interface {
+             description "Use incoming interface";
+             type empty;
+           }
+         }
+       }
+     }
+     leaf send-release-on-delete {
+       description "Always send RELEASE to the server when a binding is deleted";
+       type empty;
+     }
+     leaf always-process-option-request-option {
+       description "Always process option even after address allocation failure";
+       type empty;
+     }
+     leaf relay-source {
+       description "Interface for relay source";
+       type union {
+         type jt:interface-name;
+         type string {
+           pattern "<.*>|$.*";
+         }
+       }
+     }
+     leaf delete-binding-on-renegotiation {
+       description "Delete binding on renegotiation";
+       type empty;
+     }
+     leaf asymmetric-lease-time {
+       description "Use a reduced lease time for the client. In seconds";
+       units "seconds";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "600 .. 86400";
+         }
+       }
+     }
+     leaf asymmetric-prefix-lease-time {
+       description "Use a reduced prefix lease time for the client. In seconds";
+       units "seconds";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "600 .. 86400";
+         }
+       }
+     }
+   }
+   grouping dhcpv6-relay-group {
+     description "DHCPv6 groups";
+     leaf name {
+       description "Group name";
+       type string {
+         length "1 .. 64";
+       }
+     }
+     uses apply-advanced;
+     container active-server-group {
+       description "Name of DHCPv6 server group";
+       uses dhcpv6-gp-active-sg-type;
+     }
+     list dual-stack-group {
+       key name;
+       description "Define a DHCP dual stack group";
+       uses dhcp-dual-stack-group;
+     }
+     container authentication {
+       description "DHCPv6 authentication";
+       uses dhcpv6-authentication-type;
+     }
+     container liveness-detection {
+       description "DHCPv6 client liveness detection processing";
+       uses dhcpv6-liveness-detection-type;
+     }
+     container dynamic-profile {
+       description "Dynamic profile to use";
+       uses dynamic-profile-type;
+     }
+     leaf service-profile {
+       description "Dynamic profile to use for default service activation";
+       type string {
+         length "1 .. 128";
+       }
+     }
+     leaf access-profile {
+       description "Access profile to use for AAA services";
+       type string {
+         length "1 .. 128";
+       }
+     }
+     container short-cycle-protection {
+       description "Short cycle lockout configuration";
+       leaf lockout-min-time {
+         description "Short cycle lockout time in seconds";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "1 .. 86400";
+           }
+         }
+       }
+       leaf lockout-max-time {
+         description "Short cycle lockout time in seconds";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "1 .. 86400";
+           }
+         }
+       }
+     }
+     container overrides {
+       description "DHCPv6 override processing";
+       presence "enable overrides";
+       uses dhcpv6-override-relay-type;
+     }
+     container relay-option {
+       description "DHCPv6 option processing";
+       presence "enable relay-option";
+       uses dhcp-generic-v6-option;
+     }
+     container vendor-specific-information {
+       description "DHCPv6 option 17 vendor-specific processing";
+       uses jdhcp-vendor-specific-type;
+     }
+     container forward-only {
+       description "Forward DHCPv6 packets without creating binding";
+       presence "enable forward-only";
+       uses forward-only-to-rc-type;
+     }
+     container relay-agent-interface-id {
+       description "DHCPv6 interface-id option processing";
+       presence "enable relay-agent-interface-id";
+       uses v6-relay-option-interface-id-type;
+     }
+     container relay-agent-remote-id {
+       description "DHCPv6 remote-id option processing";
+       presence "enable relay-agent-remote-id";
+       uses v6-relay-option-remote-id-type;
+     }
+     container route-suppression {
+       description "Suppress access-internal and/or access route addition";
+       uses dhcpv6-route-suppression-type;
+     }
+     leaf relay-agent-option-79 {
+       description "Add the client MAC address to the Relay Forward header.";
+       type empty;
+     }
+     list interface {
+       key name;
+       description "One or more interfaces";
+       leaf name {
+         description "Interface name";
+         type union {
+           type jt:interface-name;
+           type string {
+             pattern "<.*>|$.*";
+           }
+         }
+       }
+       uses apply-advanced;
+       leaf upto {
+         description "Interface up to";
+         type union {
+           type jt:interface-name;
+           type string {
+             pattern "<.*>|$.*";
+           }
+         }
+       }
+       leaf exclude {
+         description "Exclude this interface range";
+         type empty;
+       }
+       leaf trace {
+         description "Enable tracing for this interface";
+         type empty;
+       }
+       container overrides {
+         description "DHCPv6 override processing";
+         uses dhcpv6-override-relay-type;
+       }
+       container dynamic-profile {
+         description "Dynamic profile to use";
+         uses dynamic-profile-type;
+       }
+       leaf service-profile {
+         description "Dynamic profile to use for default service activation";
+         type string {
+           length "1 .. 128";
+         }
+       }
+       leaf access-profile {
+         description "Access profile to use for AAA services";
+         type string {
+           length "1 .. 128";
+         }
+       }
+       container short-cycle-protection {
+         description "Short cycle lockout configuration";
+         leaf lockout-min-time {
+           description "Short cycle lockout time in seconds";
+           type union {
+             type string {
+               pattern "<.*>|$.*";
+             }
+             type uint32 {
+               range "1 .. 86400";
+             }
+           }
+         }
+         leaf lockout-max-time {
+           description "Short cycle lockout time in seconds";
+           type union {
+             type string {
+               pattern "<.*>|$.*";
+             }
+             type uint32 {
+               range "1 .. 86400";
+             }
+           }
+         }
+       }
+     }
+     list interface-tag {
+       key name;
+       description "Interface tag configurations";
+       leaf name {
+         description "Interface tag name";
+         type string {
+           length "1 .. 64";
+         }
+       }
+       uses apply-advanced;
+       container overrides {
+         description "DHCPv6 override processing";
+         uses dhcpv6-override-relay-type;
+       }
+       container dynamic-profile {
+         description "Dynamic profile to use";
+         uses dynamic-profile-type;
+       }
+       leaf service-profile {
+         description "Dynamic profile to use for default service activation";
+         type string {
+           length "1 .. 128";
+         }
+       }
+       leaf access-profile {
+         description "Access profile to use for AAA services";
+         type string {
+           length "1 .. 128";
+         }
+       }
+       container short-cycle-protection {
+         description "Short cycle lockout configuration";
+         leaf lockout-min-time {
+           description "Short cycle lockout time in seconds";
+           type union {
+             type string {
+               pattern "<.*>|$.*";
+             }
+             type uint32 {
+               range "1 .. 86400";
+             }
+           }
+         }
+         leaf lockout-max-time {
+           description "Short cycle lockout time in seconds";
+           type union {
+             type string {
+               pattern "<.*>|$.*";
+             }
+             type uint32 {
+               range "1 .. 86400";
+             }
+           }
+         }
+       }
+     }
+     container lease-time-validation {
+       presence "enable lease-time-validation";
+       description "Configure lease time violation validation";
+       uses apply-advanced;
+       leaf lease-time-threshold {
+         description "Threshold for lease time violation in seconds";
+         units "seconds";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "60 .. 2147483647";
+           }
+         }
+       }
+       container violation-action {
+         description "Lease time validation violation action";
+         leaf drop {
+           description "Drop dhcpv6 advertise and reply packets";
+           type empty;
+         }
+       }
+     }
+     container remote-id-mismatch {
+       description "DHCP client remote-id mismatch";
+       presence "enable remote-id-mismatch";
+       uses dhcp-remote-id-mismatch-type;
+     }
+     container server-match {
+       description "Server match processing";
+       uses apply-advanced;
+       container default-action {
+         description "Server match default action";
+         uses server-match-action-choice;
+       }
+       container duid {
+         description "Match duid processing";
+         uses apply-advanced;
+         container equals {
+           description "Duid equals";
+           uses server-match-v6-ascii-hex;
+         }
+         container starts-with {
+           description "Duid starts with";
+           uses server-match-v6-ascii-hex;
+         }
+       }
+       list address {
+         key name;
+         description "Server ipv6 address";
+         leaf name {
+           description "Server ipv6 address for matching";
+           type jt:ipv6prefix;
+         }
+         uses apply-advanced;
+         choice server-match-action-choice {
+           case case_1 {
+             leaf forward-only {
+               description "Forward without subscriber services when a match is made";
+               type empty;
+             }
+           }
+           case case_2 {
+             leaf create-relay-entry {
+               description "Create relay entry and allow subscriber services";
+               type empty;
+             }
+           }
+         }
+       }
+     }
+   }
+   grouping dhcpv6-gp-active-sg-type {
+     uses apply-advanced;
+     leaf active-server-group {
+       description "Name of DHCPv6 server group";
+       type string {
+         length "1 .. 64";
+       }
+     }
+   }
+   grouping dhcpv6-route-suppression-type {
+     description "Suppress access-internal and/or access route addition";
+   }
+   grouping dual-stack-authentication-type {
+     description "DHCP dual stack authentication";
+     uses apply-advanced;
+     leaf password {
+       description "Username password to use";
+       type string {
+         length "1 .. 64";
+       }
+     }
+     container username-include {
+       description "Add username options";
+       uses apply-advanced;
+       leaf delimiter {
+         description "Change delimiter/separator character";
+         type string {
+           length 1;
+         }
+       }
+       leaf domain-name {
+         description "Add domain name";
+         type string {
+           length "1 .. 64";
+         }
+       }
+       leaf user-prefix {
+         description "Add user defined prefix";
+         type string {
+           length "1 .. 64";
+         }
+       }
+       leaf mac-address {
+         description "Include MAC address";
+         type empty;
+       }
+       container client-id {
+         presence "enable client-id";
+         description "Include client ID";
+         leaf exclude-headers {
+           description "Exclude all the headers";
+           type empty;
+         }
+         leaf use-automatic-ascii-hex-encoding {
+           description "Use automatic ascii hex username encoding";
+           type empty;
+         }
+       }
+       leaf relay-agent-remote-id {
+         description "Include the relay agent remote ID";
+         type empty;
+       }
+       leaf logical-system-name {
+         description "Include logical system name";
+         type empty;
+       }
+       leaf routing-instance-name {
+         description "Include routing instance name";
+         type empty;
+       }
+       leaf relay-agent-interface-id {
+         description "Include the relay agent interface ID";
+         type empty;
+       }
+       leaf interface-name {
+         description "Include interface name";
+         type empty;
+       }
+       leaf interface-description {
+         description "Include interface description";
+         type enumeration {
+           enum "device" {
+             description "Add the device interface description";
+           }
+           enum "logical" {
+             description "Add the logical interface description";
+           }
+         }
+       }
+       leaf circuit-type {
+         description "Include circuit type";
+         type empty;
+       }
+       leaf vlan-tags {
+         description "Include the vlan tag(s)";
+         type empty;
+       }
+     }
+   }
+   grouping dynamic-profile-type {
+     description "Dynamic profile to use";
+     uses apply-advanced;
+     leaf dynamic-profile {
+       description "Dynamic profile to use";
+       type string {
+         length "1 .. 80";
+       }
+       //mandatory true;
+     }
+     choice dynamic-profile-type-choice {
+       case case_1 {
+         leaf use-primary {
+           description "Dynamic profile to use on the primary interface";
+           type string {
+             length "1 .. 80";
+           }
+         }
+       }
+       case case_2 {
+         container aggregate-clients {
+           presence "enable aggregate-clients";
+           description "Aggregate client profiles";
+           uses apply-advanced;
+           choice aggregate-type {
+             case case_1 {
+               leaf merge {
+                 description "Merge the client dynamic profiles";
+                 type empty;
+               }
+             }
+             case case_2 {
+               leaf replace {
+                 description "Replace client dynamic profiles";
+                 type empty;
+               }
+             }
+           }
+         }
+       }
+     }
+   }
+   grouping forward-only-to-rc-type {
+     description "Forward DHCP packets without creating binding";
+     uses apply-advanced;
+     leaf logical-system {
+       default "current";
+       type string;
+     }
+     leaf routing-instance {
+       default "current";
+       type string;
+     }
+   }
+   grouping jdhcp-dual-stack-protocol-mstr-type {
+     description "Select family as protocol master";
+     choice addr-fam {
+       case case_1 {
+         leaf inet {
+           description "INET family has protocol master behavior";
+           type empty;
+         }
+       }
+       case case_2 {
+         leaf inet6 {
+           description "INET6 family has protocol master behavior";
+           type empty;
+         }
+       }
+     }
+   }
+   grouping jdhcp-duplicate-clients-in-subnet-type {
+     description "Allow duplicate clients in a subnet";
+     choice distinguish-with {
+       case case_1 {
+         leaf incoming-interface {
+           description "Allow duplicate clients on different interfaces in a subnet";
+           type empty;
+         }
+       }
+       case case_2 {
+         leaf option-82 {
+           description "Allow duplicate clients using different option-82 options in a subnet";
+           type empty;
+         }
+       }
+     }
+   }
+   grouping jdhcp-interface-traceoptions-type {
+     description "Interface trace options for DHCP";
+     uses apply-advanced;
+     leaf no-remote-trace {
+       description "Disable remote tracing";
+       type empty;
+     }
+     container file {
+       description "Trace file information";
+       leaf filename {
+         description "Name of file in which to write trace information";
+         type string {
+           length "1 .. 1024";
+         }
+       }
+       leaf size {
+         description "Maximum trace file size";
+         type string;
+       }
+       leaf files {
+         description "Maximum number of trace files";
+         default "3";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "2 .. 1000";
+           }
+         }
+       }
+       choice world-readable-choice {
+         leaf world-readable {
+           description "Allow any user to read the log file";
+           type empty;
+         }
+         leaf no-world-readable {
+           description "Don't allow any user to read the log file";
+           type empty;
+         }
+       }
+       leaf match {
+         description "Regular expression for lines to be logged";
+         type jt:regular-expression;
+       }
+     }
+     list flag {
+       key name;
+       ordered-by user;
+       description "Interface trace categories";
+       leaf name {
+         type enumeration {
+           enum "state" {
+             description "State-transition operations";
+           }
+           enum "packet" {
+             description "Packet-decoding operations";
+           }
+           enum "flow" {
+             description "Flow-decoding operations";
+           }
+           enum "packet-option" {
+             description "DHCP option-decoding operations";
+           }
+           enum "dhcpv6-state" {
+             description "State-transition operations for dhcpv6";
+           }
+           enum "dhcpv6-packet" {
+             description "Packet-decoding operations for dhcpv6";
+           }
+           enum "dhcpv6-packet-option" {
+             description "DHCP option-decoding operations for dhcpv6";
+           }
+           enum "all" {
+             description "All operations";
+           }
+         }
+       }
+     }
+   }
+   grouping jdhcp-traceoptions-type {
+     description "Trace options for DHCP";
+     uses apply-advanced;
+     leaf no-remote-trace {
+       description "Disable remote tracing";
+       type empty;
+     }
+     container file {
+       description "Trace file information";
+       leaf filename {
+         description "Name of file in which to write trace information";
+         type string {
+           length "1 .. 1024";
+         }
+       }
+       leaf size {
+         description "Maximum trace file size";
+         type string;
+       }
+       leaf files {
+         description "Maximum number of trace files";
+         default "3";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "2 .. 1000";
+           }
+         }
+       }
+       choice world-readable-choice {
+         leaf world-readable {
+           description "Allow any user to read the log file";
+           type empty;
+         }
+         leaf no-world-readable {
+           description "Don't allow any user to read the log file";
+           type empty;
+         }
+       }
+       leaf match {
+         description "Regular expression for lines to be logged";
+         type jt:regular-expression;
+       }
+     }
+     list flag {
+       key name;
+       ordered-by user;
+       description "DHCP operations to include in debugging trace";
+       leaf name {
+         type enumeration {
+           enum "state" {
+             description "State-transition operations";
+           }
+           enum "packet" {
+             description "Packet-decoding operations";
+           }
+           enum "flow" {
+             description "Flow-decoding operations";
+           }
+           enum "packet-option" {
+             description "DHCP option-decoding operations";
+           }
+           enum "dhcpv6-state" {
+             description "State-transition operations for dhcpv6";
+           }
+           enum "dhcpv6-packet" {
+             description "Packet-decoding operations for dhcpv6";
+           }
+           enum "dhcpv6-packet-option" {
+             description "DHCP option-decoding operations for dhcpv6";
+           }
+           enum "all" {
+             description "All operations";
+           }
+           enum "database" {
+             description "Database operations";
+           }
+           enum "persistent" {
+             description "Persitent file operations";
+           }
+           enum "lockout-db" {
+             description "Lockout database operations";
+           }
+           enum "interface" {
+             description "Interface operations";
+           }
+           enum "rtsock" {
+             description "Routing socket operations";
+           }
+           enum "flow-notify" {
+             description "Flow notification operations";
+           }
+           enum "io" {
+             description "I/O operations";
+           }
+           enum "ha" {
+             description "High Availability-related operations";
+           }
+           enum "ui" {
+             description "User Interface operations";
+           }
+           enum "general" {
+             description "Miscellaneous operations";
+           }
+           enum "fwd" {
+             description "Firewall process operations";
+           }
+           enum "rpd" {
+             description "Routing Protocol process operations";
+           }
+           enum "auth" {
+             description "Authentication operations";
+           }
+           enum "profile" {
+             description "Profile operations";
+           }
+           enum "session-db" {
+             description "Session database operations";
+           }
+           enum "performance" {
+             description "Performance measurement operations";
+           }
+           enum "statistics" {
+             description "Baseline statistics operations";
+           }
+           enum "dhcpv6-io" {
+             description "I/O operations for dhcpv6";
+           }
+           enum "dhcpv6-rpd" {
+             description "Routing Protocol process operations for dhcpv6";
+           }
+           enum "dhcpv6-session-db" {
+             description "Session database operations for dhcpv6";
+           }
+           enum "dhcpv6-general" {
+             description "Miscellaneous operations for dhcpv6";
+           }
+           enum "liveness-detection" {
+             description "Liveness detection operations";
+           }
+           enum "security-persistence" {
+             description "Liveness detection operations";
+           }
+           enum "mclag" {
+             description "Multichassis LAG";
+           }
+           enum "ra-guard" {
+             description "DHCP RA guard option for dhcpv6";
+           }
+           enum "era" {
+             description "DHCP ERA logging option dhcp";
+           }
+           enum "telemetry" {
+             description "Telemetry operation";
+           }
+         }
+       }
+     }
+   }
+   grouping jdhcp-vendor-specific-type {
+     description "Add vendor-specific option processing";
+     uses apply-advanced;
+     leaf host-name {
+       description "Add router host name";
+       type empty;
+     }
+     leaf location {
+       description "Add location information expressed as interface name format";
+       type empty;
+     }
+   }
    grouping juniper-group {
      description "Configuration groups";
      leaf name {
@@ -5200,76 +7738,257 @@ def src_yang():
    }
    grouping juniper-policy-options {
      uses apply-advanced;
-     list prefix-list {
+     list as-list {
        key name;
-       description "Define a named set of address prefixes";
+       description "BGP as range list information";
        leaf name {
-         description "Prefix list name";
+         description "Name to identify BGP as-list";
          type string;
        }
        uses apply-advanced;
-       list prefix-list-item {
-         key name;
-         uses prefix_list_items;
-       }
-       leaf apply-path {
-         description "Apply IP prefixes from a configuration statement";
+       leaf-list members {
+         ordered-by user;
+         description "Single autonomous system number or range of autonomous system numbers in plain number";
          type string;
        }
      }
-     list rib-list {
+     list as-path {
        key name;
        ordered-by user;
-       description "Define a named set of RIB names or wildcards";
+       description "BGP autonomous system path regular expression";
        leaf name {
-         description "RIB list name";
+         description "Name to identify AS path regular expression";
          type string;
        }
        uses apply-advanced;
-       list rib-list-item {
+       leaf path {
+         description "AS path regular expression";
+         type string {
+         }
+       }
+     }
+     list as-path-group {
+       key name;
+       ordered-by user;
+       description "Group a set of AS paths";
+       leaf name {
+         description "Name to identify AS path group";
+         type string;
+       }
+       uses apply-advanced;
+       list as-path {
          key name;
-         uses rib_list_items;
-       }
-     }
-     list route-filter-list {
-       key name;
-       description "Define a named set of route-filter address prefixes";
-       leaf name {
-         description "Route filter list name";
-         type string;
-       }
-       uses apply-advanced;
-       list rf_list {
-         key "address choice-ident choice-value";
          ordered-by user;
-         uses route_filter_list_items;
+         description "BGP autonomous system path regular expression";
+         leaf name {
+           description "Name to identify AS path regular expression";
+           type string;
+         }
+         leaf path {
+           description "AS path regular expression";
+           type string {
+           }
+         }
        }
      }
-     list source-address-filter-list {
+     list community {
        key name;
-       description "Define a named set of source address filter address prefixes";
+       description "BGP community information";
        leaf name {
-         description "Source address filter list name";
+         description "Name to identify BGP community";
          type string;
        }
        uses apply-advanced;
-       list saf_list {
-         key "address choice-ident choice-value";
+       leaf invert-match {
+         description "Invert the result of the community expression matching";
+         type empty;
+       }
+       leaf-list members {
          ordered-by user;
-         uses source_address_filter_list_items;
+         description "Community members";
+         type string;
        }
      }
-     list fast-lookup-tuple-list {
+     list condition {
        key name;
-       description "Define a named set of address prefixes";
+       description "Define a route advertisement condition";
        leaf name {
-         description "Five tuple combination list name";
+         description "Name to identify Condition";
          type string;
        }
        uses apply-advanced;
-       list fast_lookup_tuple_list_item {
-         key name;
-         uses fast_lookup_tuple_list_items;
+       choice condition_type {
+         case case_1 {
+         }
+         case case_2 {
+           container if-route-exists {
+             presence "enable if-route-exists";
+             description "Route exists in a specific routing table";
+             uses apply-advanced;
+             container address-family {
+               presence "enable address-family";
+               description "Indicates the address family of the route to match on";
+               uses apply-advanced;
+               choice address-family {
+                 case case_1 {
+                   container inet {
+                     presence "enable inet";
+                     description "Route to match corresponds to an inet/inet6 prefix";
+                     uses apply-advanced;
+                     leaf address {
+                       description "Exact address of the route";
+                       type jt:ipprefix;
+                       mandatory true;
+                     }
+                     leaf table {
+                       description "Routing table in which route should exist";
+                       type string;
+                       mandatory true;
+                     }
+                   }
+                 }
+                 case case_2 {
+                   container ccc {
+                     presence "enable ccc";
+                     description "Route to match corresponds to a ccc prefix";
+                     uses apply-advanced;
+                     leaf address {
+                       description "Logical interface used to establish ccc route";
+                       type union {
+                         type jt:interface-name;
+                         type string {
+                           pattern "<.*>|$.*";
+                         }
+                       }
+                       mandatory true;
+                     }
+                     leaf table {
+                       description "Routing table in which route should exist";
+                       type string;
+                       mandatory true;
+                     }
+                     leaf standby {
+                       description "Indicates if route must be in standby state to be considered a match";
+                       type empty;
+                     }
+                     leaf peer-unit {
+                       description "Associated LT ifl's peer-unit. Required for LT-based routes";
+                       type union {
+                         type string {
+                           pattern "<.*>|$.*";
+                         }
+                         type uint32 {
+                           range "0 .. 8192";
+                         }
+                       }
+                     }
+                   }
+                 }
+               }
+             }
+             leaf address {
+               description "Exact address of the route";
+               type jt:ipprefix;
+             }
+             leaf table {
+               description "Routing table in which route should exist";
+               type string;
+             }
+           }
+         }
+       }
+     }
+     list damping {
+       key name;
+       ordered-by user;
+       description "BGP route flap damping properties";
+       leaf name {
+         description "Name to identify route flap damping parameters";
+         type string;
+       }
+       uses apply-advanced;
+       choice enable-disable {
+         case case_1 {
+           leaf disable {
+             description "Disable damping";
+             type empty;
+           }
+         }
+       }
+       leaf half-life {
+         description "Decay half-life";
+         units "minutes";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "1 .. 45";
+           }
+         }
+       }
+       leaf reuse {
+         description "Reuse threshold (figure-of-merit value)";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "1 .. 20000";
+           }
+         }
+       }
+       leaf suppress {
+         description "Cutoff threshold (figure-of-merit value)";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "1 .. 20000";
+           }
+         }
+       }
+       leaf max-suppress {
+         description "Maximum hold-down time";
+         units "minutes";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "1 .. 720";
+           }
+         }
+       }
+     }
+     container defaults {
+       description "Policy default behaviour";
+       uses apply-advanced;
+       container route-filter {
+         description "Set route filter behaviour";
+         leaf walkup {
+           description "Route filter walk up enable";
+           type empty;
+           //mandatory true;
+         }
+       }
+       container asregex-optimize {
+         description "Set AS-PATH regular expression engine optimizer";
+         choice scope-choice {
+           case case_1 {
+             leaf optimize {
+               description "Enable AS-PATH regular expression optimizer";
+               type empty;
+             }
+           }
+           case case_2 {
+             leaf no-optimize {
+               description "Disable AS-PATH regular expression optimizer";
+               type empty;
+             }
+           }
+         }
        }
      }
      list policy-statement {
@@ -11873,32 +14592,81 @@ def src_yang():
          }
        }
      }
-     container defaults {
-       description "Policy default behaviour";
+     list resolution-map {
+       key name;
+       ordered-by user;
+       description "Define a set of PNH resolution modes";
+       leaf name {
+         description "Resolution Map name";
+         type string;
+       }
        uses apply-advanced;
-       container route-filter {
-         description "Set route filter behaviour";
-         leaf walkup {
-           description "Route filter walk up enable";
-           type empty;
+       leaf-list mode {
+         ordered-by user;
+         description "List of resolution modes in order that defines fallback mechanism";
+         type enumeration {
+           enum "ip-color" {
+             description "Colored-IP PNH Resolution Mode";
+           }
+           enum "color-only" {
+             description "Color-only PNH Resolution Mode";
+           }
          }
        }
-       container asregex-optimize {
-         description "Set AS-PATH regular expression engine optimizer";
-         choice scope-choice {
-           case case_1 {
-             leaf optimize {
-               description "Enable AS-PATH regular expression optimizer";
-               type empty;
-             }
-           }
-           case case_2 {
-             leaf no-optimize {
-               description "Disable AS-PATH regular expression optimizer";
-               type empty;
-             }
-           }
-         }
+     }
+     list route-distinguisher {
+       key name;
+       description "Route-distinguisher information";
+       leaf name {
+         description "Name to identify route-distinguisher";
+         type string;
+       }
+       uses apply-advanced;
+       leaf-list members {
+         ordered-by user;
+         description "Route distinguisher string in ( *:X ) or ( Y:* ) or (X:Y) format";
+         type string;
+       }
+     }
+     list route-filter-list {
+       key name;
+       description "Define a named set of route-filter address prefixes";
+       leaf name {
+         description "Route filter list name";
+         type string;
+       }
+       uses apply-advanced;
+       list rf_list {
+         key "address choice-ident choice-value";
+         ordered-by user;
+         uses route_filter_list_items;
+       }
+     }
+     list rtf-prefix-list {
+       key name;
+       description "Define a named set of family route target prefixes";
+       leaf name {
+         description "RTF prefix list name";
+         type string;
+       }
+       uses apply-advanced;
+       list prefix-list {
+         key name;
+         uses rtf_prefix_list_items;
+       }
+     }
+     list source-address-filter-list {
+       key name;
+       description "Define a named set of source address filter address prefixes";
+       leaf name {
+         description "Source address filter list name";
+         type string;
+       }
+       uses apply-advanced;
+       list saf_list {
+         key "address choice-ident choice-value";
+         ordered-by user;
+         uses source_address_filter_list_items;
        }
      }
      list tunnel-attribute {
@@ -11937,36 +14705,48 @@ def src_yang():
          type jt:ipaddr;
        }
      }
-     list community {
+     list prefix-list {
        key name;
-       description "BGP community information";
+       description "Define a named set of address prefixes";
        leaf name {
-         description "Name to identify BGP community";
+         description "Prefix list name";
          type string;
        }
        uses apply-advanced;
-       leaf invert-match {
-         description "Invert the result of the community expression matching";
-         type empty;
+       list prefix-list-item {
+         key name;
+         uses prefix_list_items;
        }
-       leaf-list members {
-         ordered-by user;
-         description "Community members";
+       leaf apply-path {
+         description "Apply IP prefixes from a configuration statement";
          type string;
        }
      }
-     list as-list {
+     list rib-list {
        key name;
-       description "BGP as range list information";
+       ordered-by user;
+       description "Define a named set of RIB names or wildcards";
        leaf name {
-         description "Name to identify BGP as-list";
+         description "RIB list name";
          type string;
        }
        uses apply-advanced;
-       leaf-list members {
-         ordered-by user;
-         description "Single autonomous system number or range of autonomous system numbers in plain number";
+       list rib-list-item {
+         key name;
+         uses rib_list_items;
+       }
+     }
+     list fast-lookup-tuple-list {
+       key name;
+       description "Define a named set of address prefixes";
+       leaf name {
+         description "Five tuple combination list name";
          type string;
+       }
+       uses apply-advanced;
+       list fast_lookup_tuple_list_item {
+         key name;
+         uses fast_lookup_tuple_list_items;
        }
      }
      list as-list-group {
@@ -11989,247 +14769,6 @@ def src_yang():
            ordered-by user;
            description "Single autonomous system number or range of autonomous system numbers";
            type string;
-         }
-       }
-     }
-     list route-distinguisher {
-       key name;
-       description "Route-distinguisher information";
-       leaf name {
-         description "Name to identify route-distinguisher";
-         type string;
-       }
-       uses apply-advanced;
-       leaf-list members {
-         ordered-by user;
-         description "Route distinguisher string in ( *:X ) or ( Y:* ) or (X:Y) format";
-         type string;
-       }
-     }
-     list as-path {
-       key name;
-       ordered-by user;
-       description "BGP autonomous system path regular expression";
-       leaf name {
-         description "Name to identify AS path regular expression";
-         type string;
-       }
-       uses apply-advanced;
-       leaf path {
-         description "AS path regular expression";
-         type string {
-         }
-       }
-     }
-     list as-path-group {
-       key name;
-       ordered-by user;
-       description "Group a set of AS paths";
-       leaf name {
-         description "Name to identify AS path group";
-         type string;
-       }
-       uses apply-advanced;
-       list as-path {
-         key name;
-         ordered-by user;
-         description "BGP autonomous system path regular expression";
-         leaf name {
-           description "Name to identify AS path regular expression";
-           type string;
-         }
-         leaf path {
-           description "AS path regular expression";
-           type string {
-           }
-         }
-       }
-     }
-     list damping {
-       key name;
-       ordered-by user;
-       description "BGP route flap damping properties";
-       leaf name {
-         description "Name to identify route flap damping parameters";
-         type string;
-       }
-       uses apply-advanced;
-       choice enable-disable {
-         case case_1 {
-           leaf disable {
-             description "Disable damping";
-             type empty;
-           }
-         }
-       }
-       leaf half-life {
-         description "Decay half-life";
-         units "minutes";
-         type union {
-           type string {
-             pattern "<.*>|$.*";
-           }
-           type uint32 {
-             range "1 .. 45";
-           }
-         }
-       }
-       leaf reuse {
-         description "Reuse threshold (figure-of-merit value)";
-         type union {
-           type string {
-             pattern "<.*>|$.*";
-           }
-           type uint32 {
-             range "1 .. 20000";
-           }
-         }
-       }
-       leaf suppress {
-         description "Cutoff threshold (figure-of-merit value)";
-         type union {
-           type string {
-             pattern "<.*>|$.*";
-           }
-           type uint32 {
-             range "1 .. 20000";
-           }
-         }
-       }
-       leaf max-suppress {
-         description "Maximum hold-down time";
-         units "minutes";
-         type union {
-           type string {
-             pattern "<.*>|$.*";
-           }
-           type uint32 {
-             range "1 .. 720";
-           }
-         }
-       }
-     }
-     list condition {
-       key name;
-       description "Define a route advertisement condition";
-       leaf name {
-         description "Name to identify Condition";
-         type string;
-       }
-       uses apply-advanced;
-       choice condition_type {
-         case case_1 {
-         }
-         case case_2 {
-           container if-route-exists {
-             presence "enable if-route-exists";
-             description "Route exists in a specific routing table";
-             uses apply-advanced;
-             container address-family {
-               presence "enable address-family";
-               description "Indicates the address family of the route to match on";
-               uses apply-advanced;
-               choice address-family {
-                 case case_1 {
-                   container inet {
-                     presence "enable inet";
-                     description "Route to match corresponds to an inet/inet6 prefix";
-                     uses apply-advanced;
-                     leaf address {
-                       description "Exact address of the route";
-                       type jt:ipprefix;
-                       mandatory true;
-                     }
-                     leaf table {
-                       description "Routing table in which route should exist";
-                       type string;
-                       mandatory true;
-                     }
-                   }
-                 }
-                 case case_2 {
-                   container ccc {
-                     presence "enable ccc";
-                     description "Route to match corresponds to a ccc prefix";
-                     uses apply-advanced;
-                     leaf address {
-                       description "Logical interface used to establish ccc route";
-                       type union {
-                         type jt:interface-name;
-                         type string {
-                           pattern "<.*>|$.*";
-                         }
-                       }
-                       mandatory true;
-                     }
-                     leaf table {
-                       description "Routing table in which route should exist";
-                       type string;
-                       mandatory true;
-                     }
-                     leaf standby {
-                       description "Indicates if route must be in standby state to be considered a match";
-                       type empty;
-                     }
-                     leaf peer-unit {
-                       description "Associated LT ifl's peer-unit. Required for LT-based routes";
-                       type union {
-                         type string {
-                           pattern "<.*>|$.*";
-                         }
-                         type uint32 {
-                           range "0 .. 8192";
-                         }
-                       }
-                     }
-                   }
-                 }
-               }
-             }
-             leaf address {
-               description "Exact address of the route";
-               type jt:ipprefix;
-             }
-             leaf table {
-               description "Routing table in which route should exist";
-               type string;
-             }
-           }
-         }
-       }
-     }
-     list rtf-prefix-list {
-       key name;
-       description "Define a named set of family route target prefixes";
-       leaf name {
-         description "RTF prefix list name";
-         type string;
-       }
-       uses apply-advanced;
-       list prefix-list {
-         key name;
-         uses rtf_prefix_list_items;
-       }
-     }
-     list resolution-map {
-       key name;
-       ordered-by user;
-       description "Define a set of PNH resolution modes";
-       leaf name {
-         description "Resolution Map name";
-         type string;
-       }
-       uses apply-advanced;
-       leaf-list mode {
-         ordered-by user;
-         description "List of resolution modes in order that defines fallback mechanism";
-         type enumeration {
-           enum "ip-color" {
-             description "Colored-IP PNH Resolution Mode";
-           }
-           enum "color-only" {
-             description "Color-only PNH Resolution Mode";
-           }
          }
        }
      }
@@ -19088,6 +21627,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -19550,6 +22090,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -21169,6 +23710,7 @@ def src_yang():
                      range "100 .. 255000";
                    }
                  }
+                 //mandatory true;
                }
              }
              container echo-lite {
@@ -21185,6 +23727,7 @@ def src_yang():
                      range "100 .. 255000";
                    }
                  }
+                 //mandatory true;
                }
              }
              leaf holddown-interval {
@@ -21309,6 +23852,7 @@ def src_yang():
                  range "16 .. 1048575";
                }
              }
+             //mandatory true;
            }
            leaf index-range {
              description "Index to the SRGB start label block";
@@ -21320,6 +23864,7 @@ def src_yang():
                  range "32 .. 1048559";
                }
              }
+             //mandatory true;
            }
          }
          container node-segment {
@@ -22048,6 +24593,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -22609,6 +25155,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -23673,6 +26220,7 @@ def src_yang():
                  range "16 .. 1048575";
                }
              }
+             //mandatory true;
            }
            leaf index-range {
              description "Index to the SRGB start label block";
@@ -23684,6 +26232,7 @@ def src_yang():
                  range "32 .. 1048559";
                }
              }
+             //mandatory true;
            }
          }
          leaf mapping-server {
@@ -24668,6 +27217,7 @@ def src_yang():
                      range "100 .. 255000";
                    }
                  }
+                 //mandatory true;
                }
              }
              container echo-lite {
@@ -24684,6 +27234,7 @@ def src_yang():
                      range "100 .. 255000";
                    }
                  }
+                 //mandatory true;
                }
              }
              leaf full-neighbors-only {
@@ -25068,6 +27619,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -25582,6 +28134,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -26931,6 +29484,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -27090,12 +29644,14 @@ def src_yang():
                description "Locally assigned value (SNMP index of the interface)";
              }
            }
+           //mandatory true;
          }
          leaf chassis-id-value {
            description "Chassis-id value as per chassis id type";
            type string {
              length "1 .. 256";
            }
+           //mandatory true;
          }
        }
        leaf port-description-type {
@@ -27739,6 +30295,7 @@ def src_yang():
                  type string {
                    length "1 .. 1024";
                  }
+                 mandatory true;
                }
                leaf replace {
                  description "Replace trace file rather than appending to it";
@@ -28581,6 +31138,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -29446,6 +32004,7 @@ def src_yang():
            description " Autonomous system number in plain number or 'higher 16bits'.'Lower 16 bits' (asdot notation) format";
            type string {
            }
+           //mandatory true;
          }
          leaf loops {
            description "Maximum number of times this AS can be in an AS path";
@@ -30037,6 +32596,7 @@ def src_yang():
                  range "100 .. 255000";
                }
              }
+             //mandatory true;
            }
          }
          container echo-lite {
@@ -30053,6 +32613,7 @@ def src_yang():
                  range "100 .. 255000";
                }
              }
+             //mandatory true;
            }
          }
          container strict-bfd {
@@ -30262,6 +32823,7 @@ def src_yang():
                type string {
                  length "1 .. 1024";
                }
+               //mandatory true;
              }
              leaf replace {
                description "Replace trace file rather than appending to it";
@@ -31127,6 +33689,7 @@ def src_yang():
              description " Autonomous system number in plain number or 'higher 16bits'.'Lower 16 bits' (asdot notation) format";
              type string {
              }
+             //mandatory true;
            }
            leaf loops {
              description "Maximum number of times this AS can be in an AS path";
@@ -31718,6 +34281,7 @@ def src_yang():
                    range "100 .. 255000";
                  }
                }
+               //mandatory true;
              }
            }
            container echo-lite {
@@ -31734,6 +34298,7 @@ def src_yang():
                    range "100 .. 255000";
                  }
                }
+               //mandatory true;
              }
            }
            container strict-bfd {
@@ -32131,6 +34696,7 @@ def src_yang():
            type string {
              length "1 .. 1024";
            }
+           //mandatory true;
          }
          leaf replace {
            description "Replace trace file rather than appending to it";
@@ -32197,6 +34763,7 @@ def src_yang():
                range "16 .. 1048575";
              }
            }
+           //mandatory true;
          }
          leaf index-range {
            description "Index to the SRGB start label block";
@@ -32208,6 +34775,7 @@ def src_yang():
                range "16 .. 1048575";
              }
            }
+           //mandatory true;
          }
        }
        container srv6 {
@@ -32370,6 +34938,7 @@ def src_yang():
            type string {
              length "1 .. 1024";
            }
+           //mandatory true;
          }
          leaf replace {
            description "Replace trace file rather than appending to it";
@@ -32935,6 +35504,7 @@ def src_yang():
          description " Autonomous system number in plain number or 'higher 16bits'.'Lower 16 bits' (asdot notation) format";
          type string {
          }
+         //mandatory true;
        }
        leaf loops {
          description "Maximum number of times this AS can be in an AS path";
@@ -33526,6 +36096,7 @@ def src_yang():
                range "100 .. 255000";
              }
            }
+           //mandatory true;
          }
        }
        container echo-lite {
@@ -33542,6 +36113,7 @@ def src_yang():
                range "100 .. 255000";
              }
            }
+           //mandatory true;
          }
        }
        container strict-bfd {
@@ -36433,6 +39005,7 @@ def src_yang():
            range "1 .. 4294967295";
          }
        }
+       //mandatory true;
      }
      container teardown {
        presence "enable teardown";
@@ -36527,6 +39100,7 @@ def src_yang():
            range "1 .. 10";
          }
        }
+       //mandatory true;
      }
    }
    grouping bgpaf-prefix-limit {
@@ -36541,6 +39115,7 @@ def src_yang():
            range "1 .. 4294967295";
          }
        }
+       //mandatory true;
      }
      container teardown {
        presence "enable teardown";
@@ -36629,6 +39204,7 @@ def src_yang():
          type string {
            length "1 .. 1024";
          }
+         //mandatory true;
        }
        leaf replace {
          description "Replace trace file rather than appending to it";
@@ -38190,6 +40766,7 @@ def src_yang():
                    range "100 .. 255000";
                  }
                }
+               //mandatory true;
              }
            }
            container echo-lite {
@@ -38206,6 +40783,7 @@ def src_yang():
                    range "100 .. 255000";
                  }
                }
+               //mandatory true;
              }
            }
            leaf holddown-interval {
@@ -38330,6 +40908,7 @@ def src_yang():
                range "16 .. 1048575";
              }
            }
+           //mandatory true;
          }
          leaf index-range {
            description "Index to the SRGB start label block";
@@ -38341,6 +40920,7 @@ def src_yang():
                range "32 .. 1048559";
              }
            }
+           //mandatory true;
          }
        }
        container node-segment {
@@ -39069,6 +41649,7 @@ def src_yang():
            type string {
              length "1 .. 1024";
            }
+           //mandatory true;
          }
          leaf replace {
            description "Replace trace file rather than appending to it";
@@ -39629,6 +42210,7 @@ def src_yang():
            type string {
              length "1 .. 1024";
            }
+           //mandatory true;
          }
          leaf replace {
            description "Replace trace file rather than appending to it";
@@ -39724,6 +42306,7 @@ def src_yang():
            type string {
              length "1 .. 1024";
            }
+           //mandatory true;
          }
          leaf replace {
            description "Replace trace file rather than appending to it";
@@ -40493,6 +43076,7 @@ def src_yang():
            type string {
              length "1 .. 1024";
            }
+           //mandatory true;
          }
          leaf replace {
            description "Replace trace file rather than appending to it";
@@ -41176,6 +43760,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -43114,6 +45699,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -43360,6 +45946,7 @@ def src_yang():
            type string {
              length "1 .. 1024";
            }
+           //mandatory true;
          }
          leaf replace {
            description "Replace trace file rather than appending to it";
@@ -44471,6 +47058,7 @@ def src_yang():
                range "16 .. 1048575";
              }
            }
+           //mandatory true;
          }
          leaf index-range {
            description "Index to the SRGB start label block";
@@ -44482,7 +47070,7 @@ def src_yang():
                range "32 .. 1048559";
              }
            }
-           mandatory true;
+           //mandatory true;
          }
        }
        leaf mapping-server {
@@ -45467,6 +48055,7 @@ def src_yang():
                    range "100 .. 255000";
                  }
                }
+               //mandatory true;
              }
            }
            container echo-lite {
@@ -45483,6 +48072,7 @@ def src_yang():
                    range "100 .. 255000";
                  }
                }
+               //mandatory true;
              }
            }
            leaf full-neighbors-only {
@@ -45867,6 +48457,7 @@ def src_yang():
            type string {
              length "1 .. 1024";
            }
+           //mandatory true;
          }
          leaf replace {
            description "Replace trace file rather than appending to it";
@@ -46950,6 +49541,7 @@ def src_yang():
                  range "16 .. 1048575";
                }
              }
+             //mandatory true;
            }
            leaf index-range {
              description "Index to the SRGB start label block";
@@ -46961,7 +49553,7 @@ def src_yang():
                  range "32 .. 1048559";
                }
              }
-             mandatory true;
+             //mandatory true;
            }
          }
          leaf mapping-server {
@@ -47946,6 +50538,7 @@ def src_yang():
                      range "100 .. 255000";
                    }
                  }
+                 //mandatory true;
                }
              }
              container echo-lite {
@@ -47962,6 +50555,7 @@ def src_yang():
                      range "100 .. 255000";
                    }
                  }
+                 //mandatory true;
                }
              }
              leaf full-neighbors-only {
@@ -48346,6 +50940,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -49219,6 +51814,7 @@ def src_yang():
                range "16 .. 1048575";
              }
            }
+           //mandatory true;
          }
          leaf index-range {
            description "Index to the SRGB start label block";
@@ -49230,7 +51826,7 @@ def src_yang():
                range "32 .. 1048559";
              }
            }
-           mandatory true;
+           //mandatory true;
          }
        }
        leaf mapping-server {
@@ -50215,6 +52811,7 @@ def src_yang():
                    range "100 .. 255000";
                  }
                }
+               //mandatory true;
              }
            }
            container echo-lite {
@@ -50231,6 +52828,7 @@ def src_yang():
                    range "100 .. 255000";
                  }
                }
+               //mandatory true;
              }
            }
            leaf full-neighbors-only {
@@ -50615,6 +53213,7 @@ def src_yang():
            type string {
              length "1 .. 1024";
            }
+           //mandatory true;
          }
          leaf replace {
            description "Replace trace file rather than appending to it";
@@ -51131,6 +53730,7 @@ def src_yang():
            type string {
              length "1 .. 1024";
            }
+           //mandatory true;
          }
          leaf replace {
            description "Replace trace file rather than appending to it";
@@ -51395,6 +53995,10 @@ def src_yang():
          uses juniper-protocols-mvrp;
        }
      }
+     container forwarding-options {
+       description "Forwarding options configuration";
+       uses juniper-forwarding-options;
+     }
      leaf service-type {
        description "Sevice type";
        type enumeration {
@@ -51415,6 +54019,7 @@ def src_yang():
              pattern "<.*>|$.*";
            }
          }
+         //mandatory true;
        }
        container inet {
          presence "enable inet";
@@ -51440,6 +54045,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -52405,6 +55011,7 @@ def src_yang():
            type string {
              length "1 .. 1024";
            }
+           //mandatory true;
          }
          leaf replace {
            description "Replace trace file rather than appending to it";
@@ -54683,6 +57290,7 @@ def src_yang():
                      range "100 .. 255000";
                    }
                  }
+                 //mandatory true;
                }
              }
              container echo-lite {
@@ -54699,6 +57307,7 @@ def src_yang():
                      range "100 .. 255000";
                    }
                  }
+                 //mandatory true;
                }
              }
              leaf neighbor {
@@ -54995,7 +57604,7 @@ def src_yang():
                    range "1 .. 4294967295";
                  }
                }
-               mandatory true;
+               //mandatory true;
              }
              choice log_type {
                case case_1 {
@@ -55045,7 +57654,7 @@ def src_yang():
                    range "1 .. 4294967295";
                  }
                }
-               mandatory true;
+               //mandatory true;
              }
              choice log_type {
                case case_1 {
@@ -55095,7 +57704,7 @@ def src_yang():
                range "1 .. 4294967295";
              }
            }
-           mandatory true;
+           //mandatory true;
          }
          choice log_type {
            case case_1 {
@@ -55170,6 +57779,7 @@ def src_yang():
                type string {
                  length "1 .. 1024";
                }
+               //mandatory true;
              }
              leaf replace {
                description "Replace trace file rather than appending to it";
@@ -55657,6 +58267,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -55917,6 +58528,7 @@ def src_yang():
            type string {
              length "1 .. 1024";
            }
+           //mandatory true;
          }
          leaf replace {
            description "Replace trace file rather than appending to it";
@@ -56093,6 +58705,7 @@ def src_yang():
          description " Autonomous system number in plain number or 'higher 16bits'.'Lower 16 bits' (asdot notation) format";
          type string {
          }
+         //mandatory true;
        }
        leaf loops {
          description "Maximum number of times this AS can be in an AS path";
@@ -56125,6 +58738,7 @@ def src_yang():
          description " Autonomous system number in plain number or 'higher 16bits'.'Lower 16 bits' (asdot notation) format";
          type string {
          }
+         //mandatory true;
        }
        leaf-list members {
          ordered-by user;
@@ -56507,6 +59121,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -56914,6 +59529,7 @@ def src_yang():
                type string {
                  length "1 .. 1024";
                }
+               //mandatory true;
              }
              leaf replace {
                description "Replace trace file rather than appending to it";
@@ -57602,6 +60218,7 @@ def src_yang():
                    range "100 .. 255000";
                  }
                }
+               //mandatory true;
              }
            }
            container echo-lite {
@@ -57618,6 +60235,7 @@ def src_yang():
                    range "100 .. 255000";
                  }
                }
+               //mandatory true;
              }
            }
            leaf neighbor {
@@ -57914,7 +60532,7 @@ def src_yang():
                  range "1 .. 4294967295";
                }
              }
-             mandatory true;
+             //mandatory true;
            }
            choice log_type {
              case case_1 {
@@ -57964,7 +60582,7 @@ def src_yang():
                  range "1 .. 4294967295";
                }
              }
-             mandatory true;
+             //mandatory true;
            }
            choice log_type {
              case case_1 {
@@ -58014,6 +60632,7 @@ def src_yang():
              range "1 .. 4294967295";
            }
          }
+         //mandatory true;
        }
        choice log_type {
          case case_1 {
@@ -58088,6 +60707,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -58408,6 +61028,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -58772,6 +61393,7 @@ def src_yang():
                range "1 .. 65535";
              }
            }
+           //mandatory true;
          }
        }
        container traceoptions {
@@ -58784,6 +61406,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -58995,6 +61618,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -59159,6 +61783,7 @@ def src_yang():
                  type string {
                    length "1 .. 1024";
                  }
+                 //mandatory true;
                }
                leaf replace {
                  description "Replace trace file rather than appending to it";
@@ -59682,6 +62307,7 @@ def src_yang():
            range "1 .. 255";
          }
        }
+       //mandatory true;
      }
      leaf exclude {
        description "Don't apply flow-spec filter to traffic on this group";
@@ -60085,6 +62711,7 @@ def src_yang():
          type string {
            length "1 .. 1024";
          }
+         //mandatory true;
        }
        leaf replace {
          description "Replace trace file rather than appending to it";
@@ -60920,6 +63547,7 @@ def src_yang():
              description "Local Certificate ID";
              type string {
              }
+             //mandatory true;
            }
            list client-identity {
              key name;
@@ -60936,7 +63564,7 @@ def src_yang():
                description "Client certificate fingerprint in x509c2n:tls-fingerprint format";
                type string {
                }
-               mandatory true;
+               //mandatory true;
              }
              leaf map-type {
                description "Map Type";
@@ -60948,7 +63576,7 @@ def src_yang():
                    description "Use the common name (CN) field of SAN DirName as NETCONF username";
                  }
                }
-               mandatory true;
+               //mandatory true;
              }
              leaf username {
                description "NETCONF username if the map-type is specified";
@@ -60969,6 +63597,7 @@ def src_yang():
                    description "Use the common name (CN) field of SAN DirName as NETCONF username";
                  }
                }
+               //mandatory true;
              }
              leaf username {
                description "NETCONF username if the map-type is specified";
@@ -63241,6 +65870,23 @@ def src_yang():
      container processes {
        description "Process control";
        uses apply-advanced;
+       container dhcp-service {
+         presence "enable dhcp-service";
+         description "DHCP service process";
+         uses apply-advanced;
+         choice enable-disable {
+           case case_1 {
+             leaf disable {
+               description "Disable dhcp-service process";
+               type empty;
+             }
+           }
+         }
+         container traceoptions {
+           description "Traceoptions for DHCP";
+           uses jdhcp-traceoptions-level-type;
+         }
+       }
        container routing {
          description "Routing process";
          uses apply-advanced;
@@ -63465,6 +66111,191 @@ def src_yang():
        leaf from {
          description "Pattern-list of allowed hosts";
          type string {
+         }
+       }
+     }
+   }
+   grouping jdhcp-traceoptions-level-type {
+     description "Trace options for DHCP";
+     uses apply-advanced;
+     leaf no-remote-trace {
+       description "Disable remote tracing";
+       type empty;
+     }
+     container file {
+       description "Trace file information";
+       leaf filename {
+         description "Name of file in which to write trace information";
+         type string {
+           length "1 .. 1024";
+         }
+       }
+       leaf size {
+         description "Maximum trace file size";
+         type string;
+       }
+       leaf files {
+         description "Maximum number of trace files";
+         default "3";
+         type union {
+           type string {
+             pattern "<.*>|$.*";
+           }
+           type uint32 {
+             range "2 .. 1000";
+           }
+         }
+       }
+       choice world-readable-choice {
+         leaf world-readable {
+           description "Allow any user to read the log file";
+           type empty;
+         }
+         leaf no-world-readable {
+           description "Don't allow any user to read the log file";
+           type empty;
+         }
+       }
+       leaf match {
+         description "Regular expression for lines to be logged";
+         type jt:regular-expression;
+       }
+     }
+     leaf level {
+       description "Level of debugging output";
+       default "error";
+       type enumeration {
+         enum "error" {
+           description "Match error conditions";
+         }
+         enum "warning" {
+           description "Match warning messages";
+         }
+         enum "notice" {
+           description "Match conditions that should be handled specially";
+         }
+         enum "info" {
+           description "Match informational messages";
+         }
+         enum "verbose" {
+           description "Match verbose messages";
+         }
+         enum "all" {
+           description "Match all levels";
+         }
+       }
+     }
+     list flag {
+       key name;
+       ordered-by user;
+       description "DHCP operations to include in debugging trace";
+       leaf name {
+         type enumeration {
+           enum "state" {
+             description "State-transition operations";
+           }
+           enum "packet" {
+             description "Packet-decoding operations";
+           }
+           enum "flow" {
+             description "Flow-decoding operations";
+           }
+           enum "packet-option" {
+             description "DHCP option-decoding operations";
+           }
+           enum "dhcpv6-state" {
+             description "State-transition operations for dhcpv6";
+           }
+           enum "dhcpv6-packet" {
+             description "Packet-decoding operations for dhcpv6";
+           }
+           enum "dhcpv6-packet-option" {
+             description "DHCP option-decoding operations for dhcpv6";
+           }
+           enum "all" {
+             description "All operations";
+           }
+           enum "database" {
+             description "Database operations";
+           }
+           enum "persistent" {
+             description "Persitent file operations";
+           }
+           enum "lockout-db" {
+             description "Lockout database operations";
+           }
+           enum "interface" {
+             description "Interface operations";
+           }
+           enum "rtsock" {
+             description "Routing socket operations";
+           }
+           enum "flow-notify" {
+             description "Flow notification operations";
+           }
+           enum "io" {
+             description "I/O operations";
+           }
+           enum "ha" {
+             description "High Availability-related operations";
+           }
+           enum "ui" {
+             description "User Interface operations";
+           }
+           enum "general" {
+             description "Miscellaneous operations";
+           }
+           enum "fwd" {
+             description "Firewall process operations";
+           }
+           enum "rpd" {
+             description "Routing Protocol process operations";
+           }
+           enum "auth" {
+             description "Authentication operations";
+           }
+           enum "profile" {
+             description "Profile operations";
+           }
+           enum "session-db" {
+             description "Session database operations";
+           }
+           enum "performance" {
+             description "Performance measurement operations";
+           }
+           enum "statistics" {
+             description "Baseline statistics operations";
+           }
+           enum "dhcpv6-io" {
+             description "I/O operations for dhcpv6";
+           }
+           enum "dhcpv6-rpd" {
+             description "Routing Protocol process operations for dhcpv6";
+           }
+           enum "dhcpv6-session-db" {
+             description "Session database operations for dhcpv6";
+           }
+           enum "dhcpv6-general" {
+             description "Miscellaneous operations for dhcpv6";
+           }
+           enum "liveness-detection" {
+             description "Liveness detection operations";
+           }
+           enum "security-persistence" {
+             description "Liveness detection operations";
+           }
+           enum "mclag" {
+             description "Multichassis LAG";
+           }
+           enum "ra-guard" {
+             description "DHCP RA guard option for dhcpv6";
+           }
+           enum "era" {
+             description "DHCP ERA logging option dhcp";
+           }
+           enum "telemetry" {
+             description "Telemetry operation";
+           }
          }
        }
      }
@@ -64322,6 +67153,7 @@ def src_yang():
          type string {
            length "1 .. 1024";
          }
+         //mandatory true;
        }
        leaf replace {
          description "Replace trace file rather than appending to it";
@@ -64441,6 +67273,132 @@ def src_yang():
        ordered-by user;
        description "List of key:value parameters for plugin";
        uses parameter-pair;
+     }
+   }
+   grouping override-type {
+     description "DHCP override processing";
+     uses apply-advanced;
+     leaf no-unicast-replies {
+       description "Overwrite unicast bit in incoming packet, when present";
+       type empty;
+     }
+     choice allow-snooped-clients-choice {
+       leaf allow-snooped-clients {
+         description "Allow client creation from snooped PDUs";
+         type empty;
+       }
+       leaf no-allow-snooped-clients {
+         description "Don't allow client creation from snooped PDUs";
+         type empty;
+       }
+     }
+     leaf allow-no-end-option {
+       description "Allow packets without end-of-option";
+       type empty;
+     }
+     leaf always-write-giaddr {
+       description "Overwrite existing 'giaddr' field, when present";
+       type empty;
+     }
+     container always-write-option-82 {
+       description "Overwrite existing value of option 82, when present";
+       presence "enable always-write-option-82";
+       uses write-option-82-type;
+     }
+     leaf user-defined-option-82 {
+       description "Set user defined description for option-82";
+       status deprecated;
+       type string {
+         length "1 .. 252";
+       }
+     }
+     leaf include-option-82-in-vsa {
+       description "Include option 82 in Dhcp-Options RADIUS VSA";
+       type empty;
+     }
+     leaf layer2-unicast-replies {
+       description "Do not broadcast client responses";
+       type empty;
+     }
+     leaf trust-option-82 {
+       description "Trust options-82 option";
+       type empty;
+     }
+     leaf delay-authentication {
+       description "Delay subscriber authentication in DHCP protocol processing until request packet";
+       type empty;
+     }
+     leaf interface-client-limit {
+       description "Limit the number of client allowed on an interface";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "1 .. 500000";
+         }
+       }
+     }
+     leaf bootp-support {
+       description "Allows relay of bootp req and reply";
+       type empty;
+     }
+     leaf dual-stack {
+       description "Dual stack group to use.";
+       type string {
+         length "1 .. 64";
+       }
+     }
+     container client-discover-match {
+       presence "enable client-discover-match";
+       description "Use secondary match criteria for DISCOVER PDU";
+       choice match-with {
+         case case_1 {
+           leaf option60-and-option82 {
+             description "Use option 60 and option 82";
+             type empty;
+           }
+         }
+         case case_2 {
+           leaf incoming-interface {
+             description "Use incoming interface";
+             type empty;
+           }
+         }
+       }
+     }
+     container proxy-mode {
+       presence "enable proxy-mode";
+       description "Put the relay in proxy mode";
+     }
+     leaf asymmetric-lease-time {
+       description "Use a reduced lease time for the client. In seconds";
+       units "seconds";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "600 .. 86400";
+         }
+       }
+     }
+     leaf send-release-on-delete {
+       description "Always send RELEASE to the server when a binding is deleted";
+       type empty;
+     }
+     leaf relay-source {
+       description "Interface for relay source";
+       type union {
+         type jt:interface-name;
+         type string {
+           pattern "<.*>|$.*";
+         }
+       }
+     }
+     leaf delete-binding-on-renegotiation {
+       description "Delete binding on rengotiation";
+       type empty;
      }
    }
    grouping p2mp_ldp_lsp_nh_obj {
@@ -64712,6 +67670,7 @@ def src_yang():
              type string {
                length "1 .. 1024";
              }
+             //mandatory true;
            }
            leaf replace {
              description "Replace trace file rather than appending to it";
@@ -65178,6 +68137,7 @@ def src_yang():
            type string {
              length "1 .. 1024";
            }
+           //mandatory true;
          }
          leaf replace {
            description "Replace trace file rather than appending to it";
@@ -65600,6 +68560,7 @@ def src_yang():
                range "100 .. 255000";
              }
            }
+           //mandatory true;
          }
        }
        container echo-lite {
@@ -65616,6 +68577,7 @@ def src_yang():
                range "100 .. 255000";
              }
            }
+           //mandatory true;
          }
        }
        leaf neighbor {
@@ -65811,6 +68773,691 @@ def src_yang():
        }
      }
    }
+   grouping relay-bulk-leasequery-v4-type {
+     description "Configure bulk leasequery";
+     uses apply-advanced;
+     leaf attempts {
+       description "Number of retry attempts";
+       default "360";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "1 .. 720";
+         }
+       }
+     }
+     leaf timeout {
+       description "Number of seconds";
+       default "10";
+       units "seconds";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "1 .. 10";
+         }
+       }
+     }
+   }
+   grouping relay-bulk-leasequery-v6-type {
+     description "Configure bulk leasequery";
+     uses apply-advanced;
+     leaf attempts {
+       description "Number of retry attempts";
+       default "6";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "1 .. 10";
+         }
+       }
+     }
+     leaf timeout {
+       description "Number of seconds";
+       default "10";
+       units "seconds";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "1 .. 10";
+         }
+       }
+     }
+     container trigger {
+       description "Trigger for bulk leasequery";
+       leaf automatic {
+         description "Trigger automatically";
+         type empty;
+       }
+     }
+   }
+   grouping relay-leasequery-type {
+     description "Configure leasequery";
+     uses apply-advanced;
+     leaf attempts {
+       description "Number of retry attempts";
+       default "6";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "1 .. 10";
+         }
+       }
+     }
+     leaf timeout {
+       description "Number of seconds";
+       default "10";
+       units "seconds";
+       type union {
+         type string {
+           pattern "<.*>|$.*";
+         }
+         type uint32 {
+           range "1 .. 10";
+         }
+       }
+     }
+   }
+   grouping relay-option-60-type-group {
+     description "DHCP option-60 processing";
+     uses apply-advanced;
+     container vendor-option {
+       description "Add vendor option";
+       uses apply-advanced;
+       container equals {
+         description "Option 60 equals";
+         uses relay-option-60-match-group;
+       }
+       container not-equals {
+         description "Option 60 does not equal";
+         status deprecated;
+         uses relay-option-60-match-group;
+       }
+       container starts-with {
+         description "Option 60 starts with";
+         uses relay-option-60-match-group;
+       }
+       choice server-group-choice {
+         case case_1 {
+           leaf default-relay-server-group {
+             description "Name of DHCP relay server group when match is not made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_2 {
+           leaf default-local-server-group {
+             description "Name of DHCP local server group when match is not made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_3 {
+           leaf drop {
+             description "Discard when a match is not made";
+             type empty;
+           }
+         }
+         case case_4 {
+           leaf forward-only {
+             description "Forward without subscriber services when a match is not made";
+             type empty;
+           }
+         }
+       }
+     }
+   }
+   grouping relay-option-60-match-group {
+     uses apply-advanced;
+     list ascii {
+       key name;
+       description "ASCII string";
+       leaf name {
+         description "ASCII string";
+         type string {
+           length "1 .. 256";
+         }
+       }
+       uses apply-advanced;
+       choice server-group-choice {
+         case case_1 {
+           leaf relay-server-group {
+             description "Name of DHCP relay server group when match is made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_2 {
+           leaf local-server-group {
+             description "Name of DHCP local server group when match is made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_3 {
+           leaf drop {
+             description "Discard when a match is made";
+             type empty;
+           }
+         }
+         case case_4 {
+           leaf forward-only {
+             description "Forward without subscriber services when a match is made";
+             type empty;
+           }
+         }
+       }
+     }
+     list hexadecimal {
+       key name;
+       description "Hexadecimal string";
+       leaf name {
+         description "Hexadecimal string";
+         type string {
+           length "1 .. 512";
+         }
+       }
+       uses apply-advanced;
+       choice server-group-choice {
+         case case_1 {
+           leaf relay-server-group {
+             description "Name of DHCP relay server group when match is made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_2 {
+           leaf local-server-group {
+             description "Name of DHCP local server group when match is made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_3 {
+           leaf drop {
+             description "Discard when a match is made";
+             type empty;
+           }
+         }
+         case case_4 {
+           leaf forward-only {
+             description "Forward without subscriber services when a match is made";
+             type empty;
+           }
+         }
+       }
+     }
+   }
+   grouping relay-option-60-type-top {
+     description "DHCP option-60 processing";
+     uses apply-advanced;
+     container vendor-option {
+       description "Add vendor option";
+       uses apply-advanced;
+       container equals {
+         description "Option 60 equals";
+         uses relay-option-60-match-top;
+       }
+       container not-equals {
+         description "Option 60 does not equal";
+         status deprecated;
+         uses relay-option-60-match-top;
+       }
+       container starts-with {
+         description "Option 60 starts with";
+         uses relay-option-60-match-top;
+       }
+       choice server-group-choice {
+         case case_1 {
+           leaf default-relay-server-group {
+             description "Name of DHCP relay server group when match is not made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_2 {
+           leaf default-local-server-group {
+             description "Name of DHCP local server group when match is not made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_3 {
+           leaf drop {
+             description "Discard when a match is not made";
+             type empty;
+           }
+         }
+         case case_4 {
+           leaf forward-only {
+             description "Forward without subscriber services when a match is not made";
+             type empty;
+           }
+         }
+       }
+     }
+   }
+   grouping relay-option-60-match-top {
+     uses apply-advanced;
+     list ascii {
+       key name;
+       description "ASCII string";
+       leaf name {
+         description "ASCII string";
+         type string {
+           length "1 .. 256";
+         }
+       }
+       uses apply-advanced;
+       choice server-group-choice {
+         case case_1 {
+           leaf relay-server-group {
+             description "Name of DHCP relay server group when match is made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_2 {
+           leaf local-server-group {
+             description "Name of DHCP local server group when match is made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_3 {
+           leaf drop {
+             description "Discard when a match is made";
+             type empty;
+           }
+         }
+         case case_4 {
+           leaf forward-only {
+             description "Forward without subscriber services when a match is made";
+             type empty;
+           }
+         }
+       }
+     }
+     list hexadecimal {
+       key name;
+       description "Hexadecimal string";
+       leaf name {
+         description "Hexadecimal string";
+         type string {
+           length "1 .. 512";
+         }
+       }
+       uses apply-advanced;
+       choice server-group-choice {
+         case case_1 {
+           leaf relay-server-group {
+             description "Name of DHCP relay server group when match is made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_2 {
+           leaf local-server-group {
+             description "Name of DHCP local server group when match is made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_3 {
+           leaf drop {
+             description "Discard when a match is made";
+             type empty;
+           }
+         }
+         case case_4 {
+           leaf forward-only {
+             description "Forward without subscriber services when a match is made";
+             type empty;
+           }
+         }
+       }
+     }
+   }
+   grouping relay-option-82-type {
+     description "DHCP option-82 processing";
+     uses apply-advanced;
+     container circuit-id {
+       presence "enable circuit-id";
+       description "Add circuit identifier";
+       uses apply-advanced;
+       container prefix {
+         description "Add prefix to circuit/interface-id or remote-id";
+         uses apply-advanced;
+         leaf host-name {
+           description "Add router host name to circuit / interface-id or remote-id";
+           type empty;
+         }
+         leaf logical-system-name {
+           description "Add logical system name to circuit / interface-id or remote-id";
+           type empty;
+         }
+         leaf routing-instance-name {
+           description "Add routing instance name to circuit / interface-id or remote-id";
+           type empty;
+         }
+       }
+       leaf use-interface-description {
+         description "Use interface description instead of circuit identifier";
+         type enumeration {
+           enum "logical" {
+             description "Use the logical interface description";
+           }
+           enum "device" {
+             description "Use the device interface description";
+           }
+         }
+       }
+       leaf use-vlan-id {
+         description "Use VLAN id instead of name";
+         type empty;
+       }
+       container vlan-id-only {
+         presence "enable vlan-id-only";
+         description "Use only VLAN id";
+         uses apply-advanced;
+       }
+       leaf no-vlan-interface-name {
+         description "Not include vlan or interface name";
+         type empty;
+       }
+       leaf include-irb-and-l2 {
+         description "Include IRB and L2 interface name";
+         type empty;
+       }
+       container user-defined {
+         presence "enable user-defined";
+         description "Include user defined string";
+         uses apply-advanced;
+         leaf string {
+           description "Set user-defined character string description";
+           type string {
+             length "1 .. 252";
+           }
+         }
+         leaf hex-string {
+           description "Set user-defined hexadecimal string description";
+           type string {
+             length "1 .. 510";
+           }
+         }
+       }
+       leaf keep-incoming-circuit-id {
+         description "Keep incoming circuit identifier";
+         type empty;
+       }
+     }
+     container remote-id {
+       presence "enable remote-id";
+       description "Add remote identifier";
+       uses apply-advanced;
+       container prefix {
+         description "Add prefix to circuit/interface-id or remote-id";
+         uses apply-advanced;
+         leaf host-name {
+           description "Add router host name to circuit / interface-id or remote-id";
+           type empty;
+         }
+         leaf logical-system-name {
+           description "Add logical system name to circuit / interface-id or remote-id";
+           type empty;
+         }
+         leaf routing-instance-name {
+           description "Add routing instance name to circuit / interface-id or remote-id";
+           type empty;
+         }
+       }
+       leaf use-interface-description {
+         description "Use interface description instead of circuit identifier";
+         type enumeration {
+           enum "logical" {
+             description "Use the logical interface description";
+           }
+           enum "device" {
+             description "Use the device interface description";
+           }
+         }
+       }
+       leaf use-vlan-id {
+         description "Use VLAN id instead of name";
+         type empty;
+       }
+       leaf no-vlan-interface-name {
+         description "Not include vlan or interface name";
+         type empty;
+       }
+       leaf include-irb-and-l2 {
+         description "Include IRB and L2 interface name";
+         type empty;
+       }
+       container hostname-only {
+         presence "enable hostname-only";
+         description "Include hostname only";
+         uses apply-advanced;
+       }
+       container user-defined {
+         presence "enable user-defined";
+         description "Include user defined string";
+         uses apply-advanced;
+         leaf string {
+           description "Set user-defined character string description";
+           type string {
+             length "1 .. 252";
+           }
+         }
+         leaf hex-string {
+           description "Set user-defined hexadecimal string description";
+           type string {
+             length "1 .. 510";
+           }
+         }
+       }
+       leaf keep-incoming-remote-id {
+         description "Keep incoming remote identifier";
+         type empty;
+       }
+       leaf use-string {
+         description "Use raw string instead of the default remote id";
+         status deprecated;
+         type string;
+       }
+     }
+     leaf server-id-override {
+       description "Add link-selection and server-id sub-options on packets to server";
+       type empty;
+     }
+     leaf link-selection {
+       description "Add link-selection suboption on packets to server";
+       type empty;
+     }
+     leaf exclude-relay-agent-identifier {
+       description "Exclude relay agent identifier from packets to server";
+       type empty;
+     }
+     container vendor-specific {
+       description "Add vendor-specific information";
+       uses jdhcp-vendor-specific-type;
+     }
+   }
+   grouping relay-v4-option-ascii-hex {
+     uses apply-advanced;
+     list ascii {
+       key name;
+       description "ASCII string";
+       leaf name {
+         description "ASCII string";
+         type string {
+           length "1 .. 256";
+         }
+       }
+       uses apply-advanced;
+       choice server-group-choice {
+         case case_1 {
+           leaf relay-server-group {
+             description "Name of DHCP relay server group when match is made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_2 {
+           leaf local-server-group {
+             description "Name of DHCP local server group when match is made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_3 {
+           leaf drop {
+             description "Discard when a match is made";
+             type empty;
+           }
+         }
+         case case_4 {
+           leaf forward-only {
+             description "Forward without subscriber services when a match is made";
+             type empty;
+           }
+         }
+       }
+     }
+     list hexadecimal {
+       key name;
+       description "Hexadecimal string";
+       leaf name {
+         description "Hexadecimal string";
+         type string {
+           length "1 .. 512";
+         }
+       }
+       uses apply-advanced;
+       choice server-group-choice {
+         case case_1 {
+           leaf relay-server-group {
+             description "Name of DHCP relay server group when match is made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_2 {
+           leaf local-server-group {
+             description "Name of DHCP local server group when match is made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_3 {
+           leaf drop {
+             description "Discard when a match is made";
+             type empty;
+           }
+         }
+         case case_4 {
+           leaf forward-only {
+             description "Forward without subscriber services when a match is made";
+             type empty;
+           }
+         }
+       }
+     }
+   }
+   grouping relay-v6-option-ascii-hex {
+     uses apply-advanced;
+     list ascii {
+       key name;
+       description "ASCII string";
+       leaf name {
+         description "ASCII string";
+         type string {
+           length "1 .. 256";
+         }
+       }
+       uses apply-advanced;
+       choice server-group-choice {
+         case case_1 {
+           leaf relay-server-group {
+             description "Name of DHCP relay server group when match is made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_2 {
+           leaf drop {
+             description "Discard when a match is made";
+             type empty;
+           }
+         }
+         case case_3 {
+           leaf forward-only {
+             description "Forward without subscriber services when a match is made";
+             type empty;
+           }
+         }
+       }
+     }
+     list hexadecimal {
+       key name;
+       description "Hexadecimal string";
+       leaf name {
+         description "Hexadecimal string";
+         type string {
+           length "1 .. 512";
+         }
+       }
+       uses apply-advanced;
+       choice server-group-choice {
+         case case_1 {
+           leaf relay-server-group {
+             description "Name of DHCP relay server group when match is made";
+             type string {
+               length "1 .. 64";
+             }
+           }
+         }
+         case case_2 {
+           leaf drop {
+             description "Discard when a match is made";
+             type empty;
+           }
+         }
+         case case_3 {
+           leaf forward-only {
+             description "Forward without subscriber services when a match is made";
+             type empty;
+           }
+         }
+       }
+     }
+   }
    grouping rib-inet3 {
      uses apply-advanced;
      container inet.3 {
@@ -65965,6 +69612,7 @@ def src_yang():
                range "0 .. 255";
              }
            }
+           //mandatory true;
          }
        }
      }
@@ -66131,6 +69779,7 @@ def src_yang():
                range "0 .. 255";
              }
            }
+           //mandatory true;
          }
        }
      }
@@ -66140,6 +69789,7 @@ def src_yang():
      leaf ribgroup-name {
        description "Name of the routing table group";
        type string;
+       //mandatory true;
      }
    }
    grouping rib_group_type {
@@ -68785,6 +72435,100 @@ def src_yang():
        }
      }
    }
+   grouping server-group-type {
+     uses apply-advanced;
+     list server-group {
+       key name;
+       description "One or more server groups";
+       leaf name {
+         description "Server group name";
+         type string {
+           length "1 .. 64";
+         }
+       }
+       uses apply-advanced;
+       list address {
+         key name;
+         description "IP Address of one or more DHCP servers";
+         max-elements 32;
+         leaf name {
+           description "IP Address of DHCP server";
+           type jt:ipaddr;
+         }
+         uses apply-advanced;
+       }
+     }
+   }
+   grouping server-match-action-choice {
+     uses apply-advanced;
+     choice v4-action-choice {
+       case case_1 {
+         leaf forward-only {
+           description "Forward without subscriber services";
+           type empty;
+         }
+       }
+       case case_2 {
+         leaf create-relay-entry {
+           description "Create relay entry and allow subscriber services";
+           type empty;
+         }
+       }
+     }
+   }
+   grouping server-match-v6-ascii-hex {
+     uses apply-advanced;
+     list ascii {
+       key name;
+       description "ASCII string";
+       leaf name {
+         description "ASCII string";
+         type string {
+           length "1 .. 256";
+         }
+       }
+       uses apply-advanced;
+       choice server-match-action-choice {
+         case case_1 {
+           leaf forward-only {
+             description "Forward without subscriber services when a match is made";
+             type empty;
+           }
+         }
+         case case_2 {
+           leaf create-relay-entry {
+             description "Create relay entry and allow subscriber services";
+             type empty;
+           }
+         }
+       }
+     }
+     list hexadecimal {
+       key name;
+       description "Hexadecimal string";
+       leaf name {
+         description "Hexadecimal string";
+         type string {
+           length "1 .. 512";
+         }
+       }
+       uses apply-advanced;
+       choice server-match-action-choice {
+         case case_1 {
+           leaf forward-only {
+             description "Forward without subscriber services when a match is made";
+             type empty;
+           }
+         }
+         case case_2 {
+           leaf create-relay-entry {
+             description "Create relay entry and allow subscriber services";
+             type empty;
+           }
+         }
+       }
+     }
+   }
    grouping source_address_filter_list_items {
      leaf address {
        description "IP address or hostname";
@@ -70628,6 +74372,7 @@ def src_yang():
            description "Traffic class 3";
          }
        }
+       //mandatory true;
      }
      leaf priority {
        description "Preemption priority for this class";
@@ -70639,6 +74384,7 @@ def src_yang():
            range "0 .. 7";
          }
        }
+       //mandatory true;
      }
    }
    grouping three-color-policer-type {
@@ -70779,6 +74525,176 @@ def src_yang():
            length "1 .. 256";
          }
          mandatory true;
+       }
+     }
+   }
+   grouping v6-relay-option-interface-id-type {
+     description "Interface ID processing";
+     uses apply-advanced;
+     container prefix {
+       description "Add prefix to circuit/interface-id or remote-id";
+       uses apply-advanced;
+       leaf host-name {
+         description "Add router host name to circuit / interface-id or remote-id";
+         type empty;
+       }
+       leaf logical-system-name {
+         description "Add logical system name to circuit / interface-id or remote-id";
+         type empty;
+       }
+       leaf routing-instance-name {
+         description "Add routing instance name to circuit / interface-id or remote-id";
+         type empty;
+       }
+     }
+     leaf use-interface-description {
+       description "Use interface description instead of circuit identifier";
+       type enumeration {
+         enum "logical" {
+           description "Use the logical interface description";
+         }
+         enum "device" {
+           description "Use the device interface description";
+         }
+       }
+     }
+     leaf use-vlan-id {
+       description "Use VLAN id instead of name";
+       type empty;
+     }
+     leaf no-vlan-interface-name {
+       description "Not include vlan or interface name";
+       type empty;
+     }
+     leaf include-irb-and-l2 {
+       description "Include IRB and L2 interface name";
+       type empty;
+     }
+     container user-defined {
+       presence "enable user-defined";
+       description "Include user defined string";
+       uses apply-advanced;
+       leaf string {
+         description "Set user-defined character string description";
+         type string {
+           length "1 .. 252";
+         }
+       }
+       leaf hex-string {
+         description "Set user-defined hexadecimal string description";
+         type string {
+           length "1 .. 510";
+         }
+       }
+     }
+     container use-option-82 {
+       description "Use option-82 circuit-id for interface-id";
+       presence "enable use-option-82";
+       uses v6-relay-option-cid-rid-action;
+     }
+     container keep-incoming-interface-id {
+       description "Keep incoming interface identifier";
+       presence "enable keep-incoming-interface-id";
+       uses v6-relay-option-cid-rid-action;
+     }
+   }
+   grouping v6-relay-option-cid-rid-action {
+     uses apply-advanced;
+     leaf strict {
+       description "Drop packet if id not present";
+       type empty;
+     }
+   }
+   grouping v6-relay-option-remote-id-type {
+     description "Remote ID processing";
+     uses apply-advanced;
+     container prefix {
+       description "Add prefix to circuit/interface-id or remote-id";
+       uses apply-advanced;
+       leaf host-name {
+         description "Add router host name to circuit / interface-id or remote-id";
+         type empty;
+       }
+       leaf logical-system-name {
+         description "Add logical system name to circuit / interface-id or remote-id";
+         type empty;
+       }
+       leaf routing-instance-name {
+         description "Add routing instance name to circuit / interface-id or remote-id";
+         type empty;
+       }
+     }
+     leaf use-interface-description {
+       description "Use interface description instead of circuit identifier";
+       type enumeration {
+         enum "logical" {
+           description "Use the logical interface description";
+         }
+         enum "device" {
+           description "Use the device interface description";
+         }
+       }
+     }
+     leaf use-vlan-id {
+       description "Use VLAN id instead of name";
+       type empty;
+     }
+     leaf no-vlan-interface-name {
+       description "Not include vlan or interface name";
+       type empty;
+     }
+     leaf include-irb-and-l2 {
+       description "Include IRB and L2 interface name";
+       type empty;
+     }
+     container user-defined {
+       presence "enable user-defined";
+       description "Include user defined string";
+       uses apply-advanced;
+       leaf string {
+         description "Set user-defined character string description";
+         type string {
+           length "1 .. 252";
+         }
+       }
+       leaf hex-string {
+         description "Set user-defined hexadecimal string description";
+         type string {
+           length "1 .. 510";
+         }
+       }
+     }
+     container use-option-82 {
+       description "Use option-82 remote-id for v6 remote-id";
+       presence "enable use-option-82";
+       uses v6-relay-option-cid-rid-action;
+     }
+     leaf keep-incoming-remote-id {
+       description "Keep incoming remote identifier";
+       type empty;
+     }
+   }
+   grouping v6-server-group-type {
+     uses apply-advanced;
+     list server-group {
+       key name;
+       description "One or more server groups";
+       leaf name {
+         description "DHCPv6 Server group name";
+         type string {
+           length "1 .. 64";
+         }
+       }
+       uses apply-advanced;
+       list address {
+         key name;
+         description "IP Address of one or more DHCP servers";
+         max-elements 32;
+         leaf name {
+           description "IP Address of DHCP server";
+           type jt:ipaddr;
+         }
+         uses apply-advanced;
        }
      }
    }
@@ -71395,6 +75311,9 @@ def src_yang():
          }
        }
      }
+   }
+   grouping write-option-82-type {
+     uses apply-advanced;
    }
  }
 """)

@@ -518,7 +518,7 @@ The vendor proprietary device YANG models are located on this layer. The YANG
 modules are organized in directories by device and software version:
 
 * For Cisco IOS-XR: `sorespo/spec/yang/CiscoIosXr_25_3_1`
-* For Jupiper JUNOS: `JuniperCRPD_23_4R1_9`
+* For Jupiper JUNOS: `JuniperCRPD_24_4R1_9`
 * For Nokia SR-Linux: `NokiaSRLinux_25_3_2`
 
 Retrieve the configuration for `layer2`:

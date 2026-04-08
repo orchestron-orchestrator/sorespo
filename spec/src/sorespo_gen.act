@@ -371,13 +371,13 @@ actor main(env):
         rfs_layer,
     ], [
         orchestron.build.DeviceType.from_dir(fc, "CiscoIosXr_25_3_1", "yang/CiscoIosXr_25_3_1"),
-        orchestron.build.DeviceType.from_dir(fc, "JuniperCRPD_23_4R1_9", "yang/JuniperCRPD_23_4R1_9"),
+        orchestron.build.DeviceType.from_dir(fc, "JuniperCRPD_24_4R1_9", "yang/JuniperCRPD_24_4R1_9"),
         orchestron.build.DeviceType.from_dir(fc, "NokiaSRLinux_25_3_2", "yang/NokiaSRLinux_25_3_2"),
     ])
     compiled_spec = spec.compile(broken_leafrefs)
+    transform_list_order(transform_filter_crpd(compiled_spec.dev_types["JuniperCRPD_24_4R1_9"]))
     transform_filter_srl(compiled_spec.dev_types["NokiaSRLinux_25_3_2"])
     transform_filter_xr(compiled_spec.dev_types["CiscoIosXr_25_3_1"])
-    transform_list_order(transform_filter_crpd(compiled_spec.dev_types["JuniperCRPD_23_4R1_9"]))
     compiled_spec.gen_app(fc, "../src/")
 
     env.exit(0)
