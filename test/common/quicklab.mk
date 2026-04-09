@@ -210,6 +210,9 @@ test:
 .PHONY: test-ping
 test-ping::
 
+.PHONY: generate-traffic
+generate-traffic::
+
 .PHONY: test-get-config
 test-get-config:
 	$(MAKE) $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
