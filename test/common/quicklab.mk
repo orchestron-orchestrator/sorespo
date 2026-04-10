@@ -202,10 +202,15 @@ $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL) $(ROUTERS_FRR)): c
 $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 	docker run $(INTERACTIVE) --rm --network container:$(TESTENV)-otron ghcr.io/orchestron-orchestrator/ncurl --host $(@:get-dev-config-%=%) --port 830 --username clab --password clab@123 get-config
 
+.PHONY: test-restconf-get
+test-restconf-get:
+	curl -sS -f -H "Accept: application/yang-data+json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/netinfra:netinfra/router=AMS-CORE-1 | jq '.["netinfra:router"][0].name' | grep -q "AMS-CORE-1"
+
 .PHONY: test
 test:
 	$(MAKE) test-ping
 	$(MAKE) test-get-config
+	$(MAKE) test-restconf-get
 
 .PHONY: test-ping
 test-ping::

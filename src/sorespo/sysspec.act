@@ -3,6 +3,7 @@
 # WARNING WARNING WARNING WARNING WARNING
 
 import logging
+import lmdb
 
 import orchestron.app as oapp
 import orchestron.device as odev
@@ -36,11 +37,11 @@ device_types: dict[str, odev.DeviceType] = {
         ),
 }
 
-def get_layers(dev_registry: odev.DeviceRegistry, log_handler: ?logging.Handler=None):
-    layer3 = ttt.Layer('3', sorespo.layers.t_3.get_ttt(None, dev_registry, log_handler), None)
-    layer2 = ttt.Layer('2', sorespo.layers.t_2.get_ttt(layer3, dev_registry, log_handler), layer3)
-    layer1 = ttt.Layer('1', sorespo.layers.t_1.get_ttt(layer2, dev_registry, log_handler), layer2)
-    layer0 = ttt.Layer('0', sorespo.layers.t_0.get_ttt(layer1, dev_registry, log_handler), layer1)
+def get_layers(dev_registry: odev.DeviceRegistry, log_handler: ?logging.Handler=None, db: ?lmdb.Db=None):
+    layer3 = ttt.Layer('3', sorespo.layers.t_3.get_ttt(None, dev_registry, log_handler), None, db)
+    layer2 = ttt.Layer('2', sorespo.layers.t_2.get_ttt(layer3, dev_registry, log_handler), layer3, db)
+    layer1 = ttt.Layer('1', sorespo.layers.t_1.get_ttt(layer2, dev_registry, log_handler), layer2, db)
+    layer0 = ttt.Layer('0', sorespo.layers.t_0.get_ttt(layer1, dev_registry, log_handler), layer1, db)
     return layer0
 
 
