@@ -40,8 +40,7 @@ actor main(env):
         return dt
 
     def transform_filter_xr(dt):
-        # Keep only the XR configuration nodes that sorespo's RFS transforms
-        # actively write to.
+        # Keep only the XR nodes that sorespo actively uses.
         paths = [
     "/um-hostname-cfg:hostname",
     "/um-hostname-cfg:hostname/system-network-name",
@@ -171,6 +170,14 @@ actor main(env):
     "/um-route-policy-cfg:routing-policy/route-policies/route-policy",
     "/um-route-policy-cfg:routing-policy/route-policies/route-policy/route-policy-name",
     "/um-route-policy-cfg:routing-policy/route-policies/route-policy/rpl-route-policy",
+    "/pfi-im-cmd-oper:interfaces",
+    "/pfi-im-cmd-oper:interfaces/interface-xr",
+    "/pfi-im-cmd-oper:interfaces/interface-xr/interface",
+    "/pfi-im-cmd-oper:interfaces/interface-xr/interface/interface-name",
+    "/pfi-im-cmd-oper:interfaces/interface-xr/interface/interface-statistics",
+    "/pfi-im-cmd-oper:interfaces/interface-xr/interface/interface-statistics/stats-type",
+    "/pfi-im-cmd-oper:interfaces/interface-xr/interface/interface-statistics/full-interface-stats",
+    "/pfi-im-cmd-oper:interfaces/interface-xr/interface/interface-statistics/full-interface-stats/packets-received",
 ]
         filter_schema(dt.root, paths)
         return dt

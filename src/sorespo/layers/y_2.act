@@ -108,12 +108,12 @@ SRC_DNODE_CHILD_14 = DList(module='sorespo-rfs', namespace='http://example.com/s
         DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='device', config=True, mandatory=True, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
         DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='interface', config=True, mandatory=True, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
     ]),
-    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='monitor-health', config=True, default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
+    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='monitor-traffic', config=True, default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
     DContainer(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='dynstate', config=True, presence=False, exts=[
             DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave.yang', prefix='sw', name='dynstate', arg=None, exts=[])
         ], children=[
-        DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='protocols-enabled', config=True, mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
-        DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='health-state', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
+        DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='tracked-interface-name', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
+        DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='pps', config=True, mandatory=False, type_=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)])))
     ])
 ])
 
@@ -256,18 +256,18 @@ def src_yang():
                 }
             }
 
-            leaf monitor-health {
+            leaf monitor-traffic {
                 type boolean;
                 default "false";
             }
 
             container dynstate {
                 sw:dynstate;
-                leaf protocols-enabled {
-                    type boolean;
-                }
-                leaf health-state {
+                leaf tracked-interface-name {
                     type string;
+                }
+                leaf pps {
+                    type uint32;
                 }
             }
         }
@@ -1736,19 +1736,19 @@ class stratoweave_rfs__rfs__backbone_interface__remote(yang.adata.MNode):
 
 _breaker = 1
 class stratoweave_rfs__rfs__backbone_interface__dynstate(yang.adata.MNode):
-    protocols_enabled: ?bool
-    health_state: ?str
+    tracked_interface_name: ?str
+    pps: ?u64
 
-    mut def __init__(self, protocols_enabled: ?bool, health_state: ?str):
+    mut def __init__(self, tracked_interface_name: ?str, pps: ?u64):
         self._ns = 'http://example.com/sorespo-rfs'
-        self.protocols_enabled = protocols_enabled
-        self.health_state = health_state
+        self.tracked_interface_name = tracked_interface_name
+        self.pps = pps
 
     def _get_attr(self, name: str) -> ?value:
-        if name == 'protocols_enabled':
-            return self.protocols_enabled
-        if name == 'health_state':
-            return self.health_state
+        if name == 'tracked_interface_name':
+            return self.tracked_interface_name
+        if name == 'pps':
+            return self.pps
         raise ValueError('Attribute {name} not found in stratoweave_rfs__rfs__backbone_interface__dynstate')
 
     mut def to_gdata(self) -> yang.gdata.Node:
@@ -1757,7 +1757,7 @@ class stratoweave_rfs__rfs__backbone_interface__dynstate(yang.adata.MNode):
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> stratoweave_rfs__rfs__backbone_interface__dynstate:
         if n is not None:
-            return stratoweave_rfs__rfs__backbone_interface__dynstate(protocols_enabled=n.get_opt_bool(yang.gdata.Id(NS_sorespo_rfs, 'protocols-enabled')), health_state=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'health-state')))
+            return stratoweave_rfs__rfs__backbone_interface__dynstate(tracked_interface_name=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'tracked-interface-name')), pps=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'pps')))
         return stratoweave_rfs__rfs__backbone_interface__dynstate()
 
     def copy(self):
@@ -1773,10 +1773,10 @@ class stratoweave_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
     ipv6_address: ?str
     ipv6_prefix_length: ?u64
     remote: stratoweave_rfs__rfs__backbone_interface__remote
-    monitor_health: bool
+    monitor_traffic: bool
     dynstate: stratoweave_rfs__rfs__backbone_interface__dynstate
 
-    mut def __init__(self, name: str, remote: stratoweave_rfs__rfs__backbone_interface__remote, ipv4_address: ?str, ipv4_prefix_length: ?u64=None, ipv6_address: ?str, ipv6_prefix_length: ?u64, monitor_health: ?bool=None, dynstate: ?stratoweave_rfs__rfs__backbone_interface__dynstate=None):
+    mut def __init__(self, name: str, remote: stratoweave_rfs__rfs__backbone_interface__remote, ipv4_address: ?str, ipv4_prefix_length: ?u64=None, ipv6_address: ?str, ipv6_prefix_length: ?u64, monitor_traffic: ?bool=None, dynstate: ?stratoweave_rfs__rfs__backbone_interface__dynstate=None):
         self._ns = 'http://example.com/sorespo-rfs'
         self.name = name
         self.ipv4_address = ipv4_address
@@ -1784,7 +1784,7 @@ class stratoweave_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
         self.ipv6_address = ipv6_address
         self.ipv6_prefix_length = ipv6_prefix_length
         self.remote = remote
-        self.monitor_health = monitor_health if monitor_health is not None else False
+        self.monitor_traffic = monitor_traffic if monitor_traffic is not None else False
         self.dynstate = dynstate if dynstate is not None else stratoweave_rfs__rfs__backbone_interface__dynstate()
 
     def _get_attr(self, name: str) -> ?value:
@@ -1800,8 +1800,8 @@ class stratoweave_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
             return self.ipv6_prefix_length
         if name == 'remote':
             return self.remote
-        if name == 'monitor_health':
-            return self.monitor_health
+        if name == 'monitor_traffic':
+            return self.monitor_traffic
         if name == 'dynstate':
             return self.dynstate
         raise ValueError('Attribute {name} not found in stratoweave_rfs__rfs__backbone_interface')
@@ -1811,7 +1811,7 @@ class stratoweave_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> stratoweave_rfs__rfs__backbone_interface_entry:
-        return stratoweave_rfs__rfs__backbone_interface_entry(name=n.get_str(yang.gdata.Id(NS_sorespo_rfs, 'name')), ipv4_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv4-address')), ipv4_prefix_length=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'ipv4-prefix-length')), ipv6_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv6-address')), ipv6_prefix_length=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'ipv6-prefix-length')), remote=stratoweave_rfs__rfs__backbone_interface__remote.from_gdata(n.get_cnt(yang.gdata.Id(NS_sorespo_rfs, 'remote'))), monitor_health=n.get_opt_bool(yang.gdata.Id(NS_sorespo_rfs, 'monitor-health')), dynstate=stratoweave_rfs__rfs__backbone_interface__dynstate.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_sorespo_rfs, 'dynstate'))))
+        return stratoweave_rfs__rfs__backbone_interface_entry(name=n.get_str(yang.gdata.Id(NS_sorespo_rfs, 'name')), ipv4_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv4-address')), ipv4_prefix_length=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'ipv4-prefix-length')), ipv6_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv6-address')), ipv6_prefix_length=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'ipv6-prefix-length')), remote=stratoweave_rfs__rfs__backbone_interface__remote.from_gdata(n.get_cnt(yang.gdata.Id(NS_sorespo_rfs, 'remote'))), monitor_traffic=n.get_opt_bool(yang.gdata.Id(NS_sorespo_rfs, 'monitor-traffic')), dynstate=stratoweave_rfs__rfs__backbone_interface__dynstate.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_sorespo_rfs, 'dynstate'))))
 
     def copy(self):
         """Create a deep copy of this adata object"""
@@ -1825,7 +1825,7 @@ class stratoweave_rfs__rfs__backbone_interface(yang.adata.MNode):
         self._name = 'backbone-interface'
         self.elements = elements
 
-    mut def create(self, name, remote, ipv4_address=None, ipv4_prefix_length=None, ipv6_address=None, ipv6_prefix_length=None, monitor_health=None):
+    mut def create(self, name, remote, ipv4_address=None, ipv4_prefix_length=None, ipv6_address=None, ipv6_prefix_length=None, monitor_traffic=None):
         for e in self:
             match = True
             if e.name != name:
@@ -1841,11 +1841,11 @@ class stratoweave_rfs__rfs__backbone_interface(yang.adata.MNode):
                     e.ipv6_address = ipv6_address
                 if ipv6_prefix_length is not None:
                     e.ipv6_prefix_length = ipv6_prefix_length
-                if monitor_health is not None:
-                    e.monitor_health = monitor_health
+                if monitor_traffic is not None:
+                    e.monitor_traffic = monitor_traffic
                 return e
 
-        res = stratoweave_rfs__rfs__backbone_interface_entry(name=name, remote=remote, ipv4_address=ipv4_address, ipv4_prefix_length=ipv4_prefix_length, ipv6_address=ipv6_address, ipv6_prefix_length=ipv6_prefix_length, monitor_health=monitor_health)
+        res = stratoweave_rfs__rfs__backbone_interface_entry(name=name, remote=remote, ipv4_address=ipv4_address, ipv4_prefix_length=ipv4_prefix_length, ipv6_address=ipv6_address, ipv6_prefix_length=ipv6_prefix_length, monitor_traffic=monitor_traffic)
         self.elements.append(res)
         return res
 

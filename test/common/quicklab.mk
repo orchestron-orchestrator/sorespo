@@ -73,6 +73,14 @@ configure-tmf640:
 	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-backbone-link-fra-lju.json"
 	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-backbone-link-sto-lju.json"
 
+.PHONY: monitor-traffic-enable
+monitor-traffic-enable:
+	$(MAKE) send-config-wait FILE="monitor-traffic-enable.xml"
+
+.PHONY: monitor-traffic-disable
+monitor-traffic-disable:
+	$(MAKE) send-config-wait FILE="monitor-traffic-disable.xml"
+
 .PHONY: tutorial
 tutorial:
 	$(MAKE) -C ../../ download-release
