@@ -55,22 +55,36 @@ def _ms_to_ns(ms: u64) -> u64:
     return ms * 1000 * 1000
 
 NS_IOS_XR_INTERFACES_OPER = xr25.NS_Cisco_IOS_XR_pfi_im_cmd_oper
+NS_SRL_INTERFACES = srl25.NS_srl_nokia_interfaces
 
-def _q_interfaces_oper(name: str) -> gdata.Id:
+def _q_if_oper_xr(name: str) -> gdata.Id:
     return gdata.Id(NS_IOS_XR_INTERFACES_OPER, name)
 
-def _bb_interface_state_filter(tracked_interface_name: str) -> gdata.FNode:
+def _q_if_oper_srl(name: str) -> gdata.Id:
+    return gdata.Id(NS_SRL_INTERFACES, name)
+
+def _bb_interface_state_filter_xr(tracked_interface_name: str) -> gdata.FNode:
     return gdata.FNode(None, None, [
-        gdata.FNode(_q_interfaces_oper("interfaces"), children=[
-            gdata.FNode(_q_interfaces_oper("interface-xr"), children=[
-                gdata.FNode(_q_interfaces_oper("interface"), children=[
-                    gdata.FNode(_q_interfaces_oper("interface-name"), value_match=tracked_interface_name),
-                    gdata.FNode(_q_interfaces_oper("interface-statistics"), children=[
-                        gdata.FNode(_q_interfaces_oper("full-interface-stats"), children=[
-                            gdata.FNode(_q_interfaces_oper("packets-received")),
+        gdata.FNode(_q_if_oper_xr("interfaces"), children=[
+            gdata.FNode(_q_if_oper_xr("interface-xr"), children=[
+                gdata.FNode(_q_if_oper_xr("interface"), children=[
+                    gdata.FNode(_q_if_oper_xr("interface-name"), value_match=tracked_interface_name),
+                    gdata.FNode(_q_if_oper_xr("interface-statistics"), children=[
+                        gdata.FNode(_q_if_oper_xr("full-interface-stats"), children=[
+                            gdata.FNode(_q_if_oper_xr("packets-received")),
                         ])
                     ])
                 ])
+            ])
+        ])
+    ])
+
+def _bb_interface_state_filter_srl(tracked_interface_name: str) -> gdata.FNode:
+    return gdata.FNode(None, None, [
+        gdata.FNode(_q_if_oper_srl("interface"), children=[
+            gdata.FNode(_q_if_oper_srl("name"), value_match=tracked_interface_name),
+            gdata.FNode(_q_if_oper_srl("statistics"), children=[
+                gdata.FNode(_q_if_oper_srl("in-unicast-packets")),
             ])
         ])
     ])
@@ -94,6 +108,19 @@ def _rx_packets_from_xr_oper_root(t: ?xr25_root, tracked_interface_name: str) ->
                 return interface.interface_statistics.full_interface_stats.packets_received
     return None
 
+def _rx_packets_from_srl_oper_root(t: ?srl25.root, tracked_interface_name: str) -> ?u64:
+    if t is not None:
+        for interface in t.interface:
+            if interface.name == tracked_interface_name:
+                return interface.statistics.in_unicast_packets
+    return None
+
+def _bb_interface_description(remote_device: str, remote_interface: str, pps: ?u64=None) -> str:
+    if pps is not None:
+        pps_value = orchestron.ttt.expect(pps, "Missing expected PPS value.")
+        return "Link to {remote_device} [{remote_interface}] - {pps_value} PPS"
+    return "Link to {remote_device} [{remote_interface}]"
+
 def _bb_interface_dynstate_signature(dynstate: ?BackboneInterfaceDynstate) -> ?str:
     if dynstate is None:
         return None
@@ -112,7 +139,6 @@ def _opt_str_or_empty(value_: ?str, field_name: str) -> str:
     if value_ is None:
         return ""
     return orchestron.ttt.expect(value_, "Missing expected %s." % (field_name))
-
 
 class BaseConfig(base.BaseConfig):
     def transform(self, i, di):
@@ -246,6 +272,12 @@ actor BBInterfaceTransform(update_dynstate: proc(?BackboneInterfaceDynstate)->No
         update_stopwatch.reset()
         publish_dynstate(None)
 
+    def cancel_subscription():
+        if handle is not None:
+            active_handle = orchestron.ttt.expect(handle, "Missing expected BB dynstate subscription handle.")
+            active_handle.cancel()
+            handle = None
+
     def publish_dynstate(dynstate: ?BackboneInterfaceDynstate):
         signature = _bb_interface_dynstate_signature(dynstate)
         if signature == published_signature:
@@ -253,7 +285,13 @@ actor BBInterfaceTransform(update_dynstate: proc(?BackboneInterfaceDynstate)->No
         published_signature = signature
         update_dynstate(dynstate)
 
-    def on_update(t: ?xr25_root, err: ?Exception):
+    def publish_sample(tracked_name: str, rx_packets: ?u64):
+        if rx_packets is not None and last_rx_packets is not None:
+            publish_dynstate(_bb_interface_dynstate_from_rx_delta(tracked_name, rx_packets - last_rx_packets, _duration_ms(update_stopwatch.elapsed())))
+        update_stopwatch.reset()
+        last_rx_packets = rx_packets
+
+    def on_update_xr(t: ?xr25_root, err: ?Exception):
         if err is not None:
             print("BBInterfaceTransform subscription error: {err}", err=True)
             return
@@ -261,37 +299,46 @@ actor BBInterfaceTransform(update_dynstate: proc(?BackboneInterfaceDynstate)->No
         if current_name is None:
             return
         current_name_str: str = orchestron.ttt.expect(current_name, "Missing expected tracked interface name.")
-        rx_packets = _rx_packets_from_xr_oper_root(t, current_name_str)
-        if rx_packets is not None and last_rx_packets is not None:
-            publish_dynstate(_bb_interface_dynstate_from_rx_delta(current_name_str, rx_packets - last_rx_packets, _duration_ms(update_stopwatch.elapsed())))
-        update_stopwatch.reset()
-        last_rx_packets = rx_packets
+        publish_sample(current_name_str, _rx_packets_from_xr_oper_root(t, current_name_str))
+
+    def on_update_srl(t: ?srl25.root, err: ?Exception):
+        if err is not None:
+            print("BBInterfaceTransform subscription error: {err}", err=True)
+            return
+        current_name = tracked_interface_name
+        if current_name is None:
+            return
+        current_name_str: str = orchestron.ttt.expect(current_name, "Missing expected tracked interface name.")
+        publish_sample(current_name_str, _rx_packets_from_srl_oper_root(t, current_name_str))
 
     def on_conf(conf: y_2.stratoweave_rfs__rfs__backbone_interface_entry):
         modset, _modset_id = dev.get_modules()
-        if "Cisco-IOS-XR-um-hostname-cfg" not in modset:
+        is_xr = "Cisco-IOS-XR-um-hostname-cfg" in modset
+        is_srl = "srl_nokia-system" in modset
+        if not is_xr and not is_srl:
+            cancel_subscription()
+            tracked_interface_name = None
+            reset_sample_state()
             return
         next_name = None
         if conf.monitor_traffic == True:
             next_name = conf.name
         if next_name is None:
-            if handle is not None:
-                active_handle = orchestron.ttt.expect(handle, "Missing expected BB dynstate subscription handle.")
-                active_handle.cancel()
-                handle = None
+            cancel_subscription()
             tracked_interface_name = None
             reset_sample_state()
             return
         if tracked_interface_name == next_name and handle is not None:
             return
-        if handle is not None:
-            active_handle = orchestron.ttt.expect(handle, "Missing expected BB dynstate subscription handle.")
-            active_handle.cancel()
-            handle = None
+        cancel_subscription()
         tracked_interface_name = next_name
         reset_sample_state()
         opts = gdata.SubscriptionOpts(gdata.SUB_PERIODIC, period=_ms_to_ns(BB_INTERFACE_DYNSTATE_PERIOD_MSECS))
-        handle = xr25.rpc_root(dev.tree_provider()).subscribe(on_update, _bb_interface_state_filter(orchestron.ttt.expect(next_name, "Missing expected tracked interface name.")), opts)
+        tracked_name = orchestron.ttt.expect(next_name, "Missing expected tracked interface name.")
+        if is_xr:
+            handle = xr25.rpc_root(dev.tree_provider()).subscribe(on_update_xr, _bb_interface_state_filter_xr(tracked_name), opts)
+        else:
+            handle = srl25.rpc_root(dev.tree_provider()).subscribe(on_update_srl, _bb_interface_state_filter_srl(tracked_name), opts)
 
 class BBInterface(base.BBInterface):
     def transform(self, i, di, dynstate):
@@ -300,9 +347,10 @@ class BBInterface(base.BBInterface):
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
             print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}] for Cisco IOS XR", err=True)
             dev = xr25.root()
+            base_description = _bb_interface_description(i.remote.device, i.remote.interface)
 
             # Create the interface
-            intf = dev.um_interface_cfg_interfaces.interface.create(i.name, description="Link to {i.remote.device} [{i.remote.interface}]")
+            intf = dev.um_interface_cfg_interfaces.interface.create(i.name, description=base_description)
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(int(i.ipv4_prefix_length)))
@@ -323,7 +371,7 @@ class BBInterface(base.BBInterface):
                     print("Backbone interface dynstate unavailable for device={di.name} interface={i.name}", err=True)
                 else:
                     bb_dynstate: BackboneInterfaceDynstate = orchestron.ttt.expect(dynstate, "Missing expected Backbone dynstate.")
-                    intf.description = "Link to {i.remote.device} [{i.remote.interface}] - {bb_dynstate.pps} PPS"
+                    intf.description = _bb_interface_description(i.remote.device, i.remote.interface, bb_dynstate.pps)
                     print("Updated description for device={di.name} interface={i.name} to include dynstate info: {bb_dynstate.pps} PPS", err=True)
 
             return dev
@@ -359,15 +407,16 @@ class BBInterface(base.BBInterface):
         elif "srl_nokia-system" in di.modules:
             print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}] for Nokia SRLinux", err=True)
             dev = srl25.root()
+            base_description = _bb_interface_description(i.remote.device, i.remote.interface)
 
             # Create the interface
             ni = dev.network_instance.create("default")
             intf = dev.interface.create(i.name)
-            intf.description = "Link to {i.remote.device} [{i.remote.interface}]"
+            intf.description = base_description
             intf.admin_state = "enable"
             subif = intf.subinterface.create(0)
             subif.admin_state = "enable"
-            subif.description = "Link to {i.remote.device} [{i.remote.interface}]"
+            subif.description = base_description
             subif.ipv4.admin_state = "enable"
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
@@ -384,6 +433,16 @@ class BBInterface(base.BBInterface):
             isis_intf.circuit_type = "point-to-point"
             il2 = isis_intf.level.create(2)
             il2.metric = 5000
+
+            if i.monitor_traffic:
+                if dynstate is None:
+                    print("Backbone interface dynstate unavailable for device={di.name} interface={i.name}", err=True)
+                else:
+                    bb_dynstate: BackboneInterfaceDynstate = orchestron.ttt.expect(dynstate, "Missing expected Backbone dynstate.")
+                    monitored_description = _bb_interface_description(i.remote.device, i.remote.interface, bb_dynstate.pps)
+                    intf.description = monitored_description
+                    subif.description = monitored_description
+                    print("Updated description for device={di.name} interface={i.name} to include dynstate info: {bb_dynstate.pps} PPS", err=True)
 
             return dev
 
