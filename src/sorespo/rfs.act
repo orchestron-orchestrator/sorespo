@@ -1,4 +1,7 @@
 import yang.adata
+import yang.gdata as gdata
+import time
+from yang.type import Decimal
 import orchestron.device as odev
 import orchestron.ttt
 from orchestron.exception import UnsupportedDevice
@@ -9,21 +12,23 @@ import sorespo.cisco_vigenere
 import sorespo.crpd_stats
 
 import sorespo.layers.base_2 as base
+import sorespo.layers.y_2 as y_2
 
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface_entry
-from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface__dynstate
+from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface__dynstate as BackboneInterfaceDynstate
 
 import sorespo.devices.CiscoIosXr_25_3_1 as xr25
+from sorespo.devices.CiscoIosXr_25_3_1 import root as xr25_root
 import sorespo.devices.JuniperCRPD_24_4R1_9 as crpd24
 import sorespo.devices.NokiaSRLinux_25_3_2 as srl25
 
 CRPD = True
+BB_INTERFACE_DYNSTATE_PERIOD_MSECS = u64(5000)
 
 def prefix_length_to_netmask(prefix_length):
     binary_netmask = ("1" * prefix_length).ljust(32, "0")
     octets = [int(binary_netmask[i:i + 8], 2) for i in range(0, 32, 8)]
     return ".".join(map(str, octets))
-
 
 def split_interface_name(interface):
     """Split interface name into main interface and unit number.
@@ -33,7 +38,6 @@ def split_interface_name(interface):
     if len(parts) == 2:
         return (parts[0], parts[1])
     return (interface, "0")
-
 
 def net_from_ip_address(ip_address):
     """Generate a NET address from an IPv4 address."""
@@ -47,6 +51,68 @@ def net_from_ip_address(ip_address):
     net_clns_address = '49.0001.' + join_str[0:4] + '.' + join_str[4:8] + '.' + join_str[8:] + '.00'
     return net_clns_address
 
+def _ms_to_ns(ms: u64) -> u64:
+    return ms * 1000 * 1000
+
+NS_IOS_XR_INTERFACES_OPER = xr25.NS_Cisco_IOS_XR_pfi_im_cmd_oper
+
+def _q_interfaces_oper(name: str) -> gdata.Id:
+    return gdata.Id(NS_IOS_XR_INTERFACES_OPER, name)
+
+def _bb_interface_state_filter(tracked_interface_name: str) -> gdata.FNode:
+    return gdata.FNode(None, None, [
+        gdata.FNode(_q_interfaces_oper("interfaces"), children=[
+            gdata.FNode(_q_interfaces_oper("interface-xr"), children=[
+                gdata.FNode(_q_interfaces_oper("interface"), children=[
+                    gdata.FNode(_q_interfaces_oper("interface-name"), value_match=tracked_interface_name),
+                    gdata.FNode(_q_interfaces_oper("interface-statistics"), children=[
+                        gdata.FNode(_q_interfaces_oper("full-interface-stats"), children=[
+                            gdata.FNode(_q_interfaces_oper("packets-received")),
+                        ])
+                    ])
+                ])
+            ])
+        ])
+    ])
+
+def _duration_ms(duration: time.Duration) -> int:
+    return duration.second * 1000 + duration.attosecond // 10**15
+
+def _bb_interface_dynstate_from_rx_delta(tracked_interface_name: str, rx_packets_delta: u64, elapsed_ms: int) -> ?BackboneInterfaceDynstate:
+    if elapsed_ms <= 0:
+        return None
+    pps = u64((int(rx_packets_delta) * 1000) // elapsed_ms)
+    return BackboneInterfaceDynstate(
+        tracked_interface_name,
+        pps=pps,
+    )
+
+def _rx_packets_from_xr_oper_root(t: ?xr25_root, tracked_interface_name: str) -> ?u64:
+    if t is not None:
+        for interface in t.pfi_im_cmd_oper_interfaces.interface_xr.interface:
+            if interface.interface_name == tracked_interface_name:
+                return interface.interface_statistics.full_interface_stats.packets_received
+    return None
+
+def _bb_interface_dynstate_signature(dynstate: ?BackboneInterfaceDynstate) -> ?str:
+    if dynstate is None:
+        return None
+    dynstate_obj: BackboneInterfaceDynstate = orchestron.ttt.expect(dynstate, "Missing expected BB dynstate.")
+    tracked = ""
+    tracked_opt = dynstate_obj.tracked_interface_name
+    if tracked_opt is not None:
+        tracked = orchestron.ttt.expect(tracked_opt, "Missing expected tracked-interface-name.")
+    pps = ""
+    pps_opt = dynstate_obj.pps
+    if pps_opt is not None:
+        pps = orchestron.ttt.expect(str(pps_opt), "Missing expected PPS.")
+    return "{tracked}|{pps}"
+
+def _opt_str_or_empty(value_: ?str, field_name: str) -> str:
+    if value_ is None:
+        return ""
+    return orchestron.ttt.expect(value_, "Missing expected %s." % (field_name))
+
 
 class BaseConfig(base.BaseConfig):
     def transform(self, i, di):
@@ -58,7 +124,7 @@ class BaseConfig(base.BaseConfig):
             print("RFS /rfs{{{di.name}}}/base-config transform for Cisco IOS XR", err=True)
             dev = xr25.root()
             dev.hostname.system_network_name = di.name
-            intf = dev.interfaces.interface.create("Loopback0")
+            intf = dev.um_interface_cfg_interfaces.interface.create("Loopback0")
             intf.ipv4.addresses.create_address(i.ipv4_address, "255.255.255.255")
 
             # IS-IS global config
@@ -168,106 +234,64 @@ end-policy
 
         raise UnsupportedDevice()
 
+actor BBInterfaceTransform(update_dynstate: proc(?BackboneInterfaceDynstate)->None, dev: odev.DeviceMgr):
+    var handle: ?gdata.SubscriptionHandle = None
+    var tracked_interface_name: ?str = None
+    var published_signature: ?str = None
+    var last_rx_packets: ?u64 = None
+    var update_stopwatch = time.Stopwatch()
 
-actor BBInterfaceTransform(update_dynstate: proc(?stratoweave_rfs__rfs__backbone_interface__dynstate) -> None, dev: odev.DeviceMgr):
-    IF_STATE_INTERFACE_MONITOR = "monitor-interface-counters"
-    IF_STATE_PROTOCOLS_ENABLED = "protocols-enabled"
-    IF_STATE_ALL_OK = "all-ok"
+    def reset_sample_state():
+        last_rx_packets = None
+        update_stopwatch.reset()
+        publish_dynstate(None)
 
-    rpc_root = crpd24.rpc_root(odev.DeviceTreeProvider(dev))
-    var interface_name = None
-    var healthcheck_enabled = False
-    var healthcheck_running = False
-    var protocols_enabled = False
-    var health_state = IF_STATE_INTERFACE_MONITOR
-    var isis_healthy = False
-    var ldp_healthy = False
-    var counters: list[(rx_errors: int, rx_dropped: int, rx_over_errors: int, tx_errors: int, tx_dropped: int, tx_carrier_errors: int)] = []
-
-    def do_healthcheck():
-        healthcheck_running = True
-        if not healthcheck_enabled:
-            health_state = IF_STATE_INTERFACE_MONITOR
-            isis_healthy = False
-            ldp_healthy = False
-            healthcheck_running = False
-            protocols_enabled = False
+    def publish_dynstate(dynstate: ?BackboneInterfaceDynstate):
+        signature = _bb_interface_dynstate_signature(dynstate)
+        if signature == published_signature:
             return
+        published_signature = signature
+        update_dynstate(dynstate)
 
-        def update_health_state():
-            next_state = IF_STATE_PROTOCOLS_ENABLED if protocols_enabled else IF_STATE_INTERFACE_MONITOR
-            if isis_healthy and ldp_healthy:
-                next_state = IF_STATE_ALL_OK
+    def on_update(t: ?xr25_root, err: ?Exception):
+        if err is not None:
+            print("BBInterfaceTransform subscription error: {err}", err=True)
+            return
+        current_name = tracked_interface_name
+        if current_name is None:
+            return
+        current_name_str: str = orchestron.ttt.expect(current_name, "Missing expected tracked interface name.")
+        rx_packets = _rx_packets_from_xr_oper_root(t, current_name_str)
+        if rx_packets is not None and last_rx_packets is not None:
+            publish_dynstate(_bb_interface_dynstate_from_rx_delta(current_name_str, rx_packets - last_rx_packets, _duration_ms(update_stopwatch.elapsed())))
+        update_stopwatch.reset()
+        last_rx_packets = rx_packets
 
-            if health_state != next_state:
-                print("Health state changed for {interface_name}: {health_state} -> {next_state}")
-                health_state = next_state
-                dynstate = stratoweave_rfs__rfs__backbone_interface__dynstate()
-                dynstate.health_state = health_state
-                dynstate.protocols_enabled = protocols_enabled
-                update_dynstate(dynstate)
-
-        def on_if_stats_response(output: ?crpd24.junos_rpc_interfaces__get_interface_information__output, error):
-            if output is not None:
-                counters.append(sorespo.crpd_stats.parse(output))
-                if len(counters) > 2:
-                    counters.pop(0)
-
-                if len(counters) == 2:
-                    t0 = counters[0]
-                    t1 = counters[1]
-                    if (t1.rx_errors == t0.rx_errors and
-                        t1.rx_dropped == t0.rx_dropped and
-                        t1.rx_over_errors == t0.rx_over_errors and
-                        t1.tx_errors == t0.tx_errors and
-                        t1.tx_dropped == t0.tx_dropped and
-                        t1.tx_carrier_errors == t0.tx_carrier_errors):
-                        protocols_enabled = True
-                        update_health_state()
-                        after 0: do_healthcheck()
-                        return
-                after 12: do_healthcheck()
-
-        def on_isis_response(output: ?crpd24.junos_rpc_isis__get_isis_adjacency_information__output, error):
-            if output is not None:
-                # print("BBInterfaceTransform.isis_response: {output.to_gdata().to_xmlstr()}, {error}")
-                iai = output.isis_adjacency_information
-                if iai is not None:
-                    for ia in iai.isis_adjacency:
-                        if ia.interface_name == interface_name:
-                            isis_healthy = (ia.adjacency_state == "Up")
-                            update_health_state()
-                            break
-
-        def on_ldp_response(output: ?crpd24.junos_rpc_ldp__get_ldp_neighbor_information__output, error):
-            if output is not None:
-                # print("BBInterfaceTransform.ldp_response: {output.to_gdata().to_xmlstr()}, {error}")
-                lni = output.ldp_neighbor_information
-                if lni is not None:
-                    for ln in lni.ldp_neighbor:
-                        if ln.interface_name == interface_name:
-                            ldp_healthy = (ln.ldp_neighbor_address != "")
-                            update_health_state()
-                            break
-
-        if interface_name is not None and not protocols_enabled:
-            if_input = crpd24.junos_rpc_interfaces__get_interface_information__input()
-            if_input.interface_name = interface_name
-            if_input.level = "statistics"
-            rpc_root.get_interface_information(on_if_stats_response, if_input)
-        else:
-            rpc_root.get_isis_adjacency_information(on_isis_response)
-            rpc_root.get_ldp_neighbor_information(on_ldp_response)
-            after 3: do_healthcheck()
- 
-    def on_conf(conf: stratoweave_rfs__rfs__backbone_interface_entry):
-        print("BBInterfaceTransform.on_conf:{conf.name}")
-        interface_name = conf.name
-        healthcheck_enabled = conf.monitor_health
-        if healthcheck_enabled and not healthcheck_running:
-            do_healthcheck()
-
-    print("BBInterfaceTransform started")
+    def on_conf(conf: y_2.stratoweave_rfs__rfs__backbone_interface_entry):
+        modset, _modset_id = dev.get_modules()
+        if "Cisco-IOS-XR-um-hostname-cfg" not in modset:
+            return
+        next_name = None
+        if conf.monitor_traffic == True:
+            next_name = conf.name
+        if next_name is None:
+            if handle is not None:
+                active_handle = orchestron.ttt.expect(handle, "Missing expected BB dynstate subscription handle.")
+                active_handle.cancel()
+                handle = None
+            tracked_interface_name = None
+            reset_sample_state()
+            return
+        if tracked_interface_name == next_name and handle is not None:
+            return
+        if handle is not None:
+            active_handle = orchestron.ttt.expect(handle, "Missing expected BB dynstate subscription handle.")
+            active_handle.cancel()
+            handle = None
+        tracked_interface_name = next_name
+        reset_sample_state()
+        opts = gdata.SubscriptionOpts(gdata.SUB_PERIODIC, period=_ms_to_ns(BB_INTERFACE_DYNSTATE_PERIOD_MSECS))
+        handle = xr25.rpc_root(dev.tree_provider()).subscribe(on_update, _bb_interface_state_filter(orchestron.ttt.expect(next_name, "Missing expected tracked interface name.")), opts)
 
 class BBInterface(base.BBInterface):
     def transform(self, i, di, dynstate):
@@ -278,7 +302,7 @@ class BBInterface(base.BBInterface):
             dev = xr25.root()
 
             # Create the interface
-            intf = dev.interfaces.interface.create(i.name, description="Link to {i.remote.device} [{i.remote.interface}]")
+            intf = dev.um_interface_cfg_interfaces.interface.create(i.name, description="Link to {i.remote.device} [{i.remote.interface}]")
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(int(i.ipv4_prefix_length)))
@@ -294,6 +318,14 @@ class BBInterface(base.BBInterface):
             ldp.interfaces.interface.create(i.name)
             ldp.address_families.address_family.create("ipv4")
 
+            if i.monitor_traffic:
+                if dynstate is None:
+                    print("Backbone interface dynstate unavailable for device={di.name} interface={i.name}", err=True)
+                else:
+                    bb_dynstate: BackboneInterfaceDynstate = orchestron.ttt.expect(dynstate, "Missing expected Backbone dynstate.")
+                    intf.description = "Link to {i.remote.device} [{i.remote.interface}] - {bb_dynstate.pps} PPS"
+                    print("Updated description for device={di.name} interface={i.name} to include dynstate info: {bb_dynstate.pps} PPS", err=True)
+
             return dev
         elif "http://xml.juniper.net/netconf/junos/1.0" in di.modules or "junos-conf-root" in di.modules:
             print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}] for JUNOS", err=True)
@@ -302,38 +334,25 @@ class BBInterface(base.BBInterface):
             # Create the interface
             unit = dev.configuration.interfaces.interface.create(i.name).unit.create("0")
             unit.description = "Link to {i.remote.device} [{i.remote.interface}]"
-            if i.monitor_health:
-                if dynstate is not None:
-                    unit.description += " - Health: {dynstate.health_state}"
-                else:
-                    unit.description += " - Health: monitor-interface-counters"
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 unit.family.create_inet().address.create("{ipv4_address}/{i.ipv4_prefix_length}")
 
-            def configure_protocols():
-                # IS-IS config for this interface
-                dcpi = dev.configuration.protocols.isis
-                # vMX: ge-0/0/0.0, cRPD: eth0 (must not include unit)
-                if not CRPD:
-                    interface = "{i.name}.0"
-                else:
-                    interface = i.name
-                isis_intf = dcpi.interface.create(interface)
-                isis_intf.point_to_point = True
-                isis_intf.level.create(1, disable=True)
-                isis_intf.level.create(2, metric=5000)
+            # IS-IS config for this interface
+            dcpi = dev.configuration.protocols.isis
+            # vMX: ge-0/0/0.0, cRPD: eth0 (must not include unit)
+            if not CRPD:
+                interface = "{i.name}.0"
+            else:
+                interface = i.name
+            isis_intf = dcpi.interface.create(interface)
+            isis_intf.point_to_point = True
+            isis_intf.level.create(1, disable=True)
+            isis_intf.level.create(2, metric=5000)
 
-                # MPLS and LDP config for this interface
-                dev.configuration.protocols.mpls.interface.create(interface)
-                dev.configuration.protocols.ldp.interface.create(interface)
-
-            if not i.monitor_health:
-                configure_protocols()
-            if dynstate is not None:
-                pe = dynstate.protocols_enabled
-                if pe is not None and pe == True:
-                    configure_protocols()
+            # MPLS and LDP config for this interface
+            dev.configuration.protocols.mpls.interface.create(interface)
+            dev.configuration.protocols.ldp.interface.create(interface)
 
             return dev
 
@@ -487,8 +506,8 @@ class VrfInterface(base.VrfInterface):
             dev = xr25.root()
 
             # Main interface config
-            dev.interfaces.interface.create(main_intf)
-            sub_intf = dev.interfaces.interface.create(i.name, description=i.description, vrf=i.vrf)
+            dev.um_interface_cfg_interfaces.interface.create(main_intf)
+            sub_intf = dev.um_interface_cfg_interfaces.interface.create(i.name, description=i.description, vrf=i.vrf)
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 sub_intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(int(i.ipv4_prefix_length)))

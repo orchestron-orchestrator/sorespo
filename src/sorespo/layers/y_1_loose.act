@@ -54,7 +54,7 @@ SRC_DNODE_CHILD_2 = DList(module='netinfra-inter', namespace='http://example.com
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='left-interface', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='right-router', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='right-interface', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
-    DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='monitor-health', config=True, default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
+    DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='monitor-traffic', config=True, default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
 ])
 
 SRC_DNODE_CHILD_3 = DList(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='ibgp-fullmesh', key=['asn'], config=True, min_elements=0, ordered_by='system', exts=[
@@ -275,7 +275,7 @@ def src_yang():
       leaf right-interface {
         type string;
       }
-      leaf monitor-health {
+      leaf monitor-traffic {
         type boolean;
         default false;
       }
@@ -1067,15 +1067,15 @@ class netinfra_inter__netinfra__backbone_link_entry(yang.adata.MNode):
     left_interface: str
     right_router: str
     right_interface: str
-    monitor_health: ?bool
+    monitor_traffic: ?bool
 
-    mut def __init__(self, left_router: str, left_interface: str, right_router: str, right_interface: str, monitor_health: ?bool):
+    mut def __init__(self, left_router: str, left_interface: str, right_router: str, right_interface: str, monitor_traffic: ?bool):
         self._ns = 'http://example.com/netinfra-inter'
         self.left_router = left_router
         self.left_interface = left_interface
         self.right_router = right_router
         self.right_interface = right_interface
-        self.monitor_health = monitor_health
+        self.monitor_traffic = monitor_traffic
 
     def _get_attr(self, name: str) -> ?value:
         if name == 'left_router':
@@ -1086,8 +1086,8 @@ class netinfra_inter__netinfra__backbone_link_entry(yang.adata.MNode):
             return self.right_router
         if name == 'right_interface':
             return self.right_interface
-        if name == 'monitor_health':
-            return self.monitor_health
+        if name == 'monitor_traffic':
+            return self.monitor_traffic
         raise ValueError('Attribute {name} not found in netinfra_inter__netinfra__backbone_link')
 
     mut def to_gdata(self) -> yang.gdata.Node:
@@ -1095,7 +1095,7 @@ class netinfra_inter__netinfra__backbone_link_entry(yang.adata.MNode):
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra_inter__netinfra__backbone_link_entry:
-        return netinfra_inter__netinfra__backbone_link_entry(left_router=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'left-router')), left_interface=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'left-interface')), right_router=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'right-router')), right_interface=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'right-interface')), monitor_health=n.get_opt_bool(yang.gdata.Id(NS_netinfra_inter, 'monitor-health')))
+        return netinfra_inter__netinfra__backbone_link_entry(left_router=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'left-router')), left_interface=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'left-interface')), right_router=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'right-router')), right_interface=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'right-interface')), monitor_traffic=n.get_opt_bool(yang.gdata.Id(NS_netinfra_inter, 'monitor-traffic')))
 
     def copy(self):
         """Create a deep copy of this adata object"""
@@ -1109,7 +1109,7 @@ class netinfra_inter__netinfra__backbone_link(yang.adata.MNode):
         self._name = 'backbone-link'
         self.elements = elements
 
-    mut def create(self, left_router, left_interface, right_router, right_interface, monitor_health=None):
+    mut def create(self, left_router, left_interface, right_router, right_interface, monitor_traffic=None):
         for e in self:
             match = True
             if e.left_router != left_router:
@@ -1125,11 +1125,11 @@ class netinfra_inter__netinfra__backbone_link(yang.adata.MNode):
                 match = False
                 continue
             if match:
-                if monitor_health is not None:
-                    e.monitor_health = monitor_health
+                if monitor_traffic is not None:
+                    e.monitor_traffic = monitor_traffic
                 return e
 
-        res = netinfra_inter__netinfra__backbone_link_entry(left_router=left_router, left_interface=left_interface, right_router=right_router, right_interface=right_interface, monitor_health=monitor_health)
+        res = netinfra_inter__netinfra__backbone_link_entry(left_router=left_router, left_interface=left_interface, right_router=right_router, right_interface=right_interface, monitor_traffic=monitor_traffic)
         self.elements.append(res)
         return res
 
