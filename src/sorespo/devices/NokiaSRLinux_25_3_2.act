@@ -36969,7 +36969,6 @@ class ietf_netconf_monitoring__get_schema__output(yang.adata.MNode):
 
 
 actor rpc_root(tp: yang.gdata.TreeProvider):
-    var tree: ?yang.gdata.Node = root().to_gdata()
     def get_schema(cb: action(?ietf_netconf_monitoring__get_schema__output, ?Exception) -> None, inp: ietf_netconf_monitoring__get_schema__input):
         def cb_wrap(res: ?xml.Node, err: ?Exception):
             if res is not None:
@@ -36984,27 +36983,5 @@ actor rpc_root(tp: yang.gdata.TreeProvider):
             gdata_inp = yang.adata.from_adata(SRC_DNODE, inp, True, ["ietf-netconf-monitoring:get-schema", "input"])
             rpc_xml.children.extend(gdata_inp.to_xml())
         tp.rpc_xml(cb_wrap, rpc_xml)
-
-    def subscribe(cb: action(?root, ?Exception) -> None, filt: ?yang.gdata.FNode, opts: yang.gdata.SubscriptionOpts) -> yang.gdata.SubscriptionHandle:
-        def cb_wrap(n: ?yang.gdata.Node, err: ?Exception):
-            if n is not None:
-                prev = tree
-                # TODO: fix yang.gdata.patch() to accept None as old tree
-                base = prev if prev is not None else yang.gdata.Container({})
-                tree2 = yang.gdata.patch(base, n)
-
-                if tree2 is not None:
-                    d = yang.gdata.diff(prev, tree2)
-                    if d is not None:
-                        cb(root.from_gdata(tree2), err)
-                    tree = tree2
-                else:
-                    if prev is not None:
-                        cb(root.from_gdata(None), err)
-                    tree = None
-            else:
-                cb(None, err)
-
-        return tp.subscribe(cb_wrap, filt, opts)
 
 
