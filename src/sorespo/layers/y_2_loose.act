@@ -112,7 +112,6 @@ SRC_DNODE_CHILD_14 = DList(module='sorespo-rfs', namespace='http://example.com/s
     DContainer(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='dynstate', config=True, presence=False, exts=[
             DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave.yang', prefix='sw', name='dynstate', arg=None, exts=[])
         ], children=[
-        DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='tracked-interface-name', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
         DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='pps', config=True, mandatory=False, type_=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)])))
     ])
 ])
@@ -263,9 +262,6 @@ def src_yang():
 
             container dynstate {
                 sw:dynstate;
-                leaf tracked-interface-name {
-                    type string;
-                }
                 leaf pps {
                     type uint32;
                 }
@@ -1737,17 +1733,13 @@ class stratoweave_rfs__rfs__backbone_interface__remote(yang.adata.MNode):
 
 _breaker = 1
 class stratoweave_rfs__rfs__backbone_interface__dynstate(yang.adata.MNode):
-    tracked_interface_name: ?str
     pps: ?u64
 
-    mut def __init__(self, tracked_interface_name: ?str, pps: ?u64):
+    mut def __init__(self, pps: ?u64):
         self._ns = 'http://example.com/sorespo-rfs'
-        self.tracked_interface_name = tracked_interface_name
         self.pps = pps
 
     def _get_attr(self, name: str) -> ?value:
-        if name == 'tracked_interface_name':
-            return self.tracked_interface_name
         if name == 'pps':
             return self.pps
         raise ValueError('Attribute {name} not found in stratoweave_rfs__rfs__backbone_interface__dynstate')
@@ -1758,7 +1750,7 @@ class stratoweave_rfs__rfs__backbone_interface__dynstate(yang.adata.MNode):
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> stratoweave_rfs__rfs__backbone_interface__dynstate:
         if n is not None:
-            return stratoweave_rfs__rfs__backbone_interface__dynstate(tracked_interface_name=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'tracked-interface-name')), pps=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'pps')))
+            return stratoweave_rfs__rfs__backbone_interface__dynstate(pps=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'pps')))
         return stratoweave_rfs__rfs__backbone_interface__dynstate()
 
     def copy(self):
