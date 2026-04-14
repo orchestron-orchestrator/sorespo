@@ -33,7 +33,7 @@ EOF
         -H "Content-Type: application/yang-data+xml" \
         -H "Async: true" \
         -d @/tmp/temp-config.xml \
-        "http://localhost:${OTRON_PORT}/restconf"
+        "http://localhost:${OTRON_PORT}/restconf/data"
     echo ""
 }
 
