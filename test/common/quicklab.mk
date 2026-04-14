@@ -103,19 +103,19 @@ shell:
 
 .PHONY: send-config-async
 send-config-async:
-	curl -X PUT -H "Content-Type: application/yang-data+xml" -H "Async: true" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf
+	curl -X PUT -H "Content-Type: application/yang-data+xml" -H "Async: true" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/data
 
 .PHONY: send-config-wait
 send-config-wait:
-	curl -X PUT -H "Content-Type: application/yang-data+xml" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf
+	curl -X PUT -H "Content-Type: application/yang-data+xml" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/data
 
 .PHONY: send-config-json-async
 send-config-json-async:
-	curl -X PUT -H "Content-Type: application/yang-data+json" -H "Async: true" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf
+	curl -X PUT -H "Content-Type: application/yang-data+json" -H "Async: true" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/data
 
 .PHONY: send-config-json-wait
 send-config-json-wait:
-	curl -X PUT -H "Content-Type: application/yang-data+json" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf
+	curl -X PUT -H "Content-Type: application/yang-data+json" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/data
 
 .PHONY: send-config-tmf640
 send-config-tmf640:
@@ -201,7 +201,7 @@ $(addprefix resync-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 
 .PHONY: delete-config
 delete-config:
-	curl -X DELETE http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/netinfra:netinfra/routers=STO-CORE-1
+	curl -X DELETE http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/data/netinfra:netinfra/routers=STO-CORE-1
 
 .PHONY: $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL) $(ROUTERS_FRR))
 $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL) $(ROUTERS_FRR)): cli-%: platform-cli-%
@@ -212,7 +212,7 @@ $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 
 .PHONY: test-restconf-get
 test-restconf-get:
-	curl -sS -f -H "Accept: application/yang-data+json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/netinfra:netinfra/router=AMS-CORE-1 | jq '.["netinfra:router"][0].name' | grep -q "AMS-CORE-1"
+	curl -sS -f -H "Accept: application/yang-data+json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/data/netinfra:netinfra/router=AMS-CORE-1 | jq '.["netinfra:router"][0].name' | grep -q "AMS-CORE-1"
 
 .PHONY: test
 test:
