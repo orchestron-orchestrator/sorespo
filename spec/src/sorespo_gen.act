@@ -11,26 +11,6 @@ actor main(env):
     fc = file.FileCap(env.cap)
     pc = process.ProcessCap(env.cap)
 
-    orchestron.build.apply_schema_transforms_to_dir(fc, "yang/CiscoIosXr_25_3_1", [
-        orchestron.build.SchemaTransformChain(".*yang.orig", [orchestron.build.SchemaTransformNoComments()])
-    ])
-    orchestron.build.apply_schema_transforms_to_dir(fc, "yang/NokiaSRLinux_25_3_2", [
-        orchestron.build.SchemaTransformChain(".*yang.orig", [orchestron.build.SchemaTransformNoComments()])
-    ])
-
-    cfs_layer = orchestron.build.Layer.from_dir(fc, "yang/cfs")
-    cfs_layer.models.extend([
-        oyang.stratoweave,
-        oyang.ietf_inet_types,
-        tmf.yang.ietf_yang_tmf_map,
-        tmf.yang.swtmf.replace("TMF640_STORE_TRANSFORM", "sorespo.tmf.Tmf640Store"),
-        tmf.yang.swtmf640
-    ])
-    inter_layer = orchestron.build.Layer.from_dir(fc, "yang/inter")
-    inter_layer.models.extend([oyang.stratoweave, oyang.ietf_inet_types])
-    rfs_layer = orchestron.build.Layer.from_dir(fc, "yang/rfs")
-    rfs_layer.models.extend([oyang.stratoweave, oyang.rfs, oyang.ietf_inet_types])
-
     def transform_list_order(dt):
         paths = [
             "/jc:configuration/protocols/bgp/group/neighbor",
@@ -374,19 +354,43 @@ actor main(env):
         "/network-instance/protocols/bgp/neighbor/send-default-route/export-policy",
     ]
 
-    spec = orchestron.build.SysSpec("sorespo", [
-        cfs_layer,
-        inter_layer,
-        rfs_layer,
-    ], [
-        orchestron.build.DeviceType.from_dir(fc, "CiscoIosXr_25_3_1", "yang/CiscoIosXr_25_3_1"),
-        orchestron.build.DeviceType.from_dir(fc, "JuniperCRPD_24_4R1_9", "yang/JuniperCRPD_24_4R1_9"),
-        orchestron.build.DeviceType.from_dir(fc, "NokiaSRLinux_25_3_2", "yang/NokiaSRLinux_25_3_2"),
-    ])
-    compiled_spec = spec.compile(broken_leafrefs)
-    transform_list_order(transform_filter_crpd(compiled_spec.dev_types["JuniperCRPD_24_4R1_9"]))
-    transform_filter_srl(compiled_spec.dev_types["NokiaSRLinux_25_3_2"])
-    transform_filter_xr(compiled_spec.dev_types["CiscoIosXr_25_3_1"])
-    compiled_spec.gen_app(fc, "../src/")
+    try:
+        orchestron.build.apply_schema_transforms_to_dir(fc, "yang/CiscoIosXr_25_3_1", [
+            orchestron.build.SchemaTransformChain(".*yang.orig", [orchestron.build.SchemaTransformNoComments()])
+        ])
+        orchestron.build.apply_schema_transforms_to_dir(fc, "yang/NokiaSRLinux_25_3_2", [
+            orchestron.build.SchemaTransformChain(".*yang.orig", [orchestron.build.SchemaTransformNoComments()])
+        ])
 
-    env.exit(0)
+        cfs_layer = orchestron.build.Layer.from_dir(fc, "yang/cfs")
+        cfs_layer.models.extend([
+            oyang.stratoweave,
+            oyang.ietf_inet_types,
+            tmf.yang.ietf_yang_tmf_map,
+            tmf.yang.swtmf.replace("TMF640_STORE_TRANSFORM", "sorespo.tmf.Tmf640Store"),
+            tmf.yang.swtmf640
+        ])
+        inter_layer = orchestron.build.Layer.from_dir(fc, "yang/inter")
+        inter_layer.models.extend([oyang.stratoweave, oyang.ietf_inet_types])
+        rfs_layer = orchestron.build.Layer.from_dir(fc, "yang/rfs")
+        rfs_layer.models.extend([oyang.stratoweave, oyang.rfs, oyang.ietf_inet_types])
+
+        spec = orchestron.build.SysSpec("sorespo", [
+            cfs_layer,
+            inter_layer,
+            rfs_layer,
+        ], [
+            orchestron.build.DeviceType.from_dir(fc, "CiscoIosXr_25_3_1", "yang/CiscoIosXr_25_3_1"),
+            orchestron.build.DeviceType.from_dir(fc, "JuniperCRPD_24_4R1_9", "yang/JuniperCRPD_24_4R1_9"),
+            orchestron.build.DeviceType.from_dir(fc, "NokiaSRLinux_25_3_2", "yang/NokiaSRLinux_25_3_2"),
+        ])
+        compiled_spec = spec.compile(broken_leafrefs)
+        transform_list_order(transform_filter_crpd(compiled_spec.dev_types["JuniperCRPD_24_4R1_9"]))
+        transform_filter_srl(compiled_spec.dev_types["NokiaSRLinux_25_3_2"])
+        transform_filter_xr(compiled_spec.dev_types["CiscoIosXr_25_3_1"])
+        compiled_spec.gen_app(fc, "../src/")
+    except Exception as exc:
+        print(exc, err=True)
+        env.exit(1)
+    else:
+        env.exit(0)
