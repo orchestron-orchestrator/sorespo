@@ -107,6 +107,9 @@ def _bb_interface_description(remote_device: str, remote_interface: str, monitor
         return "Link to {remote_device} [{remote_interface}] - {pps} PPS"
     return "Link to {remote_device} [{remote_interface}]"
 
+def bb_interface_subscription_owner_id(interface_name: str) -> str:
+    return "backbone-interface:{interface_name}"
+
 class BaseConfig(base.BaseConfig):
     def transform(self, i, di):
         print("RFS /rfs{{{di.name}}}/base-config transform running {i.role}", err=True)
@@ -228,24 +231,22 @@ end-policy
         raise UnsupportedDevice()
 
 actor BBInterfaceTransform(update_dynstate: proc(?BackboneInterfaceDynstate)->None, dev: odev.DeviceMgr):
+    var subs: ?gdata.SubscriptionManager = None
     var dynstate = base.BBInterface.dynstate_type()()
-    var published_pps = None
     var device_os: ?str = None
     var last_rx_packets: ?u64 = None
     var update_stopwatch = time.Stopwatch()
 
-    def publish_dynstate(dynstate: ?BackboneInterfaceDynstate):
-        pps = dynstate?.pps
-        if pps == published_pps:
+    def publish_dynstate(pps: ?u64):
+        if pps == dynstate.pps:
             return
-        published_pps = pps
+        dynstate.pps = pps
         update_dynstate(dynstate)
 
     def reset_sample_state():
         last_rx_packets = None
         update_stopwatch.reset()
-        dynstate.pps = None
-        publish_dynstate(dynstate)
+        publish_dynstate(None)
 
     def on_state(t: ?gdata.Node, err: ?Exception):
         if err is not None:
@@ -253,22 +254,19 @@ actor BBInterfaceTransform(update_dynstate: proc(?BackboneInterfaceDynstate)->No
             return
         if device_os is not None:
             rx_packets = _rx_packets_from_oper_tree(t, device_os)
-            dynstate.pps = None
-            if rx_packets is not None and last_rx_packets is not None:
-                elapsed_ms = _duration_ms(update_stopwatch.elapsed())
-                if elapsed_ms > 0:
-                    dynstate.pps = u64((int(rx_packets - last_rx_packets) * 1000) // elapsed_ms)
+            elapsed_ms = _duration_ms(update_stopwatch.elapsed())
+            if elapsed_ms > 0 and rx_packets is not None and last_rx_packets is not None:
+                pps = u64((int(rx_packets - last_rx_packets) * 1000) // elapsed_ms)
+                publish_dynstate(pps)
             last_rx_packets = rx_packets
             update_stopwatch.reset()
-            publish_dynstate(dynstate)
-
-    var subs = gdata.SubscriptionManager(dev.tree_provider(), "backbone-interface", on_state)
 
     def on_conf(conf: y_2.stratoweave_rfs__rfs__backbone_interface_entry):
+        if subs is None:
+            subs = gdata.SubscriptionManager(dev.tree_provider(), "backbone-interface/{conf.name}", on_state)
         if not conf.monitor_traffic:
             clear_tracking()
             return
-
         modset, _modset_id = dev.get_modules()
         next_device_os = _device_os(modset)
         if next_device_os is not None:
@@ -277,7 +275,8 @@ actor BBInterfaceTransform(update_dynstate: proc(?BackboneInterfaceDynstate)->No
                 reset_sample_state()
             want = set()
             want.add(gdata.SubscriptionSpec(_bb_interface_state_filter(next_device_os, conf.name), period=5.0))
-            subs.declare(want)
+            if subs is not None:
+                subs.declare(want)
             return
 
         clear_tracking()
@@ -285,7 +284,8 @@ actor BBInterfaceTransform(update_dynstate: proc(?BackboneInterfaceDynstate)->No
     def clear_tracking():
         device_os = None
         reset_sample_state()
-        subs.declare(set())
+        if subs is not None:
+            subs.declare(set())
 
 class BBInterface(base.BBInterface):
     def transform(self, i, di, dynstate):
