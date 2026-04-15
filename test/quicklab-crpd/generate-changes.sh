@@ -1,15 +1,15 @@
 #!/bin/bash
 # Generate config changes for testing the approval queue
 
-# Get the Orchestron port
-OTRON_PORT=$(docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' sorespo-quicklab-crpd-otron)
+# Get the StratoWeave port
+SWEAVE_PORT=$(docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' sorespo-quicklab-crpd-sweave)
 
-if [ -z "$OTRON_PORT" ]; then
-    echo "Error: Could not find Orchestron container port"
+if [ -z "$SWEAVE_PORT" ]; then
+    echo "Error: Could not find StratoWeave container port"
     exit 1
 fi
 
-echo "Using Orchestron at port: $OTRON_PORT"
+echo "Using StratoWeave at port: $SWEAVE_PORT"
 
 # Function to send config
 send_config() {
@@ -33,7 +33,7 @@ EOF
         -H "Content-Type: application/yang-data+xml" \
         -H "Async: true" \
         -d @/tmp/temp-config.xml \
-        "http://localhost:${OTRON_PORT}/restconf/data"
+        "http://localhost:${SWEAVE_PORT}/restconf/data"
     echo ""
 }
 

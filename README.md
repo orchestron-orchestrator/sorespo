@@ -4,20 +4,20 @@
 
 The **SOmewhat REalistic Service Provider Orchestration** (SORESPO) network is
 a rather realistic looking Service Provider network. This repository contains a
-network automation system based on [Orchestron](https://github.com/stratoweave/orchestron).
+network automation system based on [StratoWeave](https://github.com/stratoweave/stratoweave).
 
 ## Introduction
-While SORESPO and Orchestron are closely related, they are two distinct
+While SORESPO and StratoWeave are closely related, they are two distinct
 projects with very different goals:
-* **Orchestron** is a ***platform*** for the development of robust network
+* **StratoWeave** is a ***platform*** for the development of robust network
 orchestration systems based on model-driven declarative transforms. It does the
 heavy lifting so you can focus on building automation that makes sense.
-* **SORESPO** is a **reference implementation** of an Orchestron system. You
+* **SORESPO** is a **reference implementation** of a StratoWeave system. You
 can use it to learn about network automation (development) or use it as a solid
 foundation for your own network automation system design.
 
 <p align="center">
-  <img src="docs/images/orchSorespoCombined.png" alt="The relationship between the Orchestron automation platform and the SORESPO service provider L3VPN service implementation" width="800"/>
+  <img src="docs/images/orchSorespoCombined.png" alt="The relationship between the StratoWeave automation platform and the SORESPO service provider L3VPN service implementation" width="800"/>
 </p>
 
 ## Getting Started
@@ -33,18 +33,18 @@ The Customer Facing Service (CFS) model is an implementation of the IETF's
 *YANG Data Model for L3VPN Service Delivery* defined in [RFC8299](https://datatracker.ietf.org/doc/rfc8299/).
 
 L3VPN was chosen as a good service to start out with as it is a common, well
-understood and overall useful service-provider use-case. But the Orchestron
+understood and overall useful service-provider use-case. But the StratoWeave
 platform is capable of implementing almost any automation use-case for any
 domain. Over time, we expect to deliver more services as part of SORESPO. But
 we will likewise deliver other reference implementations for many additional
 use-cases. With these reference implementations we aim to make service
-automation with Orchestron as simple as possible.
+automation with StratoWeave as simple as possible.
 
 ### Service Automation Layering
 
 SORESPO implements highly abstracted device and service configuration through
 layers of automation. While SORESPO is implemented using four discrete layers,
-Orchestron does not place any limitations on the number of layers that can be
+StratoWeave does not place any limitations on the number of layers that can be
 implemented - as few or many as necessary can be used.
 
 ```
