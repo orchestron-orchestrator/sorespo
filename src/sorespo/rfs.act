@@ -243,10 +243,13 @@ actor BBInterfaceTransform(update_dynstate: proc(?BackboneInterfaceDynstate)->No
         dynstate.pps = pps
         update_dynstate(dynstate)
 
-    def reset_sample_state():
+    def clear_tracking():
+        device_os = None
         last_rx_packets = None
         update_stopwatch.reset()
         publish_dynstate(None)
+        if subs is not None:
+            subs.declare(set())
 
     def on_state(t: ?gdata.Node, err: ?Exception):
         if err is not None:
@@ -268,24 +271,14 @@ actor BBInterfaceTransform(update_dynstate: proc(?BackboneInterfaceDynstate)->No
             clear_tracking()
             return
         modset, _modset_id = dev.get_modules()
-        next_device_os = _device_os(modset)
-        if next_device_os is not None:
-            if device_os != next_device_os:
-                device_os = next_device_os
-                reset_sample_state()
+        device_os = _device_os(modset)
+        if device_os is not None:
             want = set()
-            want.add(gdata.SubscriptionSpec(_bb_interface_state_filter(next_device_os, conf.name), period=5.0))
+            want.add(gdata.SubscriptionSpec(_bb_interface_state_filter(device_os, conf.name), period=5.0))
             if subs is not None:
                 subs.declare(want)
             return
-
         clear_tracking()
-
-    def clear_tracking():
-        device_os = None
-        reset_sample_state()
-        if subs is not None:
-            subs.declare(set())
 
 class BBInterface(base.BBInterface):
     def transform(self, i, di, dynstate):
