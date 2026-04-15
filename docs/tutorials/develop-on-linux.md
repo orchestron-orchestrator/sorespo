@@ -26,7 +26,7 @@ you can skip ahead to the [next step](develop-on-linux.md#modifying-the-sorespo-
 
 Clone the project:
 ```shell
-git clone https://github.com/orchestron-orchestrator/sorespo.git
+git clone https://github.com/stratoweave/sorespo.git
 ```
 
 Go into the `sorespo/test/quicklab-srl` directory and start the development

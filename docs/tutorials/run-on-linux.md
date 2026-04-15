@@ -29,7 +29,7 @@ distribution.
 
 Clone the project:
 ```shell
-git clone https://github.com/orchestron-orchestrator/sorespo.git
+git clone https://github.com/stratoweave/sorespo.git
 ```
 
 Go into the `sorespo/test/quicklab-srl` directory and start the tutorial:

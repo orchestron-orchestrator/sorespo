@@ -37,7 +37,7 @@ you can skip ahead to the [next step](develop-on-windows.md#modifying-the-soresp
 
 Clone the project:
 ```shell
-git clone https://github.com/orchestron-orchestrator/sorespo.git
+git clone https://github.com/stratoweave/sorespo.git
 ```
 
 Go into the `sorespo/test/quicklab-srl` directory and start the development
