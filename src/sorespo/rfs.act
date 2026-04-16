@@ -230,8 +230,7 @@ end-policy
 
         raise UnsupportedDevice()
 
-actor BBInterfaceTransform(update_dynstate: proc(?BackboneInterfaceDynstate)->None, dev: odev.DeviceMgr):
-    var subs: ?gdata.SubscriptionManager = None
+actor BBInterfaceTransform(path, update_dynstate: proc(?BackboneInterfaceDynstate)->None, dev: odev.DeviceMgr):
     var dynstate = base.BBInterface.dynstate_type()()
     var device_os: ?str = None
     var last_rx_packets: ?u64 = None
@@ -242,14 +241,6 @@ actor BBInterfaceTransform(update_dynstate: proc(?BackboneInterfaceDynstate)->No
             return
         dynstate.pps = pps
         update_dynstate(dynstate)
-
-    def clear_tracking():
-        device_os = None
-        last_rx_packets = None
-        update_stopwatch.reset()
-        publish_dynstate(None)
-        if subs is not None:
-            subs.declare(set())
 
     def on_state(t: ?gdata.Node, err: ?Exception):
         if err is not None:
@@ -264,21 +255,19 @@ actor BBInterfaceTransform(update_dynstate: proc(?BackboneInterfaceDynstate)->No
             last_rx_packets = rx_packets
             update_stopwatch.reset()
 
+    var subs = gdata.SubscriptionManager(dev.tree_provider(), str(path), on_state)
+
     def on_conf(conf: y_2.stratoweave_rfs__rfs__backbone_interface_entry):
-        if subs is None:
-            subs = gdata.SubscriptionManager(dev.tree_provider(), "backbone-interface/{conf.name}", on_state)
-        if not conf.monitor_traffic:
-            clear_tracking()
-            return
         modset, _modset_id = dev.get_modules()
         device_os = _device_os(modset)
-        if device_os is not None:
+        if conf.monitor_traffic and device_os is not None:
             want = set()
             want.add(gdata.SubscriptionSpec(_bb_interface_state_filter(device_os, conf.name), period=5.0))
-            if subs is not None:
-                subs.declare(want)
-            return
-        clear_tracking()
+            subs.declare(want)
+        else:
+            last_rx_packets = None
+            publish_dynstate(None)
+            subs.declare(set())
 
 class BBInterface(base.BBInterface):
     def transform(self, i, di, dynstate):
