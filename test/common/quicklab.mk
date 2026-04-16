@@ -63,15 +63,8 @@ configure:
 
 .PHONY: configure-tmf640
 configure-tmf640:
-	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-ams-core-1.json"
-	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-fra-core-1.json"
-	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-sto-core-1.json"
-	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-lju-core-1.json"
-	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-backbone-link-ams-fra.json"
-	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-backbone-link-ams-sto.json"
-	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-backbone-link-fra-sto.json"
-	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-backbone-link-fra-lju.json"
-	$(MAKE) send-config-tmf640 FILE="netinfra-tmf640-backbone-link-sto-lju.json"
+	$(MAKE) send-config-tmf640-stream FILE="netinfra.json" FILTER="../common/netinfra-to-tmf640.jq"
+	$(MAKE) send-config-tmf640-stream FILE="l3vpn-svc.json" FILTER="../common/l3vpn-svc-to-tmf640.jq"
 
 .PHONY: monitor-traffic-enable
 monitor-traffic-enable:
@@ -120,6 +113,15 @@ send-config-json-wait:
 .PHONY: send-config-tmf640
 send-config-tmf640:
 	curl  -k -sS -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/ServiceActivationAndConfiguration/v4/service | jq '.'
+
+.PHONY: send-config-tmf640-stream
+send-config-tmf640-stream:
+	set -e; \
+	json_services=$$(jq -c -f "$(FILTER)" "$(FILE)"); \
+	printf '%s\n' "$$json_services" | while IFS= read -r service; do \
+		response=$$(curl -f -k -sS -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "$$service" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/ServiceActivationAndConfiguration/v4/service); \
+		printf '%s\n' "$$response" | jq '.'; \
+	done
 
 .PHONY: get-config-tmf640
 get-config-tmf640:
