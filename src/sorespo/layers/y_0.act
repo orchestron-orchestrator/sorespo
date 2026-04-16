@@ -567,7 +567,8 @@ SRC_DNODE_CHILD_55 = DContainer(module='ietf-l3vpn-svc', namespace='urn:ietf:par
 ])
 
 SRC_DNODE_CHILD_45 = DList(module='ietf-l3vpn-svc', namespace='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', prefix='l3vpn-svc', name='vpn-service', key=['vpn-id'], config=True, description='List of VPN services.', min_elements=0, ordered_by='system', exts=[
-        DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave.yang', prefix='sw', name='transform', arg='sorespo.cfs.L3VpnVpnService', exts=[])
+        DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave.yang', prefix='sw', name='transform', arg='sorespo.cfs.L3VpnVpnService', exts=[]),
+        DExt(module='ietf-yang-tmf-map', namespace='urn:ietf:params:xml:ns:yang:ietf-yang-tmf-map', prefix='tmf', name='cfs-service', arg='L3VPN VPN Service', exts=[])
     ], children=[SRC_DNODE_CHILD_46, SRC_DNODE_CHILD_47, SRC_DNODE_CHILD_48, SRC_DNODE_CHILD_49, SRC_DNODE_CHILD_50, SRC_DNODE_CHILD_54, SRC_DNODE_CHILD_55])
 
 SRC_DNODE_CHILD_44 = DContainer(module='ietf-l3vpn-svc', namespace='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', prefix='l3vpn-svc', name='vpn-services', config=True, description='Top-level container for the VPN services.', presence=False, children=[SRC_DNODE_CHILD_45])
@@ -1074,7 +1075,8 @@ SRC_DNODE_CHILD_90 = DList(module='ietf-l3vpn-svc', namespace='urn:ietf:params:x
 SRC_DNODE_CHILD_89 = DContainer(module='ietf-l3vpn-svc', namespace='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', prefix='l3vpn-svc', name='site-network-accesses', config=True, description='List of accesses for a site.', presence=False, children=[SRC_DNODE_CHILD_90])
 
 SRC_DNODE_CHILD_57 = DList(module='ietf-l3vpn-svc', namespace='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', prefix='l3vpn-svc', name='site', key=['site-id'], config=True, description='List of sites.', min_elements=0, ordered_by='system', exts=[
-        DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave.yang', prefix='sw', name='transform', arg='sorespo.cfs.L3VpnSite', exts=[])
+        DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave.yang', prefix='sw', name='transform', arg='sorespo.cfs.L3VpnSite', exts=[]),
+        DExt(module='ietf-yang-tmf-map', namespace='urn:ietf:params:xml:ns:yang:ietf-yang-tmf-map', prefix='tmf', name='cfs-service', arg='L3VPN Site', exts=[])
     ], children=[SRC_DNODE_CHILD_58, SRC_DNODE_CHILD_59, SRC_DNODE_CHILD_60, SRC_DNODE_CHILD_61, SRC_DNODE_CHILD_62, SRC_DNODE_CHILD_63, SRC_DNODE_CHILD_64, SRC_DNODE_CHILD_65, SRC_DNODE_CHILD_66, SRC_DNODE_CHILD_67, SRC_DNODE_CHILD_68, SRC_DNODE_CHILD_69, SRC_DNODE_CHILD_80, SRC_DNODE_CHILD_81, SRC_DNODE_CHILD_89])
 
 SRC_DNODE_CHILD_56 = DContainer(module='ietf-l3vpn-svc', namespace='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', prefix='l3vpn-svc', name='sites', config=True, description='Container for sites.', presence=False, children=[SRC_DNODE_CHILD_57])
@@ -4792,6 +4794,9 @@ identity urllc {
   import stratoweave {
     prefix sw;
   }
+  import ietf-yang-tmf-map {
+    prefix tmf;
+  }
 
   description
     "Sorespo-specific augmentations for the standard IETF L3VPN service model.";
@@ -4803,10 +4808,12 @@ identity urllc {
 
   augment "/l3vpn-svc:l3vpn-svc/l3vpn-svc:vpn-services/l3vpn-svc:vpn-service" {
     sw:transform sorespo.cfs.L3VpnVpnService;
+    tmf:cfs-service "L3VPN VPN Service";
   }
 
   augment "/l3vpn-svc:l3vpn-svc/l3vpn-svc:sites/l3vpn-svc:site" {
     sw:transform sorespo.cfs.L3VpnSite;
+    tmf:cfs-service "L3VPN Site";
   }
 }
 """)
