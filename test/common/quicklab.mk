@@ -3,7 +3,7 @@ build-otron-image:
 
 licenses/%:
 # Ensure the symlink to the licenses private repo exists in the project root
-	@if [ ! -d ../../licenses ]; then \
+	@if [ ! -d ../../device-licenses ]; then \
 		echo "Error: licenses directory not found."; \
 		if [ ! -d ../../../licenses ]; then \
 			REMOTE_URL=$$(git remote get-url origin); \
@@ -15,14 +15,14 @@ licenses/%:
 			echo "Found existing licenses repository at ../../../licenses"; \
 		fi; \
 		echo "Creating symlink to licenses directory..."; \
-		ln -s ../licenses ../../licenses || \
+		ln -s ../licenses ../../device-licenses || \
 		(echo "Failed to create symlink to licenses directory." && exit 1); \
 	fi
 # Copy the requested license file to the test directory. We run containerlab in
 # a container, meaning we cannot follow a symlink outside of the current
 # project directory.
 	mkdir -p licenses
-	cp ../../licenses/$* $@
+	cp ../../device-licenses/$* $@
 
 .PHONY: start
 start: build-otron-image
