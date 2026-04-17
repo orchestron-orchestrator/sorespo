@@ -1,28 +1,27 @@
 # Orchestron Web UI
 
-A Svelte-based web interface for managing Orchestron/SORESPO devices.
+This frontend is now a SvelteKit application with an adapter-node build target.
 
 ## Setup
 
 ```bash
-# Install dependencies
 npm install
-
-# Run development server
 npm run dev
 ```
 
-The app will be available at http://localhost:3000
+The app runs on `http://localhost:3000`.
 
-## Features
+## Route Areas
 
-- Device list view with status indicators
-- Individual device detail pages
-- Device reconfiguration
-- Real-time status updates
+- `/devices`
+- `/operations/config-queue`
+- `/services`
 
 ## API Integration
 
-The UI expects the Orchestron API to be running on port 15000. The Vite dev server proxies `/api/*` requests to `http://localhost:15000`.
+The browser only talks to SvelteKit routes under `/api/*`.
 
-Currently using mock data - update the endpoints in `src/services/api.js` to connect to real Orchestron API endpoints.
+- `/api/*` proxies to the existing Orchestron backend on `http://localhost:15000`
+- `/api/restconf/*` proxies to the backend RESTCONF interface
+
+The upstream origin can be overridden with `ORCHESTRON_API_ORIGIN`.
