@@ -2,7 +2,7 @@
 
 ## Introduction
 
-SORESPO is a network automation system based on the Orchestron platform that
+SORESPO is a network automation system based on the StratoWeave platform that
 support configuring an IP network with L3VPN network services and manage the
 full life cycle of the network, including core network infrastructure 
 configuration. As part of the SORESPO git repository, there are a number of
@@ -52,7 +52,7 @@ make tutorial
 ...
 ... # Containerlab starts the SR Linux lab, this may take a few minutes ...
 ...
-Orchestron/sorespo running..
+StratoWeave/sorespo running..
 ```
 
 This will start the entire SR Linux network lab and run the SORESPO system in
@@ -153,7 +153,7 @@ are a great introduction to the Nokia SR Linux CLI.
 
 SORESPO implements highly abstracted device and service configuration through
 layers of automation. While SORESPO is implemented using four discrete layers,
-Orchestron does not place any limitations on the number of layers that can be
+StratoWeave does not place any limitations on the number of layers that can be
 implemented - as few or many as necessary can be used.
 
 ```
@@ -179,7 +179,7 @@ implemented - as few or many as necessary can be used.
 
 
 The SORESPO system implements a RESTCONF northbound interface, which is
-model-driven by Orchestron based on the top-level CFS YANG model of the SORESPO
+model-driven by StratoWeave based on the top-level CFS YANG model of the SORESPO
 system.
 
 For many common queries and tasks, `make` targets are implemented to send the
@@ -666,7 +666,7 @@ make test-ping
 *NOTE*: It may take up to a minute for the customer and provider routers to establish a BGP session and exchange routes.
 
 Throughout this tutorial you have used the `send-config-wait` target to apply
-intent configuration. This synchronous method waits for Orchestron to apply the
+intent configuration. This synchronous method waits for StratoWeave to apply the
 configuration to the device(s) before it returns. Usually, asynchronous
 operations are preferred. Try using the `send-config-async` target instead and
 notice how your terminal returns as soon as the intent was accepted by SORESPO.

@@ -1,7 +1,7 @@
 # Quicklab NOTCONF
 
 This lab contains four core routers. Two of the PE routers are Juniper cRPD,
-the other two are Cisco IOS XRd. Or ... that's what Orchestron will think when
+the other two are Cisco IOS XRd. Or ... that's what StratoWeave will think when
 it connects to these devices which are actually NOTCONF devices simulating the
 northbound interfaces (YANG models) of those vendors.
 

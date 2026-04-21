@@ -37,7 +37,7 @@ make dev-tutorial
 ...
 ... # Containerlab starts the SR Linux lab, this may take a few minutes ...
 ...
-Orchestron/sorespo running..
+StratoWeave/sorespo running..
 ...
 All config files applied
 ...
@@ -223,7 +223,7 @@ Review the YANG model for this layer in `sorespo/spec/yang/rfs/sorespo-rfs.yang`
 ...
 list vrf-interface {
     key "name";
-    orchestron:rfs-transform sorespo.rfs.VrfInterface;
+    sw:rfs-transform sorespo.rfs.VrfInterface;
     leaf name {
         type string;
     }
@@ -253,7 +253,7 @@ Modify the YANG module to add in the `mtu` leaf:
 ...
 list vrf-interface {
     key "name";
-    orchestron:rfs-transform sorespo.rfs.VrfInterface;
+    sw:rfs-transform sorespo.rfs.VrfInterface;
     leaf name {
         type string;
     }
@@ -317,7 +317,7 @@ After you have saved the files to disk, you can re-build the SORESPO binary
 to incorporate the change. Press *Ctrl+C* in the terminal window
 where SORESPO is running.
 
-In the same terminal window, request the Orchestron build system and
+In the same terminal window, request the StratoWeave build system and
 Acton YANG parser to re-generate the codebase from the SORESPO YANG modules:
 ```shell
 make -C ../../ gen

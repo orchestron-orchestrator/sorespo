@@ -47,7 +47,7 @@
   <nav>
     <div class="nav-container">
       <div class="nav-left">
-        <h1>Orchestron</h1>
+        <h1>StratoWeave</h1>
         <ul>
           <li>
             <Link to="/">Devices</Link>

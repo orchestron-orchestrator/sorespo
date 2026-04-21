@@ -1,5 +1,5 @@
-build-otron-image:
-	docker build --build-arg http_proxy=$(http_proxy) --build-arg https_proxy=$(https_proxy) -t sorespo-otron-base -f ../common/Dockerfile.otron .
+build-sweave-image:
+	docker build --build-arg http_proxy=$(http_proxy) --build-arg https_proxy=$(https_proxy) -t sorespo-sweave-base -f ../common/Dockerfile.sweave .
 
 licenses/%:
 # Ensure the symlink to the licenses private repo exists in the project root
@@ -25,7 +25,7 @@ licenses/%:
 	cp ../../licenses/$* $@
 
 .PHONY: start
-start: build-otron-image
+start: build-sweave-image
 	$(CLAB_BIN) deploy --topo $(TESTENV:sorespo-%=%).clab.yml --log-level debug --reconfigure
 
 .PHONY: stop
@@ -38,13 +38,13 @@ wait: $(addprefix platform-wait-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 
 .PHONY: copy
 copy:
-	docker cp ../../out/bin/sorespo $(TESTENV)-otron:/sorespo
-	docker cp l3vpn-svc.xml $(TESTENV)-otron:/l3vpn-svc.xml
-	docker cp netinfra.xml $(TESTENV)-otron:/netinfra.xml
+	docker cp ../../out/bin/sorespo $(TESTENV)-sweave:/sorespo
+	docker cp l3vpn-svc.xml $(TESTENV)-sweave:/l3vpn-svc.xml
+	docker cp netinfra.xml $(TESTENV)-sweave:/netinfra.xml
 
 .PHONY: run
 run:
-	docker exec $(INTERACTIVE) $(TESTENV)-otron /sorespo --rts-bt-dbg
+	docker exec $(INTERACTIVE) $(TESTENV)-sweave /sorespo --rts-bt-dbg
 
 ifndef CI
 INTERACTIVE=-it
@@ -54,7 +54,7 @@ endif
 
 .PHONY: run-and-configure
 run-and-configure:
-	docker exec $(INTERACTIVE) $(TESTENV)-otron /sorespo $(EXIT_ON_DONE) netinfra.xml l3vpn-svc.xml --rts-bt-dbg
+	docker exec $(INTERACTIVE) $(TESTENV)-sweave /sorespo $(EXIT_ON_DONE) netinfra.xml l3vpn-svc.xml --rts-bt-dbg
 
 .PHONY: configure
 configure:
@@ -92,27 +92,27 @@ dev-tutorial:
 
 .PHONY: shell
 shell:
-	docker exec -it $(TESTENV)-otron bash -l
+	docker exec -it $(TESTENV)-sweave bash -l
 
 .PHONY: send-config-async
 send-config-async:
-	curl -X PUT -H "Content-Type: application/yang-data+xml" -H "Async: true" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/data
+	curl -X PUT -H "Content-Type: application/yang-data+xml" -H "Async: true" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/restconf/data
 
 .PHONY: send-config-wait
 send-config-wait:
-	curl -X PUT -H "Content-Type: application/yang-data+xml" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/data
+	curl -X PUT -H "Content-Type: application/yang-data+xml" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/restconf/data
 
 .PHONY: send-config-json-async
 send-config-json-async:
-	curl -X PUT -H "Content-Type: application/yang-data+json" -H "Async: true" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/data
+	curl -X PUT -H "Content-Type: application/yang-data+json" -H "Async: true" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/restconf/data
 
 .PHONY: send-config-json-wait
 send-config-json-wait:
-	curl -X PUT -H "Content-Type: application/yang-data+json" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/data
+	curl -X PUT -H "Content-Type: application/yang-data+json" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/restconf/data
 
 .PHONY: send-config-tmf640
 send-config-tmf640:
-	curl  -k -sS -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/ServiceActivationAndConfiguration/v4/service | jq '.'
+	curl  -k -sS -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d @$(FILE) http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/tmf-api/ServiceActivationAndConfiguration/v4/service | jq '.'
 
 .PHONY: send-config-tmf640-stream
 send-config-tmf640-stream:
@@ -125,35 +125,35 @@ send-config-tmf640-stream:
 
 .PHONY: get-config-tmf640
 get-config-tmf640:
-	curl -k -sS -H "Accept: application/json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/ServiceActivationAndConfiguration/v4/service$(if $(ID),/$(ID),) | jq '.'
+	curl -k -sS -H "Accept: application/json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/tmf-api/ServiceActivationAndConfiguration/v4/service$(if $(ID),/$(ID),) | jq '.'
 
 .PHONY: get-tmf633-service-catalog
 get-tmf633-service-catalog:
-	curl -k -sS -H "Accept: application/json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/serviceCatalogManagement/v4/serviceCatalog$(if $(ID),/$(ID),) | jq '.'
+	curl -k -sS -H "Accept: application/json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/tmf-api/serviceCatalogManagement/v4/serviceCatalog$(if $(ID),/$(ID),) | jq '.'
 
 .PHONY: get-tmf633-service-category
 get-tmf633-service-category:
-	curl -k -sS -H "Accept: application/json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/serviceCatalogManagement/v4/serviceCategory$(if $(ID),/$(ID),) | jq '.'
+	curl -k -sS -H "Accept: application/json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/tmf-api/serviceCatalogManagement/v4/serviceCategory$(if $(ID),/$(ID),) | jq '.'
 
 .PHONY: get-tmf633-service-candidate
 get-tmf633-service-candidate:
-	curl -k -sS -H "Accept: application/json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/serviceCatalogManagement/v4/serviceCandidate$(if $(ID),/$(ID),) | jq '.'
+	curl -k -sS -H "Accept: application/json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/tmf-api/serviceCatalogManagement/v4/serviceCandidate$(if $(ID),/$(ID),) | jq '.'
 
 .PHONY: get-tmf633-service-specification
 get-tmf633-service-specification:
-	curl -k -sS -H "Accept: application/json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/serviceCatalogManagement/v4/serviceSpecification$(if $(ID),/$(ID),) | jq '.'
+	curl -k -sS -H "Accept: application/json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/tmf-api/serviceCatalogManagement/v4/serviceSpecification$(if $(ID),/$(ID),) | jq '.'
 
 .PHONY: get-config0 get-config1 get-config2 get-config3
 get-config0 get-config1 get-config2 get-config3:
-	curl -H "Accept: application/yang-data+xml" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/layer/$(subst get-config,,$@)
+	curl -H "Accept: application/yang-data+xml" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/layer/$(subst get-config,,$@)
 
 .PHONY: get-config-json0 get-config-json1 get-config-json2 get-config-json3
 get-config-json0 get-config-json1 get-config-json2 get-config-json3:
-	@curl -H "Accept: application/yang-data+json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/layer/$(subst get-config-json,,$@)
+	@curl -H "Accept: application/yang-data+json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/layer/$(subst get-config-json,,$@)
 
 .PHONY: get-config-adata0 get-config-adata1 get-config-adata2 get-config-adata3
 get-config-adata0 get-config-adata1 get-config-adata2 get-config-adata3:
-	@curl -H "Accept: application/yang-data+acton-adata" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/layer/$(subst get-config-adata,,$@)?loose=$(LAYER_CONFIG_LOOSE)
+	@curl -H "Accept: application/yang-data+acton-adata" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/layer/$(subst get-config-adata,,$@)?loose=$(LAYER_CONFIG_LOOSE)
 
 # Default for /layer/<idx> adata output (query param).
 LAYER_CONFIG_LOOSE?=true
@@ -168,12 +168,12 @@ DEVICE_CONFIG_FORMAT?=xml
 # /device endpoints are case-sensitive; normalize to upper-case.
 upper = $(shell printf '%s' "$(1)" | tr '[:lower:]' '[:upper:]')
 
-# "target" is the Orchestron's intended configuration, i.e. the configuration
+# "target" is the StratoWeave's intended configuration, i.e. the configuration
 # *we* want on the device. Note how this is not NMDA-speak for "intended
 # configuration" of the device itself.
 .PHONY: $(addprefix get-target-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-target-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
-	@curl http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/device/$(call upper,$(subst get-target-,,$@))/target?format=$(DEVICE_CONFIG_FORMAT)
+	@curl http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/device/$(call upper,$(subst get-target-,,$@))/target?format=$(DEVICE_CONFIG_FORMAT)
 
 .PHONY: $(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
@@ -183,7 +183,7 @@ $(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 # NMDA-speak is the "intended configuration".
 .PHONY: $(addprefix get-running-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-running-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
-	@curl http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/device/$(call upper,$(subst get-running-,,$@))/running?format=$(DEVICE_CONFIG_FORMAT)
+	@curl http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/device/$(call upper,$(subst get-running-,,$@))/running?format=$(DEVICE_CONFIG_FORMAT)
 
 .PHONY: $(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
@@ -191,7 +191,7 @@ $(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 
 .PHONY: $(addprefix get-diff-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-diff-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
-	@curl http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/device/$(call upper,$(subst get-diff-,,$@))/diff?format=$(DEVICE_CONFIG_FORMAT)
+	@curl http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/device/$(call upper,$(subst get-diff-,,$@))/diff?format=$(DEVICE_CONFIG_FORMAT)
 
 .PHONY: $(addprefix get-diff-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-diff-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
@@ -199,22 +199,22 @@ $(addprefix get-diff-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 
 .PHONY: $(addprefix resync-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix resync-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
-	@curl http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/device/$(call upper,$(subst resync-,,$@))/resync
+	@curl http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/device/$(call upper,$(subst resync-,,$@))/resync
 
 .PHONY: delete-config
 delete-config:
-	curl -X DELETE http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/data/netinfra:netinfra/routers=STO-CORE-1
+	curl -X DELETE http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/restconf/data/netinfra:netinfra/routers=STO-CORE-1
 
 .PHONY: $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL) $(ROUTERS_FRR))
 $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL) $(ROUTERS_FRR)): cli-%: platform-cli-%
 
 .PHONY: $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
-	docker run $(INTERACTIVE) --rm --network container:$(TESTENV)-otron ghcr.io/stratoweave/ncurl --host $(@:get-dev-config-%=%) --port 830 --username clab --password clab@123 get-config
+	docker run $(INTERACTIVE) --rm --network container:$(TESTENV)-sweave ghcr.io/stratoweave/ncurl --host $(@:get-dev-config-%=%) --port 830 --username clab --password clab@123 get-config
 
 .PHONY: test-restconf-get
 test-restconf-get:
-	curl -sS -f -H "Accept: application/yang-data+json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/restconf/data/netinfra:netinfra/router=AMS-CORE-1 | jq '.["netinfra:router"][0].name' | grep -q "AMS-CORE-1"
+	curl -sS -f -H "Accept: application/yang-data+json" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/restconf/data/netinfra:netinfra/router=AMS-CORE-1 | jq '.["netinfra:router"][0].name' | grep -q "AMS-CORE-1"
 
 .PHONY: test
 test:
