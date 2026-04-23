@@ -1885,9 +1885,11 @@ class stratoweave_rfs__rfs__ibgp_neighbor(yang.adata.MNode):
     mut def create(self, address, asn, description):
         for e in self:
             match = True
-            if e.address != address:
-                match = False
-                continue
+            e_address = e.address
+            if isinstance(e_address, str) and isinstance(address, str):
+                if e_address != address:
+                    match = False
+                    continue
             if match:
                 e.asn = asn
                 e.description = description
@@ -2146,9 +2148,11 @@ class stratoweave_rfs__rfs__ebgp_customer(yang.adata.MNode):
             if e.vrf != vrf:
                 match = False
                 continue
-            if e.address != address:
-                match = False
-                continue
+            e_address = e.address
+            if isinstance(e_address, str) and isinstance(address, str):
+                if e_address != address:
+                    match = False
+                    continue
             if match:
                 e.local_asn = local_asn
                 e.peer_asn = peer_asn

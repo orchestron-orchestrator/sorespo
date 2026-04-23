@@ -16,13 +16,14 @@ from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface_entry
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface__dynstate as BackboneInterfaceDynstate
 
 import sorespo.devices.CiscoIosXr_25_3_1 as xr25
-from sorespo.devices.CiscoIosXr_25_3_1 import root as xr25_root
+import sorespo.devices.CiscoIosXr_25_3_1_oper as xr25_oper
+from sorespo.devices.CiscoIosXr_25_3_1_oper import root as xr25_oper_root
 import sorespo.devices.JuniperCRPD_24_4R1_9 as crpd24
 import sorespo.devices.NokiaSRLinux_25_3_2 as srl25
+import sorespo.devices.NokiaSRLinux_25_3_2_oper as srl25_oper
+from sorespo.devices.NokiaSRLinux_25_3_2_oper import root as srl25_oper_root
 
 CRPD = True
-DEVICE_OS_XR = "xr"
-DEVICE_OS_SRL = "srl"
 
 def prefix_length_to_netmask(prefix_length):
     binary_netmask = ("1" * prefix_length).ljust(32, "0")
@@ -50,57 +51,14 @@ def net_from_ip_address(ip_address):
     net_clns_address = '49.0001.' + join_str[0:4] + '.' + join_str[4:8] + '.' + join_str[8:] + '.00'
     return net_clns_address
 
-NS_IOS_XR_INTERFACES_OPER = xr25.NS_Cisco_IOS_XR_pfi_im_cmd_oper
-NS_SRL_INTERFACES = srl25.NS_srl_nokia_interfaces
-
-def _q_if_xr(name: str) -> gdata.Id:
-    return gdata.Id(NS_IOS_XR_INTERFACES_OPER, name)
-
-def _q_if_srl(name: str) -> gdata.Id:
-    return gdata.Id(NS_SRL_INTERFACES, name)
-
-def _device_os(modset) -> ?str:
-    if "Cisco-IOS-XR-um-hostname-cfg" in modset:
-        return DEVICE_OS_XR
-    if "srl_nokia-system" in modset:
-        return DEVICE_OS_SRL
-    return None
-
-def _bb_interface_state_filter(device_os: str, tracked_interface_name: str) -> gdata.FNode:
-    xr_filter = gdata.FNode(None, None, [
-        gdata.FNode(_q_if_xr("interfaces"), children=[
-            gdata.FNode(_q_if_xr("interface-xr"), children=[
-                gdata.FNode(_q_if_xr("interface"), children=[
-                    gdata.FNode(_q_if_xr("interface-name"), value_match=tracked_interface_name),
-                    gdata.FNode(_q_if_xr("interface-statistics"), children=[
-                        gdata.FNode(_q_if_xr("full-interface-stats"), children=[
-                            gdata.FNode(_q_if_xr("packets-received")),
-                        ])
-                    ])
-                ])
-            ])
-        ])
-    ])
-    srl_filter = gdata.FNode(None, None, [
-        gdata.FNode(_q_if_srl("interface"), children=[
-            gdata.FNode(_q_if_srl("name"), value_match=tracked_interface_name),
-            gdata.FNode(_q_if_srl("statistics"), children=[
-                gdata.FNode(_q_if_srl("in-unicast-packets")),
-            ])
-        ])
-    ])
-    return xr_filter if device_os == DEVICE_OS_XR else srl_filter
-
 def _duration_ms(duration: time.Duration) -> int:
     return duration.second * 1000 + duration.attosecond // 10**15
 
-def _rx_packets_from_oper_tree(t: ?gdata.Node, device_os: str) -> ?u64:
-    if device_os == DEVICE_OS_XR:
-        for interface in xr25_root.from_gdata(t).pfi_im_cmd_oper_interfaces.interface_xr.interface:
-            return interface.interface_statistics.full_interface_stats.packets_received
-    elif device_os == DEVICE_OS_SRL:
-        for interface in srl25.root.from_gdata(t).interface:
-            return interface.statistics.in_unicast_packets
+class InterfaceStats(object):
+    rx_packets: ?u64
+
+    def __init__(self, rx_packets: ?u64):
+        self.rx_packets = rx_packets
 
 def _bb_interface_description(remote_device: str, remote_interface: str, monitored: bool = False, pps: ?u64=None) -> str:
     if monitored and pps is not None:
@@ -120,7 +78,7 @@ class BaseConfig(base.BaseConfig):
             print("RFS /rfs{{{di.name}}}/base-config transform for Cisco IOS XR", err=True)
             dev = xr25.root()
             dev.hostname.system_network_name = di.name
-            intf = dev.um_interface_cfg_interfaces.interface.create("Loopback0")
+            intf = dev.interfaces.interface.create("Loopback0")
             intf.ipv4.addresses.create_address(i.ipv4_address, "255.255.255.255")
 
             # IS-IS global config
@@ -231,43 +189,67 @@ end-policy
         raise UnsupportedDevice()
 
 actor BBInterfaceTransform(path, update_dynstate: proc(?BackboneInterfaceDynstate)->None, dev: swdev.DeviceMgr):
-    var dynstate = base.BBInterface.dynstate_type()()
-    var device_os: ?str = None
+    _dynstate = base.BBInterface.dynstate_type()()
+    _subs = gdata.SubscriptionManager(dev.tree_provider(), str(path))
     var last_rx_packets: ?u64 = None
     var update_stopwatch = time.Stopwatch()
 
-    def publish_dynstate(pps: ?u64):
-        if pps == dynstate.pps:
-            return
-        dynstate.pps = pps
-        update_dynstate(dynstate)
+    def reset_stats():
+        last_rx_packets = None
+        update_stopwatch.reset()
+        _dynstate.pps = None
+        update_dynstate(_dynstate)
 
-    def on_state(t: ?gdata.Node, err: ?Exception):
+    def handle_stats(stats: InterfaceStats):
+        if stats.rx_packets is None:
+            reset_stats()
+            return
+        rx_packets = stats.rx_packets!
+        elapsed_ms = _duration_ms(update_stopwatch.elapsed())
+        if last_rx_packets is not None and elapsed_ms > 0:
+            _dynstate.pps = u64((int(rx_packets - last_rx_packets!) * 1000) // elapsed_ms)
+            update_dynstate(_dynstate)
+        last_rx_packets = rx_packets
+        update_stopwatch.reset()
+
+    def on_xr_state(root: ?xr25_oper_root, err: ?Exception):
+        stats = InterfaceStats(None)
         if err is not None:
             print("BBInterfaceTransform subscription error: {err}", err=True)
-            return
-        if device_os is not None:
-            rx_packets = _rx_packets_from_oper_tree(t, device_os)
-            elapsed_ms = _duration_ms(update_stopwatch.elapsed())
-            if elapsed_ms > 0 and rx_packets is not None and last_rx_packets is not None:
-                pps = u64((int(rx_packets - last_rx_packets) * 1000) // elapsed_ms)
-                publish_dynstate(pps)
-            last_rx_packets = rx_packets
-            update_stopwatch.reset()
+        elif root is not None:
+            for interface in root.pfi_im_cmd_oper_interfaces.interface_xr.interface:
+                stats.rx_packets = interface.interface_statistics.full_interface_stats.packets_received
+        handle_stats(stats)
 
-    var subs = gdata.SubscriptionManager(dev.tree_provider(), str(path), on_state)
+    def on_srl_state(root: ?srl25_oper_root, err: ?Exception):
+        stats = InterfaceStats(None)
+        if err is not None:
+            print("BBInterfaceTransform subscription error: {err}", err=True)
+        elif root is not None:
+            for interface in root.interface:
+                stats.rx_packets = interface.statistics.in_unicast_packets
+        handle_stats(stats)
+
+    xr_dst = xr25_oper.dst(on_xr_state)
+    srl_dst = srl25_oper.dst(on_srl_state)
 
     def on_conf(conf: y_2.stratoweave_rfs__rfs__backbone_interface_entry):
-        modset, _modset_id = dev.get_modules()
-        device_os = _device_os(modset)
-        if conf.monitor_traffic and device_os is not None:
-            want = set()
-            want.add(gdata.SubscriptionSpec(_bb_interface_state_filter(device_os, conf.name), period=5.0))
-            subs.declare(want)
+        want: set[gdata.Delivery] = set()
+        modset = dev.get_modules().0
+        if conf.monitor_traffic:
+            if "Cisco-IOS-XR-um-hostname-cfg" in modset:
+                want.add(xr_dst.deliver({
+                    xr25_oper.subs.pfi_im_cmd_oper_interfaces.interface_xr.interface.entry(conf.name).interface_statistics.full_interface_stats.packets_received.subscribe(period=5.0)
+                }))
+            elif "srl_nokia-system" in modset:
+                want.add(srl_dst.deliver({
+                    srl25_oper.subs.interface.entry(conf.name).statistics.in_unicast_packets.subscribe(period=5.0)
+                }))
+            else:
+                reset_stats()
         else:
-            last_rx_packets = None
-            publish_dynstate(None)
-            subs.declare(set())
+            reset_stats()
+        _subs.declare(want)
 
 class BBInterface(base.BBInterface):
     def transform(self, i, di, dynstate):
@@ -279,7 +261,7 @@ class BBInterface(base.BBInterface):
             dev = xr25.root()
 
             # Create the interface
-            intf = dev.um_interface_cfg_interfaces.interface.create(i.name, description=if_description)
+            intf = dev.interfaces.interface.create(i.name, description=if_description)
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(int(i.ipv4_prefix_length)))
@@ -475,8 +457,8 @@ class VrfInterface(base.VrfInterface):
             dev = xr25.root()
 
             # Main interface config
-            dev.um_interface_cfg_interfaces.interface.create(main_intf)
-            sub_intf = dev.um_interface_cfg_interfaces.interface.create(i.name, description=i.description, vrf=i.vrf)
+            dev.interfaces.interface.create(main_intf)
+            sub_intf = dev.interfaces.interface.create(i.name, description=i.description, vrf=i.vrf)
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 sub_intf.ipv4.addresses.create_address(ipv4_address, prefix_length_to_netmask(int(i.ipv4_prefix_length)))
