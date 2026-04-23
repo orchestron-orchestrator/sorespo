@@ -194,18 +194,21 @@ actor BBInterfaceTransform(path, update_dynstate: proc(?BackboneInterfaceDynstat
     var last_rx_packets: ?u64 = None
     var update_stopwatch = time.Stopwatch()
 
-    def publish_dynstate(pps: ?u64):
-        if pps == _dynstate.pps:
-            return
-        _dynstate.pps = pps
+    def reset_stats():
+        last_rx_packets = None
+        update_stopwatch.reset()
+        _dynstate.pps = None
         update_dynstate(_dynstate)
 
-    def handle_counters(stats: InterfaceStats):
-        rx_packets = stats.rx_packets
+    def handle_stats(stats: InterfaceStats):
+        if stats.rx_packets is None:
+            reset_stats()
+            return
+        rx_packets = stats.rx_packets!
         elapsed_ms = _duration_ms(update_stopwatch.elapsed())
-        if elapsed_ms > 0 and rx_packets is not None and last_rx_packets is not None:
-            pps = u64((int(rx_packets - last_rx_packets) * 1000) // elapsed_ms)
-            publish_dynstate(pps)
+        if last_rx_packets is not None and elapsed_ms > 0:
+            _dynstate.pps = u64((int(rx_packets - last_rx_packets!) * 1000) // elapsed_ms)
+            update_dynstate(_dynstate)
         last_rx_packets = rx_packets
         update_stopwatch.reset()
 
@@ -215,9 +218,8 @@ actor BBInterfaceTransform(path, update_dynstate: proc(?BackboneInterfaceDynstat
             print("BBInterfaceTransform subscription error: {err}", err=True)
         elif root is not None:
             for interface in root.pfi_im_cmd_oper_interfaces.interface_xr.interface:
-                stats = InterfaceStats(interface.interface_statistics.full_interface_stats.packets_received)
-                break
-        handle_counters(stats)
+                stats.rx_packets = interface.interface_statistics.full_interface_stats.packets_received
+        handle_stats(stats)
 
     def on_srl_state(root: ?srl25_oper_root, err: ?Exception):
         stats = InterfaceStats(None)
@@ -225,9 +227,8 @@ actor BBInterfaceTransform(path, update_dynstate: proc(?BackboneInterfaceDynstat
             print("BBInterfaceTransform subscription error: {err}", err=True)
         elif root is not None:
             for interface in root.interface:
-                stats = InterfaceStats(interface.statistics.in_unicast_packets)
-                break
-        handle_counters(stats)
+                stats.rx_packets = interface.statistics.in_unicast_packets
+        handle_stats(stats)
 
     xr_dst = xr25_oper.dst(on_xr_state)
     srl_dst = srl25_oper.dst(on_srl_state)
@@ -245,11 +246,9 @@ actor BBInterfaceTransform(path, update_dynstate: proc(?BackboneInterfaceDynstat
                     srl25_oper.subs.interface.entry(conf.name).statistics.in_unicast_packets.subscribe(period=5.0)
                 }))
             else:
-                last_rx_packets = None
-                publish_dynstate(None)
+                reset_stats()
         else:
-            last_rx_packets = None
-            publish_dynstate(None)
+            reset_stats()
         _subs.declare(want)
 
 class BBInterface(base.BBInterface):
