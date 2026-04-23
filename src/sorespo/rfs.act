@@ -1,6 +1,5 @@
 import yang.adata
 import yang.gdata as gdata
-import time
 import stratoweave.device as swdev
 import stratoweave.ttt
 from stratoweave.exception import UnsupportedDevice
@@ -8,6 +7,7 @@ from stratoweave.exception import UnsupportedDevice
 from rtrsecrets.junos import *
 
 import sorespo.cisco_vigenere
+import timeseries
 
 import sorespo.layers.base_2 as base
 import sorespo.layers.y_2 as y_2
@@ -50,9 +50,6 @@ def net_from_ip_address(ip_address):
     join_str = ''.join(padded_split)
     net_clns_address = '49.0001.' + join_str[0:4] + '.' + join_str[4:8] + '.' + join_str[8:] + '.00'
     return net_clns_address
-
-def _duration_ms(duration: time.Duration) -> int:
-    return duration.second * 1000 + duration.attosecond // 10**15
 
 class InterfaceStats(object):
     rx_packets: ?u64
@@ -191,12 +188,10 @@ end-policy
 actor BBInterfaceTransform(path, update_dynstate: proc(?BackboneInterfaceDynstate)->None, dev: swdev.DeviceMgr):
     _dynstate = base.BBInterface.dynstate_type()()
     _subs = gdata.SubscriptionManager(dev.tree_provider(), str(path))
-    var last_rx_packets: ?u64 = None
-    var update_stopwatch = time.Stopwatch()
+    var rx_packets: timeseries.Counter[u64] = timeseries.Counter(None, 2)
 
     def reset_stats():
-        last_rx_packets = None
-        update_stopwatch.reset()
+        rx_packets.clear()
         _dynstate.pps = None
         update_dynstate(_dynstate)
 
@@ -204,13 +199,9 @@ actor BBInterfaceTransform(path, update_dynstate: proc(?BackboneInterfaceDynstat
         if stats.rx_packets is None:
             reset_stats()
             return
-        rx_packets = stats.rx_packets!
-        elapsed_ms = _duration_ms(update_stopwatch.elapsed())
-        if last_rx_packets is not None and elapsed_ms > 0:
-            _dynstate.pps = u64((int(rx_packets - last_rx_packets!) * 1000) // elapsed_ms)
-            update_dynstate(_dynstate)
-        last_rx_packets = rx_packets
-        update_stopwatch.reset()
+        rx_packets.add(stats.rx_packets!)
+        _dynstate.pps = rx_packets.rate()
+        update_dynstate(_dynstate)
 
     def on_xr_state(root: ?xr25_oper_root, err: ?Exception):
         stats = InterfaceStats(None)
