@@ -1,5 +1,5 @@
 <p align="left">
-  <img src="docs/images/sorespoTempBlue.png" width="400"/>
+  <img src="docs/images/sorespoTmpBlue.png" width="400"/>
 </p>
 
 The **SOmewhat REalistic Service Provider Orchestration** (SORESPO) network is
