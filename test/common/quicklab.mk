@@ -119,7 +119,7 @@ send-config-tmf640-stream:
 	set -e; \
 	json_services=$$(jq -c -f "$(FILTER)" "$(FILE)"); \
 	printf '%s\n' "$$json_services" | while IFS= read -r service; do \
-		response=$$(curl -f -k -sS -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "$$service" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-otron)/tmf-api/ServiceActivationAndConfiguration/v4/service); \
+		response=$$(curl -f -k -sS -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "$$service" http://localhost:$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)/tmf-api/ServiceActivationAndConfiguration/v4/service); \
 		printf '%s\n' "$$response" | jq '.'; \
 	done
 
