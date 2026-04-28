@@ -1,5 +1,5 @@
 <p align="left">
-  <img src="../images/sorespo.png" width="400"/>
+  <img src="../images/SorespoTmpBlue.png" width="400"/>
 </p>
 
 # Tutorials
