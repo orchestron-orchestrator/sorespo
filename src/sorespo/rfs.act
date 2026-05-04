@@ -11,6 +11,7 @@ import timeseries
 
 import sorespo.layers.base_2 as base
 import sorespo.layers.y_2 as y_2
+import sorespo.layers.y_2_oper as y_2_oper
 
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface_entry
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface__dynstate as BackboneInterfaceDynstate
@@ -185,23 +186,31 @@ end-policy
 
         raise UnsupportedDevice()
 
-actor BBInterfaceTransform(path, update_dynstate: proc(?BackboneInterfaceDynstate)->None, dev: swdev.DeviceMgr):
-    _dynstate = base.BBInterface.dynstate_type()()
+actor BBInterfaceTransform(path, update_dynstate: proc(?BackboneInterfaceDynstate)->None, update_oper: proc(?y_2_oper.stratoweave_rfs__rfs__backbone_interface_entry)->None, dev: swdev.DeviceMgr):
     _subs = gdata.SubscriptionManager(dev.tree_provider(), str(path))
+    _dynstate = base.BBInterface.dynstate_type()()
+    _oper = base.BBInterface.new_state(path)
     var rx_packets: timeseries.Counter[u64] = timeseries.Counter(None, 2)
 
     def reset_stats():
         rx_packets.clear()
         _dynstate.pps = None
+        _oper.state.rx_packets = None
+        _oper.state.pps = None
         update_dynstate(_dynstate)
+        update_oper(_oper)
 
     def handle_stats(stats: InterfaceStats):
         if stats.rx_packets is None:
             reset_stats()
             return
         rx_packets.add(stats.rx_packets!)
-        _dynstate.pps = rx_packets.rate()
+        rate = rx_packets.rate()
+        _dynstate.pps = rate
+        _oper.state.rx_packets = stats.rx_packets!
+        _oper.state.pps = rate
         update_dynstate(_dynstate)
+        update_oper(_oper)
 
     def on_xr_state(root: ?xr25_oper_root, err: ?Exception):
         stats = InterfaceStats(None)
@@ -221,18 +230,17 @@ actor BBInterfaceTransform(path, update_dynstate: proc(?BackboneInterfaceDynstat
                 stats.rx_packets = interface.statistics.in_unicast_packets
         handle_stats(stats)
 
-    xr_dst = xr25_oper.dst(on_xr_state)
-    srl_dst = srl25_oper.dst(on_srl_state)
-
     def on_conf(conf: y_2.stratoweave_rfs__rfs__backbone_interface_entry):
         want: set[gdata.Delivery] = set()
         modset = dev.get_modules().0
         if conf.monitor_traffic:
             if "Cisco-IOS-XR-um-hostname-cfg" in modset:
+                xr_dst = xr25_oper.dst(on_xr_state)
                 want.add(xr_dst.deliver({
                     xr25_oper.subs.pfi_im_cmd_oper_interfaces.interface_xr.interface.entry(conf.name).interface_statistics.full_interface_stats.packets_received.subscribe(period=5.0)
                 }))
             elif "srl_nokia-system" in modset:
+                srl_dst = srl25_oper.dst(on_srl_state)
                 want.add(srl_dst.deliver({
                     srl25_oper.subs.interface.entry(conf.name).statistics.in_unicast_packets.subscribe(period=5.0)
                 }))

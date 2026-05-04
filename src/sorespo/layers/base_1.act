@@ -10,9 +10,13 @@ import yang.gdata
 import yang.xml
 
 from sorespo.layers.y_1 import netinfra_inter__netinfra__router_entry
+from sorespo.layers.y_1_oper import netinfra_inter__netinfra__router_entry as netinfra_inter__netinfra__router_entry__oper
 from sorespo.layers.y_1 import netinfra_inter__netinfra__backbone_link_entry
+from sorespo.layers.y_1_oper import netinfra_inter__netinfra__backbone_link_entry as netinfra_inter__netinfra__backbone_link_entry__oper
 from sorespo.layers.y_1 import netinfra_inter__netinfra__ibgp_fullmesh_entry
+from sorespo.layers.y_1_oper import netinfra_inter__netinfra__ibgp_fullmesh_entry as netinfra_inter__netinfra__ibgp_fullmesh_entry__oper
 from sorespo.layers.y_1 import l3vpn_inter__l3vpns__l3vpn_entry
+from sorespo.layers.y_1_oper import l3vpn_inter__l3vpns__l3vpn_entry as l3vpn_inter__l3vpns__l3vpn_entry__oper
 from sorespo.layers.y_1 import SRC_DNODE
 from sorespo.layers.y_2_loose import root as output_root
 
@@ -27,6 +31,16 @@ class Router(ttt.TransformFunction):
     def input_type():
         """Return the modeled input type for this transform"""
         return netinfra_inter__netinfra__router_entry
+
+    @staticmethod
+    def state_type():
+        """Return the modeled operational state type for this transform"""
+        return netinfra_inter__netinfra__router_entry__oper
+
+    @staticmethod
+    def new_state(path: ttt.Path):
+        """Create modeled operational state for this transform path"""
+        return netinfra_inter__netinfra__router_entry__oper.from_gdata(ttt.path_key_data(path))
 
     mut def transform_wrapper(self, i: yang.gdata.Node, linked: yang.gdata.Node, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from gdata to
@@ -53,6 +67,16 @@ class BBLink(ttt.TransformFunction):
         """Return the modeled input type for this transform"""
         return netinfra_inter__netinfra__backbone_link_entry
 
+    @staticmethod
+    def state_type():
+        """Return the modeled operational state type for this transform"""
+        return netinfra_inter__netinfra__backbone_link_entry__oper
+
+    @staticmethod
+    def new_state(path: ttt.Path):
+        """Create modeled operational state for this transform path"""
+        return netinfra_inter__netinfra__backbone_link_entry__oper.from_gdata(ttt.path_key_data(path))
+
     mut def transform_wrapper(self, i: yang.gdata.Node, linked: yang.gdata.Node, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from gdata to
         modeled input and back to gdata
@@ -78,6 +102,16 @@ class IbgpFullmesh(ttt.TransformFunction):
         """Return the modeled input type for this transform"""
         return netinfra_inter__netinfra__ibgp_fullmesh_entry
 
+    @staticmethod
+    def state_type():
+        """Return the modeled operational state type for this transform"""
+        return netinfra_inter__netinfra__ibgp_fullmesh_entry__oper
+
+    @staticmethod
+    def new_state(path: ttt.Path):
+        """Create modeled operational state for this transform path"""
+        return netinfra_inter__netinfra__ibgp_fullmesh_entry__oper.from_gdata(ttt.path_key_data(path))
+
     mut def transform_wrapper(self, i: yang.gdata.Node, linked: yang.gdata.Node, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from gdata to
         modeled input and back to gdata
@@ -102,6 +136,16 @@ class L3Vpn(ttt.TransformFunction):
     def input_type():
         """Return the modeled input type for this transform"""
         return l3vpn_inter__l3vpns__l3vpn_entry
+
+    @staticmethod
+    def state_type():
+        """Return the modeled operational state type for this transform"""
+        return l3vpn_inter__l3vpns__l3vpn_entry__oper
+
+    @staticmethod
+    def new_state(path: ttt.Path):
+        """Create modeled operational state for this transform path"""
+        return l3vpn_inter__l3vpns__l3vpn_entry__oper.from_gdata(ttt.path_key_data(path))
 
     mut def transform_wrapper(self, i: yang.gdata.Node, linked: yang.gdata.Node, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from gdata to
