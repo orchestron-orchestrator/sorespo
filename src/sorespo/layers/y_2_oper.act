@@ -115,10 +115,11 @@ SRC_DNODE_CHILD_15 = DList(module='sorespo-rfs', namespace='http://example.com/s
     DContainer(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='dynstate', config=True, presence=False, exts=[
             DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave.yang', prefix='sw', name='dynstate', arg=None, exts=[])
         ], children=[
-        DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='pps', config=True, mandatory=False, type_=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)])))
+        DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='pps', config=True, mandatory=False, type_=DTypeIntegerUnsigned(name='uint64', description=None, reference=None, exts=[], builtin_type='uint64', default=None, ranges=Ranges([(0, 18446744073709551615)])))
     ]),
     DContainer(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='state', config=False, presence=False, children=[
-        DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='rx-packets', config=False, mandatory=False, type_=DTypeIntegerUnsigned(name='uint64', description=None, reference=None, exts=[], builtin_type='uint64', default=None, ranges=Ranges([(0, 18446744073709551615)])))
+        DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='rx-packets', config=False, mandatory=False, type_=DTypeIntegerUnsigned(name='uint64', description=None, reference=None, exts=[], builtin_type='uint64', default=None, ranges=Ranges([(0, 18446744073709551615)]))),
+        DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='pps', config=False, mandatory=False, type_=DTypeIntegerUnsigned(name='uint64', description=None, reference=None, exts=[], builtin_type='uint64', default=None, ranges=Ranges([(0, 18446744073709551615)])))
     ])
 ])
 
@@ -269,13 +270,16 @@ def src_yang():
             container dynstate {
                 sw:dynstate;
                 leaf pps {
-                    type uint32;
+                    type uint64;
                 }
             }
 
             container state {
                 config false;
                 leaf rx-packets {
+                    type uint64;
+                }
+                leaf pps {
                     type uint64;
                 }
             }
@@ -1800,14 +1804,18 @@ class stratoweave_rfs__rfs__backbone_interface__dynstate(yang.adata.MNode):
 _breaker21 = None
 class stratoweave_rfs__rfs__backbone_interface__state(yang.adata.MNode):
     rx_packets: ?u64
+    pps: ?u64
 
-    mut def __init__(self, rx_packets: ?u64) -> None:
+    mut def __init__(self, rx_packets: ?u64, pps: ?u64) -> None:
         self._ns = 'http://example.com/sorespo-rfs'
         self.rx_packets = rx_packets
+        self.pps = pps
 
     def _get_attr(self, name: str) -> ?value:
         if name == 'rx_packets':
             return self.rx_packets
+        if name == 'pps':
+            return self.pps
 
     mut def to_gdata(self) -> yang.gdata.Node:
         return yang.adata.from_adata(SRC_DNODE, self, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:backbone-interface', 'state'])
@@ -1815,7 +1823,7 @@ class stratoweave_rfs__rfs__backbone_interface__state(yang.adata.MNode):
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> stratoweave_rfs__rfs__backbone_interface__state:
         if n is not None:
-            return stratoweave_rfs__rfs__backbone_interface__state(rx_packets=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'rx-packets')))
+            return stratoweave_rfs__rfs__backbone_interface__state(rx_packets=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'rx-packets')), pps=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'pps')))
         return stratoweave_rfs__rfs__backbone_interface__state()
 
     def copy(self) -> stratoweave_rfs__rfs__backbone_interface__state:
@@ -2761,13 +2769,15 @@ class stratoweave_rfs__rfs__backbone_interface__dynstate_subs(SubscriptionNode):
 
 class stratoweave_rfs__rfs__backbone_interface__state_subs(SubscriptionNode):
     rx_packets: SubscriptionNode
+    pps: SubscriptionNode
 
     def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
         self.rx_packets = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_sorespo_rfs, 'rx-packets'), parent=path))
+        self.pps = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_sorespo_rfs, 'pps'), parent=path))
 
     def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.rx_packets]
+        direct: list[SubscriptionNode] = [self.rx_packets, self.pps]
         return direct
 
 class stratoweave_rfs__rfs__backbone_interface_subs(SubscriptionNode):
