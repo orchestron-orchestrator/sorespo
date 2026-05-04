@@ -266,6 +266,13 @@ def src_yang():
                     type uint32;
                 }
             }
+
+            container state {
+                config false;
+                leaf rx-packets {
+                    type uint64;
+                }
+            }
         }
 
         list ibgp-neighbor {
@@ -1055,7 +1062,7 @@ class stratoweave_rfs__device__address__initial_credentials_entry(yang.adata.MNo
     password: str
     key: str
 
-    mut def __init__(self, username: str, password: str, key: str):
+    mut def __init__(self, username: str, password: str, key: str) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self.username = username
         self.password = password
@@ -1076,19 +1083,19 @@ class stratoweave_rfs__device__address__initial_credentials_entry(yang.adata.MNo
     mut def from_gdata(n: yang.gdata.Node) -> stratoweave_rfs__device__address__initial_credentials_entry:
         return stratoweave_rfs__device__address__initial_credentials_entry(username=n.get_str(yang.gdata.Id(NS_stratoweave_rfs, 'username')), password=n.get_str(yang.gdata.Id(NS_stratoweave_rfs, 'password')), key=n.get_str(yang.gdata.Id(NS_stratoweave_rfs, 'key')))
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__device__address__initial_credentials_entry:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__device__address__initial_credentials_entry.from_gdata(self.to_gdata())
 
 _breaker2 = None
 class stratoweave_rfs__device__address__initial_credentials(yang.adata.MNode):
     elements: list[stratoweave_rfs__device__address__initial_credentials_entry]
-    mut def __init__(self, elements=[]):
+    mut def __init__(self, elements: list[stratoweave_rfs__device__address__initial_credentials_entry]=[]) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self._name = 'initial-credentials'
         self.elements = elements
 
-    mut def create(self, username, password, key):
+    mut def create(self, username: str, password: str, key: str) -> stratoweave_rfs__device__address__initial_credentials_entry:
         for e in self:
             match = True
             if e.username != username:
@@ -1113,7 +1120,7 @@ class stratoweave_rfs__device__address__initial_credentials(yang.adata.MNode):
             return [stratoweave_rfs__device__address__initial_credentials_entry.from_gdata(e) for e in n.elements]
         return []
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__device__address__initial_credentials:
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
@@ -1134,7 +1141,7 @@ class stratoweave_rfs__device__address_entry(yang.adata.MNode):
     port: ?u64
     initial_credentials: stratoweave_rfs__device__address__initial_credentials
 
-    mut def __init__(self, name: str, address: ?str, port: ?u64, initial_credentials: list[stratoweave_rfs__device__address__initial_credentials_entry]=[]):
+    mut def __init__(self, name: str, address: ?str, port: ?u64, initial_credentials: list[stratoweave_rfs__device__address__initial_credentials_entry]=[]) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self.name = name
         self.address = address
@@ -1158,19 +1165,19 @@ class stratoweave_rfs__device__address_entry(yang.adata.MNode):
     mut def from_gdata(n: yang.gdata.Node) -> stratoweave_rfs__device__address_entry:
         return stratoweave_rfs__device__address_entry(name=n.get_str(yang.gdata.Id(NS_stratoweave_rfs, 'name')), address=n.get_opt_str(yang.gdata.Id(NS_stratoweave_rfs, 'address')), port=n.get_opt_u64(yang.gdata.Id(NS_stratoweave_rfs, 'port')), initial_credentials=stratoweave_rfs__device__address__initial_credentials.from_gdata(n.get_opt_list(yang.gdata.Id(NS_stratoweave_rfs, 'initial-credentials'))))
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__device__address_entry:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__device__address_entry.from_gdata(self.to_gdata())
 
 _breaker4 = None
 class stratoweave_rfs__device__address(yang.adata.MNode):
     elements: list[stratoweave_rfs__device__address_entry]
-    mut def __init__(self, elements=[]):
+    mut def __init__(self, elements: list[stratoweave_rfs__device__address_entry]=[]) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self._name = 'address'
         self.elements = elements
 
-    mut def create(self, name, address=None, port=None):
+    mut def create(self, name: str, address: ?str=None, port: ?u64=None) -> stratoweave_rfs__device__address_entry:
         for e in self:
             match = True
             if e.name != name:
@@ -1193,7 +1200,7 @@ class stratoweave_rfs__device__address(yang.adata.MNode):
             return [stratoweave_rfs__device__address_entry.from_gdata(e) for e in n.elements]
         return []
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__device__address:
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
@@ -1212,7 +1219,7 @@ class stratoweave_rfs__device__credentials__key_entry(yang.adata.MNode):
     key: str
     private_key: ?str
 
-    mut def __init__(self, key: str, private_key: ?str):
+    mut def __init__(self, key: str, private_key: ?str) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self.key = key
         self.private_key = private_key
@@ -1230,19 +1237,19 @@ class stratoweave_rfs__device__credentials__key_entry(yang.adata.MNode):
     mut def from_gdata(n: yang.gdata.Node) -> stratoweave_rfs__device__credentials__key_entry:
         return stratoweave_rfs__device__credentials__key_entry(key=n.get_str(yang.gdata.Id(NS_stratoweave_rfs, 'key')), private_key=n.get_opt_str(yang.gdata.Id(NS_stratoweave_rfs, 'private-key')))
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__device__credentials__key_entry:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__device__credentials__key_entry.from_gdata(self.to_gdata())
 
 _breaker6 = None
 class stratoweave_rfs__device__credentials__key(yang.adata.MNode):
     elements: list[stratoweave_rfs__device__credentials__key_entry]
-    mut def __init__(self, elements=[]):
+    mut def __init__(self, elements: list[stratoweave_rfs__device__credentials__key_entry]=[]) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self._name = 'key'
         self.elements = elements
 
-    mut def create(self, key, private_key=None):
+    mut def create(self, key: str, private_key: ?str=None) -> stratoweave_rfs__device__credentials__key_entry:
         for e in self:
             match = True
             if e.key != key:
@@ -1263,7 +1270,7 @@ class stratoweave_rfs__device__credentials__key(yang.adata.MNode):
             return [stratoweave_rfs__device__credentials__key_entry.from_gdata(e) for e in n.elements]
         return []
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__device__credentials__key:
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
@@ -1283,7 +1290,7 @@ class stratoweave_rfs__device__credentials(yang.adata.MNode):
     password: ?str
     key: stratoweave_rfs__device__credentials__key
 
-    mut def __init__(self, username: ?str, password: ?str, key: list[stratoweave_rfs__device__credentials__key_entry]=[]):
+    mut def __init__(self, username: ?str, password: ?str, key: list[stratoweave_rfs__device__credentials__key_entry]=[]) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self.username = username
         self.password = password
@@ -1306,7 +1313,7 @@ class stratoweave_rfs__device__credentials(yang.adata.MNode):
             return stratoweave_rfs__device__credentials(username=n.get_opt_str(yang.gdata.Id(NS_stratoweave_rfs, 'username')), password=n.get_opt_str(yang.gdata.Id(NS_stratoweave_rfs, 'password')), key=stratoweave_rfs__device__credentials__key.from_gdata(n.get_opt_list(yang.gdata.Id(NS_stratoweave_rfs, 'key'))))
         return stratoweave_rfs__device__credentials()
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__device__credentials:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__device__credentials.from_gdata(self.to_gdata())
 
@@ -1317,7 +1324,7 @@ class stratoweave_rfs__device__initial_credentials_entry(yang.adata.MNode):
     password: str
     key: str
 
-    mut def __init__(self, username: str, password: str, key: str):
+    mut def __init__(self, username: str, password: str, key: str) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self.username = username
         self.password = password
@@ -1338,19 +1345,19 @@ class stratoweave_rfs__device__initial_credentials_entry(yang.adata.MNode):
     mut def from_gdata(n: yang.gdata.Node) -> stratoweave_rfs__device__initial_credentials_entry:
         return stratoweave_rfs__device__initial_credentials_entry(username=n.get_str(yang.gdata.Id(NS_stratoweave_rfs, 'username')), password=n.get_str(yang.gdata.Id(NS_stratoweave_rfs, 'password')), key=n.get_str(yang.gdata.Id(NS_stratoweave_rfs, 'key')))
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__device__initial_credentials_entry:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__device__initial_credentials_entry.from_gdata(self.to_gdata())
 
 _breaker9 = None
 class stratoweave_rfs__device__initial_credentials(yang.adata.MNode):
     elements: list[stratoweave_rfs__device__initial_credentials_entry]
-    mut def __init__(self, elements=[]):
+    mut def __init__(self, elements: list[stratoweave_rfs__device__initial_credentials_entry]=[]) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self._name = 'initial-credentials'
         self.elements = elements
 
-    mut def create(self, username, password, key):
+    mut def create(self, username: str, password: str, key: str) -> stratoweave_rfs__device__initial_credentials_entry:
         for e in self:
             match = True
             if e.username != username:
@@ -1375,7 +1382,7 @@ class stratoweave_rfs__device__initial_credentials(yang.adata.MNode):
             return [stratoweave_rfs__device__initial_credentials_entry.from_gdata(e) for e in n.elements]
         return []
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__device__initial_credentials:
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
@@ -1396,7 +1403,7 @@ class stratoweave_rfs__device__mock__module_entry(yang.adata.MNode):
     revision: ?str
     feature: list[str]
 
-    mut def __init__(self, name: str, namespace: ?str, revision: ?str, feature: ?list[str]=None):
+    mut def __init__(self, name: str, namespace: ?str, revision: ?str, feature: ?list[str]=None) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self.name = name
         self.namespace = namespace
@@ -1420,19 +1427,19 @@ class stratoweave_rfs__device__mock__module_entry(yang.adata.MNode):
     mut def from_gdata(n: yang.gdata.Node) -> stratoweave_rfs__device__mock__module_entry:
         return stratoweave_rfs__device__mock__module_entry(name=n.get_str(yang.gdata.Id(NS_stratoweave_rfs, 'name')), namespace=n.get_opt_str(yang.gdata.Id(NS_stratoweave_rfs, 'namespace')), revision=n.get_opt_str(yang.gdata.Id(NS_stratoweave_rfs, 'revision')), feature=n.get_opt_strs(yang.gdata.Id(NS_stratoweave_rfs, 'feature')))
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__device__mock__module_entry:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__device__mock__module_entry.from_gdata(self.to_gdata())
 
 _breaker11 = None
 class stratoweave_rfs__device__mock__module(yang.adata.MNode):
     elements: list[stratoweave_rfs__device__mock__module_entry]
-    mut def __init__(self, elements=[]):
+    mut def __init__(self, elements: list[stratoweave_rfs__device__mock__module_entry]=[]) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self._name = 'module'
         self.elements = elements
 
-    mut def create(self, name, namespace=None, revision=None):
+    mut def create(self, name: str, namespace: ?str=None, revision: ?str=None) -> stratoweave_rfs__device__mock__module_entry:
         for e in self:
             match = True
             if e.name != name:
@@ -1455,7 +1462,7 @@ class stratoweave_rfs__device__mock__module(yang.adata.MNode):
             return [stratoweave_rfs__device__mock__module_entry.from_gdata(e) for e in n.elements]
         return []
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__device__mock__module:
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
@@ -1475,7 +1482,7 @@ class stratoweave_rfs__device__mock(yang.adata.MNode):
     preset: list[str]
     module: stratoweave_rfs__device__mock__module
 
-    mut def __init__(self, enabled: ?bool, preset: ?list[str]=None, module: list[stratoweave_rfs__device__mock__module_entry]=[]):
+    mut def __init__(self, enabled: ?bool, preset: ?list[str]=None, module: list[stratoweave_rfs__device__mock__module_entry]=[]) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self.enabled = enabled
         self.preset = preset if preset is not None else []
@@ -1498,7 +1505,7 @@ class stratoweave_rfs__device__mock(yang.adata.MNode):
             return stratoweave_rfs__device__mock(enabled=n.get_opt_bool(yang.gdata.Id(NS_stratoweave_rfs, 'enabled')), preset=n.get_opt_strs(yang.gdata.Id(NS_stratoweave_rfs, 'preset')), module=stratoweave_rfs__device__mock__module.from_gdata(n.get_opt_list(yang.gdata.Id(NS_stratoweave_rfs, 'module'))))
         return stratoweave_rfs__device__mock()
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__device__mock:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__device__mock.from_gdata(self.to_gdata())
 
@@ -1507,7 +1514,7 @@ _breaker13 = None
 class stratoweave_rfs__device__debug(yang.adata.MNode):
     connection: ?bool
 
-    mut def __init__(self, connection: ?bool):
+    mut def __init__(self, connection: ?bool) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self.connection = connection
 
@@ -1524,7 +1531,7 @@ class stratoweave_rfs__device__debug(yang.adata.MNode):
             return stratoweave_rfs__device__debug(connection=n.get_opt_bool(yang.gdata.Id(NS_stratoweave_rfs, 'connection')))
         return stratoweave_rfs__device__debug()
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__device__debug:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__device__debug.from_gdata(self.to_gdata())
 
@@ -1533,7 +1540,7 @@ _breaker14 = None
 class stratoweave_rfs__device__feature_flags(yang.adata.MNode):
     runtime_schema_fetch: ?bool
 
-    mut def __init__(self, runtime_schema_fetch: ?bool):
+    mut def __init__(self, runtime_schema_fetch: ?bool) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self.runtime_schema_fetch = runtime_schema_fetch
 
@@ -1550,7 +1557,7 @@ class stratoweave_rfs__device__feature_flags(yang.adata.MNode):
             return stratoweave_rfs__device__feature_flags(runtime_schema_fetch=n.get_opt_bool(yang.gdata.Id(NS_stratoweave_rfs, 'runtime-schema-fetch')))
         return stratoweave_rfs__device__feature_flags()
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__device__feature_flags:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__device__feature_flags.from_gdata(self.to_gdata())
 
@@ -1568,7 +1575,7 @@ class stratoweave_rfs__device_entry(yang.adata.MNode):
     debug: stratoweave_rfs__device__debug
     feature_flags: stratoweave_rfs__device__feature_flags
 
-    mut def __init__(self, name: str, description: ?str, type: ?str, address: list[stratoweave_rfs__device__address_entry]=[], credentials: ?stratoweave_rfs__device__credentials=None, initial_credentials: list[stratoweave_rfs__device__initial_credentials_entry]=[], approval_required: ?bool, mock: ?stratoweave_rfs__device__mock=None, debug: ?stratoweave_rfs__device__debug=None, feature_flags: ?stratoweave_rfs__device__feature_flags=None):
+    mut def __init__(self, name: str, description: ?str, type: ?str, address: list[stratoweave_rfs__device__address_entry]=[], credentials: ?stratoweave_rfs__device__credentials=None, initial_credentials: list[stratoweave_rfs__device__initial_credentials_entry]=[], approval_required: ?bool, mock: ?stratoweave_rfs__device__mock=None, debug: ?stratoweave_rfs__device__debug=None, feature_flags: ?stratoweave_rfs__device__feature_flags=None) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self.name = name
         self.description = description
@@ -1610,19 +1617,19 @@ class stratoweave_rfs__device_entry(yang.adata.MNode):
     mut def from_gdata(n: yang.gdata.Node) -> stratoweave_rfs__device_entry:
         return stratoweave_rfs__device_entry(name=n.get_str(yang.gdata.Id(NS_stratoweave_rfs, 'name')), description=n.get_opt_str(yang.gdata.Id(NS_stratoweave_rfs, 'description')), type=n.get_opt_str(yang.gdata.Id(NS_stratoweave_rfs, 'type')), address=stratoweave_rfs__device__address.from_gdata(n.get_opt_list(yang.gdata.Id(NS_stratoweave_rfs, 'address'))), credentials=stratoweave_rfs__device__credentials.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_stratoweave_rfs, 'credentials'))), initial_credentials=stratoweave_rfs__device__initial_credentials.from_gdata(n.get_opt_list(yang.gdata.Id(NS_stratoweave_rfs, 'initial-credentials'))), approval_required=n.get_opt_bool(yang.gdata.Id(NS_stratoweave_rfs, 'approval-required')), mock=stratoweave_rfs__device__mock.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_stratoweave_rfs, 'mock'))), debug=stratoweave_rfs__device__debug.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_stratoweave_rfs, 'debug'))), feature_flags=stratoweave_rfs__device__feature_flags.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_stratoweave_rfs, 'feature-flags'))))
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__device_entry:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__device_entry.from_gdata(self.to_gdata())
 
 _breaker16 = None
 class stratoweave_rfs__device(yang.adata.MNode):
     elements: list[stratoweave_rfs__device_entry]
-    mut def __init__(self, elements=[]):
+    mut def __init__(self, elements: list[stratoweave_rfs__device_entry]=[]) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self._name = 'device'
         self.elements = elements
 
-    mut def create(self, name, description=None, type=None, approval_required=None):
+    mut def create(self, name: str, description: ?str=None, type: ?str=None, approval_required: ?bool=None) -> stratoweave_rfs__device_entry:
         for e in self:
             match = True
             if e.name != name:
@@ -1647,7 +1654,7 @@ class stratoweave_rfs__device(yang.adata.MNode):
             return [stratoweave_rfs__device_entry.from_gdata(e) for e in n.elements]
         return []
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__device:
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
@@ -1669,7 +1676,7 @@ class stratoweave_rfs__rfs__base_config(yang.adata.MNode):
     asn: ?u64
     ibgp_authentication_key: ?str
 
-    mut def __init__(self, role: ?str, ipv4_address: ?str, ipv6_address: ?str, asn: ?u64, ibgp_authentication_key: ?str):
+    mut def __init__(self, role: ?str, ipv4_address: ?str, ipv6_address: ?str, asn: ?u64, ibgp_authentication_key: ?str) -> None:
         self._ns = 'http://example.com/sorespo-rfs'
         self.role = role
         self.ipv4_address = ipv4_address
@@ -1698,7 +1705,7 @@ class stratoweave_rfs__rfs__base_config(yang.adata.MNode):
             return stratoweave_rfs__rfs__base_config(role=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'role')), ipv4_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv4-address')), ipv6_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv6-address')), asn=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'asn')), ibgp_authentication_key=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ibgp-authentication-key')))
         return stratoweave_rfs__rfs__base_config()
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__rfs__base_config:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__rfs__base_config.from_gdata(self.to_gdata())
 
@@ -1708,7 +1715,7 @@ class stratoweave_rfs__rfs__backbone_interface__remote(yang.adata.MNode):
     device: ?str
     interface: ?str
 
-    mut def __init__(self, device: ?str, interface: ?str):
+    mut def __init__(self, device: ?str, interface: ?str) -> None:
         self._ns = 'http://example.com/sorespo-rfs'
         self.device = device
         self.interface = interface
@@ -1728,7 +1735,7 @@ class stratoweave_rfs__rfs__backbone_interface__remote(yang.adata.MNode):
             return stratoweave_rfs__rfs__backbone_interface__remote(device=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'device')), interface=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'interface')))
         return stratoweave_rfs__rfs__backbone_interface__remote()
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__rfs__backbone_interface__remote:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__rfs__backbone_interface__remote.from_gdata(self.to_gdata())
 
@@ -1737,7 +1744,7 @@ _breaker19 = None
 class stratoweave_rfs__rfs__backbone_interface__dynstate(yang.adata.MNode):
     pps: ?u64
 
-    mut def __init__(self, pps: ?u64):
+    mut def __init__(self, pps: ?u64) -> None:
         self._ns = 'http://example.com/sorespo-rfs'
         self.pps = pps
 
@@ -1754,7 +1761,7 @@ class stratoweave_rfs__rfs__backbone_interface__dynstate(yang.adata.MNode):
             return stratoweave_rfs__rfs__backbone_interface__dynstate(pps=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'pps')))
         return stratoweave_rfs__rfs__backbone_interface__dynstate()
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__rfs__backbone_interface__dynstate:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__rfs__backbone_interface__dynstate.from_gdata(self.to_gdata())
 
@@ -1769,7 +1776,7 @@ class stratoweave_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
     remote: stratoweave_rfs__rfs__backbone_interface__remote
     monitor_traffic: ?bool
 
-    mut def __init__(self, name: str, ipv4_address: ?str, ipv4_prefix_length: ?u64, ipv6_address: ?str, ipv6_prefix_length: ?u64, remote: ?stratoweave_rfs__rfs__backbone_interface__remote=None, monitor_traffic: ?bool):
+    mut def __init__(self, name: str, ipv4_address: ?str, ipv4_prefix_length: ?u64, ipv6_address: ?str, ipv6_prefix_length: ?u64, remote: ?stratoweave_rfs__rfs__backbone_interface__remote=None, monitor_traffic: ?bool) -> None:
         self._ns = 'http://example.com/sorespo-rfs'
         self.name = name
         self.ipv4_address = ipv4_address
@@ -1802,19 +1809,19 @@ class stratoweave_rfs__rfs__backbone_interface_entry(yang.adata.MNode):
     mut def from_gdata(n: yang.gdata.Node) -> stratoweave_rfs__rfs__backbone_interface_entry:
         return stratoweave_rfs__rfs__backbone_interface_entry(name=n.get_str(yang.gdata.Id(NS_sorespo_rfs, 'name')), ipv4_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv4-address')), ipv4_prefix_length=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'ipv4-prefix-length')), ipv6_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv6-address')), ipv6_prefix_length=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'ipv6-prefix-length')), remote=stratoweave_rfs__rfs__backbone_interface__remote.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_sorespo_rfs, 'remote'))), monitor_traffic=n.get_opt_bool(yang.gdata.Id(NS_sorespo_rfs, 'monitor-traffic')))
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__rfs__backbone_interface_entry:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__rfs__backbone_interface_entry.from_gdata(self.to_gdata())
 
 _breaker21 = None
 class stratoweave_rfs__rfs__backbone_interface(yang.adata.MNode):
     elements: list[stratoweave_rfs__rfs__backbone_interface_entry]
-    mut def __init__(self, elements=[]):
+    mut def __init__(self, elements: list[stratoweave_rfs__rfs__backbone_interface_entry]=[]) -> None:
         self._ns = 'http://example.com/sorespo-rfs'
         self._name = 'backbone-interface'
         self.elements = elements
 
-    mut def create(self, name, ipv4_address=None, ipv4_prefix_length=None, ipv6_address=None, ipv6_prefix_length=None, monitor_traffic=None):
+    mut def create(self, name: str, ipv4_address: ?str=None, ipv4_prefix_length: ?u64=None, ipv6_address: ?str=None, ipv6_prefix_length: ?u64=None, monitor_traffic: ?bool=None) -> stratoweave_rfs__rfs__backbone_interface_entry:
         for e in self:
             match = True
             if e.name != name:
@@ -1843,7 +1850,7 @@ class stratoweave_rfs__rfs__backbone_interface(yang.adata.MNode):
             return [stratoweave_rfs__rfs__backbone_interface_entry.from_gdata(e) for e in n.elements]
         return []
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__rfs__backbone_interface:
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
@@ -1863,7 +1870,7 @@ class stratoweave_rfs__rfs__ibgp_neighbor_entry(yang.adata.MNode):
     asn: ?u64
     description: ?str
 
-    mut def __init__(self, address: str, asn: ?u64, description: ?str):
+    mut def __init__(self, address: str, asn: ?u64, description: ?str) -> None:
         self._ns = 'http://example.com/sorespo-rfs'
         self.address = address
         self.asn = asn
@@ -1884,19 +1891,19 @@ class stratoweave_rfs__rfs__ibgp_neighbor_entry(yang.adata.MNode):
     mut def from_gdata(n: yang.gdata.Node) -> stratoweave_rfs__rfs__ibgp_neighbor_entry:
         return stratoweave_rfs__rfs__ibgp_neighbor_entry(address=n.get_str(yang.gdata.Id(NS_sorespo_rfs, 'address')), asn=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'asn')), description=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'description')))
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__rfs__ibgp_neighbor_entry:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__rfs__ibgp_neighbor_entry.from_gdata(self.to_gdata())
 
 _breaker23 = None
 class stratoweave_rfs__rfs__ibgp_neighbor(yang.adata.MNode):
     elements: list[stratoweave_rfs__rfs__ibgp_neighbor_entry]
-    mut def __init__(self, elements=[]):
+    mut def __init__(self, elements: list[stratoweave_rfs__rfs__ibgp_neighbor_entry]=[]) -> None:
         self._ns = 'http://example.com/sorespo-rfs'
         self._name = 'ibgp-neighbor'
         self.elements = elements
 
-    mut def create(self, address, asn=None, description=None):
+    mut def create(self, address: str, asn: ?u64=None, description: ?str=None) -> stratoweave_rfs__rfs__ibgp_neighbor_entry:
         for e in self:
             match = True
             e_address = e.address
@@ -1921,7 +1928,7 @@ class stratoweave_rfs__rfs__ibgp_neighbor(yang.adata.MNode):
             return [stratoweave_rfs__rfs__ibgp_neighbor_entry.from_gdata(e) for e in n.elements]
         return []
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__rfs__ibgp_neighbor:
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
@@ -1943,7 +1950,7 @@ class stratoweave_rfs__rfs__vrf_entry(yang.adata.MNode):
     router_id: ?u64
     asn: ?u64
 
-    mut def __init__(self, name: str, description: ?str, id: ?u64, router_id: ?u64, asn: ?u64):
+    mut def __init__(self, name: str, description: ?str, id: ?u64, router_id: ?u64, asn: ?u64) -> None:
         self._ns = 'http://example.com/sorespo-rfs'
         self.name = name
         self.description = description
@@ -1970,19 +1977,19 @@ class stratoweave_rfs__rfs__vrf_entry(yang.adata.MNode):
     mut def from_gdata(n: yang.gdata.Node) -> stratoweave_rfs__rfs__vrf_entry:
         return stratoweave_rfs__rfs__vrf_entry(name=n.get_str(yang.gdata.Id(NS_sorespo_rfs, 'name')), description=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'description')), id=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'id')), router_id=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'router-id')), asn=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'asn')))
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__rfs__vrf_entry:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__rfs__vrf_entry.from_gdata(self.to_gdata())
 
 _breaker25 = None
 class stratoweave_rfs__rfs__vrf(yang.adata.MNode):
     elements: list[stratoweave_rfs__rfs__vrf_entry]
-    mut def __init__(self, elements=[]):
+    mut def __init__(self, elements: list[stratoweave_rfs__rfs__vrf_entry]=[]) -> None:
         self._ns = 'http://example.com/sorespo-rfs'
         self._name = 'vrf'
         self.elements = elements
 
-    mut def create(self, name, description=None, id=None, router_id=None, asn=None):
+    mut def create(self, name: str, description: ?str=None, id: ?u64=None, router_id: ?u64=None, asn: ?u64=None) -> stratoweave_rfs__rfs__vrf_entry:
         for e in self:
             match = True
             if e.name != name:
@@ -2009,7 +2016,7 @@ class stratoweave_rfs__rfs__vrf(yang.adata.MNode):
             return [stratoweave_rfs__rfs__vrf_entry.from_gdata(e) for e in n.elements]
         return []
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__rfs__vrf:
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
@@ -2031,7 +2038,7 @@ class stratoweave_rfs__rfs__vrf_interface_entry(yang.adata.MNode):
     ipv4_address: ?str
     ipv4_prefix_length: ?u64
 
-    mut def __init__(self, name: str, description: ?str, vrf: ?str, ipv4_address: ?str, ipv4_prefix_length: ?u64):
+    mut def __init__(self, name: str, description: ?str, vrf: ?str, ipv4_address: ?str, ipv4_prefix_length: ?u64) -> None:
         self._ns = 'http://example.com/sorespo-rfs'
         self.name = name
         self.description = description
@@ -2058,19 +2065,19 @@ class stratoweave_rfs__rfs__vrf_interface_entry(yang.adata.MNode):
     mut def from_gdata(n: yang.gdata.Node) -> stratoweave_rfs__rfs__vrf_interface_entry:
         return stratoweave_rfs__rfs__vrf_interface_entry(name=n.get_str(yang.gdata.Id(NS_sorespo_rfs, 'name')), description=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'description')), vrf=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'vrf')), ipv4_address=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'ipv4-address')), ipv4_prefix_length=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'ipv4-prefix-length')))
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__rfs__vrf_interface_entry:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__rfs__vrf_interface_entry.from_gdata(self.to_gdata())
 
 _breaker27 = None
 class stratoweave_rfs__rfs__vrf_interface(yang.adata.MNode):
     elements: list[stratoweave_rfs__rfs__vrf_interface_entry]
-    mut def __init__(self, elements=[]):
+    mut def __init__(self, elements: list[stratoweave_rfs__rfs__vrf_interface_entry]=[]) -> None:
         self._ns = 'http://example.com/sorespo-rfs'
         self._name = 'vrf-interface'
         self.elements = elements
 
-    mut def create(self, name, description=None, vrf=None, ipv4_address=None, ipv4_prefix_length=None):
+    mut def create(self, name: str, description: ?str=None, vrf: ?str=None, ipv4_address: ?str=None, ipv4_prefix_length: ?u64=None) -> stratoweave_rfs__rfs__vrf_interface_entry:
         for e in self:
             match = True
             if e.name != name:
@@ -2097,7 +2104,7 @@ class stratoweave_rfs__rfs__vrf_interface(yang.adata.MNode):
             return [stratoweave_rfs__rfs__vrf_interface_entry.from_gdata(e) for e in n.elements]
         return []
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__rfs__vrf_interface:
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
@@ -2120,7 +2127,7 @@ class stratoweave_rfs__rfs__ebgp_customer_entry(yang.adata.MNode):
     description: ?str
     authentication_key: ?str
 
-    mut def __init__(self, vrf: str, address: str, local_asn: ?u64, peer_asn: ?u64, description: ?str, authentication_key: ?str):
+    mut def __init__(self, vrf: str, address: str, local_asn: ?u64, peer_asn: ?u64, description: ?str, authentication_key: ?str) -> None:
         self._ns = 'http://example.com/sorespo-rfs'
         self.vrf = vrf
         self.address = address
@@ -2150,19 +2157,19 @@ class stratoweave_rfs__rfs__ebgp_customer_entry(yang.adata.MNode):
     mut def from_gdata(n: yang.gdata.Node) -> stratoweave_rfs__rfs__ebgp_customer_entry:
         return stratoweave_rfs__rfs__ebgp_customer_entry(vrf=n.get_str(yang.gdata.Id(NS_sorespo_rfs, 'vrf')), address=n.get_str(yang.gdata.Id(NS_sorespo_rfs, 'address')), local_asn=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'local-asn')), peer_asn=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'peer-asn')), description=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'description')), authentication_key=n.get_opt_str(yang.gdata.Id(NS_sorespo_rfs, 'authentication-key')))
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__rfs__ebgp_customer_entry:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__rfs__ebgp_customer_entry.from_gdata(self.to_gdata())
 
 _breaker29 = None
 class stratoweave_rfs__rfs__ebgp_customer(yang.adata.MNode):
     elements: list[stratoweave_rfs__rfs__ebgp_customer_entry]
-    mut def __init__(self, elements=[]):
+    mut def __init__(self, elements: list[stratoweave_rfs__rfs__ebgp_customer_entry]=[]) -> None:
         self._ns = 'http://example.com/sorespo-rfs'
         self._name = 'ebgp-customer'
         self.elements = elements
 
-    mut def create(self, vrf, address, local_asn=None, peer_asn=None, description=None, authentication_key=None):
+    mut def create(self, vrf: str, address: str, local_asn: ?u64=None, peer_asn: ?u64=None, description: ?str=None, authentication_key: ?str=None) -> stratoweave_rfs__rfs__ebgp_customer_entry:
         for e in self:
             match = True
             if e.vrf != vrf:
@@ -2194,7 +2201,7 @@ class stratoweave_rfs__rfs__ebgp_customer(yang.adata.MNode):
             return [stratoweave_rfs__rfs__ebgp_customer_entry.from_gdata(e) for e in n.elements]
         return []
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__rfs__ebgp_customer:
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
@@ -2218,7 +2225,7 @@ class stratoweave_rfs__rfs_entry(yang.adata.MNode):
     vrf_interface: stratoweave_rfs__rfs__vrf_interface
     ebgp_customer: stratoweave_rfs__rfs__ebgp_customer
 
-    mut def __init__(self, name: str, base_config: ?stratoweave_rfs__rfs__base_config=None, backbone_interface: list[stratoweave_rfs__rfs__backbone_interface_entry]=[], ibgp_neighbor: list[stratoweave_rfs__rfs__ibgp_neighbor_entry]=[], vrf: list[stratoweave_rfs__rfs__vrf_entry]=[], vrf_interface: list[stratoweave_rfs__rfs__vrf_interface_entry]=[], ebgp_customer: list[stratoweave_rfs__rfs__ebgp_customer_entry]=[]):
+    mut def __init__(self, name: str, base_config: ?stratoweave_rfs__rfs__base_config=None, backbone_interface: list[stratoweave_rfs__rfs__backbone_interface_entry]=[], ibgp_neighbor: list[stratoweave_rfs__rfs__ibgp_neighbor_entry]=[], vrf: list[stratoweave_rfs__rfs__vrf_entry]=[], vrf_interface: list[stratoweave_rfs__rfs__vrf_interface_entry]=[], ebgp_customer: list[stratoweave_rfs__rfs__ebgp_customer_entry]=[]) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self.name = name
         self.base_config = base_config if base_config is not None else stratoweave_rfs__rfs__base_config()
@@ -2251,19 +2258,19 @@ class stratoweave_rfs__rfs_entry(yang.adata.MNode):
     mut def from_gdata(n: yang.gdata.Node) -> stratoweave_rfs__rfs_entry:
         return stratoweave_rfs__rfs_entry(name=n.get_str(yang.gdata.Id(NS_stratoweave_rfs, 'name')), base_config=stratoweave_rfs__rfs__base_config.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_sorespo_rfs, 'base-config'))), backbone_interface=stratoweave_rfs__rfs__backbone_interface.from_gdata(n.get_opt_list(yang.gdata.Id(NS_sorespo_rfs, 'backbone-interface'))), ibgp_neighbor=stratoweave_rfs__rfs__ibgp_neighbor.from_gdata(n.get_opt_list(yang.gdata.Id(NS_sorespo_rfs, 'ibgp-neighbor'))), vrf=stratoweave_rfs__rfs__vrf.from_gdata(n.get_opt_list(yang.gdata.Id(NS_sorespo_rfs, 'vrf'))), vrf_interface=stratoweave_rfs__rfs__vrf_interface.from_gdata(n.get_opt_list(yang.gdata.Id(NS_sorespo_rfs, 'vrf-interface'))), ebgp_customer=stratoweave_rfs__rfs__ebgp_customer.from_gdata(n.get_opt_list(yang.gdata.Id(NS_sorespo_rfs, 'ebgp-customer'))))
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__rfs_entry:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__rfs_entry.from_gdata(self.to_gdata())
 
 _breaker31 = None
 class stratoweave_rfs__rfs(yang.adata.MNode):
     elements: list[stratoweave_rfs__rfs_entry]
-    mut def __init__(self, elements=[]):
+    mut def __init__(self, elements: list[stratoweave_rfs__rfs_entry]=[]) -> None:
         self._ns = 'http://stratoweave.org/yang/stratoweave-rfs.yang'
         self._name = 'rfs'
         self.elements = elements
 
-    mut def create(self, name):
+    mut def create(self, name: str) -> stratoweave_rfs__rfs_entry:
         for e in self:
             match = True
             if e.name != name:
@@ -2282,7 +2289,7 @@ class stratoweave_rfs__rfs(yang.adata.MNode):
             return [stratoweave_rfs__rfs_entry.from_gdata(e) for e in n.elements]
         return []
 
-    def copy(self):
+    def copy(self) -> stratoweave_rfs__rfs:
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
@@ -2301,7 +2308,7 @@ class root(yang.adata.MNode):
     device: stratoweave_rfs__device
     rfs: stratoweave_rfs__rfs
 
-    mut def __init__(self, device: list[stratoweave_rfs__device_entry]=[], rfs: list[stratoweave_rfs__rfs_entry]=[]):
+    mut def __init__(self, device: list[stratoweave_rfs__device_entry]=[], rfs: list[stratoweave_rfs__rfs_entry]=[]) -> None:
         self._ns = ''
         self.device = stratoweave_rfs__device(elements=device)
         self.rfs = stratoweave_rfs__rfs(elements=rfs)
@@ -2321,7 +2328,7 @@ class root(yang.adata.MNode):
             return root(device=stratoweave_rfs__device.from_gdata(n.get_opt_list(yang.gdata.Id(NS_stratoweave_rfs, 'device'))), rfs=stratoweave_rfs__rfs.from_gdata(n.get_opt_list(yang.gdata.Id(NS_stratoweave_rfs, 'rfs'))))
         return root()
 
-    def copy(self):
+    def copy(self) -> root:
         """Create a deep copy of this adata object"""
         return root.from_gdata(self.to_gdata())
 
