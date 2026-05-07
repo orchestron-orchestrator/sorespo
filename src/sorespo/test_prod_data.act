@@ -2,7 +2,7 @@ import testing
 
 import sorespo.sysspec
 import sorespo.layers.y_0 as cfs_layer
-import stratoweave
+import stratoweave.testing as swts
 
 
 actor _test_complete_prod_data(t: testing.AsyncT):
@@ -126,19 +126,7 @@ actor _test_complete_prod_data(t: testing.AsyncT):
 
     sna_4.vpn_attachment.vpn_id = 'acme-65501'
 
-
-
-    input_config = root.to_gdata()
-    tr = stratoweave.test_main(sorespo.sysspec.SYSSPEC, t.log_handler)
-
-    def cont(_r: value):
-        t.success(tr.device_adata_snapshot())
-
-    tr.edit_config(input_config, cont)
-
-    def fail():
-        t.failure(ValueError())
-    after 2.5: fail()
+    swts.TransformTester(t, sorespo.sysspec.SYSSPEC, root.to_gdata())
 
 actor _test_netinfra_ams_core_1(t: testing.AsyncT):
     # Test input config
@@ -147,17 +135,7 @@ actor _test_netinfra_ams_core_1(t: testing.AsyncT):
     router.role = "edge"
     router.mock = True
 
-    input_config = root.to_gdata()
-    tr = stratoweave.test_main(sorespo.sysspec.SYSSPEC, t.log_handler)
-
-    def cont(_r: value):
-        t.success(tr.device_adata_snapshot())
-
-    tr.edit_config(input_config, cont)
-
-    def fail():
-        t.failure(ValueError())
-    after 2.5: fail()
+    swts.TransformTester(t, sorespo.sysspec.SYSSPEC, root.to_gdata())
 
 actor _test_netinfra_fra_core_1(t: testing.AsyncT):
     # Test input config
@@ -166,17 +144,7 @@ actor _test_netinfra_fra_core_1(t: testing.AsyncT):
     router.role = "edge"
     router.mock = True
 
-    input_config = root.to_gdata()
-    tr = stratoweave.test_main(sorespo.sysspec.SYSSPEC, t.log_handler)
-
-    def cont(_r: value):
-        t.success(tr.device_adata_snapshot())
-
-    tr.edit_config(input_config, cont)
-
-    def fail():
-        t.failure(ValueError())
-    after 2.5: fail()
+    swts.TransformTester(t, sorespo.sysspec.SYSSPEC, root.to_gdata())
 
 actor _test_netinfra_sto_core_1(t: testing.AsyncT):
     # Test input config
@@ -185,17 +153,7 @@ actor _test_netinfra_sto_core_1(t: testing.AsyncT):
     router.role = "edge"
     router.mock = True
 
-    input_config = root.to_gdata()
-    tr = stratoweave.test_main(sorespo.sysspec.SYSSPEC, t.log_handler)
-
-    def cont(_r: value):
-        t.success(tr.device_adata_snapshot())
-
-    tr.edit_config(input_config, cont)
-
-    def fail():
-        t.failure(ValueError())
-    after 2.5: fail()
+    swts.TransformTester(t, sorespo.sysspec.SYSSPEC, root.to_gdata())
 
 actor _test_netinfra_lju_core_1(t: testing.AsyncT):
     # Test input config
@@ -204,14 +162,4 @@ actor _test_netinfra_lju_core_1(t: testing.AsyncT):
     router.role = "edge"
     router.mock = True
 
-    input_config = root.to_gdata()
-    tr = stratoweave.test_main(sorespo.sysspec.SYSSPEC, t.log_handler)
-
-    def cont(_r: value):
-        t.success(tr.device_adata_snapshot())
-
-    tr.edit_config(input_config, cont)
-
-    def fail():
-        t.failure(ValueError())
-    after 2.5: fail()
+    swts.TransformTester(t, sorespo.sysspec.SYSSPEC, root.to_gdata())
