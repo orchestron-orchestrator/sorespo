@@ -7,8 +7,10 @@ import lmdb
 
 import stratoweave.app as swapp
 import stratoweave.device as swdev
+import stratoweave.adapters.netconf as swna
 import stratoweave.ttt as ttt
 
+import sorespo.device_types as sw_device_types
 import sorespo.layers.t_3
 import sorespo.layers.y_3
 import sorespo.layers.t_2
@@ -23,25 +25,6 @@ import sorespo.devices.JuniperCRPD_24_4R1_9
 import sorespo.devices.JuniperCRPD_24_4R1_9_oper
 import sorespo.devices.NokiaSRLinux_25_3_2
 import sorespo.devices.NokiaSRLinux_25_3_2_oper
-
-
-device_types: dict[str, swdev.DeviceType] = {
-    "CiscoIosXr_25_3_1": swdev.DeviceType(name="CiscoIosXr_25_3_1",
-            adapter_type=swdev.NetconfAdapter,
-            src_dnode=sorespo.devices.CiscoIosXr_25_3_1.SRC_DNODE,
-            oper_src_dnode=sorespo.devices.CiscoIosXr_25_3_1_oper.SRC_DNODE,
-        ),
-    "JuniperCRPD_24_4R1_9": swdev.DeviceType(name="JuniperCRPD_24_4R1_9",
-            adapter_type=swdev.NetconfAdapter,
-            src_dnode=sorespo.devices.JuniperCRPD_24_4R1_9.SRC_DNODE,
-            oper_src_dnode=sorespo.devices.JuniperCRPD_24_4R1_9_oper.SRC_DNODE,
-        ),
-    "NokiaSRLinux_25_3_2": swdev.DeviceType(name="NokiaSRLinux_25_3_2",
-            adapter_type=swdev.NetconfAdapter,
-            src_dnode=sorespo.devices.NokiaSRLinux_25_3_2.SRC_DNODE,
-            oper_src_dnode=sorespo.devices.NokiaSRLinux_25_3_2_oper.SRC_DNODE,
-        ),
-}
 
 def get_layers(dev_registry: swdev.DeviceRegistry, log_handler: ?logging.Handler=None, db: ?lmdb.Db=None):
     layer3 = ttt.Layer('3', sorespo.layers.t_3.get_ttt(None, dev_registry, log_handler), None, db)
@@ -68,5 +51,27 @@ def schema_for_layer(layer):
         return sorespo.layers.y_0.SRC_DNODE
     raise ValueError('Invalid layer: {layer}')
 
+
+generated_device_types: dict[str, swdev.DeviceType] = {
+    "CiscoIosXr_25_3_1": swdev.DeviceType(name="CiscoIosXr_25_3_1",
+            adapter_type=swna.NetconfAdapter,
+            src_dnode=sorespo.devices.CiscoIosXr_25_3_1.SRC_DNODE,
+            oper_src_dnode=sorespo.devices.CiscoIosXr_25_3_1_oper.SRC_DNODE,
+        ),
+    "JuniperCRPD_24_4R1_9": swdev.DeviceType(name="JuniperCRPD_24_4R1_9",
+            adapter_type=swna.NetconfAdapter,
+            src_dnode=sorespo.devices.JuniperCRPD_24_4R1_9.SRC_DNODE,
+            oper_src_dnode=sorespo.devices.JuniperCRPD_24_4R1_9_oper.SRC_DNODE,
+        ),
+    "NokiaSRLinux_25_3_2": swdev.DeviceType(name="NokiaSRLinux_25_3_2",
+            adapter_type=swna.NetconfAdapter,
+            src_dnode=sorespo.devices.NokiaSRLinux_25_3_2.SRC_DNODE,
+            oper_src_dnode=sorespo.devices.NokiaSRLinux_25_3_2_oper.SRC_DNODE,
+        ),
+}
+
+device_types: dict[str, swdev.DeviceType] = dict(
+    list(generated_device_types.items()) + list(sw_device_types.device_types.items())
+)
 
 SYSSPEC = swapp.SysSpec(device_types, get_layers, schema_for_layer)

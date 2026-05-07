@@ -3,7 +3,7 @@ import testing
 import xml
 
 import stratoweave.ttt
-import stratoweave.device
+import stratoweave.adapters.adapter
 
 import sorespo.rfs
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface__remote
@@ -20,7 +20,7 @@ proc def _test_rfs_bbinterface1(t: testing.SyncT):
     )
 
     mock_di = stratoweave.ttt.DeviceInfo("AMS-CORE-1",
-        {"Cisco-IOS-XR-um-hostname-cfg": stratoweave.device.ModCap("Cisco-IOS-XR-um-hostname-cfg", "http://cisco.com/ns/yang/Cisco-IOS-XR-um-hostname-cfg")}
+        {"Cisco-IOS-XR-um-hostname-cfg": stratoweave.adapters.adapter.ModCap("Cisco-IOS-XR-um-hostname-cfg", "http://cisco.com/ns/yang/Cisco-IOS-XR-um-hostname-cfg")}
     )
     transform = sorespo.rfs.BBInterface(t.log_handler)
     out = transform.transform(modeled_input, mock_di).to_gdata()
@@ -38,7 +38,7 @@ proc def _test_rfs_bbinterface2(t: testing.SyncT):
 </backbone-interface>"""
 
     mock_di = stratoweave.ttt.DeviceInfo("STO-CORE-1",
-        {"http://xml.juniper.net/netconf/junos/1.0": stratoweave.device.ModCap("http://xml.juniper.net/netconf/junos/1.0", "http://xml.juniper.net/netconf/junos/1.0")}
+        {"http://xml.juniper.net/netconf/junos/1.0": stratoweave.adapters.adapter.ModCap("http://xml.juniper.net/netconf/junos/1.0", "http://xml.juniper.net/netconf/junos/1.0")}
     )
     transform = sorespo.rfs.BBInterface(t.log_handler)
     out, _ = transform.transform_xml(xml.decode(xmlin), mock_di)
