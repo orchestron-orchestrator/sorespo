@@ -5,8 +5,8 @@ import stratoweave.ttt
 from stratoweave.exception import UnsupportedDevice
 
 from rtrsecrets.junos import *
+from rtrsecrets.cisco import cisco_type7_encrypt
 
-import sorespo.cisco_vigenere
 import timeseries
 
 import sorespo.layers.base_2 as base
@@ -97,7 +97,7 @@ class BaseConfig(base.BaseConfig):
             bgp_ng = bgp_as.neighbor_groups.neighbor_group.create("IPV4-IBGP", remote_as=i.asn, update_source="Loopback0")
             bgp_ng.address_families.address_family.create("vpnv4-unicast")
             bgp_ng.address_families.address_family.create("vpnv6-unicast")
-            bgp_ng.password.encrypted = sorespo.cisco_vigenere.encrypt(i.ibgp_authentication_key, 4)
+            bgp_ng.password.encrypted = cisco_type7_encrypt(i.ibgp_authentication_key, 4)
 
             bgp_as.address_families.address_family.create("vpnv4-unicast")
             bgp_as.address_families.address_family.create("vpnv6-unicast")
@@ -525,7 +525,7 @@ class EbgpCustomer(base.EbgpCustomer):
             af.route_policy.in_ = "ACCEPT"
             af.route_policy.out = "ACCEPT"
             af.create_as_override()
-            neighbor.password.encrypted = sorespo.cisco_vigenere.encrypt(i.authentication_key, 4)
+            neighbor.password.encrypted = cisco_type7_encrypt(i.authentication_key, 4)
 
             return dev
 
