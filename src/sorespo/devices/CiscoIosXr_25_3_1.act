@@ -352463,21 +352463,20 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import_
         self._name = 'two-byte-as-route-target'
         self.elements = elements
 
-    mut def create(self, two_byte_as_number: u64, asn2_index: u64, stitching: str) -> Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import__route_target__two_byte_as_route_targets__two_byte_as_route_target_entry:
+    def get(self, two_byte_as_number: u64, asn2_index: u64, stitching: str) -> ?Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import__route_target__two_byte_as_route_targets__two_byte_as_route_target_entry:
         for e in self:
-            match = True
             if e.two_byte_as_number != two_byte_as_number:
-                match = False
                 continue
             if e.asn2_index != asn2_index:
-                match = False
                 continue
             if e.stitching != stitching:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, two_byte_as_number: u64, asn2_index: u64, stitching: str) -> Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import__route_target__two_byte_as_route_targets__two_byte_as_route_target_entry:
+        e = self.get(two_byte_as_number, asn2_index, stitching)
+        if e is not None:
+            return e
         res = Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import__route_target__two_byte_as_route_targets__two_byte_as_route_target_entry(two_byte_as_number=two_byte_as_number, asn2_index=asn2_index, stitching=stitching)
         self.elements.append(res)
         return res
@@ -352619,21 +352618,20 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export_
         self._name = 'two-byte-as-route-target'
         self.elements = elements
 
-    mut def create(self, two_byte_as_number: u64, asn2_index: u64, stitching: str) -> Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export__route_target__two_byte_as_route_targets__two_byte_as_route_target_entry:
+    def get(self, two_byte_as_number: u64, asn2_index: u64, stitching: str) -> ?Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export__route_target__two_byte_as_route_targets__two_byte_as_route_target_entry:
         for e in self:
-            match = True
             if e.two_byte_as_number != two_byte_as_number:
-                match = False
                 continue
             if e.asn2_index != asn2_index:
-                match = False
                 continue
             if e.stitching != stitching:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, two_byte_as_number: u64, asn2_index: u64, stitching: str) -> Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export__route_target__two_byte_as_route_targets__two_byte_as_route_target_entry:
+        e = self.get(two_byte_as_number, asn2_index, stitching)
+        if e is not None:
+            return e
         res = Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export__route_target__two_byte_as_route_targets__two_byte_as_route_target_entry(two_byte_as_number=two_byte_as_number, asn2_index=asn2_index, stitching=stitching)
         self.elements.append(res)
         return res
@@ -352868,17 +352866,18 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf(yang.adata.MNode):
         self._name = 'vrf'
         self.elements = elements
 
-    mut def create(self, vrf_name: str, description: ?str=None) -> Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf_entry:
+    def get(self, vrf_name: str) -> ?Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf_entry:
         for e in self:
-            match = True
             if e.vrf_name != vrf_name:
-                match = False
                 continue
-            if match:
-                if description is not None:
-                    e.description = description
-                return e
+            return e
 
+    mut def create(self, vrf_name: str, description: ?str=None) -> Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf_entry:
+        e = self.get(vrf_name)
+        if e is not None:
+            if description is not None:
+                e.description = description
+            return e
         res = Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf_entry(vrf_name=vrf_name, description=description)
         self.elements.append(res)
         return res
@@ -352902,6 +352901,27 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf(yang.adata.MNode):
 extension Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf(Iterable[Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf_entry]):
     def __iter__(self) -> Iterator[Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf_entry]:
         return self.elements.__iter__()
+
+extension Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf(Indexed[str, Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf_entry]):
+    def __getitem__(self, k: str) -> Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.vrf_name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.vrf_name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker16 = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs(yang.adata.MNode):
@@ -353161,19 +353181,20 @@ class Cisco_IOS_XR_um_interface_cfg__interfaces__interface(yang.adata.MNode):
         self._name = 'interface'
         self.elements = elements
 
-    mut def create(self, interface_name: str, description: ?str=None, vrf: ?str=None) -> Cisco_IOS_XR_um_interface_cfg__interfaces__interface_entry:
+    def get(self, interface_name: str) -> ?Cisco_IOS_XR_um_interface_cfg__interfaces__interface_entry:
         for e in self:
-            match = True
             if e.interface_name != interface_name:
-                match = False
                 continue
-            if match:
-                if description is not None:
-                    e.description = description
-                if vrf is not None:
-                    e.vrf = vrf
-                return e
+            return e
 
+    mut def create(self, interface_name: str, description: ?str=None, vrf: ?str=None) -> Cisco_IOS_XR_um_interface_cfg__interfaces__interface_entry:
+        e = self.get(interface_name)
+        if e is not None:
+            if description is not None:
+                e.description = description
+            if vrf is not None:
+                e.vrf = vrf
+            return e
         res = Cisco_IOS_XR_um_interface_cfg__interfaces__interface_entry(interface_name=interface_name, description=description, vrf=vrf)
         self.elements.append(res)
         return res
@@ -353197,6 +353218,27 @@ class Cisco_IOS_XR_um_interface_cfg__interfaces__interface(yang.adata.MNode):
 extension Cisco_IOS_XR_um_interface_cfg__interfaces__interface(Iterable[Cisco_IOS_XR_um_interface_cfg__interfaces__interface_entry]):
     def __iter__(self) -> Iterator[Cisco_IOS_XR_um_interface_cfg__interfaces__interface_entry]:
         return self.elements.__iter__()
+
+extension Cisco_IOS_XR_um_interface_cfg__interfaces__interface(Indexed[str, Cisco_IOS_XR_um_interface_cfg__interfaces__interface_entry]):
+    def __getitem__(self, k: str) -> Cisco_IOS_XR_um_interface_cfg__interfaces__interface_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: Cisco_IOS_XR_um_interface_cfg__interfaces__interface_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.interface_name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.interface_name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker25 = None
 class Cisco_IOS_XR_um_interface_cfg__interfaces(yang.adata.MNode):
@@ -353255,15 +353297,16 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         self._name = 'net'
         self.elements = elements
 
-    mut def create(self, net_id: str) -> Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net_entry:
+    def get(self, net_id: str) -> ?Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net_entry:
         for e in self:
-            match = True
             if e.net_id != net_id:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, net_id: str) -> Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net_entry:
+        e = self.get(net_id)
+        if e is not None:
+            return e
         res = Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net_entry(net_id=net_id)
         self.elements.append(res)
         return res
@@ -353287,6 +353330,27 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
 extension Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net(Iterable[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net_entry]):
     def __iter__(self) -> Iterator[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net_entry]:
         return self.elements.__iter__()
+
+extension Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net(Indexed[str, Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net_entry]):
+    def __getitem__(self, k: str) -> Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.net_id == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.net_id == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker28 = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets(yang.adata.MNode):
@@ -353349,17 +353413,18 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         self._name = 'metric-level'
         self.elements = elements
 
-    mut def create(self, level_number: u64, default_metric: ?u64=None) -> Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level_entry:
+    def get(self, level_number: u64) -> ?Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level_entry:
         for e in self:
-            match = True
             if e.level_number != level_number:
-                match = False
                 continue
-            if match:
-                if default_metric is not None:
-                    e.default_metric = default_metric
-                return e
+            return e
 
+    mut def create(self, level_number: u64, default_metric: ?u64=None) -> Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level_entry:
+        e = self.get(level_number)
+        if e is not None:
+            if default_metric is not None:
+                e.default_metric = default_metric
+            return e
         res = Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level_entry(level_number=level_number, default_metric=default_metric)
         self.elements.append(res)
         return res
@@ -353383,6 +353448,27 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
 extension Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level(Iterable[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level_entry]):
     def __iter__(self) -> Iterator[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level_entry]:
         return self.elements.__iter__()
+
+extension Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level(Indexed[u64, Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level_entry]):
+    def __getitem__(self, k: u64) -> Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: u64, n: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.level_number == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: u64) -> None:
+        for i, e in enumerate(self.elements):
+            if e.level_number == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker31 = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels(yang.adata.MNode):
@@ -353449,18 +353535,18 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         self._name = 'address-family'
         self.elements = elements
 
-    mut def create(self, af_name: str, saf_name: str) -> Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family_entry:
+    def get(self, af_name: str, saf_name: str) -> ?Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family_entry:
         for e in self:
-            match = True
             if e.af_name != af_name:
-                match = False
                 continue
             if e.saf_name != saf_name:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, af_name: str, saf_name: str) -> Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family_entry:
+        e = self.get(af_name, saf_name)
+        if e is not None:
+            return e
         res = Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family_entry(af_name=af_name, saf_name=saf_name)
         self.elements.append(res)
         return res
@@ -353558,21 +353644,22 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         self._name = 'interface'
         self.elements = elements
 
-    mut def create(self, interface_name: str, state: ?str=None, circuit_type: ?str=None, point_to_point: ?bool=None) -> Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface_entry:
+    def get(self, interface_name: str) -> ?Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface_entry:
         for e in self:
-            match = True
             if e.interface_name != interface_name:
-                match = False
                 continue
-            if match:
-                if state is not None:
-                    e.state = state
-                if circuit_type is not None:
-                    e.circuit_type = circuit_type
-                if point_to_point is not None:
-                    e.point_to_point = point_to_point
-                return e
+            return e
 
+    mut def create(self, interface_name: str, state: ?str=None, circuit_type: ?str=None, point_to_point: ?bool=None) -> Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface_entry:
+        e = self.get(interface_name)
+        if e is not None:
+            if state is not None:
+                e.state = state
+            if circuit_type is not None:
+                e.circuit_type = circuit_type
+            if point_to_point is not None:
+                e.point_to_point = point_to_point
+            return e
         res = Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface_entry(interface_name=interface_name, state=state, circuit_type=circuit_type, point_to_point=point_to_point)
         self.elements.append(res)
         return res
@@ -353596,6 +353683,27 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
 extension Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface(Iterable[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface_entry]):
     def __iter__(self) -> Iterator[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface_entry]:
         return self.elements.__iter__()
+
+extension Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface(Indexed[str, Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface_entry]):
+    def __getitem__(self, k: str) -> Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.interface_name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.interface_name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker37 = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces(yang.adata.MNode):
@@ -353720,18 +353828,18 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         self._name = 'address-family'
         self.elements = elements
 
-    mut def create(self, af_name: str, saf_name: str) -> Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family_entry:
+    def get(self, af_name: str, saf_name: str) -> ?Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family_entry:
         for e in self:
-            match = True
             if e.af_name != af_name:
-                match = False
                 continue
             if e.saf_name != saf_name:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, af_name: str, saf_name: str) -> Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family_entry:
+        e = self.get(af_name, saf_name)
+        if e is not None:
+            return e
         res = Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family_entry(af_name=af_name, saf_name=saf_name)
         self.elements.append(res)
         return res
@@ -353829,17 +353937,18 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         self._name = 'process'
         self.elements = elements
 
-    mut def create(self, process_id: str, is_type: ?str=None) -> Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process_entry:
+    def get(self, process_id: str) -> ?Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process_entry:
         for e in self:
-            match = True
             if e.process_id != process_id:
-                match = False
                 continue
-            if match:
-                if is_type is not None:
-                    e.is_type = is_type
-                return e
+            return e
 
+    mut def create(self, process_id: str, is_type: ?str=None) -> Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process_entry:
+        e = self.get(process_id)
+        if e is not None:
+            if is_type is not None:
+                e.is_type = is_type
+            return e
         res = Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process_entry(process_id=process_id, is_type=is_type)
         self.elements.append(res)
         return res
@@ -353863,6 +353972,27 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
 extension Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process(Iterable[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process_entry]):
     def __iter__(self) -> Iterator[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process_entry]:
         return self.elements.__iter__()
+
+extension Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process(Indexed[str, Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process_entry]):
+    def __getitem__(self, k: str) -> Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.process_id == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.process_id == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker45 = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes(yang.adata.MNode):
@@ -354007,19 +354137,23 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         self._name = 'neighbor'
         self.elements = elements
 
-    mut def create(self, address: str, description: ?str=None) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry:
+    def get(self, address: str) -> ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry:
         for e in self:
-            match = True
             e_address = e.address
+            address_match = False
             if isinstance(e_address, str) and isinstance(address, str):
-                if e_address != address:
-                    match = False
-                    continue
-            if match:
-                if description is not None:
-                    e.description = description
-                return e
+                if e_address == address:
+                    address_match = True
+            if not address_match:
+                continue
+            return e
 
+    mut def create(self, address: str, description: ?str=None) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry:
+        e = self.get(address)
+        if e is not None:
+            if description is not None:
+                e.description = description
+            return e
         res = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry(address=address, description=description)
         self.elements.append(res)
         return res
@@ -354127,15 +354261,16 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         self._name = 'address-family'
         self.elements = elements
 
-    mut def create(self, af_name: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family_entry:
+    def get(self, af_name: str) -> ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family_entry:
         for e in self:
-            match = True
             if e.af_name != af_name:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, af_name: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family_entry:
+        e = self.get(af_name)
+        if e is not None:
+            return e
         res = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family_entry(af_name=af_name)
         self.elements.append(res)
         return res
@@ -354159,6 +354294,27 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
 extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family(Iterable[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family_entry]):
     def __iter__(self) -> Iterator[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family_entry]:
         return self.elements.__iter__()
+
+extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family(Indexed[str, Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family_entry]):
+    def __getitem__(self, k: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.af_name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.af_name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker55 = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families(yang.adata.MNode):
@@ -354233,19 +354389,20 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         self._name = 'neighbor-group'
         self.elements = elements
 
-    mut def create(self, neighbor_group_name: str, remote_as: ?value=None, update_source: ?str=None) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group_entry:
+    def get(self, neighbor_group_name: str) -> ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group_entry:
         for e in self:
-            match = True
             if e.neighbor_group_name != neighbor_group_name:
-                match = False
                 continue
-            if match:
-                if remote_as is not None:
-                    e.remote_as = remote_as
-                if update_source is not None:
-                    e.update_source = update_source
-                return e
+            return e
 
+    mut def create(self, neighbor_group_name: str, remote_as: ?value=None, update_source: ?str=None) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group_entry:
+        e = self.get(neighbor_group_name)
+        if e is not None:
+            if remote_as is not None:
+                e.remote_as = remote_as
+            if update_source is not None:
+                e.update_source = update_source
+            return e
         res = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group_entry(neighbor_group_name=neighbor_group_name, remote_as=remote_as, update_source=update_source)
         self.elements.append(res)
         return res
@@ -354269,6 +354426,27 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
 extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group(Iterable[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group_entry]):
     def __iter__(self) -> Iterator[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group_entry]:
         return self.elements.__iter__()
+
+extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group(Indexed[str, Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group_entry]):
+    def __getitem__(self, k: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.neighbor_group_name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.neighbor_group_name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker58 = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups(yang.adata.MNode):
@@ -354327,15 +354505,16 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address
         self._name = 'address-family'
         self.elements = elements
 
-    mut def create(self, af_name: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family_entry:
+    def get(self, af_name: str) -> ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family_entry:
         for e in self:
-            match = True
             if e.af_name != af_name:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, af_name: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family_entry:
+        e = self.get(af_name)
+        if e is not None:
+            return e
         res = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family_entry(af_name=af_name)
         self.elements.append(res)
         return res
@@ -354359,6 +354538,27 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address
 extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family(Iterable[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family_entry]):
     def __iter__(self) -> Iterator[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family_entry]:
         return self.elements.__iter__()
+
+extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family(Indexed[str, Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family_entry]):
+    def __getitem__(self, k: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.af_name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.af_name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker61 = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families(yang.adata.MNode):
@@ -354514,15 +354714,16 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         self._name = 'address-family'
         self.elements = elements
 
-    mut def create(self, af_name: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family_entry:
+    def get(self, af_name: str) -> ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family_entry:
         for e in self:
-            match = True
             if e.af_name != af_name:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, af_name: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family_entry:
+        e = self.get(af_name)
+        if e is not None:
+            return e
         res = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family_entry(af_name=af_name)
         self.elements.append(res)
         return res
@@ -354546,6 +354747,27 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
 extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family(Iterable[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family_entry]):
     def __iter__(self) -> Iterator[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family_entry]:
         return self.elements.__iter__()
+
+extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family(Indexed[str, Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family_entry]):
+    def __getitem__(self, k: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.af_name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.af_name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker67 = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families(yang.adata.MNode):
@@ -354700,15 +354922,16 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         self._name = 'address-family'
         self.elements = elements
 
-    mut def create(self, af_name: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry:
+    def get(self, af_name: str) -> ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry:
         for e in self:
-            match = True
             if e.af_name != af_name:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, af_name: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry:
+        e = self.get(af_name)
+        if e is not None:
+            return e
         res = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry(af_name=af_name)
         self.elements.append(res)
         return res
@@ -354732,6 +354955,27 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
 extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family(Iterable[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry]):
     def __iter__(self) -> Iterator[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry]:
         return self.elements.__iter__()
+
+extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family(Indexed[str, Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry]):
+    def __getitem__(self, k: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.af_name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.af_name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker73 = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families(yang.adata.MNode):
@@ -354806,21 +355050,25 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         self._name = 'neighbor'
         self.elements = elements
 
-    mut def create(self, address: str, remote_as: ?value=None, description: ?str=None) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry:
+    def get(self, address: str) -> ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry:
         for e in self:
-            match = True
             e_address = e.address
+            address_match = False
             if isinstance(e_address, str) and isinstance(address, str):
-                if e_address != address:
-                    match = False
-                    continue
-            if match:
-                if remote_as is not None:
-                    e.remote_as = remote_as
-                if description is not None:
-                    e.description = description
-                return e
+                if e_address == address:
+                    address_match = True
+            if not address_match:
+                continue
+            return e
 
+    mut def create(self, address: str, remote_as: ?value=None, description: ?str=None) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry:
+        e = self.get(address)
+        if e is not None:
+            if remote_as is not None:
+                e.remote_as = remote_as
+            if description is not None:
+                e.description = description
+            return e
         res = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry(address=address, remote_as=remote_as, description=description)
         self.elements.append(res)
         return res
@@ -354914,15 +355162,16 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         self._name = 'vrf'
         self.elements = elements
 
-    mut def create(self, vrf_name: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry:
+    def get(self, vrf_name: str) -> ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry:
         for e in self:
-            match = True
             if e.vrf_name != vrf_name:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, vrf_name: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry:
+        e = self.get(vrf_name)
+        if e is not None:
+            return e
         res = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry(vrf_name=vrf_name)
         self.elements.append(res)
         return res
@@ -354946,6 +355195,27 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
 extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf(Iterable[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry]):
     def __iter__(self) -> Iterator[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry]:
         return self.elements.__iter__()
+
+extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf(Indexed[str, Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry]):
+    def __getitem__(self, k: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.vrf_name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.vrf_name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker79 = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs(yang.adata.MNode):
@@ -355024,22 +355294,24 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as(yang.ada
         self._name = 'as'
         self.elements = elements
 
-    mut def create(self, as_number: value) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_entry:
+    def get(self, as_number: value) -> ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_entry:
         for e in self:
-            match = True
             e_as_number = e.as_number
+            as_number_match = False
             if isinstance(e_as_number, u64) and isinstance(as_number, u64):
-                if e_as_number != as_number:
-                    match = False
-                    continue
-            e_as_number = e.as_number
-            if isinstance(e_as_number, str) and isinstance(as_number, str):
-                if e_as_number != as_number:
-                    match = False
-                    continue
-            if match:
-                return e
+                if e_as_number == as_number:
+                    as_number_match = True
+            elif isinstance(e_as_number, str) and isinstance(as_number, str):
+                if e_as_number == as_number:
+                    as_number_match = True
+            if not as_number_match:
+                continue
+            return e
 
+    mut def create(self, as_number: value) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_entry:
+        e = self.get(as_number)
+        if e is not None:
+            return e
         res = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_entry(as_number=as_number)
         self.elements.append(res)
         return res
@@ -355151,17 +355423,18 @@ class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_po
         self._name = 'route-policy'
         self.elements = elements
 
-    mut def create(self, route_policy_name: str, rpl_route_policy: ?str=None) -> Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry:
+    def get(self, route_policy_name: str) -> ?Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry:
         for e in self:
-            match = True
             if e.route_policy_name != route_policy_name:
-                match = False
                 continue
-            if match:
-                if rpl_route_policy is not None:
-                    e.rpl_route_policy = rpl_route_policy
-                return e
+            return e
 
+    mut def create(self, route_policy_name: str, rpl_route_policy: ?str=None) -> Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry:
+        e = self.get(route_policy_name)
+        if e is not None:
+            if rpl_route_policy is not None:
+                e.rpl_route_policy = rpl_route_policy
+            return e
         res = Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry(route_policy_name=route_policy_name, rpl_route_policy=rpl_route_policy)
         self.elements.append(res)
         return res
@@ -355185,6 +355458,27 @@ class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_po
 extension Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy(Iterable[Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry]):
     def __iter__(self) -> Iterator[Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry]:
         return self.elements.__iter__()
+
+extension Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy(Indexed[str, Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry]):
+    def __getitem__(self, k: str) -> Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.route_policy_name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.route_policy_name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker86 = None
 class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies(yang.adata.MNode):
@@ -355269,15 +355563,16 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family(
         self._name = 'address-family'
         self.elements = elements
 
-    mut def create(self, af_name: str) -> Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry:
+    def get(self, af_name: str) -> ?Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry:
         for e in self:
-            match = True
             if e.af_name != af_name:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, af_name: str) -> Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry:
+        e = self.get(af_name)
+        if e is not None:
+            return e
         res = Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry(af_name=af_name)
         self.elements.append(res)
         return res
@@ -355301,6 +355596,27 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family(
 extension Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family(Iterable[Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry]):
     def __iter__(self) -> Iterator[Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry]:
         return self.elements.__iter__()
+
+extension Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family(Indexed[str, Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry]):
+    def __getitem__(self, k: str) -> Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.af_name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.af_name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker90 = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families(yang.adata.MNode):
@@ -355359,15 +355675,16 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface(yang.adata.
         self._name = 'interface'
         self.elements = elements
 
-    mut def create(self, interface_name: str) -> Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry:
+    def get(self, interface_name: str) -> ?Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry:
         for e in self:
-            match = True
             if e.interface_name != interface_name:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, interface_name: str) -> Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry:
+        e = self.get(interface_name)
+        if e is not None:
+            return e
         res = Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry(interface_name=interface_name)
         self.elements.append(res)
         return res
@@ -355391,6 +355708,27 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface(yang.adata.
 extension Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface(Iterable[Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry]):
     def __iter__(self) -> Iterator[Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry]:
         return self.elements.__iter__()
+
+extension Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface(Indexed[str, Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry]):
+    def __getitem__(self, k: str) -> Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.interface_name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.interface_name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker93 = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces(yang.adata.MNode):

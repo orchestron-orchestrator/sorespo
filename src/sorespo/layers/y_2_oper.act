@@ -1113,21 +1113,20 @@ class stratoweave_rfs__device__address__initial_credentials(yang.adata.MNode):
         self._name = 'initial-credentials'
         self.elements = elements
 
-    mut def create(self, username: str, password: str, key: str) -> stratoweave_rfs__device__address__initial_credentials_entry:
+    def get(self, username: str, password: str, key: str) -> ?stratoweave_rfs__device__address__initial_credentials_entry:
         for e in self:
-            match = True
             if e.username != username:
-                match = False
                 continue
             if e.password != password:
-                match = False
                 continue
             if e.key != key:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, username: str, password: str, key: str) -> stratoweave_rfs__device__address__initial_credentials_entry:
+        e = self.get(username, password, key)
+        if e is not None:
+            return e
         res = stratoweave_rfs__device__address__initial_credentials_entry(username=username, password=password, key=key)
         self.elements.append(res)
         return res
@@ -1195,19 +1194,20 @@ class stratoweave_rfs__device__address(yang.adata.MNode):
         self._name = 'address'
         self.elements = elements
 
-    mut def create(self, name: str, address: ?str=None, port: ?u64=None) -> stratoweave_rfs__device__address_entry:
+    def get(self, name: str) -> ?stratoweave_rfs__device__address_entry:
         for e in self:
-            match = True
             if e.name != name:
-                match = False
                 continue
-            if match:
-                if address is not None:
-                    e.address = address
-                if port is not None:
-                    e.port = port
-                return e
+            return e
 
+    mut def create(self, name: str, address: ?str=None, port: ?u64=None) -> stratoweave_rfs__device__address_entry:
+        e = self.get(name)
+        if e is not None:
+            if address is not None:
+                e.address = address
+            if port is not None:
+                e.port = port
+            return e
         res = stratoweave_rfs__device__address_entry(name=name, address=address, port=port)
         self.elements.append(res)
         return res
@@ -1231,6 +1231,27 @@ class stratoweave_rfs__device__address(yang.adata.MNode):
 extension stratoweave_rfs__device__address(Iterable[stratoweave_rfs__device__address_entry]):
     def __iter__(self) -> Iterator[stratoweave_rfs__device__address_entry]:
         return self.elements.__iter__()
+
+extension stratoweave_rfs__device__address(Indexed[str, stratoweave_rfs__device__address_entry]):
+    def __getitem__(self, k: str) -> stratoweave_rfs__device__address_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: stratoweave_rfs__device__address_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker5 = None
 class stratoweave_rfs__device__credentials__key_entry(yang.adata.MNode):
@@ -1267,17 +1288,18 @@ class stratoweave_rfs__device__credentials__key(yang.adata.MNode):
         self._name = 'key'
         self.elements = elements
 
-    mut def create(self, key: str, private_key: ?str=None) -> stratoweave_rfs__device__credentials__key_entry:
+    def get(self, key: str) -> ?stratoweave_rfs__device__credentials__key_entry:
         for e in self:
-            match = True
             if e.key != key:
-                match = False
                 continue
-            if match:
-                if private_key is not None:
-                    e.private_key = private_key
-                return e
+            return e
 
+    mut def create(self, key: str, private_key: ?str=None) -> stratoweave_rfs__device__credentials__key_entry:
+        e = self.get(key)
+        if e is not None:
+            if private_key is not None:
+                e.private_key = private_key
+            return e
         res = stratoweave_rfs__device__credentials__key_entry(key=key, private_key=private_key)
         self.elements.append(res)
         return res
@@ -1301,6 +1323,27 @@ class stratoweave_rfs__device__credentials__key(yang.adata.MNode):
 extension stratoweave_rfs__device__credentials__key(Iterable[stratoweave_rfs__device__credentials__key_entry]):
     def __iter__(self) -> Iterator[stratoweave_rfs__device__credentials__key_entry]:
         return self.elements.__iter__()
+
+extension stratoweave_rfs__device__credentials__key(Indexed[str, stratoweave_rfs__device__credentials__key_entry]):
+    def __getitem__(self, k: str) -> stratoweave_rfs__device__credentials__key_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: stratoweave_rfs__device__credentials__key_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.key == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.key == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker7 = None
 class stratoweave_rfs__device__credentials(yang.adata.MNode):
@@ -1375,21 +1418,20 @@ class stratoweave_rfs__device__initial_credentials(yang.adata.MNode):
         self._name = 'initial-credentials'
         self.elements = elements
 
-    mut def create(self, username: str, password: str, key: str) -> stratoweave_rfs__device__initial_credentials_entry:
+    def get(self, username: str, password: str, key: str) -> ?stratoweave_rfs__device__initial_credentials_entry:
         for e in self:
-            match = True
             if e.username != username:
-                match = False
                 continue
             if e.password != password:
-                match = False
                 continue
             if e.key != key:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, username: str, password: str, key: str) -> stratoweave_rfs__device__initial_credentials_entry:
+        e = self.get(username, password, key)
+        if e is not None:
+            return e
         res = stratoweave_rfs__device__initial_credentials_entry(username=username, password=password, key=key)
         self.elements.append(res)
         return res
@@ -1457,19 +1499,20 @@ class stratoweave_rfs__device__mock__module(yang.adata.MNode):
         self._name = 'module'
         self.elements = elements
 
-    mut def create(self, name: str, namespace: ?str=None, revision: ?str=None) -> stratoweave_rfs__device__mock__module_entry:
+    def get(self, name: str) -> ?stratoweave_rfs__device__mock__module_entry:
         for e in self:
-            match = True
             if e.name != name:
-                match = False
                 continue
-            if match:
-                if namespace is not None:
-                    e.namespace = namespace
-                if revision is not None:
-                    e.revision = revision
-                return e
+            return e
 
+    mut def create(self, name: str, namespace: ?str=None, revision: ?str=None) -> stratoweave_rfs__device__mock__module_entry:
+        e = self.get(name)
+        if e is not None:
+            if namespace is not None:
+                e.namespace = namespace
+            if revision is not None:
+                e.revision = revision
+            return e
         res = stratoweave_rfs__device__mock__module_entry(name=name, namespace=namespace, revision=revision)
         self.elements.append(res)
         return res
@@ -1493,6 +1536,27 @@ class stratoweave_rfs__device__mock__module(yang.adata.MNode):
 extension stratoweave_rfs__device__mock__module(Iterable[stratoweave_rfs__device__mock__module_entry]):
     def __iter__(self) -> Iterator[stratoweave_rfs__device__mock__module_entry]:
         return self.elements.__iter__()
+
+extension stratoweave_rfs__device__mock__module(Indexed[str, stratoweave_rfs__device__mock__module_entry]):
+    def __getitem__(self, k: str) -> stratoweave_rfs__device__mock__module_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: stratoweave_rfs__device__mock__module_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker12 = None
 class stratoweave_rfs__device__mock(yang.adata.MNode):
@@ -1672,21 +1736,22 @@ class stratoweave_rfs__device(yang.adata.MNode):
         self._name = 'device'
         self.elements = elements
 
-    mut def create(self, name: str, description: ?str=None, type: ?str=None, approval_required: ?bool=None) -> stratoweave_rfs__device_entry:
+    def get(self, name: str) -> ?stratoweave_rfs__device_entry:
         for e in self:
-            match = True
             if e.name != name:
-                match = False
                 continue
-            if match:
-                if description is not None:
-                    e.description = description
-                if type is not None:
-                    e.type = type
-                if approval_required is not None:
-                    e.approval_required = approval_required
-                return e
+            return e
 
+    mut def create(self, name: str, description: ?str=None, type: ?str=None, approval_required: ?bool=None) -> stratoweave_rfs__device_entry:
+        e = self.get(name)
+        if e is not None:
+            if description is not None:
+                e.description = description
+            if type is not None:
+                e.type = type
+            if approval_required is not None:
+                e.approval_required = approval_required
+            return e
         res = stratoweave_rfs__device_entry(name=name, description=description, type=type, approval_required=approval_required)
         self.elements.append(res)
         return res
@@ -1710,6 +1775,27 @@ class stratoweave_rfs__device(yang.adata.MNode):
 extension stratoweave_rfs__device(Iterable[stratoweave_rfs__device_entry]):
     def __iter__(self) -> Iterator[stratoweave_rfs__device_entry]:
         return self.elements.__iter__()
+
+extension stratoweave_rfs__device(Indexed[str, stratoweave_rfs__device_entry]):
+    def __getitem__(self, k: str) -> stratoweave_rfs__device_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: stratoweave_rfs__device_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker18 = None
 class stratoweave_rfs__rfs__base_config(yang.adata.MNode):
@@ -1898,25 +1984,26 @@ class stratoweave_rfs__rfs__backbone_interface(yang.adata.MNode):
         self._name = 'backbone-interface'
         self.elements = elements
 
-    mut def create(self, name: str, ipv4_address: ?str=None, ipv4_prefix_length: ?u64=None, ipv6_address: ?str=None, ipv6_prefix_length: ?u64=None, monitor_traffic: ?bool=None) -> stratoweave_rfs__rfs__backbone_interface_entry:
+    def get(self, name: str) -> ?stratoweave_rfs__rfs__backbone_interface_entry:
         for e in self:
-            match = True
             if e.name != name:
-                match = False
                 continue
-            if match:
-                if ipv4_address is not None:
-                    e.ipv4_address = ipv4_address
-                if ipv4_prefix_length is not None:
-                    e.ipv4_prefix_length = ipv4_prefix_length
-                if ipv6_address is not None:
-                    e.ipv6_address = ipv6_address
-                if ipv6_prefix_length is not None:
-                    e.ipv6_prefix_length = ipv6_prefix_length
-                if monitor_traffic is not None:
-                    e.monitor_traffic = monitor_traffic
-                return e
+            return e
 
+    mut def create(self, name: str, ipv4_address: ?str=None, ipv4_prefix_length: ?u64=None, ipv6_address: ?str=None, ipv6_prefix_length: ?u64=None, monitor_traffic: ?bool=None) -> stratoweave_rfs__rfs__backbone_interface_entry:
+        e = self.get(name)
+        if e is not None:
+            if ipv4_address is not None:
+                e.ipv4_address = ipv4_address
+            if ipv4_prefix_length is not None:
+                e.ipv4_prefix_length = ipv4_prefix_length
+            if ipv6_address is not None:
+                e.ipv6_address = ipv6_address
+            if ipv6_prefix_length is not None:
+                e.ipv6_prefix_length = ipv6_prefix_length
+            if monitor_traffic is not None:
+                e.monitor_traffic = monitor_traffic
+            return e
         res = stratoweave_rfs__rfs__backbone_interface_entry(name=name, ipv4_address=ipv4_address, ipv4_prefix_length=ipv4_prefix_length, ipv6_address=ipv6_address, ipv6_prefix_length=ipv6_prefix_length, monitor_traffic=monitor_traffic)
         self.elements.append(res)
         return res
@@ -1940,6 +2027,27 @@ class stratoweave_rfs__rfs__backbone_interface(yang.adata.MNode):
 extension stratoweave_rfs__rfs__backbone_interface(Iterable[stratoweave_rfs__rfs__backbone_interface_entry]):
     def __iter__(self) -> Iterator[stratoweave_rfs__rfs__backbone_interface_entry]:
         return self.elements.__iter__()
+
+extension stratoweave_rfs__rfs__backbone_interface(Indexed[str, stratoweave_rfs__rfs__backbone_interface_entry]):
+    def __getitem__(self, k: str) -> stratoweave_rfs__rfs__backbone_interface_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: stratoweave_rfs__rfs__backbone_interface_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker24 = None
 class stratoweave_rfs__rfs__ibgp_neighbor_entry(yang.adata.MNode):
@@ -1980,21 +2088,25 @@ class stratoweave_rfs__rfs__ibgp_neighbor(yang.adata.MNode):
         self._name = 'ibgp-neighbor'
         self.elements = elements
 
-    mut def create(self, address: str, asn: ?u64=None, description: ?str=None) -> stratoweave_rfs__rfs__ibgp_neighbor_entry:
+    def get(self, address: str) -> ?stratoweave_rfs__rfs__ibgp_neighbor_entry:
         for e in self:
-            match = True
             e_address = e.address
+            address_match = False
             if isinstance(e_address, str) and isinstance(address, str):
-                if e_address != address:
-                    match = False
-                    continue
-            if match:
-                if asn is not None:
-                    e.asn = asn
-                if description is not None:
-                    e.description = description
-                return e
+                if e_address == address:
+                    address_match = True
+            if not address_match:
+                continue
+            return e
 
+    mut def create(self, address: str, asn: ?u64=None, description: ?str=None) -> stratoweave_rfs__rfs__ibgp_neighbor_entry:
+        e = self.get(address)
+        if e is not None:
+            if asn is not None:
+                e.asn = asn
+            if description is not None:
+                e.description = description
+            return e
         res = stratoweave_rfs__rfs__ibgp_neighbor_entry(address=address, asn=asn, description=description)
         self.elements.append(res)
         return res
@@ -2066,23 +2178,24 @@ class stratoweave_rfs__rfs__vrf(yang.adata.MNode):
         self._name = 'vrf'
         self.elements = elements
 
-    mut def create(self, name: str, description: ?str=None, id: ?u64=None, router_id: ?u64=None, asn: ?u64=None) -> stratoweave_rfs__rfs__vrf_entry:
+    def get(self, name: str) -> ?stratoweave_rfs__rfs__vrf_entry:
         for e in self:
-            match = True
             if e.name != name:
-                match = False
                 continue
-            if match:
-                if description is not None:
-                    e.description = description
-                if id is not None:
-                    e.id = id
-                if router_id is not None:
-                    e.router_id = router_id
-                if asn is not None:
-                    e.asn = asn
-                return e
+            return e
 
+    mut def create(self, name: str, description: ?str=None, id: ?u64=None, router_id: ?u64=None, asn: ?u64=None) -> stratoweave_rfs__rfs__vrf_entry:
+        e = self.get(name)
+        if e is not None:
+            if description is not None:
+                e.description = description
+            if id is not None:
+                e.id = id
+            if router_id is not None:
+                e.router_id = router_id
+            if asn is not None:
+                e.asn = asn
+            return e
         res = stratoweave_rfs__rfs__vrf_entry(name=name, description=description, id=id, router_id=router_id, asn=asn)
         self.elements.append(res)
         return res
@@ -2106,6 +2219,27 @@ class stratoweave_rfs__rfs__vrf(yang.adata.MNode):
 extension stratoweave_rfs__rfs__vrf(Iterable[stratoweave_rfs__rfs__vrf_entry]):
     def __iter__(self) -> Iterator[stratoweave_rfs__rfs__vrf_entry]:
         return self.elements.__iter__()
+
+extension stratoweave_rfs__rfs__vrf(Indexed[str, stratoweave_rfs__rfs__vrf_entry]):
+    def __getitem__(self, k: str) -> stratoweave_rfs__rfs__vrf_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: stratoweave_rfs__rfs__vrf_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker28 = None
 class stratoweave_rfs__rfs__vrf_interface_entry(yang.adata.MNode):
@@ -2154,23 +2288,24 @@ class stratoweave_rfs__rfs__vrf_interface(yang.adata.MNode):
         self._name = 'vrf-interface'
         self.elements = elements
 
-    mut def create(self, name: str, description: ?str=None, vrf: ?str=None, ipv4_address: ?str=None, ipv4_prefix_length: ?u64=None) -> stratoweave_rfs__rfs__vrf_interface_entry:
+    def get(self, name: str) -> ?stratoweave_rfs__rfs__vrf_interface_entry:
         for e in self:
-            match = True
             if e.name != name:
-                match = False
                 continue
-            if match:
-                if description is not None:
-                    e.description = description
-                if vrf is not None:
-                    e.vrf = vrf
-                if ipv4_address is not None:
-                    e.ipv4_address = ipv4_address
-                if ipv4_prefix_length is not None:
-                    e.ipv4_prefix_length = ipv4_prefix_length
-                return e
+            return e
 
+    mut def create(self, name: str, description: ?str=None, vrf: ?str=None, ipv4_address: ?str=None, ipv4_prefix_length: ?u64=None) -> stratoweave_rfs__rfs__vrf_interface_entry:
+        e = self.get(name)
+        if e is not None:
+            if description is not None:
+                e.description = description
+            if vrf is not None:
+                e.vrf = vrf
+            if ipv4_address is not None:
+                e.ipv4_address = ipv4_address
+            if ipv4_prefix_length is not None:
+                e.ipv4_prefix_length = ipv4_prefix_length
+            return e
         res = stratoweave_rfs__rfs__vrf_interface_entry(name=name, description=description, vrf=vrf, ipv4_address=ipv4_address, ipv4_prefix_length=ipv4_prefix_length)
         self.elements.append(res)
         return res
@@ -2194,6 +2329,27 @@ class stratoweave_rfs__rfs__vrf_interface(yang.adata.MNode):
 extension stratoweave_rfs__rfs__vrf_interface(Iterable[stratoweave_rfs__rfs__vrf_interface_entry]):
     def __iter__(self) -> Iterator[stratoweave_rfs__rfs__vrf_interface_entry]:
         return self.elements.__iter__()
+
+extension stratoweave_rfs__rfs__vrf_interface(Indexed[str, stratoweave_rfs__rfs__vrf_interface_entry]):
+    def __getitem__(self, k: str) -> stratoweave_rfs__rfs__vrf_interface_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: stratoweave_rfs__rfs__vrf_interface_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker30 = None
 class stratoweave_rfs__rfs__ebgp_customer_entry(yang.adata.MNode):
@@ -2246,28 +2402,31 @@ class stratoweave_rfs__rfs__ebgp_customer(yang.adata.MNode):
         self._name = 'ebgp-customer'
         self.elements = elements
 
-    mut def create(self, vrf: str, address: str, local_asn: ?u64=None, peer_asn: ?u64=None, description: ?str=None, authentication_key: ?str=None) -> stratoweave_rfs__rfs__ebgp_customer_entry:
+    def get(self, vrf: str, address: str) -> ?stratoweave_rfs__rfs__ebgp_customer_entry:
         for e in self:
-            match = True
             if e.vrf != vrf:
-                match = False
                 continue
             e_address = e.address
+            address_match = False
             if isinstance(e_address, str) and isinstance(address, str):
-                if e_address != address:
-                    match = False
-                    continue
-            if match:
-                if local_asn is not None:
-                    e.local_asn = local_asn
-                if peer_asn is not None:
-                    e.peer_asn = peer_asn
-                if description is not None:
-                    e.description = description
-                if authentication_key is not None:
-                    e.authentication_key = authentication_key
-                return e
+                if e_address == address:
+                    address_match = True
+            if not address_match:
+                continue
+            return e
 
+    mut def create(self, vrf: str, address: str, local_asn: ?u64=None, peer_asn: ?u64=None, description: ?str=None, authentication_key: ?str=None) -> stratoweave_rfs__rfs__ebgp_customer_entry:
+        e = self.get(vrf, address)
+        if e is not None:
+            if local_asn is not None:
+                e.local_asn = local_asn
+            if peer_asn is not None:
+                e.peer_asn = peer_asn
+            if description is not None:
+                e.description = description
+            if authentication_key is not None:
+                e.authentication_key = authentication_key
+            return e
         res = stratoweave_rfs__rfs__ebgp_customer_entry(vrf=vrf, address=address, local_asn=local_asn, peer_asn=peer_asn, description=description, authentication_key=authentication_key)
         self.elements.append(res)
         return res
@@ -2347,15 +2506,16 @@ class stratoweave_rfs__rfs(yang.adata.MNode):
         self._name = 'rfs'
         self.elements = elements
 
-    mut def create(self, name: str) -> stratoweave_rfs__rfs_entry:
+    def get(self, name: str) -> ?stratoweave_rfs__rfs_entry:
         for e in self:
-            match = True
             if e.name != name:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, name: str) -> stratoweave_rfs__rfs_entry:
+        e = self.get(name)
+        if e is not None:
+            return e
         res = stratoweave_rfs__rfs_entry(name=name)
         self.elements.append(res)
         return res
@@ -2379,6 +2539,27 @@ class stratoweave_rfs__rfs(yang.adata.MNode):
 extension stratoweave_rfs__rfs(Iterable[stratoweave_rfs__rfs_entry]):
     def __iter__(self) -> Iterator[stratoweave_rfs__rfs_entry]:
         return self.elements.__iter__()
+
+extension stratoweave_rfs__rfs(Indexed[str, stratoweave_rfs__rfs_entry]):
+    def __getitem__(self, k: str) -> stratoweave_rfs__rfs_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: stratoweave_rfs__rfs_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker34 = None
 class root(yang.adata.MNode):

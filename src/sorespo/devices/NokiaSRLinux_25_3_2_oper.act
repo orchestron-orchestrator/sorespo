@@ -34085,15 +34085,16 @@ class srl_nokia_interfaces__interface__subinterface__ipv4__address(yang.adata.MN
         self._name = 'address'
         self.elements = elements
 
-    mut def create(self, ip_prefix: str) -> srl_nokia_interfaces__interface__subinterface__ipv4__address_entry:
+    def get(self, ip_prefix: str) -> ?srl_nokia_interfaces__interface__subinterface__ipv4__address_entry:
         for e in self:
-            match = True
             if e.ip_prefix != ip_prefix:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, ip_prefix: str) -> srl_nokia_interfaces__interface__subinterface__ipv4__address_entry:
+        e = self.get(ip_prefix)
+        if e is not None:
+            return e
         res = srl_nokia_interfaces__interface__subinterface__ipv4__address_entry(ip_prefix=ip_prefix)
         self.elements.append(res)
         return res
@@ -34117,6 +34118,27 @@ class srl_nokia_interfaces__interface__subinterface__ipv4__address(yang.adata.MN
 extension srl_nokia_interfaces__interface__subinterface__ipv4__address(Iterable[srl_nokia_interfaces__interface__subinterface__ipv4__address_entry]):
     def __iter__(self) -> Iterator[srl_nokia_interfaces__interface__subinterface__ipv4__address_entry]:
         return self.elements.__iter__()
+
+extension srl_nokia_interfaces__interface__subinterface__ipv4__address(Indexed[str, srl_nokia_interfaces__interface__subinterface__ipv4__address_entry]):
+    def __getitem__(self, k: str) -> srl_nokia_interfaces__interface__subinterface__ipv4__address_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: srl_nokia_interfaces__interface__subinterface__ipv4__address_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.ip_prefix == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.ip_prefix == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker6 = None
 class srl_nokia_interfaces__interface__subinterface__ipv4(yang.adata.MNode):
@@ -34316,19 +34338,20 @@ class srl_nokia_interfaces__interface__subinterface(yang.adata.MNode):
         self._name = 'subinterface'
         self.elements = elements
 
-    mut def create(self, index: u64, description: ?str=None, admin_state: ?str=None) -> srl_nokia_interfaces__interface__subinterface_entry:
+    def get(self, index: u64) -> ?srl_nokia_interfaces__interface__subinterface_entry:
         for e in self:
-            match = True
             if e.index != index:
-                match = False
                 continue
-            if match:
-                if description is not None:
-                    e.description = description
-                if admin_state is not None:
-                    e.admin_state = admin_state
-                return e
+            return e
 
+    mut def create(self, index: u64, description: ?str=None, admin_state: ?str=None) -> srl_nokia_interfaces__interface__subinterface_entry:
+        e = self.get(index)
+        if e is not None:
+            if description is not None:
+                e.description = description
+            if admin_state is not None:
+                e.admin_state = admin_state
+            return e
         res = srl_nokia_interfaces__interface__subinterface_entry(index=index, description=description, admin_state=admin_state)
         self.elements.append(res)
         return res
@@ -34352,6 +34375,27 @@ class srl_nokia_interfaces__interface__subinterface(yang.adata.MNode):
 extension srl_nokia_interfaces__interface__subinterface(Iterable[srl_nokia_interfaces__interface__subinterface_entry]):
     def __iter__(self) -> Iterator[srl_nokia_interfaces__interface__subinterface_entry]:
         return self.elements.__iter__()
+
+extension srl_nokia_interfaces__interface__subinterface(Indexed[u64, srl_nokia_interfaces__interface__subinterface_entry]):
+    def __getitem__(self, k: u64) -> srl_nokia_interfaces__interface__subinterface_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: u64, n: srl_nokia_interfaces__interface__subinterface_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.index == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: u64) -> None:
+        for i, e in enumerate(self.elements):
+            if e.index == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker13 = None
 class srl_nokia_interfaces__interface_entry(yang.adata.MNode):
@@ -34404,21 +34448,22 @@ class srl_nokia_interfaces__interface(yang.adata.MNode):
         self._name = 'interface'
         self.elements = elements
 
-    mut def create(self, name: str, description: ?str=None, admin_state: ?str=None, vlan_tagging: ?bool=None) -> srl_nokia_interfaces__interface_entry:
+    def get(self, name: str) -> ?srl_nokia_interfaces__interface_entry:
         for e in self:
-            match = True
             if e.name != name:
-                match = False
                 continue
-            if match:
-                if description is not None:
-                    e.description = description
-                if admin_state is not None:
-                    e.admin_state = admin_state
-                if vlan_tagging is not None:
-                    e.vlan_tagging = vlan_tagging
-                return e
+            return e
 
+    mut def create(self, name: str, description: ?str=None, admin_state: ?str=None, vlan_tagging: ?bool=None) -> srl_nokia_interfaces__interface_entry:
+        e = self.get(name)
+        if e is not None:
+            if description is not None:
+                e.description = description
+            if admin_state is not None:
+                e.admin_state = admin_state
+            if vlan_tagging is not None:
+                e.vlan_tagging = vlan_tagging
+            return e
         res = srl_nokia_interfaces__interface_entry(name=name, description=description, admin_state=admin_state, vlan_tagging=vlan_tagging)
         self.elements.append(res)
         return res
@@ -34442,6 +34487,27 @@ class srl_nokia_interfaces__interface(yang.adata.MNode):
 extension srl_nokia_interfaces__interface(Iterable[srl_nokia_interfaces__interface_entry]):
     def __iter__(self) -> Iterator[srl_nokia_interfaces__interface_entry]:
         return self.elements.__iter__()
+
+extension srl_nokia_interfaces__interface(Indexed[str, srl_nokia_interfaces__interface_entry]):
+    def __getitem__(self, k: str) -> srl_nokia_interfaces__interface_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: srl_nokia_interfaces__interface_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker15 = None
 class srl_nokia_network_instance__network_instance__interface_entry(yang.adata.MNode):
@@ -34474,15 +34540,16 @@ class srl_nokia_network_instance__network_instance__interface(yang.adata.MNode):
         self._name = 'interface'
         self.elements = elements
 
-    mut def create(self, name: str) -> srl_nokia_network_instance__network_instance__interface_entry:
+    def get(self, name: str) -> ?srl_nokia_network_instance__network_instance__interface_entry:
         for e in self:
-            match = True
             if e.name != name:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, name: str) -> srl_nokia_network_instance__network_instance__interface_entry:
+        e = self.get(name)
+        if e is not None:
+            return e
         res = srl_nokia_network_instance__network_instance__interface_entry(name=name)
         self.elements.append(res)
         return res
@@ -34506,6 +34573,27 @@ class srl_nokia_network_instance__network_instance__interface(yang.adata.MNode):
 extension srl_nokia_network_instance__network_instance__interface(Iterable[srl_nokia_network_instance__network_instance__interface_entry]):
     def __iter__(self) -> Iterator[srl_nokia_network_instance__network_instance__interface_entry]:
         return self.elements.__iter__()
+
+extension srl_nokia_network_instance__network_instance__interface(Indexed[str, srl_nokia_network_instance__network_instance__interface_entry]):
+    def __getitem__(self, k: str) -> srl_nokia_network_instance__network_instance__interface_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: srl_nokia_network_instance__network_instance__interface_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker17 = None
 class srl_nokia_network_instance__network_instance__vxlan_interface_entry(yang.adata.MNode):
@@ -34538,15 +34626,16 @@ class srl_nokia_network_instance__network_instance__vxlan_interface(yang.adata.M
         self._name = 'vxlan-interface'
         self.elements = elements
 
-    mut def create(self, name: str) -> srl_nokia_network_instance__network_instance__vxlan_interface_entry:
+    def get(self, name: str) -> ?srl_nokia_network_instance__network_instance__vxlan_interface_entry:
         for e in self:
-            match = True
             if e.name != name:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, name: str) -> srl_nokia_network_instance__network_instance__vxlan_interface_entry:
+        e = self.get(name)
+        if e is not None:
+            return e
         res = srl_nokia_network_instance__network_instance__vxlan_interface_entry(name=name)
         self.elements.append(res)
         return res
@@ -34570,6 +34659,27 @@ class srl_nokia_network_instance__network_instance__vxlan_interface(yang.adata.M
 extension srl_nokia_network_instance__network_instance__vxlan_interface(Iterable[srl_nokia_network_instance__network_instance__vxlan_interface_entry]):
     def __iter__(self) -> Iterator[srl_nokia_network_instance__network_instance__vxlan_interface_entry]:
         return self.elements.__iter__()
+
+extension srl_nokia_network_instance__network_instance__vxlan_interface(Indexed[str, srl_nokia_network_instance__network_instance__vxlan_interface_entry]):
+    def __getitem__(self, k: str) -> srl_nokia_network_instance__network_instance__vxlan_interface_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: srl_nokia_network_instance__network_instance__vxlan_interface_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker19 = None
 class srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance_entry(yang.adata.MNode):
@@ -34614,21 +34724,22 @@ class srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_ins
         self._name = 'bgp-instance'
         self.elements = elements
 
-    mut def create(self, id: u64, admin_state: ?str=None, vxlan_interface: ?str=None, evi: ?u64=None) -> srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance_entry:
+    def get(self, id: u64) -> ?srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance_entry:
         for e in self:
-            match = True
             if e.id != id:
-                match = False
                 continue
-            if match:
-                if admin_state is not None:
-                    e.admin_state = admin_state
-                if vxlan_interface is not None:
-                    e.vxlan_interface = vxlan_interface
-                if evi is not None:
-                    e.evi = evi
-                return e
+            return e
 
+    mut def create(self, id: u64, admin_state: ?str=None, vxlan_interface: ?str=None, evi: ?u64=None) -> srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance_entry:
+        e = self.get(id)
+        if e is not None:
+            if admin_state is not None:
+                e.admin_state = admin_state
+            if vxlan_interface is not None:
+                e.vxlan_interface = vxlan_interface
+            if evi is not None:
+                e.evi = evi
+            return e
         res = srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance_entry(id=id, admin_state=admin_state, vxlan_interface=vxlan_interface, evi=evi)
         self.elements.append(res)
         return res
@@ -34652,6 +34763,27 @@ class srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_ins
 extension srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance(Iterable[srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance_entry]):
     def __iter__(self) -> Iterator[srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance_entry]:
         return self.elements.__iter__()
+
+extension srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance(Indexed[u64, srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance_entry]):
+    def __getitem__(self, k: u64) -> srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: u64, n: srl_nokia_network_instance__network_instance__protocols__bgp_evpn__bgp_instance_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.id == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: u64) -> None:
+        for i, e in enumerate(self.elements):
+            if e.id == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker21 = None
 class srl_nokia_network_instance__network_instance__protocols__bgp_evpn(yang.adata.MNode):
@@ -34743,17 +34875,18 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance__i
         self._name = 'level'
         self.elements = elements
 
-    mut def create(self, level_number: u64, metric: ?u64=None) -> srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level_entry:
+    def get(self, level_number: u64) -> ?srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level_entry:
         for e in self:
-            match = True
             if e.level_number != level_number:
-                match = False
                 continue
-            if match:
-                if metric is not None:
-                    e.metric = metric
-                return e
+            return e
 
+    mut def create(self, level_number: u64, metric: ?u64=None) -> srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level_entry:
+        e = self.get(level_number)
+        if e is not None:
+            if metric is not None:
+                e.metric = metric
+            return e
         res = srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level_entry(level_number=level_number, metric=metric)
         self.elements.append(res)
         return res
@@ -34777,6 +34910,27 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance__i
 extension srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level(Iterable[srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level_entry]):
     def __iter__(self) -> Iterator[srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level_entry]:
         return self.elements.__iter__()
+
+extension srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level(Indexed[u64, srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level_entry]):
+    def __getitem__(self, k: u64) -> srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: u64, n: srl_nokia_network_instance__network_instance__protocols__isis__instance__interface__level_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.level_number == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: u64) -> None:
+        for i, e in enumerate(self.elements):
+            if e.level_number == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker25 = None
 class srl_nokia_network_instance__network_instance__protocols__isis__instance__interface_entry(yang.adata.MNode):
@@ -34825,21 +34979,22 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance__i
         self._name = 'interface'
         self.elements = elements
 
-    mut def create(self, interface_name: str, admin_state: ?str=None, circuit_type: ?str=None, passive: ?bool=None) -> srl_nokia_network_instance__network_instance__protocols__isis__instance__interface_entry:
+    def get(self, interface_name: str) -> ?srl_nokia_network_instance__network_instance__protocols__isis__instance__interface_entry:
         for e in self:
-            match = True
             if e.interface_name != interface_name:
-                match = False
                 continue
-            if match:
-                if admin_state is not None:
-                    e.admin_state = admin_state
-                if circuit_type is not None:
-                    e.circuit_type = circuit_type
-                if passive is not None:
-                    e.passive = passive
-                return e
+            return e
 
+    mut def create(self, interface_name: str, admin_state: ?str=None, circuit_type: ?str=None, passive: ?bool=None) -> srl_nokia_network_instance__network_instance__protocols__isis__instance__interface_entry:
+        e = self.get(interface_name)
+        if e is not None:
+            if admin_state is not None:
+                e.admin_state = admin_state
+            if circuit_type is not None:
+                e.circuit_type = circuit_type
+            if passive is not None:
+                e.passive = passive
+            return e
         res = srl_nokia_network_instance__network_instance__protocols__isis__instance__interface_entry(interface_name=interface_name, admin_state=admin_state, circuit_type=circuit_type, passive=passive)
         self.elements.append(res)
         return res
@@ -34863,6 +35018,27 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance__i
 extension srl_nokia_network_instance__network_instance__protocols__isis__instance__interface(Iterable[srl_nokia_network_instance__network_instance__protocols__isis__instance__interface_entry]):
     def __iter__(self) -> Iterator[srl_nokia_network_instance__network_instance__protocols__isis__instance__interface_entry]:
         return self.elements.__iter__()
+
+extension srl_nokia_network_instance__network_instance__protocols__isis__instance__interface(Indexed[str, srl_nokia_network_instance__network_instance__protocols__isis__instance__interface_entry]):
+    def __getitem__(self, k: str) -> srl_nokia_network_instance__network_instance__protocols__isis__instance__interface_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: srl_nokia_network_instance__network_instance__protocols__isis__instance__interface_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.interface_name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.interface_name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker27 = None
 class srl_nokia_network_instance__network_instance__protocols__isis__instance_entry(yang.adata.MNode):
@@ -34915,19 +35091,20 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance(ya
         self._name = 'instance'
         self.elements = elements
 
-    mut def create(self, name: str, admin_state: ?str=None, level_capability: ?str=None) -> srl_nokia_network_instance__network_instance__protocols__isis__instance_entry:
+    def get(self, name: str) -> ?srl_nokia_network_instance__network_instance__protocols__isis__instance_entry:
         for e in self:
-            match = True
             if e.name != name:
-                match = False
                 continue
-            if match:
-                if admin_state is not None:
-                    e.admin_state = admin_state
-                if level_capability is not None:
-                    e.level_capability = level_capability
-                return e
+            return e
 
+    mut def create(self, name: str, admin_state: ?str=None, level_capability: ?str=None) -> srl_nokia_network_instance__network_instance__protocols__isis__instance_entry:
+        e = self.get(name)
+        if e is not None:
+            if admin_state is not None:
+                e.admin_state = admin_state
+            if level_capability is not None:
+                e.level_capability = level_capability
+            return e
         res = srl_nokia_network_instance__network_instance__protocols__isis__instance_entry(name=name, admin_state=admin_state, level_capability=level_capability)
         self.elements.append(res)
         return res
@@ -34951,6 +35128,27 @@ class srl_nokia_network_instance__network_instance__protocols__isis__instance(ya
 extension srl_nokia_network_instance__network_instance__protocols__isis__instance(Iterable[srl_nokia_network_instance__network_instance__protocols__isis__instance_entry]):
     def __iter__(self) -> Iterator[srl_nokia_network_instance__network_instance__protocols__isis__instance_entry]:
         return self.elements.__iter__()
+
+extension srl_nokia_network_instance__network_instance__protocols__isis__instance(Indexed[str, srl_nokia_network_instance__network_instance__protocols__isis__instance_entry]):
+    def __getitem__(self, k: str) -> srl_nokia_network_instance__network_instance__protocols__isis__instance_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: srl_nokia_network_instance__network_instance__protocols__isis__instance_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker29 = None
 class srl_nokia_network_instance__network_instance__protocols__isis(yang.adata.MNode):
@@ -35046,17 +35244,18 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi(yan
         self._name = 'afi-safi'
         self.elements = elements
 
-    mut def create(self, afi_safi_name: Identityref, admin_state: ?str=None) -> srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_entry:
+    def get(self, afi_safi_name: Identityref) -> ?srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_entry:
         for e in self:
-            match = True
             if e.afi_safi_name != afi_safi_name:
-                match = False
                 continue
-            if match:
-                if admin_state is not None:
-                    e.admin_state = admin_state
-                return e
+            return e
 
+    mut def create(self, afi_safi_name: Identityref, admin_state: ?str=None) -> srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_entry:
+        e = self.get(afi_safi_name)
+        if e is not None:
+            if admin_state is not None:
+                e.admin_state = admin_state
+            return e
         res = srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_entry(afi_safi_name=afi_safi_name, admin_state=admin_state)
         self.elements.append(res)
         return res
@@ -35080,6 +35279,27 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi(yan
 extension srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi(Iterable[srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_entry]):
     def __iter__(self) -> Iterator[srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_entry]:
         return self.elements.__iter__()
+
+extension srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi(Indexed[Identityref, srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_entry]):
+    def __getitem__(self, k: Identityref) -> srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: Identityref, n: srl_nokia_network_instance__network_instance__protocols__bgp__afi_safi_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.afi_safi_name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: Identityref) -> None:
+        for i, e in enumerate(self.elements):
+            if e.afi_safi_name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker33 = None
 class srl_nokia_network_instance__network_instance__protocols__bgp__group__send_default_route(yang.adata.MNode):
@@ -35146,17 +35366,18 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__group(yang.a
         self._name = 'group'
         self.elements = elements
 
-    mut def create(self, group_name: str, peer_as: ?u64=None) -> srl_nokia_network_instance__network_instance__protocols__bgp__group_entry:
+    def get(self, group_name: str) -> ?srl_nokia_network_instance__network_instance__protocols__bgp__group_entry:
         for e in self:
-            match = True
             if e.group_name != group_name:
-                match = False
                 continue
-            if match:
-                if peer_as is not None:
-                    e.peer_as = peer_as
-                return e
+            return e
 
+    mut def create(self, group_name: str, peer_as: ?u64=None) -> srl_nokia_network_instance__network_instance__protocols__bgp__group_entry:
+        e = self.get(group_name)
+        if e is not None:
+            if peer_as is not None:
+                e.peer_as = peer_as
+            return e
         res = srl_nokia_network_instance__network_instance__protocols__bgp__group_entry(group_name=group_name, peer_as=peer_as)
         self.elements.append(res)
         return res
@@ -35180,6 +35401,27 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__group(yang.a
 extension srl_nokia_network_instance__network_instance__protocols__bgp__group(Iterable[srl_nokia_network_instance__network_instance__protocols__bgp__group_entry]):
     def __iter__(self) -> Iterator[srl_nokia_network_instance__network_instance__protocols__bgp__group_entry]:
         return self.elements.__iter__()
+
+extension srl_nokia_network_instance__network_instance__protocols__bgp__group(Indexed[str, srl_nokia_network_instance__network_instance__protocols__bgp__group_entry]):
+    def __getitem__(self, k: str) -> srl_nokia_network_instance__network_instance__protocols__bgp__group_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: srl_nokia_network_instance__network_instance__protocols__bgp__group_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.group_name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.group_name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker36 = None
 class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication(yang.adata.MNode):
@@ -35258,25 +35500,29 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor(yan
         self._name = 'neighbor'
         self.elements = elements
 
-    mut def create(self, peer_address: str, admin_state: ?str=None, description: ?str=None, peer_as: ?u64=None, peer_group: ?str=None) -> srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry:
+    def get(self, peer_address: str) -> ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry:
         for e in self:
-            match = True
             e_peer_address = e.peer_address
+            peer_address_match = False
             if isinstance(e_peer_address, str) and isinstance(peer_address, str):
-                if e_peer_address != peer_address:
-                    match = False
-                    continue
-            if match:
-                if admin_state is not None:
-                    e.admin_state = admin_state
-                if description is not None:
-                    e.description = description
-                if peer_as is not None:
-                    e.peer_as = peer_as
-                if peer_group is not None:
-                    e.peer_group = peer_group
-                return e
+                if e_peer_address == peer_address:
+                    peer_address_match = True
+            if not peer_address_match:
+                continue
+            return e
 
+    mut def create(self, peer_address: str, admin_state: ?str=None, description: ?str=None, peer_as: ?u64=None, peer_group: ?str=None) -> srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry:
+        e = self.get(peer_address)
+        if e is not None:
+            if admin_state is not None:
+                e.admin_state = admin_state
+            if description is not None:
+                e.description = description
+            if peer_as is not None:
+                e.peer_as = peer_as
+            if peer_group is not None:
+                e.peer_group = peer_group
+            return e
         res = srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry(peer_address=peer_address, admin_state=admin_state, description=description, peer_as=peer_as, peer_group=peer_group)
         self.elements.append(res)
         return res
@@ -35415,15 +35661,16 @@ class srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_inst
         self._name = 'bgp-instance'
         self.elements = elements
 
-    mut def create(self, id: u64) -> srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance_entry:
+    def get(self, id: u64) -> ?srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance_entry:
         for e in self:
-            match = True
             if e.id != id:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, id: u64) -> srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance_entry:
+        e = self.get(id)
+        if e is not None:
+            return e
         res = srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance_entry(id=id)
         self.elements.append(res)
         return res
@@ -35447,6 +35694,27 @@ class srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_inst
 extension srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance(Iterable[srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance_entry]):
     def __iter__(self) -> Iterator[srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance_entry]:
         return self.elements.__iter__()
+
+extension srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance(Indexed[u64, srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance_entry]):
+    def __getitem__(self, k: u64) -> srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: u64, n: srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.id == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: u64) -> None:
+        for i, e in enumerate(self.elements):
+            if e.id == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker43 = None
 class srl_nokia_network_instance__network_instance__protocols__bgp_vpn(yang.adata.MNode):
@@ -35606,21 +35874,22 @@ class srl_nokia_network_instance__network_instance(yang.adata.MNode):
         self._name = 'network-instance'
         self.elements = elements
 
-    mut def create(self, name: str, type: ?Identityref=None, admin_state: ?str=None, description: ?str=None) -> srl_nokia_network_instance__network_instance_entry:
+    def get(self, name: str) -> ?srl_nokia_network_instance__network_instance_entry:
         for e in self:
-            match = True
             if e.name != name:
-                match = False
                 continue
-            if match:
-                if type is not None:
-                    e.type = type
-                if admin_state is not None:
-                    e.admin_state = admin_state
-                if description is not None:
-                    e.description = description
-                return e
+            return e
 
+    mut def create(self, name: str, type: ?Identityref=None, admin_state: ?str=None, description: ?str=None) -> srl_nokia_network_instance__network_instance_entry:
+        e = self.get(name)
+        if e is not None:
+            if type is not None:
+                e.type = type
+            if admin_state is not None:
+                e.admin_state = admin_state
+            if description is not None:
+                e.description = description
+            return e
         res = srl_nokia_network_instance__network_instance_entry(name=name, type=type, admin_state=admin_state, description=description)
         self.elements.append(res)
         return res
@@ -35644,6 +35913,27 @@ class srl_nokia_network_instance__network_instance(yang.adata.MNode):
 extension srl_nokia_network_instance__network_instance(Iterable[srl_nokia_network_instance__network_instance_entry]):
     def __iter__(self) -> Iterator[srl_nokia_network_instance__network_instance_entry]:
         return self.elements.__iter__()
+
+extension srl_nokia_network_instance__network_instance(Indexed[str, srl_nokia_network_instance__network_instance_entry]):
+    def __getitem__(self, k: str) -> srl_nokia_network_instance__network_instance_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: srl_nokia_network_instance__network_instance_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker47 = None
 class srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress(yang.adata.MNode):
@@ -35710,17 +36000,18 @@ class srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface(yang.adata.
         self._name = 'vxlan-interface'
         self.elements = elements
 
-    mut def create(self, index: u64, type: ?Identityref=None) -> srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry:
+    def get(self, index: u64) -> ?srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry:
         for e in self:
-            match = True
             if e.index != index:
-                match = False
                 continue
-            if match:
-                if type is not None:
-                    e.type = type
-                return e
+            return e
 
+    mut def create(self, index: u64, type: ?Identityref=None) -> srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry:
+        e = self.get(index)
+        if e is not None:
+            if type is not None:
+                e.type = type
+            return e
         res = srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry(index=index, type=type)
         self.elements.append(res)
         return res
@@ -35744,6 +36035,27 @@ class srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface(yang.adata.
 extension srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface(Iterable[srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry]):
     def __iter__(self) -> Iterator[srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry]:
         return self.elements.__iter__()
+
+extension srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface(Indexed[u64, srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry]):
+    def __getitem__(self, k: u64) -> srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: u64, n: srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.index == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: u64) -> None:
+        for i, e in enumerate(self.elements):
+            if e.index == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker50 = None
 class srl_nokia_tunnel_interfaces__tunnel_interface_entry(yang.adata.MNode):
@@ -35780,15 +36092,16 @@ class srl_nokia_tunnel_interfaces__tunnel_interface(yang.adata.MNode):
         self._name = 'tunnel-interface'
         self.elements = elements
 
-    mut def create(self, name: str) -> srl_nokia_tunnel_interfaces__tunnel_interface_entry:
+    def get(self, name: str) -> ?srl_nokia_tunnel_interfaces__tunnel_interface_entry:
         for e in self:
-            match = True
             if e.name != name:
-                match = False
                 continue
-            if match:
-                return e
+            return e
 
+    mut def create(self, name: str) -> srl_nokia_tunnel_interfaces__tunnel_interface_entry:
+        e = self.get(name)
+        if e is not None:
+            return e
         res = srl_nokia_tunnel_interfaces__tunnel_interface_entry(name=name)
         self.elements.append(res)
         return res
@@ -35812,6 +36125,27 @@ class srl_nokia_tunnel_interfaces__tunnel_interface(yang.adata.MNode):
 extension srl_nokia_tunnel_interfaces__tunnel_interface(Iterable[srl_nokia_tunnel_interfaces__tunnel_interface_entry]):
     def __iter__(self) -> Iterator[srl_nokia_tunnel_interfaces__tunnel_interface_entry]:
         return self.elements.__iter__()
+
+extension srl_nokia_tunnel_interfaces__tunnel_interface(Indexed[str, srl_nokia_tunnel_interfaces__tunnel_interface_entry]):
+    def __getitem__(self, k: str) -> srl_nokia_tunnel_interfaces__tunnel_interface_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: srl_nokia_tunnel_interfaces__tunnel_interface_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
 
 _breaker52 = None
 class root(yang.adata.MNode):
