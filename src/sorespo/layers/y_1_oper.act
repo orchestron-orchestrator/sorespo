@@ -1709,6 +1709,7 @@ actor rpc_root(tp: yang.gdata.TreeProvider):
 
 
 
+_breaker21: None = None
 class netinfra_inter__netinfra__router__feature_flags_subs(SubscriptionNode):
     runtime_schema_fetch: SubscriptionNode
 
@@ -1720,6 +1721,7 @@ class netinfra_inter__netinfra__router__feature_flags_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.runtime_schema_fetch]
         return direct
 
+_breaker22: None = None
 class netinfra_inter__netinfra__router__base_config_subs(SubscriptionNode):
     asn: SubscriptionNode
     ipv4_address: SubscriptionNode
@@ -1735,6 +1737,21 @@ class netinfra_inter__netinfra__router__base_config_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.asn, self.ipv4_address, self.ipv6_address]
         return direct
 
+_breaker23: None = None
+class netinfra_inter__netinfra__router__l3vpn_vrf_entry_subs(SubscriptionNode):
+    vpn_id: SubscriptionNode
+    ebgp_customer_address: SubscriptionNode
+
+    pure def __init__(self, path: ?SubscriptionPath=None) -> None:
+        SubscriptionNode.__init__(self, path)
+        self.vpn_id = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'vpn-id'), parent=path))
+        self.ebgp_customer_address = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'ebgp-customer-address'), parent=path))
+
+    pure def _direct_children(self) -> list[SubscriptionNode]:
+        direct: list[SubscriptionNode] = [self.vpn_id, self.ebgp_customer_address]
+        return direct
+
+_breaker24: None = None
 class netinfra_inter__netinfra__router__l3vpn_vrf_subs(SubscriptionNode):
     vpn_id: SubscriptionNode
     ebgp_customer_address: SubscriptionNode
@@ -1754,19 +1771,35 @@ class netinfra_inter__netinfra__router__l3vpn_vrf_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.vpn_id, self.ebgp_customer_address]
         return direct
 
-class netinfra_inter__netinfra__router__l3vpn_vrf_entry_subs(SubscriptionNode):
-    vpn_id: SubscriptionNode
-    ebgp_customer_address: SubscriptionNode
+_breaker25: None = None
+class netinfra_inter__netinfra__router_entry_subs(SubscriptionNode):
+    name: SubscriptionNode
+    id: SubscriptionNode
+    type: SubscriptionNode
+    role: SubscriptionNode
+    mock: SubscriptionNode
+    approval_required: SubscriptionNode
+    feature_flags: netinfra_inter__netinfra__router__feature_flags_subs
+    base_config: netinfra_inter__netinfra__router__base_config_subs
+    l3vpn_vrf: netinfra_inter__netinfra__router__l3vpn_vrf_subs
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
-        self.vpn_id = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'vpn-id'), parent=path))
-        self.ebgp_customer_address = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'ebgp-customer-address'), parent=path))
+        self.name = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'name'), parent=path))
+        self.id = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'id'), parent=path))
+        self.type = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'type'), parent=path))
+        self.role = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'role'), parent=path))
+        self.mock = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'mock'), parent=path))
+        self.approval_required = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'approval-required'), parent=path))
+        self.feature_flags = netinfra_inter__netinfra__router__feature_flags_subs(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'feature-flags'), parent=path))
+        self.base_config = netinfra_inter__netinfra__router__base_config_subs(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'base-config'), parent=path))
+        self.l3vpn_vrf = netinfra_inter__netinfra__router__l3vpn_vrf_subs(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'l3vpn-vrf'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.vpn_id, self.ebgp_customer_address]
+        direct: list[SubscriptionNode] = [self.name, self.id, self.type, self.role, self.mock, self.approval_required, self.feature_flags, self.base_config, self.l3vpn_vrf]
         return direct
 
+_breaker26: None = None
 class netinfra_inter__netinfra__router_subs(SubscriptionNode):
     name: SubscriptionNode
     id: SubscriptionNode
@@ -1800,33 +1833,27 @@ class netinfra_inter__netinfra__router_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.id, self.type, self.role, self.mock, self.approval_required, self.feature_flags, self.base_config, self.l3vpn_vrf]
         return direct
 
-class netinfra_inter__netinfra__router_entry_subs(SubscriptionNode):
-    name: SubscriptionNode
-    id: SubscriptionNode
-    type: SubscriptionNode
-    role: SubscriptionNode
-    mock: SubscriptionNode
-    approval_required: SubscriptionNode
-    feature_flags: netinfra_inter__netinfra__router__feature_flags_subs
-    base_config: netinfra_inter__netinfra__router__base_config_subs
-    l3vpn_vrf: netinfra_inter__netinfra__router__l3vpn_vrf_subs
+_breaker27: None = None
+class netinfra_inter__netinfra__backbone_link_entry_subs(SubscriptionNode):
+    left_router: SubscriptionNode
+    left_interface: SubscriptionNode
+    right_router: SubscriptionNode
+    right_interface: SubscriptionNode
+    monitor_traffic: SubscriptionNode
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
-        self.name = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'name'), parent=path))
-        self.id = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'id'), parent=path))
-        self.type = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'type'), parent=path))
-        self.role = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'role'), parent=path))
-        self.mock = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'mock'), parent=path))
-        self.approval_required = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'approval-required'), parent=path))
-        self.feature_flags = netinfra_inter__netinfra__router__feature_flags_subs(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'feature-flags'), parent=path))
-        self.base_config = netinfra_inter__netinfra__router__base_config_subs(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'base-config'), parent=path))
-        self.l3vpn_vrf = netinfra_inter__netinfra__router__l3vpn_vrf_subs(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'l3vpn-vrf'), parent=path))
+        self.left_router = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'left-router'), parent=path))
+        self.left_interface = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'left-interface'), parent=path))
+        self.right_router = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'right-router'), parent=path))
+        self.right_interface = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'right-interface'), parent=path))
+        self.monitor_traffic = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'monitor-traffic'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.name, self.id, self.type, self.role, self.mock, self.approval_required, self.feature_flags, self.base_config, self.l3vpn_vrf]
+        direct: list[SubscriptionNode] = [self.left_router, self.left_interface, self.right_router, self.right_interface, self.monitor_traffic]
         return direct
 
+_breaker28: None = None
 class netinfra_inter__netinfra__backbone_link_subs(SubscriptionNode):
     left_router: SubscriptionNode
     left_interface: SubscriptionNode
@@ -1855,25 +1882,21 @@ class netinfra_inter__netinfra__backbone_link_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.left_router, self.left_interface, self.right_router, self.right_interface, self.monitor_traffic]
         return direct
 
-class netinfra_inter__netinfra__backbone_link_entry_subs(SubscriptionNode):
-    left_router: SubscriptionNode
-    left_interface: SubscriptionNode
-    right_router: SubscriptionNode
-    right_interface: SubscriptionNode
-    monitor_traffic: SubscriptionNode
+_breaker29: None = None
+class netinfra_inter__netinfra__ibgp_fullmesh__router_entry_subs(SubscriptionNode):
+    name: SubscriptionNode
+    ipv4_address: SubscriptionNode
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
-        self.left_router = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'left-router'), parent=path))
-        self.left_interface = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'left-interface'), parent=path))
-        self.right_router = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'right-router'), parent=path))
-        self.right_interface = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'right-interface'), parent=path))
-        self.monitor_traffic = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'monitor-traffic'), parent=path))
+        self.name = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'name'), parent=path))
+        self.ipv4_address = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'ipv4-address'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.left_router, self.left_interface, self.right_router, self.right_interface, self.monitor_traffic]
+        direct: list[SubscriptionNode] = [self.name, self.ipv4_address]
         return direct
 
+_breaker30: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh__router_subs(SubscriptionNode):
     name: SubscriptionNode
     ipv4_address: SubscriptionNode
@@ -1893,19 +1916,23 @@ class netinfra_inter__netinfra__ibgp_fullmesh__router_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.ipv4_address]
         return direct
 
-class netinfra_inter__netinfra__ibgp_fullmesh__router_entry_subs(SubscriptionNode):
-    name: SubscriptionNode
-    ipv4_address: SubscriptionNode
+_breaker31: None = None
+class netinfra_inter__netinfra__ibgp_fullmesh_entry_subs(SubscriptionNode):
+    asn: SubscriptionNode
+    authentication_key: SubscriptionNode
+    router: netinfra_inter__netinfra__ibgp_fullmesh__router_subs
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
-        self.name = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'name'), parent=path))
-        self.ipv4_address = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'ipv4-address'), parent=path))
+        self.asn = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'asn'), parent=path))
+        self.authentication_key = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'authentication-key'), parent=path))
+        self.router = netinfra_inter__netinfra__ibgp_fullmesh__router_subs(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'router'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.name, self.ipv4_address]
+        direct: list[SubscriptionNode] = [self.asn, self.authentication_key, self.router]
         return direct
 
+_breaker32: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh_subs(SubscriptionNode):
     asn: SubscriptionNode
     authentication_key: SubscriptionNode
@@ -1927,21 +1954,7 @@ class netinfra_inter__netinfra__ibgp_fullmesh_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.asn, self.authentication_key, self.router]
         return direct
 
-class netinfra_inter__netinfra__ibgp_fullmesh_entry_subs(SubscriptionNode):
-    asn: SubscriptionNode
-    authentication_key: SubscriptionNode
-    router: netinfra_inter__netinfra__ibgp_fullmesh__router_subs
-
-    pure def __init__(self, path: ?SubscriptionPath=None) -> None:
-        SubscriptionNode.__init__(self, path)
-        self.asn = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'asn'), parent=path))
-        self.authentication_key = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'authentication-key'), parent=path))
-        self.router = netinfra_inter__netinfra__ibgp_fullmesh__router_subs(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'router'), parent=path))
-
-    pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.asn, self.authentication_key, self.router]
-        return direct
-
+_breaker33: None = None
 class netinfra_inter__netinfra_subs(SubscriptionNode):
     router: netinfra_inter__netinfra__router_subs
     backbone_link: netinfra_inter__netinfra__backbone_link_subs
@@ -1957,6 +1970,7 @@ class netinfra_inter__netinfra_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.router, self.backbone_link, self.ibgp_fullmesh]
         return direct
 
+_breaker34: None = None
 class l3vpn_inter__l3vpns__l3vpn__endpoint__bgp_subs(SubscriptionNode):
     as_number: SubscriptionNode
 
@@ -1968,6 +1982,33 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint__bgp_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.as_number]
         return direct
 
+_breaker35: None = None
+class l3vpn_inter__l3vpns__l3vpn__endpoint_entry_subs(SubscriptionNode):
+    device: SubscriptionNode
+    interface: SubscriptionNode
+    site: SubscriptionNode
+    site_network_access: SubscriptionNode
+    provider_ipv4_address: SubscriptionNode
+    customer_ipv4_address: SubscriptionNode
+    ipv4_prefix_length: SubscriptionNode
+    bgp: l3vpn_inter__l3vpns__l3vpn__endpoint__bgp_subs
+
+    pure def __init__(self, path: ?SubscriptionPath=None) -> None:
+        SubscriptionNode.__init__(self, path)
+        self.device = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'device'), parent=path))
+        self.interface = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'interface'), parent=path))
+        self.site = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'site'), parent=path))
+        self.site_network_access = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'site-network-access'), parent=path))
+        self.provider_ipv4_address = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'provider-ipv4-address'), parent=path))
+        self.customer_ipv4_address = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'customer-ipv4-address'), parent=path))
+        self.ipv4_prefix_length = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'ipv4-prefix-length'), parent=path))
+        self.bgp = l3vpn_inter__l3vpns__l3vpn__endpoint__bgp_subs(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'bgp'), parent=path))
+
+    pure def _direct_children(self) -> list[SubscriptionNode]:
+        direct: list[SubscriptionNode] = [self.device, self.interface, self.site, self.site_network_access, self.provider_ipv4_address, self.customer_ipv4_address, self.ipv4_prefix_length, self.bgp]
+        return direct
+
+_breaker36: None = None
 class l3vpn_inter__l3vpns__l3vpn__endpoint_subs(SubscriptionNode):
     device: SubscriptionNode
     interface: SubscriptionNode
@@ -2000,31 +2041,23 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.device, self.interface, self.site, self.site_network_access, self.provider_ipv4_address, self.customer_ipv4_address, self.ipv4_prefix_length, self.bgp]
         return direct
 
-class l3vpn_inter__l3vpns__l3vpn__endpoint_entry_subs(SubscriptionNode):
-    device: SubscriptionNode
-    interface: SubscriptionNode
-    site: SubscriptionNode
-    site_network_access: SubscriptionNode
-    provider_ipv4_address: SubscriptionNode
-    customer_ipv4_address: SubscriptionNode
-    ipv4_prefix_length: SubscriptionNode
-    bgp: l3vpn_inter__l3vpns__l3vpn__endpoint__bgp_subs
+_breaker37: None = None
+class l3vpn_inter__l3vpns__l3vpn_entry_subs(SubscriptionNode):
+    name: SubscriptionNode
+    description: SubscriptionNode
+    endpoint: l3vpn_inter__l3vpns__l3vpn__endpoint_subs
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
-        self.device = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'device'), parent=path))
-        self.interface = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'interface'), parent=path))
-        self.site = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'site'), parent=path))
-        self.site_network_access = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'site-network-access'), parent=path))
-        self.provider_ipv4_address = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'provider-ipv4-address'), parent=path))
-        self.customer_ipv4_address = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'customer-ipv4-address'), parent=path))
-        self.ipv4_prefix_length = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'ipv4-prefix-length'), parent=path))
-        self.bgp = l3vpn_inter__l3vpns__l3vpn__endpoint__bgp_subs(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'bgp'), parent=path))
+        self.name = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'name'), parent=path))
+        self.description = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'description'), parent=path))
+        self.endpoint = l3vpn_inter__l3vpns__l3vpn__endpoint_subs(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'endpoint'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.device, self.interface, self.site, self.site_network_access, self.provider_ipv4_address, self.customer_ipv4_address, self.ipv4_prefix_length, self.bgp]
+        direct: list[SubscriptionNode] = [self.name, self.description, self.endpoint]
         return direct
 
+_breaker38: None = None
 class l3vpn_inter__l3vpns__l3vpn_subs(SubscriptionNode):
     name: SubscriptionNode
     description: SubscriptionNode
@@ -2046,21 +2079,7 @@ class l3vpn_inter__l3vpns__l3vpn_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.description, self.endpoint]
         return direct
 
-class l3vpn_inter__l3vpns__l3vpn_entry_subs(SubscriptionNode):
-    name: SubscriptionNode
-    description: SubscriptionNode
-    endpoint: l3vpn_inter__l3vpns__l3vpn__endpoint_subs
-
-    pure def __init__(self, path: ?SubscriptionPath=None) -> None:
-        SubscriptionNode.__init__(self, path)
-        self.name = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'name'), parent=path))
-        self.description = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'description'), parent=path))
-        self.endpoint = l3vpn_inter__l3vpns__l3vpn__endpoint_subs(SubscriptionPath(yang.gdata.Id(NS_l3vpn_inter, 'endpoint'), parent=path))
-
-    pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.name, self.description, self.endpoint]
-        return direct
-
+_breaker39: None = None
 class l3vpn_inter__l3vpns_subs(SubscriptionNode):
     l3vpn: l3vpn_inter__l3vpns__l3vpn_subs
 
@@ -2072,6 +2091,7 @@ class l3vpn_inter__l3vpns_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.l3vpn]
         return direct
 
+_breaker40: None = None
 class root_subs(SubscriptionNode):
     netinfra: netinfra_inter__netinfra_subs
     l3vpns: l3vpn_inter__l3vpns_subs
