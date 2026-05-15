@@ -1,7 +1,9 @@
 <script lang="ts">
   import {
+    formatPps,
     getLinkLabelPosition,
     getLinkLabelWidth,
+    getLinkPpsLabel,
     TOPOLOGY_LINK_LABEL_HEIGHT,
     TOPOLOGY_ROUTER_RADIUS,
     TOPOLOGY_SITE_CARD_HEIGHT,
@@ -65,38 +67,54 @@
               {@const length = Math.hypot(deltaX, deltaY) || 1}
               {@const offsetX = (deltaX / length) * (routerRadius + 4)}
               {@const offsetY = (deltaY / length) * (routerRadius + 4)}
+              {@const routeId = `${link.leftRouter},${link.leftInterface},${link.rightRouter},${link.rightInterface}`}
+              {@const href = `/services/netinfra-backbone-link/${encodeURIComponent(routeId)}`}
 
-              <line
-                x1={leftRouter.x + offsetX}
-                y1={leftRouter.y + offsetY}
-                x2={rightRouter.x - offsetX}
-                y2={rightRouter.y - offsetY}
-                class="topology__link"
-              />
+              <a {href} class="topology__link-link" aria-label={`Open backbone-link ${link.leftRouter} ${link.leftInterface} ↔ ${link.rightRouter} ${link.rightInterface}, status ${link.linkStatus}`}>
+                <line
+                  x1={leftRouter.x + offsetX}
+                  y1={leftRouter.y + offsetY}
+                  x2={rightRouter.x - offsetX}
+                  y2={rightRouter.y - offsetY}
+                  class="topology__link"
+                  class:topology__link--up={link.linkStatus === 'up'}
+                  class:topology__link--down={link.linkStatus === 'down'}
+                />
+                <line
+                  x1={leftRouter.x + offsetX}
+                  y1={leftRouter.y + offsetY}
+                  x2={rightRouter.x - offsetX}
+                  y2={rightRouter.y - offsetY}
+                  class="topology__link-hit"
+                />
 
-              {#if link.leftInterface || link.rightInterface}
-                {@const labelWidth = getLinkLabelWidth(link.leftInterface, link.rightInterface)}
-                {@const label = getLinkLabelPosition(
-                  leftRouter.x,
-                  leftRouter.y,
-                  rightRouter.x,
-                  rightRouter.y
-                )}
-                <g transform={`translate(${label.x}, ${label.y})`}>
-                  <rect
-                    class="topology__link-label-bg"
-                    x={-labelWidth / 2}
-                    y={-linkLabelHeight / 2}
-                    width={labelWidth}
-                    height={linkLabelHeight}
-                    rx="12"
-                  ></rect>
-                  <text class="topology__link-label" text-anchor="middle">
-                    <tspan x="0" y="-4">{link.leftInterface || 'left interface'}</tspan>
-                    <tspan x="0" y="11">{link.rightInterface || 'right interface'}</tspan>
-                  </text>
-                </g>
-              {/if}
+                {#if link.leftInterface || link.rightInterface}
+                  {@const ppsLabel = getLinkPpsLabel(link)}
+                  {@const labelWidth = getLinkLabelWidth(link.leftInterface, link.rightInterface, ppsLabel)}
+                  {@const label = getLinkLabelPosition(
+                    leftRouter.x,
+                    leftRouter.y,
+                    rightRouter.x,
+                    rightRouter.y
+                  )}
+                  <g class="topology__link-label-group" transform={`translate(${label.x}, ${label.y})`}>
+                    <rect
+                      class="topology__link-label-bg"
+                      x={-labelWidth / 2}
+                      y={-linkLabelHeight / 2}
+                      width={labelWidth}
+                      height={linkLabelHeight}
+                      rx="12"
+                    ></rect>
+                    <text class="topology__link-label" text-anchor="middle">
+                      <tspan x="0" y={link.monitorTraffic ? -13 : -4}>{link.leftInterface || 'left interface'} ↔ {link.rightInterface || 'right interface'}</tspan>
+                      {#if link.monitorTraffic}
+                        <tspan class="topology__link-pps" x="0" y="9">→ {formatPps(link.leftPps)} pps    ← {formatPps(link.rightPps)}</tspan>
+                      {/if}
+                    </text>
+                  </g>
+                {/if}
+              </a>
             {/if}
           {/each}
         </g>
@@ -243,15 +261,46 @@
     height: auto;
   }
 
+  .topology__link-link {
+    cursor: pointer;
+    text-decoration: none;
+  }
+
   .topology__link {
     stroke: rgba(136, 153, 170, 0.45);
     stroke-width: 3;
+    transition: stroke 0.15s ease, stroke-width 0.15s ease;
+    pointer-events: none;
+  }
+
+  .topology__link--up {
+    stroke: rgba(34, 197, 94, 0.85);
+  }
+
+  .topology__link--down {
+    stroke: rgba(239, 68, 68, 0.9);
+  }
+
+  .topology__link-hit {
+    stroke: transparent;
+    stroke-width: 14;
+    pointer-events: stroke;
+  }
+
+  .topology__link-link:hover .topology__link {
+    stroke: var(--sw-accent);
+    stroke-width: 4;
+  }
+
+  .topology__link-link:hover .topology__link-label-bg {
+    stroke: var(--sw-accent);
   }
 
   .topology__link-label-bg {
     fill: rgba(10, 14, 20, 0.8);
     stroke: rgba(38, 48, 64, 0.95);
     stroke-width: 1;
+    transition: stroke 0.15s ease;
   }
 
   .topology__link-label {
@@ -264,6 +313,12 @@
 
   .topology__link-label tspan:last-child {
     fill: var(--sw-text-secondary);
+  }
+
+  .topology__link-label .topology__link-pps {
+    fill: var(--sw-accent);
+    font-size: 11px;
+    font-weight: 600;
   }
 
   .topology__attachment-link {

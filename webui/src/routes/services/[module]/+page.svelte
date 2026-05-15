@@ -104,6 +104,19 @@
               {#if item.description}
                 <p>{item.description}</p>
               {/if}
+              {#if item.badges && item.badges.length > 0}
+                <div class="service-list__badges">
+                  {#each item.badges as badge}
+                    <span
+                      class="pill service-list__badge"
+                      class:service-list__badge--up={badge.tone === 'up'}
+                      class:service-list__badge--down={badge.tone === 'down'}
+                      class:service-list__badge--unknown={badge.tone === 'unknown'}
+                      title={badge.title ?? ''}
+                    >{badge.text}</span>
+                  {/each}
+                </div>
+              {/if}
             </div>
             <span class="pill monospace">{formatServiceRouteId(serviceModule, item.id)}</span>
           </a>
@@ -192,6 +205,34 @@
   .service-list__copy p {
     margin-top: 0.35rem;
     color: var(--text-muted);
+  }
+
+  .service-list__badges {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .service-list__badge {
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 11px;
+    font-family: var(--sw-font-mono);
+  }
+
+  .service-list__badge--up {
+    color: rgba(34, 197, 94, 0.95);
+    background: rgba(34, 197, 94, 0.12);
+  }
+
+  .service-list__badge--down {
+    color: rgba(239, 68, 68, 0.95);
+    background: rgba(239, 68, 68, 0.12);
+  }
+
+  .service-list__badge--unknown {
+    color: var(--sw-text-muted);
   }
 
   .service-list__actions {

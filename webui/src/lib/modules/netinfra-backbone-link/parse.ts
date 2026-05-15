@@ -23,6 +23,20 @@ function getBackboneLinkEntry(input: any): any | null {
   return null;
 }
 
+function parsePpsLeaf(value: unknown): number | null {
+  if (value === undefined || value === null) {
+    return null;
+  }
+  const parsed = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function parseLinkStatusLeaf(value: unknown): 'up' | 'down' | 'unknown' {
+  if (value === 'up') return 'up';
+  if (value === 'down') return 'down';
+  return 'unknown';
+}
+
 export function parseNetinfraBackboneLink(input: unknown): NetinfraBackboneLinkDraft {
   const defaults = createNetinfraBackboneLinkDraft();
   const backboneLink = getBackboneLinkEntry(input);
@@ -31,12 +45,17 @@ export function parseNetinfraBackboneLink(input: unknown): NetinfraBackboneLinkD
     return defaults;
   }
 
+  const state = backboneLink.state;
+
   return {
     leftRouter: String(backboneLink['left-router'] ?? ''),
     leftInterface: String(backboneLink['left-interface'] ?? ''),
     rightRouter: String(backboneLink['right-router'] ?? ''),
     rightInterface: String(backboneLink['right-interface'] ?? ''),
-    monitorTraffic: Boolean(backboneLink['monitor-traffic'] ?? false)
+    monitorTraffic: Boolean(backboneLink['monitor-traffic'] ?? false),
+    leftPps: parsePpsLeaf(state?.['left-pps']),
+    rightPps: parsePpsLeaf(state?.['right-pps']),
+    linkStatus: parseLinkStatusLeaf(state?.['link-status'])
   };
 }
 
@@ -50,13 +69,23 @@ export function listNetinfraBackboneLinks(input: any): ServiceListItem[] {
 
   return backboneLinks.map((backboneLink) => {
     const draft = parseNetinfraBackboneLink(backboneLink);
+    const badges = draft.monitorTraffic
+      ? [
+          {
+            text: `● ${draft.linkStatus}`,
+            tone: draft.linkStatus,
+            title: 'Combined link oper-status (AND of both endpoints)'
+          }
+        ]
+      : undefined;
 
     return {
       id: getNetinfraBackboneLinkRouteId(draft),
       label: formatNetinfraBackboneLinkEndpoints(draft),
       description: draft.monitorTraffic
         ? 'Traffic monitoring enabled'
-        : 'Traffic monitoring disabled'
+        : 'Traffic monitoring disabled',
+      badges
     };
   });
 }

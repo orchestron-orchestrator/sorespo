@@ -40,9 +40,11 @@
   }
 
   async function loadTopology(): Promise<void> {
+    const isInitialLoad = topologyGraph === null;
     try {
-      loadingTopology = true;
-      topologyError = '';
+      if (isInitialLoad) {
+        loadingTopology = true;
+      }
       topologyNote = '';
 
       const [netinfraResult, sitesResult] = await Promise.allSettled([
@@ -51,13 +53,19 @@
       ]);
 
       if (netinfraResult.status !== 'fulfilled') {
-        topologyGraph = null;
-        topologyError = netinfraResult.reason instanceof Error
+        const message = netinfraResult.reason instanceof Error
           ? netinfraResult.reason.message
           : 'Failed to load netinfra topology.';
+        if (isInitialLoad) {
+          topologyGraph = null;
+          topologyError = message;
+        } else {
+          topologyNote = `Refresh failed: ${message}`;
+        }
         return;
       }
 
+      topologyError = '';
       topologyGraph = buildTopologyGraph(
         netinfraResult.value,
         sitesResult.status === 'fulfilled' ? sitesResult.value : null
@@ -73,6 +81,8 @@
     }
   }
 
+  const TOPOLOGY_REFRESH_MS = 5000;
+
   onMount(() => {
     loadDevices();
     loadTopology();
@@ -83,8 +93,37 @@
     };
     window.addEventListener('global-refresh', handleRefresh);
 
+    let refreshTimer: ReturnType<typeof setInterval> | null = null;
+    const startTopologyRefresh = () => {
+      if (refreshTimer !== null) {
+        return;
+      }
+      refreshTimer = setInterval(() => {
+        if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+          return;
+        }
+        loadTopology();
+      }, TOPOLOGY_REFRESH_MS);
+    };
+    const stopTopologyRefresh = () => {
+      if (refreshTimer !== null) {
+        clearInterval(refreshTimer);
+        refreshTimer = null;
+      }
+    };
+    startTopologyRefresh();
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        loadTopology();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     return () => {
       window.removeEventListener('global-refresh', handleRefresh);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      stopTopologyRefresh();
     };
   });
 </script>

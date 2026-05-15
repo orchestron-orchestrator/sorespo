@@ -111,9 +111,7 @@ SRC_DNODE_CHILD_14: DList = DList(module='sorespo-rfs', namespace='http://exampl
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='monitor-traffic', config=True, default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
     DContainer(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='dynstate', config=True, presence=False, exts=[
             DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave.yang', prefix='sw', name='dynstate', arg=None, exts=[])
-        ], children=[
-        DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='pps', config=True, mandatory=False, type_=DTypeIntegerUnsigned(name='uint64', description=None, reference=None, exts=[], builtin_type='uint64', default=None, ranges=Ranges([(0, 18446744073709551615)])))
-    ])
+        ])
 ])
 
 SRC_DNODE_CHILD_15: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ibgp-neighbor', key=['address'], config=True, min_elements=0, ordered_by='system', exts=[
@@ -260,9 +258,6 @@ SRC_YANG_0: str = r"""module sorespo-rfs {
 
             container dynstate {
                 sw:dynstate;
-                leaf pps {
-                    type uint64;
-                }
             }
 
             container state {
@@ -272,6 +267,13 @@ SRC_YANG_0: str = r"""module sorespo-rfs {
                 }
                 leaf pps {
                     type uint64;
+                }
+                leaf oper-status {
+                    type enumeration {
+                        enum up;
+                        enum down;
+                        enum unknown;
+                    }
                 }
             }
         }
@@ -1814,14 +1816,9 @@ class stratoweave_rfs__rfs__backbone_interface__remote(yang.adata.MNode):
 
 _breaker19: None = None
 class stratoweave_rfs__rfs__backbone_interface__dynstate(yang.adata.MNode):
-    pps: ?u64
 
-    mut def __init__(self, pps: ?u64) -> None:
-        self.pps = pps
-
-    pure def _get_attr(self, name: str) -> ?value:
-        if name == 'sorespo-rfs:pps':
-            return self.pps
+    mut def __init__(self) -> None:
+        pass
 
     mut def to_gdata(self) -> yang.gdata.Node:
         return yang.adata.from_adata(SRC_DNODE, self, loose=False, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:backbone-interface', 'dynstate'])
@@ -1829,7 +1826,7 @@ class stratoweave_rfs__rfs__backbone_interface__dynstate(yang.adata.MNode):
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> stratoweave_rfs__rfs__backbone_interface__dynstate:
         if n is not None:
-            return stratoweave_rfs__rfs__backbone_interface__dynstate(pps=n.get_opt_u64(yang.gdata.Id(NS_sorespo_rfs, 'pps')))
+            return stratoweave_rfs__rfs__backbone_interface__dynstate()
         return stratoweave_rfs__rfs__backbone_interface__dynstate()
 
     mut def copy(self) -> stratoweave_rfs__rfs__backbone_interface__dynstate:

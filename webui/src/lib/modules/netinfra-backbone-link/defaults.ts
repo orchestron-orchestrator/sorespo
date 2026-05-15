@@ -6,6 +6,9 @@ export function createNetinfraBackboneLinkDraft(): NetinfraBackboneLinkDraft {
     leftInterface: '',
     rightRouter: '',
     rightInterface: '',
-    monitorTraffic: false
+    monitorTraffic: false,
+    leftPps: null,
+    rightPps: null,
+    linkStatus: 'unknown'
   };
 }

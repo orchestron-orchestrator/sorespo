@@ -1,9 +1,17 @@
+export type NetinfraBackboneLinkStatus = 'up' | 'down' | 'unknown';
+
 export interface NetinfraBackboneLinkDraft {
   leftRouter: string;
   leftInterface: string;
   rightRouter: string;
   rightInterface: string;
   monitorTraffic: boolean;
+  /** Read-only operational state lifted from the lower layers. Not serialized. */
+  leftPps: number | null;
+  /** Read-only operational state lifted from the lower layers. Not serialized. */
+  rightPps: number | null;
+  /** Combined link status (AND of both endpoints' oper-state). Not serialized. */
+  linkStatus: NetinfraBackboneLinkStatus;
 }
 
 export function getNetinfraBackboneLinkRouteId(

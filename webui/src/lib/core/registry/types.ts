@@ -2,10 +2,19 @@ import type { Component } from 'svelte';
 
 import type { ValidationResult } from '$lib/core/validation/types';
 
+export type ServiceListItemTone = 'up' | 'down' | 'unknown' | 'neutral';
+
+export interface ServiceListItemBadge {
+  text: string;
+  tone?: ServiceListItemTone;
+  title?: string;
+}
+
 export interface ServiceListItem {
   id: string;
   label: string;
   description?: string;
+  badges?: ServiceListItemBadge[];
 }
 
 export interface ServiceModule<TDraft = unknown> {
