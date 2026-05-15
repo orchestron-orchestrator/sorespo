@@ -1,6 +1,8 @@
 build-sweave-image:
 	docker build --build-arg http_proxy=$(http_proxy) --build-arg https_proxy=$(https_proxy) -t sorespo-sweave-base -f ../common/Dockerfile.sweave .
 
+STRATOWEAVE_HTTP_ORIGIN ?= http://localhost:15000
+
 licenses/%:
 # Ensure the symlink to the licenses private repo exists in the project root
 	@if [ ! -d ../../licenses ]; then \
@@ -27,6 +29,17 @@ licenses/%:
 .PHONY: start
 start: build-sweave-image
 	$(CLAB_BIN) deploy --topo $(TESTENV:sorespo-%=%).clab.yml --log-level debug --reconfigure
+	@if [ "$(WEBUI)" = "true" ]; then \
+		$(MAKE) -C ../../ start-webui STRATOWEAVE_API_ORIGIN="$(STRATOWEAVE_HTTP_ORIGIN)"; \
+	fi
+
+.PHONY: start-webui
+start-webui:
+	$(MAKE) -C ../../ start-webui STRATOWEAVE_API_ORIGIN="$(STRATOWEAVE_HTTP_ORIGIN)"
+
+.PHONY: stop-webui
+stop-webui:
+	$(MAKE) -C ../../ stop-webui
 
 .PHONY: stop
 stop:
@@ -94,76 +107,75 @@ dev-tutorial:
 shell:
 	docker exec -it $(TESTENV)-sweave bash -l
 
-RESTCONF_PORT=$(shell docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' $(TESTENV)-sweave)
 
 .PHONY: send-config-async
 send-config-async:
-	curl -f -X PATCH -H "Content-Type: application/yang-data+xml" -H "Async: true" -d @$(FILE) http://localhost:$(RESTCONF_PORT)/restconf/data
+	curl -f -X PATCH -H "Content-Type: application/yang-data+xml" -H "Async: true" -d @$(FILE) $(STRATOWEAVE_HTTP_ORIGIN)/restconf/data
 
 .PHONY: send-config-wait
 send-config-wait:
-	curl -f -X PATCH -H "Content-Type: application/yang-data+xml" -d @$(FILE) http://localhost:$(RESTCONF_PORT)/restconf/data
+	curl -f -X PATCH -H "Content-Type: application/yang-data+xml" -d @$(FILE) $(STRATOWEAVE_HTTP_ORIGIN)/restconf/data
 
 .PHONY: send-config-json-async
 send-config-json-async:
-	curl -f -X PATCH -H "Content-Type: application/yang-data+json" -H "Async: true" -d @$(FILE) http://localhost:$(RESTCONF_PORT)/restconf/data
+	curl -f -X PATCH -H "Content-Type: application/yang-data+json" -H "Async: true" -d @$(FILE) $(STRATOWEAVE_HTTP_ORIGIN)/restconf/data
 
 .PHONY: send-config-json-wait
 send-config-json-wait:
-	curl -f -X PATCH -H "Content-Type: application/yang-data+json" -d @$(FILE) http://localhost:$(RESTCONF_PORT)/restconf/data
+	curl -f -X PATCH -H "Content-Type: application/yang-data+json" -d @$(FILE) $(STRATOWEAVE_HTTP_ORIGIN)/restconf/data
 
 .PHONY: send-config-tmf640
 send-config-tmf640:
-	curl  -k -sS -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d @$(FILE) http://localhost:$(RESTCONF_PORT)/tmf-api/ServiceActivationAndConfiguration/v4/service | jq '.'
+	curl  -k -sS -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d @$(FILE) $(STRATOWEAVE_HTTP_ORIGIN)/tmf-api/ServiceActivationAndConfiguration/v4/service | jq '.'
 
 .PHONY: send-config-tmf640-stream
 send-config-tmf640-stream:
 	set -e; \
 	json_services=$$(jq -c -f "$(FILTER)" "$(FILE)"); \
 	printf '%s\n' "$$json_services" | while IFS= read -r service; do \
-		response=$$(curl -f -k -sS -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "$$service" http://localhost:$(RESTCONF_PORT)/tmf-api/ServiceActivationAndConfiguration/v4/service); \
+		response=$$(curl -f -k -sS -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "$$service" $(STRATOWEAVE_HTTP_ORIGIN)/tmf-api/ServiceActivationAndConfiguration/v4/service); \
 		printf '%s\n' "$$response" | jq '.'; \
 	done
 
 .PHONY: get-config-tmf640
 get-config-tmf640:
-	curl -k -sS -H "Accept: application/json" http://localhost:$(RESTCONF_PORT)/tmf-api/ServiceActivationAndConfiguration/v4/service$(if $(ID),/$(ID),) | jq '.'
+	curl -k -sS -H "Accept: application/json" $(STRATOWEAVE_HTTP_ORIGIN)/tmf-api/ServiceActivationAndConfiguration/v4/service$(if $(ID),/$(ID),) | jq '.'
 
 .PHONY: get-tmf633-service-catalog
 get-tmf633-service-catalog:
-	curl -k -sS -H "Accept: application/json" http://localhost:$(RESTCONF_PORT)/tmf-api/serviceCatalogManagement/v4/serviceCatalog$(if $(ID),/$(ID),) | jq '.'
+	curl -k -sS -H "Accept: application/json" $(STRATOWEAVE_HTTP_ORIGIN)/tmf-api/serviceCatalogManagement/v4/serviceCatalog$(if $(ID),/$(ID),) | jq '.'
 
 .PHONY: get-tmf633-service-category
 get-tmf633-service-category:
-	curl -k -sS -H "Accept: application/json" http://localhost:$(RESTCONF_PORT)/tmf-api/serviceCatalogManagement/v4/serviceCategory$(if $(ID),/$(ID),) | jq '.'
+	curl -k -sS -H "Accept: application/json" $(STRATOWEAVE_HTTP_ORIGIN)/tmf-api/serviceCatalogManagement/v4/serviceCategory$(if $(ID),/$(ID),) | jq '.'
 
 .PHONY: get-tmf633-service-candidate
 get-tmf633-service-candidate:
-	curl -k -sS -H "Accept: application/json" http://localhost:$(RESTCONF_PORT)/tmf-api/serviceCatalogManagement/v4/serviceCandidate$(if $(ID),/$(ID),) | jq '.'
+	curl -k -sS -H "Accept: application/json" $(STRATOWEAVE_HTTP_ORIGIN)/tmf-api/serviceCatalogManagement/v4/serviceCandidate$(if $(ID),/$(ID),) | jq '.'
 
 .PHONY: get-tmf633-service-specification
 get-tmf633-service-specification:
-	curl -k -sS -H "Accept: application/json" http://localhost:$(RESTCONF_PORT)/tmf-api/serviceCatalogManagement/v4/serviceSpecification$(if $(ID),/$(ID),) | jq '.'
+	curl -k -sS -H "Accept: application/json" $(STRATOWEAVE_HTTP_ORIGIN)/tmf-api/serviceCatalogManagement/v4/serviceSpecification$(if $(ID),/$(ID),) | jq '.'
 
 .PHONY: get-config-restconf
 get-config-restconf:
-	curl -f -sS -H "Accept: application/yang-data+xml" http://localhost:$(RESTCONF_PORT)/restconf/data
+	curl -f -sS -H "Accept: application/yang-data+xml" $(STRATOWEAVE_HTTP_ORIGIN)/restconf/data
 
 .PHONY: get-config-restconf-json
 get-config-restconf-json:
-	curl -f -sS -H "Accept: application/yang-data+json" http://localhost:$(RESTCONF_PORT)/restconf/data | jq '.'
+	curl -f -sS -H "Accept: application/yang-data+json" $(STRATOWEAVE_HTTP_ORIGIN)/restconf/data | jq '.'
 
 .PHONY: get-config0 get-config1 get-config2 get-config3
 get-config0 get-config1 get-config2 get-config3:
-	curl -H "Accept: application/yang-data+xml" http://localhost:$(RESTCONF_PORT)/layer/$(subst get-config,,$@)
+	curl -H "Accept: application/yang-data+xml" $(STRATOWEAVE_HTTP_ORIGIN)/layer/$(subst get-config,,$@)
 
 .PHONY: get-config-json0 get-config-json1 get-config-json2 get-config-json3
 get-config-json0 get-config-json1 get-config-json2 get-config-json3:
-	@curl -H "Accept: application/yang-data+json" http://localhost:$(RESTCONF_PORT)/layer/$(subst get-config-json,,$@)
+	@curl -H "Accept: application/yang-data+json" $(STRATOWEAVE_HTTP_ORIGIN)/layer/$(subst get-config-json,,$@)
 
 .PHONY: get-config-adata0 get-config-adata1 get-config-adata2 get-config-adata3
 get-config-adata0 get-config-adata1 get-config-adata2 get-config-adata3:
-	@curl -H "Accept: application/yang-data+acton-adata" http://localhost:$(RESTCONF_PORT)/layer/$(subst get-config-adata,,$@)?loose=$(LAYER_CONFIG_LOOSE)
+	@curl -H "Accept: application/yang-data+acton-adata" $(STRATOWEAVE_HTTP_ORIGIN)/layer/$(subst get-config-adata,,$@)?loose=$(LAYER_CONFIG_LOOSE)
 
 # Default for /layer/<idx> adata output (query param).
 LAYER_CONFIG_LOOSE?=true
@@ -183,7 +195,7 @@ upper = $(shell printf '%s' "$(1)" | tr '[:lower:]' '[:upper:]')
 # configuration" of the device itself.
 .PHONY: $(addprefix get-target-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-target-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
-	@curl http://localhost:$(RESTCONF_PORT)/device/$(call upper,$(subst get-target-,,$@))/target?format=$(DEVICE_CONFIG_FORMAT)
+	@curl $(STRATOWEAVE_HTTP_ORIGIN)/device/$(call upper,$(subst get-target-,,$@))/target?format=$(DEVICE_CONFIG_FORMAT)
 
 .PHONY: $(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
@@ -193,7 +205,7 @@ $(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 # NMDA-speak is the "intended configuration".
 .PHONY: $(addprefix get-running-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-running-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
-	@curl http://localhost:$(RESTCONF_PORT)/device/$(call upper,$(subst get-running-,,$@))/running?format=$(DEVICE_CONFIG_FORMAT)
+	@curl $(STRATOWEAVE_HTTP_ORIGIN)/device/$(call upper,$(subst get-running-,,$@))/running?format=$(DEVICE_CONFIG_FORMAT)
 
 .PHONY: $(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
@@ -201,7 +213,7 @@ $(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 
 .PHONY: $(addprefix get-diff-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-diff-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
-	@curl http://localhost:$(RESTCONF_PORT)/device/$(call upper,$(subst get-diff-,,$@))/diff?format=$(DEVICE_CONFIG_FORMAT)
+	@curl $(STRATOWEAVE_HTTP_ORIGIN)/device/$(call upper,$(subst get-diff-,,$@))/diff?format=$(DEVICE_CONFIG_FORMAT)
 
 .PHONY: $(addprefix get-diff-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-diff-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
@@ -209,11 +221,11 @@ $(addprefix get-diff-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 
 .PHONY: $(addprefix resync-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix resync-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
-	@curl http://localhost:$(RESTCONF_PORT)/device/$(call upper,$(subst resync-,,$@))/resync
+	@curl $(STRATOWEAVE_HTTP_ORIGIN)/device/$(call upper,$(subst resync-,,$@))/resync
 
 .PHONY: delete-config
 delete-config:
-	curl -f -X DELETE http://localhost:$(RESTCONF_PORT)/restconf/data/netinfra:netinfra/router=STO-CORE-1
+	curl -f -X DELETE $(STRATOWEAVE_HTTP_ORIGIN)/restconf/data/netinfra:netinfra/router=STO-CORE-1
 
 .PHONY: $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL) $(ROUTERS_FRR))
 $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL) $(ROUTERS_FRR)): cli-%: platform-cli-%
@@ -224,7 +236,7 @@ $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 
 .PHONY: test-restconf-get
 test-restconf-get:
-	curl -sS -f -H "Accept: application/yang-data+json" http://localhost:$(RESTCONF_PORT)/restconf/data/netinfra:netinfra/router=AMS-CORE-1 | jq '.["netinfra:router"][0].name' | grep -q "AMS-CORE-1"
+	curl -sS -f -H "Accept: application/yang-data+json" $(STRATOWEAVE_HTTP_ORIGIN)/restconf/data/netinfra:netinfra/router=AMS-CORE-1 | jq '.["netinfra:router"][0].name' | grep -q "AMS-CORE-1"
 
 .PHONY: test
 test:

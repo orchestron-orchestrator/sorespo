@@ -1,28 +1,45 @@
 # StratoWeave Web UI
 
-A Svelte-based web interface for managing StratoWeave/SORESPO devices.
+This frontend is now a SvelteKit application with an adapter-node build target.
 
 ## Setup
 
 ```bash
-# Install dependencies
 npm install
-
-# Run development server
-npm run dev
+make start-webui
 ```
 
-The app will be available at http://localhost:3000
+The app runs on `http://localhost:3000`.
 
-## Features
+## Route Areas
 
-- Device list view with status indicators
-- Individual device detail pages
-- Device reconfiguration
-- Real-time status updates
+- `/devices`
+- `/operations/config-queue`
+- `/services`
 
 ## API Integration
 
-The UI expects the StratoWeave API to be running on port 15000. The Vite dev server proxies `/api/*` requests to `http://localhost:15000`.
+The browser only talks to SvelteKit routes under `/api/*`.
 
-Currently using mock data - update the endpoints in `src/services/api.js` to connect to real StratoWeave API endpoints.
+- `/api/*` proxies to the existing StratoWeave backend on `http://localhost:15000`
+- `/api/restconf/*` proxies to the backend RESTCONF interface
+
+The upstream origin can be overridden with `STRATOWEAVE_API_ORIGIN`.
+
+## Quicklab Workflow
+
+For the lab environments, the StratoWeave backend is published on a fixed host port:
+
+- `http://localhost:15000`
+
+You can start the lab and the detached webui dev server together with:
+
+```bash
+make -C test/quicklab-srl start WEBUI=true
+```
+
+Or start the webui separately from the repo root:
+
+```bash
+make start-webui
+```
