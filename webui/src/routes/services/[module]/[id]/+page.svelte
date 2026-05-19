@@ -192,20 +192,9 @@
   }
 </script>
 
-<div class="page-header">
-  <div>
-    <div class="breadcrumb">
-      <a href="/services">Services</a>
-      <span>›</span>
-      <a href={`/services/${serviceModule.id}`}>{serviceModule.title}</a>
-      <span>›</span>
-      <span class="monospace">{displayServiceId}</span>
-    </div>
-  </div>
-  <div>
-    <a class="btn btn-secondary" href={cloneHref}>Clone as new</a>
-  </div>
-</div>
+{#snippet cloneAction()}
+  <a class="btn btn-secondary btn-sm" href={cloneHref}>Clone as new</a>
+{/snippet}
 
 <ServiceWorkspace
   module={serviceModule}
@@ -222,6 +211,7 @@
   saveDisabled={!validation.ok || !getDraftKey(serviceModule, draft)}
   showDelete={serviceModule.deletable ?? false}
   {statusMessage}
+  headerActions={cloneAction}
   onchange={(next) => store.set(next)}
   ontouch={() => (validationActive = true)}
   onreset={handleReset}
@@ -238,17 +228,3 @@
   onconfirm={confirmDelete}
 />
 
-<style>
-  .breadcrumb {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    color: var(--text-muted);
-    font-size: 0.95rem;
-  }
-
-  .breadcrumb a {
-    color: var(--brand);
-    text-decoration: none;
-  }
-</style>

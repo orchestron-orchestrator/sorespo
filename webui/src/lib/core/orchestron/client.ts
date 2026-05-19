@@ -3,7 +3,14 @@ const API_BASE = '/api';
 export interface DeviceSummary {
   id: string;
   name: string;
+  type?: string;
+  address?: string;
+  username?: string;
+  queueLength?: number;
+  pendingApprovals?: number;
   hasRunningConfig?: boolean;
+  hasTargetConfig?: boolean;
+  approvalRequired?: boolean;
 }
 
 export interface DeviceAddress {
@@ -92,11 +99,22 @@ export async function fetchDevices(fetchFn: Fetch = fetch): Promise<DeviceSummar
     deviceNames.map(async (name) => {
       const upperId = name.toUpperCase();
       const info = await apiRequest<any>(`/device/${upperId}/info`, {}, fetchFn);
+      const firstAddr = Array.isArray(info.addresses) && info.addresses.length > 0 ? info.addresses[0] : null;
+      const address = firstAddr
+        ? `${firstAddr.address}${firstAddr.port ? `:${firstAddr.port}` : ''}`
+        : undefined;
 
       return {
         id: upperId,
         name: info.name || upperId,
-        hasRunningConfig: info.has_running_config
+        type: info.type,
+        address,
+        username: info.username,
+        queueLength: info.queue_length,
+        pendingApprovals: info.pending_approvals,
+        hasRunningConfig: info.has_running_config,
+        hasTargetConfig: info.has_target_config,
+        approvalRequired: Boolean(info.approval_required)
       } satisfies DeviceSummary;
     })
   );

@@ -7,8 +7,8 @@
 
   import CommandPalette from '$lib/core/command-palette/CommandPalette.svelte';
   import { queuesPoll, refreshQueues } from '$lib/core/orchestron/poll-store';
-  import { listServiceModuleMeta } from '$lib/core/registry/service-modules';
-  import { version } from '../../package.json';
+  import { getServiceModule, listServiceModuleMeta } from '$lib/core/registry/service-modules';
+  import { formatServiceRouteId } from '$lib/core/registry/types';
 
   let { children }: { children?: Snippet } = $props();
 
@@ -41,21 +41,67 @@
     }
   }
 
-  /** Derive a YANG-path breadcrumb from the current route */
-  function getYangSegments(pathname: string): { label: string; current: boolean }[] {
-    const parts = pathname.split('/').filter(Boolean);
-    if (parts.length === 0) return [{ label: 'dashboard', current: true }];
+  function capitalize(value: string): string {
+    if (!value) return value;
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  }
 
-    return parts.map((p, i) => ({
-      label: decodePathSegment(p),
-      current: i === parts.length - 1
-    }));
+  type Crumb = { label: string; href: string; current: boolean };
+
+  /** Map a URL path to a friendly, clickable breadcrumb. */
+  function getBreadcrumbs(pathname: string): Crumb[] {
+    const parts = pathname.split('/').filter(Boolean).map(decodePathSegment);
+    if (parts.length === 0) return [{ label: 'Dashboard', href: '/', current: true }];
+
+    const crumbs: Crumb[] = [];
+    let href = '';
+
+    for (let i = 0; i < parts.length; i += 1) {
+      const part = parts[i];
+      href += `/${part}`;
+
+      let label = capitalize(part);
+
+      if (parts[0] === 'services') {
+        if (i === 0) {
+          label = 'Services';
+        } else if (i === 1) {
+          const module = getServiceModule(part);
+          label = module?.title ?? part;
+        } else if (i === 2) {
+          if (part === 'new') {
+            label = 'New';
+          } else {
+            const module = getServiceModule(parts[1]);
+            label = module ? formatServiceRouteId(module, part) : part;
+          }
+        }
+      } else if (parts[0] === 'devices') {
+        if (i === 0) {
+          label = 'Devices';
+        } else if (i === 1) {
+          label = part;
+        } else {
+          label = capitalize(part);
+        }
+      } else if (parts[0] === 'operations') {
+        if (i === 0) {
+          label = 'Operations';
+        } else if (part === 'config-queue') {
+          label = 'Config Queue';
+        }
+      }
+
+      crumbs.push({ label, href, current: i === parts.length - 1 });
+    }
+
+    return crumbs;
   }
 
   let currentPathname = $derived(page.url.pathname);
-  let yangSegments = $derived(getYangSegments(currentPathname));
+  let breadcrumbs = $derived(getBreadcrumbs(currentPathname));
   let pageTitle = $derived(
-    yangSegments
+    breadcrumbs
       .slice()
       .reverse()
       .map((seg) => seg.label)
@@ -72,9 +118,15 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <div class="logo-mark">SW</div>
-      <span class="logo-text">StratoWeave</span>
-      <span class="logo-version">v{version}</span>
+      <a class="logo-link" href="/" aria-label="StratoWeave — go to dashboard">
+        <img
+          class="logo-img"
+          src="/stratoweave-logo.png"
+          alt="StratoWeave — Orchestration Platform"
+          width="286"
+          height="53"
+        />
+      </a>
     </div>
     <nav class="sidebar-nav" aria-label="Primary navigation">
       <div class="nav-section">
@@ -146,14 +198,18 @@
   <!-- Main area -->
   <div class="app-main-wrap">
     <header class="app-header">
-      <div class="yang-path">
-        {#each yangSegments as seg, i}
+      <nav class="yang-path" aria-label="Breadcrumb">
+        {#each breadcrumbs as crumb, i}
           {#if i > 0}
-            <span class="separator">/</span>
+            <span class="separator">›</span>
           {/if}
-          <span class="segment" class:current={seg.current}>{seg.label}</span>
+          {#if crumb.current}
+            <span class="segment current" aria-current="page">{crumb.label}</span>
+          {:else}
+            <a class="segment" href={crumb.href}>{crumb.label}</a>
+          {/if}
         {/each}
-      </div>
+      </nav>
 
       <div class="header-actions">
         <button class="btn btn-ghost btn-sm cmdk-trigger" type="button" onclick={() => (paletteOpen = true)} aria-label="Open command palette">
@@ -203,7 +259,7 @@
     padding: 1px 5px;
     border: 1px solid var(--sw-border-subtle);
     border-radius: 4px;
-    background: var(--sw-bg-deep);
+    background: rgba(13, 23, 48, 0.6);
     font-family: var(--sw-font-mono);
     font-size: 10px;
     color: var(--sw-text-muted);

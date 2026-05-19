@@ -118,7 +118,7 @@
                 </div>
               {/if}
             </div>
-            <span class="pill monospace">{formatServiceRouteId(serviceModule, item.id)}</span>
+            <span class="pill monospace service-list__id-pill">{formatServiceRouteId(serviceModule, item.id)}</span>
           </a>
 
           <div class="service-list__actions">
@@ -187,7 +187,7 @@
     display: flex;
     flex: 1;
     min-width: 0;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 1rem;
     text-decoration: none;
@@ -233,6 +233,11 @@
 
   .service-list__badge--unknown {
     color: var(--sw-text-muted);
+  }
+
+  .service-list__id-pill {
+    padding: 5px 10px;
+    font-size: 12px;
   }
 
   .service-list__actions {

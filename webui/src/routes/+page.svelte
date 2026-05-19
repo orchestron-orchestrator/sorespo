@@ -19,11 +19,12 @@
   let topologyError = $state('');
   let topologyNote = $state('');
 
-  let totalServices = $derived(modules.length);
-  let totalDevices = $derived(devices.length);
-
   function configDotColor(device: DeviceSummary): string {
     return device.hasRunningConfig === false ? 'var(--sw-danger)' : 'var(--sw-success)';
+  }
+
+  function configStatusLabel(device: DeviceSummary): string {
+    return device.hasRunningConfig === false ? 'No config' : 'Configured';
   }
 
   async function loadDevices(): Promise<void> {
@@ -132,33 +133,13 @@
   <div class="page-header">
     <div>
       <h2>Overview</h2>
-      <p>Landing page for current devices and service configuration entry points.</p>
     </div>
   </div>
-
-  <section class="overview__stats">
-    <article class="card stat-card">
-      <div class="card-body stat-card__body">
-        <span class="stat-card__label">Devices</span>
-        <strong class="stat-card__value">{loadingDevices ? '...' : totalDevices}</strong>
-        <a class="btn btn-secondary btn-sm" href="/devices">Open devices</a>
-      </div>
-    </article>
-
-    <article class="card stat-card">
-      <div class="card-body stat-card__body">
-        <span class="stat-card__label">Service Modules</span>
-        <strong class="stat-card__value">{totalServices}</strong>
-        <a class="btn btn-secondary btn-sm" href="/services">Open services</a>
-      </div>
-    </article>
-  </section>
 
   <section class="overview__section">
     <div class="section-head">
       <div>
         <h3>Network Topology</h3>
-        <p>Live map derived from `netinfra` and L3VPN site bearer references exposed by the API.</p>
       </div>
     </div>
 
@@ -177,7 +158,7 @@
     <div class="section-head">
       <div>
         <h3>Devices</h3>
-        <p>Current discovered devices from otron.</p>
+        <p>Current managed devices</p>
       </div>
       <a class="btn btn-secondary btn-sm" href="/devices">View all devices</a>
     </div>
@@ -189,19 +170,48 @@
     {:else if devices.length === 0}
       <div class="empty-state">No devices were returned by the backend.</div>
     {:else}
-      <div class="device-grid">
-        {#each devices as device}
-          <a class="device-card card" href={`/devices/${device.id}`}>
-            <div class="device-card__header">
-              <h4>{device.name}</h4>
-              <span class="pill">
-                <span class="dot" style={`background: ${configDotColor(device)};`}></span>
-                Device
-              </span>
-            </div>
-            <p class="device-card__id">{device.id}</p>
-          </a>
-        {/each}
+      <div class="card device-table">
+        <div class="card-body no-pad">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Address</th>
+                <th>User</th>
+                <th>Queue</th>
+                <th>Pending</th>
+                <th>Approval</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each devices as device}
+                <tr>
+                  <td><a class="device-table__name" href={`/devices/${device.id}`}>{device.name}</a></td>
+                  <td>{device.type ?? '—'}</td>
+                  <td class="monospace">{device.address ?? '—'}</td>
+                  <td>{device.username ?? '—'}</td>
+                  <td>{device.queueLength ?? 0}</td>
+                  <td>{device.pendingApprovals ?? 0}</td>
+                  <td>
+                    {#if device.approvalRequired}
+                      <span class="pill warning"><span class="dot"></span>Required</span>
+                    {:else}
+                      <span class="device-table__muted">Auto</span>
+                    {/if}
+                  </td>
+                  <td>
+                    <span class="pill">
+                      <span class="dot" style={`background: ${configDotColor(device)};`}></span>
+                      {configStatusLabel(device)}
+                    </span>
+                  </td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
       </div>
     {/if}
   </section>
@@ -243,30 +253,8 @@
     gap: 20px;
   }
 
-  .overview__stats {
-    display: grid;
-    gap: 16px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .stat-card__body {
-    display: grid;
-    gap: 10px;
-  }
-
-  .stat-card__label {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--sw-text-muted);
-    font-weight: 600;
-  }
-
-  .stat-card__value {
-    font-size: 2rem;
-    line-height: 1;
-    letter-spacing: -0.04em;
-    color: var(--sw-text-primary);
+  .overview :global(.page-header) {
+    margin-bottom: 0;
   }
 
   .overview__section {
@@ -292,43 +280,23 @@
     font-size: 13px;
   }
 
-  .device-grid {
-    display: grid;
-    gap: 12px;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  .device-table {
+    overflow: hidden;
   }
 
-  .device-card {
-    display: grid;
-    gap: 10px;
-    padding: 20px;
-    text-decoration: none;
-    transition: border-color 0.2s, transform 0.2s;
-  }
-
-  .device-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--sw-accent-dim);
-  }
-
-  .device-card__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-
-  .device-card__header h4 {
-    margin: 0;
-    font-size: 15px;
+  .device-table__name {
+    color: var(--sw-text-primary);
     font-weight: 600;
+    text-decoration: none;
   }
 
-  .device-card__id {
-    margin: 0;
-    font-family: var(--sw-font-mono);
-    font-size: 12px;
+  .device-table__name:hover {
     color: var(--sw-accent);
+  }
+
+  .device-table__muted {
+    color: var(--sw-text-muted);
+    font-size: 12px;
   }
 
   .service-grid {
@@ -351,13 +319,13 @@
   }
 
   @media (max-width: 720px) {
-    .overview__stats {
-      grid-template-columns: 1fr;
-    }
-
     .section-head {
       flex-direction: column;
       align-items: stretch;
+    }
+
+    .device-table .card-body {
+      overflow-x: auto;
     }
   }
 </style>

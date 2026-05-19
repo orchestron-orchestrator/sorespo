@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import PreviewPanel from '$lib/core/workspace/PreviewPanel.svelte';
   import SaveBar from '$lib/core/workspace/SaveBar.svelte';
   import ValidationPanel from '$lib/core/workspace/ValidationPanel.svelte';
@@ -24,6 +26,7 @@
     showDelete?: boolean;
     deleteDisabled?: boolean;
     deleteLabel?: string;
+    headerActions?: Snippet;
     onchange?: (next: unknown) => void;
     ontouch?: () => void;
     onsave?: () => void;
@@ -49,6 +52,7 @@
     showDelete = false,
     deleteDisabled = false,
     deleteLabel = 'Delete',
+    headerActions,
     onchange,
     ontouch,
     onsave,
@@ -80,6 +84,9 @@
           Needs fixes
         {/if}
       </span>
+      {#if headerActions}
+        {@render headerActions()}
+      {/if}
     </div>
   </div>
 
@@ -145,6 +152,7 @@
     gap: 8px;
     align-items: center;
     flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
   .workspace__grid {

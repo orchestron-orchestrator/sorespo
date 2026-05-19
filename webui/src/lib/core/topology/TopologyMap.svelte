@@ -48,13 +48,11 @@
         role="img"
       >
         <defs>
-          <filter id="topology-glow">
-            <feGaussianBlur stdDeviation="8" result="coloredBlur"></feGaussianBlur>
-            <feMerge>
-              <feMergeNode in="coloredBlur"></feMergeNode>
-              <feMergeNode in="SourceGraphic"></feMergeNode>
-            </feMerge>
-          </filter>
+          <radialGradient id="topology-ring-grad" cx="50%" cy="50%" r="50%">
+            <stop offset="60%" stop-color="rgba(34, 211, 238, 0)"></stop>
+            <stop offset="85%" stop-color="rgba(34, 211, 238, 0.55)"></stop>
+            <stop offset="100%" stop-color="rgba(34, 211, 238, 0)"></stop>
+          </radialGradient>
         </defs>
 
         <g class="topology__links">
@@ -152,10 +150,11 @@
               >
                 <circle
                   class="topology__router-ring"
-                  r={routerRadius + 10}
-                  filter="url(#topology-glow)"
+                  r={routerRadius + 12}
+                  fill="url(#topology-ring-grad)"
                 ></circle>
                 <circle class="topology__router-core" r={routerRadius}></circle>
+                <circle class="topology__router-core-inner" r={routerRadius - 2}></circle>
                 <text class="topology__router-name" text-anchor="middle">
                   <tspan x="0" y="-4">{router.name}</tspan>
                   <tspan x="0" y="14">
@@ -248,9 +247,12 @@
   .topology__canvas-wrap {
     overflow: auto;
     padding: 0;
-    background:
-      radial-gradient(circle at top, rgba(45, 212, 191, 0.08), transparent 42%),
-      linear-gradient(180deg, rgba(17, 24, 32, 0.95), rgba(10, 14, 20, 0.98));
+    background-color: rgba(8, 16, 32, 0.55);
+    background-image:
+      radial-gradient(600px 320px at 50% 50%, rgba(34, 211, 238, 0.10), transparent 70%),
+      linear-gradient(rgba(226, 232, 240, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(226, 232, 240, 0.04) 1px, transparent 1px);
+    background-size: auto, 32px 32px, 32px 32px;
   }
 
   .topology__svg {
@@ -267,18 +269,20 @@
   }
 
   .topology__link {
-    stroke: rgba(136, 153, 170, 0.45);
-    stroke-width: 3;
+    stroke: rgba(226, 232, 240, 0.20);
+    stroke-width: 1.5;
     transition: stroke 0.15s ease, stroke-width 0.15s ease;
     pointer-events: none;
   }
 
   .topology__link--up {
     stroke: rgba(34, 197, 94, 0.85);
+    stroke-width: 2;
   }
 
   .topology__link--down {
     stroke: rgba(239, 68, 68, 0.9);
+    stroke-width: 2;
   }
 
   .topology__link-hit {
@@ -289,7 +293,7 @@
 
   .topology__link-link:hover .topology__link {
     stroke: var(--sw-accent);
-    stroke-width: 4;
+    stroke-width: 2.5;
   }
 
   .topology__link-link:hover .topology__link-label-bg {
@@ -297,22 +301,22 @@
   }
 
   .topology__link-label-bg {
-    fill: rgba(10, 14, 20, 0.8);
-    stroke: rgba(38, 48, 64, 0.95);
+    fill: rgba(8, 16, 32, 0.92);
+    stroke: var(--sw-border-default);
     stroke-width: 1;
     transition: stroke 0.15s ease;
   }
 
   .topology__link-label {
-    fill: var(--sw-text-muted);
-    font-size: 10px;
+    fill: var(--sw-text-secondary);
+    font-size: 11px;
     font-family: var(--sw-font-mono);
     dominant-baseline: middle;
     pointer-events: none;
   }
 
   .topology__link-label tspan:last-child {
-    fill: var(--sw-text-secondary);
+    fill: var(--sw-text-muted);
   }
 
   .topology__link-label .topology__link-pps {
@@ -322,9 +326,9 @@
   }
 
   .topology__attachment-link {
-    stroke: rgba(45, 212, 191, 0.55);
-    stroke-width: 2;
-    stroke-dasharray: 6 6;
+    stroke: rgba(226, 232, 240, 0.20);
+    stroke-width: 1;
+    stroke-dasharray: 2 3;
   }
 
   .topology__router {
@@ -332,25 +336,35 @@
   }
 
   .topology__router-ring {
-    fill: rgba(45, 212, 191, 0.09);
-    stroke: rgba(45, 212, 191, 0.22);
-    stroke-width: 2;
+    stroke: none;
+    pointer-events: none;
   }
 
   .topology__router-core {
-    fill: rgba(17, 24, 32, 0.96);
-    stroke: rgba(45, 212, 191, 0.9);
-    stroke-width: 3;
+    fill: rgba(8, 16, 32, 0.92);
+    stroke: var(--sw-accent);
+    stroke-width: 1.4;
     transition: transform 0.15s ease, stroke 0.15s ease;
+  }
+
+  .topology__router-core-inner {
+    fill: none;
+    stroke: rgba(34, 211, 238, 0.25);
+    stroke-width: 1;
+    pointer-events: none;
   }
 
   .topology__router:hover .topology__router-core {
     transform: scale(1.03);
-    stroke: #4ef2de;
+    stroke: #5ce8fa;
   }
 
   .topology__router--approval .topology__router-core {
     stroke: var(--sw-warning);
+  }
+
+  .topology__router--approval .topology__router-core-inner {
+    stroke: rgba(245, 158, 11, 0.25);
   }
 
   .topology__router-name {
@@ -372,13 +386,14 @@
   }
 
   .topology__site-card {
-    fill: rgba(22, 30, 40, 0.96);
-    stroke: rgba(59, 130, 246, 0.7);
-    stroke-width: 2;
+    fill: rgba(8, 16, 32, 0.92);
+    stroke: var(--sw-violet);
+    stroke-width: 1.1;
+    transition: stroke 0.15s ease;
   }
 
   .topology__site:hover .topology__site-card {
-    stroke: #65a8ff;
+    stroke: #a78bfa;
   }
 
   .topology__site-text {
@@ -397,12 +412,12 @@
 
   .topology__site-count-bg {
     fill: var(--sw-warning);
-    stroke: rgba(10, 14, 20, 0.9);
+    stroke: rgba(8, 16, 32, 0.92);
     stroke-width: 2;
   }
 
   .topology__site-count {
-    fill: var(--sw-bg-deep);
+    fill: var(--sw-navy);
     font-size: 10px;
     font-weight: 700;
     pointer-events: none;
