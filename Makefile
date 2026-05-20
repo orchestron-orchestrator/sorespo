@@ -1,7 +1,11 @@
 
+# Release builds are optimized and typically run faster.
+# Override with `RELEASE=` for a debug build.
+RELEASE ?= --release
+
 .PHONY: build
 build:
-	acton build $(DEP_OVERRIDES) $(TARGET)
+	acton build $(RELEASE) $(DEP_OVERRIDES) $(TARGET)
 
 .PHONY: build-ldep
 build-ldep:
@@ -32,7 +36,7 @@ test-ldep:
 
 .PHONY: gen
 gen:
-	cd spec && acton build $(DEP_OVERRIDES) && out/bin/sorespo_gen
+	cd spec && acton build $(RELEASE) $(DEP_OVERRIDES) && out/bin/sorespo_gen
 
 .PHONY: gen-ldep
 gen-ldep:
