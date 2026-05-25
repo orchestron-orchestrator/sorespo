@@ -54,7 +54,10 @@ SRC_DNODE_CHILD_2: DList = DList(module='netinfra-inter', namespace='http://exam
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='left-interface', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='right-router', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='right-interface', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
-    DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='monitor-traffic', config=True, default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
+    DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='monitor-traffic', config=True, default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
+    DContainer(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='dynstate', config=True, presence=False, exts=[
+            DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave.yang', prefix='sw', name='dynstate', arg=None, exts=[])
+        ])
 ])
 
 SRC_DNODE_CHILD_3: DList = DList(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='ibgp-fullmesh', key=['asn'], config=True, min_elements=0, ordered_by='system', exts=[
@@ -277,6 +280,32 @@ SRC_YANG_1: str = r"""module netinfra-inter {
       leaf monitor-traffic {
         type boolean;
         default false;
+      }
+      container dynstate {
+        sw:dynstate;
+      }
+      container state {
+        config false;
+        description
+          "Operational state lifted from the RFS backbone-interface entries.
+           left-pps is the receive PPS measured on the left interface;
+           right-pps is the receive PPS measured on the right interface.
+           link-status is the combined oper-state of the two endpoints
+           (up only when both endpoints are up; down if either is down;
+           unknown when either endpoint's oper-state is unavailable).";
+        leaf left-pps {
+          type uint64;
+        }
+        leaf right-pps {
+          type uint64;
+        }
+        leaf link-status {
+          type enumeration {
+            enum up;
+            enum down;
+            enum unknown;
+          }
+        }
       }
     }
 
@@ -1116,6 +1145,26 @@ extension netinfra_inter__netinfra__router(Indexed[str, netinfra_inter__netinfra
         raise KeyError(k)
 
 _breaker7: None = None
+class netinfra_inter__netinfra__backbone_link__dynstate(yang.adata.MNode):
+
+    mut def __init__(self) -> None:
+        pass
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        return yang.adata.from_adata(SRC_DNODE, self, loose=True, root_path=['netinfra-inter:netinfra', 'backbone-link', 'dynstate'])
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> netinfra_inter__netinfra__backbone_link__dynstate:
+        if n is not None:
+            return netinfra_inter__netinfra__backbone_link__dynstate()
+        return netinfra_inter__netinfra__backbone_link__dynstate()
+
+    mut def copy(self) -> netinfra_inter__netinfra__backbone_link__dynstate:
+        """Create a deep copy of this adata object"""
+        return netinfra_inter__netinfra__backbone_link__dynstate.from_gdata(self.to_gdata())
+
+
+_breaker8: None = None
 class netinfra_inter__netinfra__backbone_link_entry(yang.adata.MNode):
     left_router: str
     left_interface: str
@@ -1153,7 +1202,7 @@ class netinfra_inter__netinfra__backbone_link_entry(yang.adata.MNode):
         """Create a deep copy of this adata object"""
         return netinfra_inter__netinfra__backbone_link_entry.from_gdata(self.to_gdata())
 
-_breaker8: None = None
+_breaker9: None = None
 class netinfra_inter__netinfra__backbone_link(yang.adata.MNode):
     elements: list[netinfra_inter__netinfra__backbone_link_entry]
     mut def __init__(self, elements: list[netinfra_inter__netinfra__backbone_link_entry]=[]) -> None:
@@ -1201,7 +1250,7 @@ extension netinfra_inter__netinfra__backbone_link(Iterable[netinfra_inter__netin
     def __iter__(self) -> Iterator[netinfra_inter__netinfra__backbone_link_entry]:
         return self.elements.__iter__()
 
-_breaker9: None = None
+_breaker10: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh__router_entry(yang.adata.MNode):
     name: str
     ipv4_address: ?str
@@ -1227,7 +1276,7 @@ class netinfra_inter__netinfra__ibgp_fullmesh__router_entry(yang.adata.MNode):
         """Create a deep copy of this adata object"""
         return netinfra_inter__netinfra__ibgp_fullmesh__router_entry.from_gdata(self.to_gdata())
 
-_breaker10: None = None
+_breaker11: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh__router(yang.adata.MNode):
     elements: list[netinfra_inter__netinfra__ibgp_fullmesh__router_entry]
     mut def __init__(self, elements: list[netinfra_inter__netinfra__ibgp_fullmesh__router_entry]=[]) -> None:
@@ -1290,7 +1339,7 @@ extension netinfra_inter__netinfra__ibgp_fullmesh__router(Indexed[str, netinfra_
                 return
         raise KeyError(k)
 
-_breaker11: None = None
+_breaker12: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh_entry(yang.adata.MNode):
     asn: u64
     authentication_key: ?str
@@ -1320,7 +1369,7 @@ class netinfra_inter__netinfra__ibgp_fullmesh_entry(yang.adata.MNode):
         """Create a deep copy of this adata object"""
         return netinfra_inter__netinfra__ibgp_fullmesh_entry.from_gdata(self.to_gdata())
 
-_breaker12: None = None
+_breaker13: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh(yang.adata.MNode):
     elements: list[netinfra_inter__netinfra__ibgp_fullmesh_entry]
     mut def __init__(self, elements: list[netinfra_inter__netinfra__ibgp_fullmesh_entry]=[]) -> None:
@@ -1383,7 +1432,7 @@ extension netinfra_inter__netinfra__ibgp_fullmesh(Indexed[u64, netinfra_inter__n
                 return
         raise KeyError(k)
 
-_breaker13: None = None
+_breaker14: None = None
 class netinfra_inter__netinfra(yang.adata.MNode):
     router: netinfra_inter__netinfra__router
     backbone_link: netinfra_inter__netinfra__backbone_link
@@ -1416,7 +1465,7 @@ class netinfra_inter__netinfra(yang.adata.MNode):
         return netinfra_inter__netinfra.from_gdata(self.to_gdata())
 
 
-_breaker14: None = None
+_breaker15: None = None
 class l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(yang.adata.MNode):
     as_number: ?u64
 
@@ -1444,7 +1493,7 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(yang.adata.MNode):
         raise Exception('Unreachable in l3vpn_inter__l3vpns__l3vpn__endpoint__bgp.copy()')
 
 
-_breaker15: None = None
+_breaker16: None = None
 class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yang.adata.MNode):
     device: str
     interface: str
@@ -1504,7 +1553,7 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yang.adata.MNode):
         """Create a deep copy of this adata object"""
         return l3vpn_inter__l3vpns__l3vpn__endpoint_entry.from_gdata(self.to_gdata())
 
-_breaker16: None = None
+_breaker17: None = None
 class l3vpn_inter__l3vpns__l3vpn__endpoint(yang.adata.MNode):
     elements: list[l3vpn_inter__l3vpns__l3vpn__endpoint_entry]
     mut def __init__(self, elements: list[l3vpn_inter__l3vpns__l3vpn__endpoint_entry]=[]) -> None:
@@ -1556,7 +1605,7 @@ extension l3vpn_inter__l3vpns__l3vpn__endpoint(Iterable[l3vpn_inter__l3vpns__l3v
     def __iter__(self) -> Iterator[l3vpn_inter__l3vpns__l3vpn__endpoint_entry]:
         return self.elements.__iter__()
 
-_breaker17: None = None
+_breaker18: None = None
 class l3vpn_inter__l3vpns__l3vpn_entry(yang.adata.MNode):
     name: str
     description: ?str
@@ -1586,7 +1635,7 @@ class l3vpn_inter__l3vpns__l3vpn_entry(yang.adata.MNode):
         """Create a deep copy of this adata object"""
         return l3vpn_inter__l3vpns__l3vpn_entry.from_gdata(self.to_gdata())
 
-_breaker18: None = None
+_breaker19: None = None
 class l3vpn_inter__l3vpns__l3vpn(yang.adata.MNode):
     elements: list[l3vpn_inter__l3vpns__l3vpn_entry]
     mut def __init__(self, elements: list[l3vpn_inter__l3vpns__l3vpn_entry]=[]) -> None:
@@ -1649,7 +1698,7 @@ extension l3vpn_inter__l3vpns__l3vpn(Indexed[str, l3vpn_inter__l3vpns__l3vpn_ent
                 return
         raise KeyError(k)
 
-_breaker19: None = None
+_breaker20: None = None
 class l3vpn_inter__l3vpns(yang.adata.MNode):
     l3vpn: l3vpn_inter__l3vpns__l3vpn
 
@@ -1674,7 +1723,7 @@ class l3vpn_inter__l3vpns(yang.adata.MNode):
         return l3vpn_inter__l3vpns.from_gdata(self.to_gdata())
 
 
-_breaker20: None = None
+_breaker21: None = None
 class root(yang.adata.MNode):
     netinfra: netinfra_inter__netinfra
     l3vpns: l3vpn_inter__l3vpns

@@ -55,7 +55,15 @@ SRC_DNODE_CHILD_2: DList = DList(module='netinfra-inter', namespace='http://exam
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='left-interface', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='right-router', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='right-interface', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
-    DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='monitor-traffic', config=True, default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
+    DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='monitor-traffic', config=True, default='false', mandatory=False, type_=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
+    DContainer(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='dynstate', config=True, presence=False, exts=[
+            DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave.yang', prefix='sw', name='dynstate', arg=None, exts=[])
+        ]),
+    DContainer(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='state', config=False, description="Operational state lifted from the RFS backbone-interface entries.\nleft-pps is the receive PPS measured on the left interface;\nright-pps is the receive PPS measured on the right interface.\nlink-status is the combined oper-state of the two endpoints\n(up only when both endpoints are up; down if either is down;\nunknown when either endpoint's oper-state is unavailable).", presence=False, children=[
+        DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='left-pps', config=False, mandatory=False, type_=DTypeIntegerUnsigned(name='uint64', description=None, reference=None, exts=[], builtin_type='uint64', default=None, ranges=Ranges([(0, 18446744073709551615)]))),
+        DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='right-pps', config=False, mandatory=False, type_=DTypeIntegerUnsigned(name='uint64', description=None, reference=None, exts=[], builtin_type='uint64', default=None, ranges=Ranges([(0, 18446744073709551615)]))),
+        DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='link-status', config=False, mandatory=False, type_=DTypeEnum(name='enumeration', description=None, reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'up':0, 'down':1, 'unknown':2}))
+    ])
 ])
 
 SRC_DNODE_CHILD_3: DList = DList(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='ibgp-fullmesh', key=['asn'], config=True, min_elements=0, ordered_by='system', exts=[
@@ -278,6 +286,32 @@ SRC_YANG_1: str = r"""module netinfra-inter {
       leaf monitor-traffic {
         type boolean;
         default false;
+      }
+      container dynstate {
+        sw:dynstate;
+      }
+      container state {
+        config false;
+        description
+          "Operational state lifted from the RFS backbone-interface entries.
+           left-pps is the receive PPS measured on the left interface;
+           right-pps is the receive PPS measured on the right interface.
+           link-status is the combined oper-state of the two endpoints
+           (up only when both endpoints are up; down if either is down;
+           unknown when either endpoint's oper-state is unavailable).";
+        leaf left-pps {
+          type uint64;
+        }
+        leaf right-pps {
+          type uint64;
+        }
+        leaf link-status {
+          type enumeration {
+            enum up;
+            enum down;
+            enum unknown;
+          }
+        }
       }
     }
 
@@ -1117,19 +1151,74 @@ extension netinfra_inter__netinfra__router(Indexed[str, netinfra_inter__netinfra
         raise KeyError(k)
 
 _breaker7: None = None
+class netinfra_inter__netinfra__backbone_link__dynstate(yang.adata.MNode):
+
+    mut def __init__(self) -> None:
+        pass
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        return yang.adata.from_adata(SRC_DNODE, self, loose=True, root_path=['netinfra-inter:netinfra', 'backbone-link', 'dynstate'])
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> netinfra_inter__netinfra__backbone_link__dynstate:
+        if n is not None:
+            return netinfra_inter__netinfra__backbone_link__dynstate()
+        return netinfra_inter__netinfra__backbone_link__dynstate()
+
+    mut def copy(self) -> netinfra_inter__netinfra__backbone_link__dynstate:
+        """Create a deep copy of this adata object"""
+        return netinfra_inter__netinfra__backbone_link__dynstate.from_gdata(self.to_gdata())
+
+
+_breaker8: None = None
+class netinfra_inter__netinfra__backbone_link__state(yang.adata.MNode):
+    left_pps: ?u64
+    right_pps: ?u64
+    link_status: ?str
+
+    mut def __init__(self, left_pps: ?u64, right_pps: ?u64, link_status: ?str) -> None:
+        self.left_pps = left_pps
+        self.right_pps = right_pps
+        self.link_status = link_status
+
+    pure def _get_attr(self, name: str) -> ?value:
+        if name == 'netinfra-inter:left-pps':
+            return self.left_pps
+        if name == 'netinfra-inter:right-pps':
+            return self.right_pps
+        if name == 'netinfra-inter:link-status':
+            return self.link_status
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        return yang.adata.from_adata(SRC_DNODE, self, loose=True, root_path=['netinfra-inter:netinfra', 'backbone-link', 'state'])
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> netinfra_inter__netinfra__backbone_link__state:
+        if n is not None:
+            return netinfra_inter__netinfra__backbone_link__state(left_pps=n.get_opt_u64(yang.gdata.Id(NS_netinfra_inter, 'left-pps')), right_pps=n.get_opt_u64(yang.gdata.Id(NS_netinfra_inter, 'right-pps')), link_status=n.get_opt_str(yang.gdata.Id(NS_netinfra_inter, 'link-status')))
+        return netinfra_inter__netinfra__backbone_link__state()
+
+    mut def copy(self) -> netinfra_inter__netinfra__backbone_link__state:
+        """Create a deep copy of this adata object"""
+        return netinfra_inter__netinfra__backbone_link__state.from_gdata(self.to_gdata())
+
+
+_breaker9: None = None
 class netinfra_inter__netinfra__backbone_link_entry(yang.adata.MNode):
     left_router: str
     left_interface: str
     right_router: str
     right_interface: str
     monitor_traffic: ?bool
+    state: netinfra_inter__netinfra__backbone_link__state
 
-    mut def __init__(self, left_router: str, left_interface: str, right_router: str, right_interface: str, monitor_traffic: ?bool) -> None:
+    mut def __init__(self, left_router: str, left_interface: str, right_router: str, right_interface: str, monitor_traffic: ?bool, state: ?netinfra_inter__netinfra__backbone_link__state=None) -> None:
         self.left_router = left_router
         self.left_interface = left_interface
         self.right_router = right_router
         self.right_interface = right_interface
         self.monitor_traffic = monitor_traffic
+        self.state = state if state is not None else netinfra_inter__netinfra__backbone_link__state()
 
     pure def _get_attr(self, name: str) -> ?value:
         if name == 'netinfra-inter:left-router':
@@ -1142,19 +1231,21 @@ class netinfra_inter__netinfra__backbone_link_entry(yang.adata.MNode):
             return self.right_interface
         if name == 'netinfra-inter:monitor-traffic':
             return self.monitor_traffic
+        if name == 'netinfra-inter:state':
+            return self.state
 
     mut def to_gdata(self) -> yang.gdata.Node:
         return yang.adata.from_adata(SRC_DNODE, self, loose=True, root_path=['netinfra-inter:netinfra', 'backbone-link'])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> netinfra_inter__netinfra__backbone_link_entry:
-        return netinfra_inter__netinfra__backbone_link_entry(left_router=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'left-router')), left_interface=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'left-interface')), right_router=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'right-router')), right_interface=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'right-interface')), monitor_traffic=n.get_opt_bool(yang.gdata.Id(NS_netinfra_inter, 'monitor-traffic')))
+        return netinfra_inter__netinfra__backbone_link_entry(left_router=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'left-router')), left_interface=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'left-interface')), right_router=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'right-router')), right_interface=n.get_str(yang.gdata.Id(NS_netinfra_inter, 'right-interface')), monitor_traffic=n.get_opt_bool(yang.gdata.Id(NS_netinfra_inter, 'monitor-traffic')), state=netinfra_inter__netinfra__backbone_link__state.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_netinfra_inter, 'state'))))
 
     mut def copy(self) -> netinfra_inter__netinfra__backbone_link_entry:
         """Create a deep copy of this adata object"""
         return netinfra_inter__netinfra__backbone_link_entry.from_gdata(self.to_gdata())
 
-_breaker8: None = None
+_breaker10: None = None
 class netinfra_inter__netinfra__backbone_link(yang.adata.MNode):
     elements: list[netinfra_inter__netinfra__backbone_link_entry]
     mut def __init__(self, elements: list[netinfra_inter__netinfra__backbone_link_entry]=[]) -> None:
@@ -1202,7 +1293,7 @@ extension netinfra_inter__netinfra__backbone_link(Iterable[netinfra_inter__netin
     def __iter__(self) -> Iterator[netinfra_inter__netinfra__backbone_link_entry]:
         return self.elements.__iter__()
 
-_breaker9: None = None
+_breaker11: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh__router_entry(yang.adata.MNode):
     name: str
     ipv4_address: ?str
@@ -1228,7 +1319,7 @@ class netinfra_inter__netinfra__ibgp_fullmesh__router_entry(yang.adata.MNode):
         """Create a deep copy of this adata object"""
         return netinfra_inter__netinfra__ibgp_fullmesh__router_entry.from_gdata(self.to_gdata())
 
-_breaker10: None = None
+_breaker12: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh__router(yang.adata.MNode):
     elements: list[netinfra_inter__netinfra__ibgp_fullmesh__router_entry]
     mut def __init__(self, elements: list[netinfra_inter__netinfra__ibgp_fullmesh__router_entry]=[]) -> None:
@@ -1291,7 +1382,7 @@ extension netinfra_inter__netinfra__ibgp_fullmesh__router(Indexed[str, netinfra_
                 return
         raise KeyError(k)
 
-_breaker11: None = None
+_breaker13: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh_entry(yang.adata.MNode):
     asn: u64
     authentication_key: ?str
@@ -1321,7 +1412,7 @@ class netinfra_inter__netinfra__ibgp_fullmesh_entry(yang.adata.MNode):
         """Create a deep copy of this adata object"""
         return netinfra_inter__netinfra__ibgp_fullmesh_entry.from_gdata(self.to_gdata())
 
-_breaker12: None = None
+_breaker14: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh(yang.adata.MNode):
     elements: list[netinfra_inter__netinfra__ibgp_fullmesh_entry]
     mut def __init__(self, elements: list[netinfra_inter__netinfra__ibgp_fullmesh_entry]=[]) -> None:
@@ -1384,7 +1475,7 @@ extension netinfra_inter__netinfra__ibgp_fullmesh(Indexed[u64, netinfra_inter__n
                 return
         raise KeyError(k)
 
-_breaker13: None = None
+_breaker15: None = None
 class netinfra_inter__netinfra(yang.adata.MNode):
     router: netinfra_inter__netinfra__router
     backbone_link: netinfra_inter__netinfra__backbone_link
@@ -1417,7 +1508,7 @@ class netinfra_inter__netinfra(yang.adata.MNode):
         return netinfra_inter__netinfra.from_gdata(self.to_gdata())
 
 
-_breaker14: None = None
+_breaker16: None = None
 class l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(yang.adata.MNode):
     as_number: ?u64
 
@@ -1445,7 +1536,7 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(yang.adata.MNode):
         raise Exception('Unreachable in l3vpn_inter__l3vpns__l3vpn__endpoint__bgp.copy()')
 
 
-_breaker15: None = None
+_breaker17: None = None
 class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yang.adata.MNode):
     device: str
     interface: str
@@ -1505,7 +1596,7 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yang.adata.MNode):
         """Create a deep copy of this adata object"""
         return l3vpn_inter__l3vpns__l3vpn__endpoint_entry.from_gdata(self.to_gdata())
 
-_breaker16: None = None
+_breaker18: None = None
 class l3vpn_inter__l3vpns__l3vpn__endpoint(yang.adata.MNode):
     elements: list[l3vpn_inter__l3vpns__l3vpn__endpoint_entry]
     mut def __init__(self, elements: list[l3vpn_inter__l3vpns__l3vpn__endpoint_entry]=[]) -> None:
@@ -1557,7 +1648,7 @@ extension l3vpn_inter__l3vpns__l3vpn__endpoint(Iterable[l3vpn_inter__l3vpns__l3v
     def __iter__(self) -> Iterator[l3vpn_inter__l3vpns__l3vpn__endpoint_entry]:
         return self.elements.__iter__()
 
-_breaker17: None = None
+_breaker19: None = None
 class l3vpn_inter__l3vpns__l3vpn_entry(yang.adata.MNode):
     name: str
     description: ?str
@@ -1587,7 +1678,7 @@ class l3vpn_inter__l3vpns__l3vpn_entry(yang.adata.MNode):
         """Create a deep copy of this adata object"""
         return l3vpn_inter__l3vpns__l3vpn_entry.from_gdata(self.to_gdata())
 
-_breaker18: None = None
+_breaker20: None = None
 class l3vpn_inter__l3vpns__l3vpn(yang.adata.MNode):
     elements: list[l3vpn_inter__l3vpns__l3vpn_entry]
     mut def __init__(self, elements: list[l3vpn_inter__l3vpns__l3vpn_entry]=[]) -> None:
@@ -1650,7 +1741,7 @@ extension l3vpn_inter__l3vpns__l3vpn(Indexed[str, l3vpn_inter__l3vpns__l3vpn_ent
                 return
         raise KeyError(k)
 
-_breaker19: None = None
+_breaker21: None = None
 class l3vpn_inter__l3vpns(yang.adata.MNode):
     l3vpn: l3vpn_inter__l3vpns__l3vpn
 
@@ -1675,7 +1766,7 @@ class l3vpn_inter__l3vpns(yang.adata.MNode):
         return l3vpn_inter__l3vpns.from_gdata(self.to_gdata())
 
 
-_breaker20: None = None
+_breaker22: None = None
 class root(yang.adata.MNode):
     netinfra: netinfra_inter__netinfra
     l3vpns: l3vpn_inter__l3vpns
@@ -1709,7 +1800,7 @@ actor rpc_root(tp: yang.gdata.TreeProvider):
 
 
 
-_breaker21: None = None
+_breaker23: None = None
 class netinfra_inter__netinfra__router__feature_flags_subs(SubscriptionNode):
     runtime_schema_fetch: SubscriptionNode
 
@@ -1721,7 +1812,7 @@ class netinfra_inter__netinfra__router__feature_flags_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.runtime_schema_fetch]
         return direct
 
-_breaker22: None = None
+_breaker24: None = None
 class netinfra_inter__netinfra__router__base_config_subs(SubscriptionNode):
     asn: SubscriptionNode
     ipv4_address: SubscriptionNode
@@ -1737,7 +1828,7 @@ class netinfra_inter__netinfra__router__base_config_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.asn, self.ipv4_address, self.ipv6_address]
         return direct
 
-_breaker23: None = None
+_breaker25: None = None
 class netinfra_inter__netinfra__router__l3vpn_vrf_entry_subs(SubscriptionNode):
     vpn_id: SubscriptionNode
     ebgp_customer_address: SubscriptionNode
@@ -1751,7 +1842,7 @@ class netinfra_inter__netinfra__router__l3vpn_vrf_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.vpn_id, self.ebgp_customer_address]
         return direct
 
-_breaker24: None = None
+_breaker26: None = None
 class netinfra_inter__netinfra__router__l3vpn_vrf_subs(SubscriptionNode):
     vpn_id: SubscriptionNode
     ebgp_customer_address: SubscriptionNode
@@ -1771,7 +1862,7 @@ class netinfra_inter__netinfra__router__l3vpn_vrf_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.vpn_id, self.ebgp_customer_address]
         return direct
 
-_breaker25: None = None
+_breaker27: None = None
 class netinfra_inter__netinfra__router_entry_subs(SubscriptionNode):
     name: SubscriptionNode
     id: SubscriptionNode
@@ -1799,7 +1890,7 @@ class netinfra_inter__netinfra__router_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.id, self.type, self.role, self.mock, self.approval_required, self.feature_flags, self.base_config, self.l3vpn_vrf]
         return direct
 
-_breaker26: None = None
+_breaker28: None = None
 class netinfra_inter__netinfra__router_subs(SubscriptionNode):
     name: SubscriptionNode
     id: SubscriptionNode
@@ -1833,13 +1924,41 @@ class netinfra_inter__netinfra__router_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.id, self.type, self.role, self.mock, self.approval_required, self.feature_flags, self.base_config, self.l3vpn_vrf]
         return direct
 
-_breaker27: None = None
+_breaker29: None = None
+class netinfra_inter__netinfra__backbone_link__dynstate_subs(SubscriptionNode):
+
+    pure def __init__(self, path: ?SubscriptionPath=None) -> None:
+        SubscriptionNode.__init__(self, path)
+
+    pure def _direct_children(self) -> list[SubscriptionNode]:
+        direct: list[SubscriptionNode] = []
+        return direct
+
+_breaker30: None = None
+class netinfra_inter__netinfra__backbone_link__state_subs(SubscriptionNode):
+    left_pps: SubscriptionNode
+    right_pps: SubscriptionNode
+    link_status: SubscriptionNode
+
+    pure def __init__(self, path: ?SubscriptionPath=None) -> None:
+        SubscriptionNode.__init__(self, path)
+        self.left_pps = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'left-pps'), parent=path))
+        self.right_pps = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'right-pps'), parent=path))
+        self.link_status = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'link-status'), parent=path))
+
+    pure def _direct_children(self) -> list[SubscriptionNode]:
+        direct: list[SubscriptionNode] = [self.left_pps, self.right_pps, self.link_status]
+        return direct
+
+_breaker31: None = None
 class netinfra_inter__netinfra__backbone_link_entry_subs(SubscriptionNode):
     left_router: SubscriptionNode
     left_interface: SubscriptionNode
     right_router: SubscriptionNode
     right_interface: SubscriptionNode
     monitor_traffic: SubscriptionNode
+    dynstate: netinfra_inter__netinfra__backbone_link__dynstate_subs
+    state: netinfra_inter__netinfra__backbone_link__state_subs
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
@@ -1848,18 +1967,22 @@ class netinfra_inter__netinfra__backbone_link_entry_subs(SubscriptionNode):
         self.right_router = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'right-router'), parent=path))
         self.right_interface = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'right-interface'), parent=path))
         self.monitor_traffic = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'monitor-traffic'), parent=path))
+        self.dynstate = netinfra_inter__netinfra__backbone_link__dynstate_subs(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'dynstate'), parent=path))
+        self.state = netinfra_inter__netinfra__backbone_link__state_subs(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'state'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.left_router, self.left_interface, self.right_router, self.right_interface, self.monitor_traffic]
+        direct: list[SubscriptionNode] = [self.left_router, self.left_interface, self.right_router, self.right_interface, self.monitor_traffic, self.dynstate, self.state]
         return direct
 
-_breaker28: None = None
+_breaker32: None = None
 class netinfra_inter__netinfra__backbone_link_subs(SubscriptionNode):
     left_router: SubscriptionNode
     left_interface: SubscriptionNode
     right_router: SubscriptionNode
     right_interface: SubscriptionNode
     monitor_traffic: SubscriptionNode
+    dynstate: netinfra_inter__netinfra__backbone_link__dynstate_subs
+    state: netinfra_inter__netinfra__backbone_link__state_subs
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
         self.left_router = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'left-router'), parent=path))
@@ -1867,6 +1990,8 @@ class netinfra_inter__netinfra__backbone_link_subs(SubscriptionNode):
         self.right_router = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'right-router'), parent=path))
         self.right_interface = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'right-interface'), parent=path))
         self.monitor_traffic = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'monitor-traffic'), parent=path))
+        self.dynstate = netinfra_inter__netinfra__backbone_link__dynstate_subs(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'dynstate'), parent=path))
+        self.state = netinfra_inter__netinfra__backbone_link__state_subs(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'state'), parent=path))
 
     pure def entry(self, left_router: str, left_interface: str, right_router: str, right_interface: str) -> netinfra_inter__netinfra__backbone_link_entry_subs:
         predicates = [
@@ -1879,10 +2004,10 @@ class netinfra_inter__netinfra__backbone_link_subs(SubscriptionNode):
         return netinfra_inter__netinfra__backbone_link_entry_subs(SubscriptionPath(yang.gdata.Id(NS_netinfra_inter, 'backbone-link'), predicates=predicates, parent=base_path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.left_router, self.left_interface, self.right_router, self.right_interface, self.monitor_traffic]
+        direct: list[SubscriptionNode] = [self.left_router, self.left_interface, self.right_router, self.right_interface, self.monitor_traffic, self.dynstate, self.state]
         return direct
 
-_breaker29: None = None
+_breaker33: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh__router_entry_subs(SubscriptionNode):
     name: SubscriptionNode
     ipv4_address: SubscriptionNode
@@ -1896,7 +2021,7 @@ class netinfra_inter__netinfra__ibgp_fullmesh__router_entry_subs(SubscriptionNod
         direct: list[SubscriptionNode] = [self.name, self.ipv4_address]
         return direct
 
-_breaker30: None = None
+_breaker34: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh__router_subs(SubscriptionNode):
     name: SubscriptionNode
     ipv4_address: SubscriptionNode
@@ -1916,7 +2041,7 @@ class netinfra_inter__netinfra__ibgp_fullmesh__router_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.ipv4_address]
         return direct
 
-_breaker31: None = None
+_breaker35: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh_entry_subs(SubscriptionNode):
     asn: SubscriptionNode
     authentication_key: SubscriptionNode
@@ -1932,7 +2057,7 @@ class netinfra_inter__netinfra__ibgp_fullmesh_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.asn, self.authentication_key, self.router]
         return direct
 
-_breaker32: None = None
+_breaker36: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh_subs(SubscriptionNode):
     asn: SubscriptionNode
     authentication_key: SubscriptionNode
@@ -1954,7 +2079,7 @@ class netinfra_inter__netinfra__ibgp_fullmesh_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.asn, self.authentication_key, self.router]
         return direct
 
-_breaker33: None = None
+_breaker37: None = None
 class netinfra_inter__netinfra_subs(SubscriptionNode):
     router: netinfra_inter__netinfra__router_subs
     backbone_link: netinfra_inter__netinfra__backbone_link_subs
@@ -1970,7 +2095,7 @@ class netinfra_inter__netinfra_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.router, self.backbone_link, self.ibgp_fullmesh]
         return direct
 
-_breaker34: None = None
+_breaker38: None = None
 class l3vpn_inter__l3vpns__l3vpn__endpoint__bgp_subs(SubscriptionNode):
     as_number: SubscriptionNode
 
@@ -1982,7 +2107,7 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint__bgp_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.as_number]
         return direct
 
-_breaker35: None = None
+_breaker39: None = None
 class l3vpn_inter__l3vpns__l3vpn__endpoint_entry_subs(SubscriptionNode):
     device: SubscriptionNode
     interface: SubscriptionNode
@@ -2008,7 +2133,7 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.device, self.interface, self.site, self.site_network_access, self.provider_ipv4_address, self.customer_ipv4_address, self.ipv4_prefix_length, self.bgp]
         return direct
 
-_breaker36: None = None
+_breaker40: None = None
 class l3vpn_inter__l3vpns__l3vpn__endpoint_subs(SubscriptionNode):
     device: SubscriptionNode
     interface: SubscriptionNode
@@ -2041,7 +2166,7 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.device, self.interface, self.site, self.site_network_access, self.provider_ipv4_address, self.customer_ipv4_address, self.ipv4_prefix_length, self.bgp]
         return direct
 
-_breaker37: None = None
+_breaker41: None = None
 class l3vpn_inter__l3vpns__l3vpn_entry_subs(SubscriptionNode):
     name: SubscriptionNode
     description: SubscriptionNode
@@ -2057,7 +2182,7 @@ class l3vpn_inter__l3vpns__l3vpn_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.description, self.endpoint]
         return direct
 
-_breaker38: None = None
+_breaker42: None = None
 class l3vpn_inter__l3vpns__l3vpn_subs(SubscriptionNode):
     name: SubscriptionNode
     description: SubscriptionNode
@@ -2079,7 +2204,7 @@ class l3vpn_inter__l3vpns__l3vpn_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.description, self.endpoint]
         return direct
 
-_breaker39: None = None
+_breaker43: None = None
 class l3vpn_inter__l3vpns_subs(SubscriptionNode):
     l3vpn: l3vpn_inter__l3vpns__l3vpn_subs
 
@@ -2091,7 +2216,7 @@ class l3vpn_inter__l3vpns_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.l3vpn]
         return direct
 
-_breaker40: None = None
+_breaker44: None = None
 class root_subs(SubscriptionNode):
     netinfra: netinfra_inter__netinfra_subs
     l3vpns: l3vpn_inter__l3vpns_subs

@@ -106,6 +106,32 @@ module netinfra-inter {
         type boolean;
         default false;
       }
+      container dynstate {
+        sw:dynstate;
+      }
+      container state {
+        config false;
+        description
+          "Operational state lifted from the RFS backbone-interface entries.
+           left-pps is the receive PPS measured on the left interface;
+           right-pps is the receive PPS measured on the right interface.
+           link-status is the combined oper-state of the two endpoints
+           (up only when both endpoints are up; down if either is down;
+           unknown when either endpoint's oper-state is unavailable).";
+        leaf left-pps {
+          type uint64;
+        }
+        leaf right-pps {
+          type uint64;
+        }
+        leaf link-status {
+          type enumeration {
+            enum up;
+            enum down;
+            enum unknown;
+          }
+        }
+      }
     }
 
     list ibgp-fullmesh {

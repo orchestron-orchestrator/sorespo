@@ -1,15 +1,16 @@
 #!/bin/bash
 # Generate config changes for testing the approval queue
 
-# Get the StratoWeave port
-SWEAVE_PORT=$(docker inspect -f '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' sorespo-quicklab-crpd-sweave)
-
-if [ -z "$SWEAVE_PORT" ]; then
-    echo "Error: Could not find StratoWeave container port"
-    exit 1
+if [ -z "$STRATOWEAVE_API_ORIGIN" ]; then
+    port=$(docker port sorespo-quicklab-crpd-sweave 80/tcp 2>/dev/null | sed -n 's/.*:\([0-9][0-9]*\)$/\1/p' | head -n 1)
+    if [ -z "$port" ]; then
+        echo "Error: sorespo-quicklab-crpd-sweave is not running or port 80 is not published; start the lab first or export STRATOWEAVE_API_ORIGIN" >&2
+        exit 1
+    fi
+    STRATOWEAVE_API_ORIGIN="http://localhost:$port"
 fi
 
-echo "Using StratoWeave at port: $SWEAVE_PORT"
+echo "Using StratoWeave at: $STRATOWEAVE_API_ORIGIN"
 
 # Function to send config
 send_config() {
@@ -29,11 +30,11 @@ send_config() {
 EOF
     
     echo "Sending config to set FRA-CORE-1 role to: $role"
-    curl -X PUT \
+    curl -f -X PATCH \
         -H "Content-Type: application/yang-data+xml" \
         -H "Async: true" \
         -d @/tmp/temp-config.xml \
-        "http://localhost:${SWEAVE_PORT}/restconf/data"
+        "${STRATOWEAVE_API_ORIGIN}/restconf/data"
     echo ""
 }
 

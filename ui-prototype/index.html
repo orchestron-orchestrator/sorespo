@@ -1,0 +1,3108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StratoWeave — Network Orchestration</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-deep: #0a0e14;
+  --bg-surface: #111820;
+  --bg-card: #161e28;
+  --bg-elevated: #1c2632;
+  --bg-input: #0d1219;
+  --border-subtle: #1e2a38;
+  --border-default: #263040;
+  --border-focus: #2dd4bf;
+  --text-primary: #e2e8f0;
+  --text-secondary: #8899aa;
+  --text-muted: #556677;
+  --text-label: #a0b0c0;
+  --accent: #2dd4bf;
+  --accent-dim: #1a8a7a;
+  --accent-glow: rgba(45, 212, 191, 0.15);
+  --accent-glow-strong: rgba(45, 212, 191, 0.3);
+  --accent-secondary: #f59e0b;
+  --danger: #ef4444;
+  --danger-dim: rgba(239, 68, 68, 0.15);
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-card: 0 2px 12px rgba(0,0,0,0.3);
+  --shadow-elevated: 0 8px 32px rgba(0,0,0,0.4);
+  --font-sans: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --sidebar-width: 240px;
+  --header-height: 56px;
+}
+
+html { font-size: 14px; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Grid pattern background ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(45, 212, 191, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45, 212, 191, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Layout ── */
+.app { display: flex; height: 100vh; position: relative; z-index: 1; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  gap: 10px;
+}
+
+.sidebar-logo .logo-mark {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--bg-deep);
+  position: relative;
+}
+
+.sidebar-logo .logo-mark::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+  opacity: 0.3;
+}
+
+.sidebar-logo .logo-text {
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.sidebar-logo .logo-version {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.sidebar-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+
+.nav-section {
+  margin-bottom: 8px;
+}
+
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 8px 12px 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 400;
+  transition: all 0.15s;
+  position: relative;
+  user-select: none;
+}
+
+.nav-item:hover {
+  background: rgba(45, 212, 191, 0.06);
+  color: var(--text-primary);
+}
+
+.nav-item.active {
+  background: var(--accent-glow);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+}
+
+.nav-icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+}
+
+.nav-item.active .nav-icon { opacity: 1; }
+
+.nav-badge {
+  margin-left: auto;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.nav-item.active .nav-badge {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+/* ── Main area ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Header bar ── */
+.header {
+  height: var(--header-height);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  flex-shrink: 0;
+  background: var(--bg-surface);
+}
+
+.yang-path {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.yang-path .separator { color: var(--border-default); }
+.yang-path .segment { color: var(--text-secondary); cursor: pointer; transition: color 0.15s; }
+.yang-path .segment:hover { color: var(--accent); }
+.yang-path .segment.current { color: var(--accent); font-weight: 500; }
+
+.header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Content ── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  scroll-behavior: smooth;
+}
+
+.content::-webkit-scrollbar { width: 6px; }
+.content::-webkit-scrollbar-track { background: transparent; }
+.content::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 3px; }
+.content::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ── Page title ── */
+.page-title {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  gap: 12px;
+}
+
+.card-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.card-header .card-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--accent-glow);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.card-header .card-actions { margin-left: auto; display: flex; gap: 6px; }
+
+.card-body { padding: 20px; }
+.card-body.no-pad { padding: 0; }
+
+/* ── Grid layouts ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.gap-24 { gap: 24px; }
+
+/* ── Stat cards ── */
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.stat-card:hover { border-color: var(--border-default); }
+
+.stat-card .stat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  font-size: 16px;
+}
+
+.stat-card .stat-value {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  font-family: var(--font-mono);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-card .stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.stat-card .stat-trend {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.stat-card .stat-trend.up { color: var(--success); }
+.stat-card .stat-trend.down { color: var(--danger); }
+
+/* ── Tables ── */
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+  background: var(--bg-surface);
+  position: sticky;
+  top: 0;
+}
+
+td {
+  padding: 12px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+tr:last-child td { border-bottom: none; }
+
+tr:hover td { background: rgba(45, 212, 191, 0.03); }
+
+td .mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+}
+
+/* ── Status badges ── */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.status .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status.active { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
+.status.active .dot { background: #22c55e; box-shadow: 0 0 6px rgba(34, 197, 94, 0.5); }
+.status.pending { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+.status.pending .dot { background: #f59e0b; }
+.status.draft { background: rgba(107, 114, 128, 0.15); color: #9ca3af; }
+.status.draft .dot { background: #9ca3af; }
+.status.error { background: var(--danger-dim); color: var(--danger); }
+.status.error .dot { background: var(--danger); }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg-deep);
+  border-color: var(--accent);
+}
+.btn-primary:hover { background: #3ee8d1; box-shadow: 0 0 20px var(--accent-glow-strong); }
+
+.btn-secondary {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-default);
+}
+.btn-secondary:hover { border-color: var(--text-muted); background: var(--bg-card); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  padding: 6px 10px;
+}
+.btn-ghost:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+
+.btn-danger {
+  background: transparent;
+  color: var(--danger);
+  border-color: rgba(239,68,68,0.3);
+}
+.btn-danger:hover { background: var(--danger-dim); }
+
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-icon { padding: 6px 8px; }
+
+/* ── Form elements ── */
+.form-group { margin-bottom: 16px; }
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-label);
+  margin-bottom: 6px;
+}
+
+.form-label .required {
+  color: var(--danger);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.form-label .yang-type {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--bg-deep);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  transition: all 0.15s;
+  outline: none;
+}
+
+.form-input::placeholder { color: var(--text-muted); }
+.form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.form-input.error { border-color: var(--danger); box-shadow: 0 0 0 3px var(--danger-dim); }
+.form-input.mono { font-family: var(--font-mono); font-size: 12px; }
+
+.form-input[type="number"] { font-family: var(--font-mono); }
+
+select.form-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23556677' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+.form-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.form-error {
+  font-size: 11px;
+  color: var(--danger);
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.form-row {
+  display: grid;
+  gap: 16px;
+}
+.form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+.form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-row.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+/* ── Toggle ── */
+.toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle {
+  width: 40px;
+  height: 22px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 11px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.toggle.on {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+
+.toggle.on::after {
+  left: 20px;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow-strong);
+}
+
+.toggle-label { font-size: 13px; color: var(--text-primary); }
+
+/* ── Choice/Case tabs ── */
+.choice-tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-deep);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  margin-bottom: 16px;
+}
+
+.choice-tab {
+  flex: 1;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.choice-tab:hover { color: var(--text-primary); }
+
+.choice-tab.active {
+  background: var(--bg-elevated);
+  color: var(--accent);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+/* ── Collapsible container ── */
+.collapsible {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.collapsible-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--bg-elevated);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.collapsible-header:hover { background: rgba(45, 212, 191, 0.06); }
+
+.collapsible-arrow {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+  font-size: 10px;
+}
+
+.collapsible.open .collapsible-arrow { transform: rotate(90deg); }
+
+.collapsible-title {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.collapsible-yang {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.collapsible-body {
+  display: none;
+  padding: 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.collapsible.open .collapsible-body { display: block; }
+
+/* ── IP Address Input ── */
+.ip-input-group {
+  display: flex;
+  gap: 0;
+  align-items: stretch;
+}
+
+.ip-input-group .form-input {
+  border-radius: 0;
+  border-right: none;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.ip-input-group .form-input:first-child { border-radius: var(--radius-md) 0 0 var(--radius-md); }
+
+.ip-input-group .ip-sep {
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+  background: var(--bg-input);
+  border-top: 1px solid var(--border-default);
+  border-bottom: 1px solid var(--border-default);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ip-input-group .prefix-sep {
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-left: none;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ip-input-group .prefix-input {
+  width: 56px;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  border-left: none;
+}
+
+/* ── Wizard / Stepper ── */
+.wizard-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.wizard-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  position: relative;
+  cursor: pointer;
+}
+
+.wizard-step .step-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  border: 2px solid var(--border-default);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: all 0.3s;
+  z-index: 1;
+}
+
+.wizard-step.completed .step-number {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg-deep);
+}
+
+.wizard-step.active .step-number {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+.wizard-step .step-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.wizard-step.active .step-label { color: var(--accent); }
+.wizard-step.completed .step-label { color: var(--text-secondary); }
+
+.wizard-step .step-line {
+  position: absolute;
+  top: 50%;
+  left: 32px;
+  right: 0;
+  height: 2px;
+  background: var(--border-default);
+  transform: translateY(-50%);
+  z-index: 0;
+}
+
+.wizard-step.completed .step-line { background: var(--accent-dim); }
+.wizard-step:last-child .step-line { display: none; }
+
+/* ── List management ── */
+.list-manager { }
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+  background: var(--bg-elevated);
+  transition: border-color 0.15s;
+}
+
+.list-item:hover { border-color: var(--border-default); }
+
+.list-item .drag-handle {
+  color: var(--text-muted);
+  cursor: grab;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.list-item .list-item-content { flex: 1; }
+
+.list-item .list-item-key {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.list-item .list-item-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.list-item .list-item-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.list-item:hover .list-item-actions { opacity: 1; }
+
+.add-item-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px;
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.add-item-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+
+/* ── Topology Diagram (mini) ── */
+.topo-mini {
+  background: var(--bg-deep);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.topo-node {
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--accent-dim);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--accent);
+  transition: all 0.3s;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.topo-node:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 16px var(--accent-glow-strong);
+  transform: scale(1.1);
+}
+
+.topo-node .node-icon { font-size: 16px; margin-bottom: 2px; }
+
+.topo-link {
+  position: absolute;
+  background: var(--accent-dim);
+  height: 2px;
+  transform-origin: left center;
+  z-index: 1;
+  opacity: 0.5;
+}
+
+/* ── Section divider ── */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0 16px;
+}
+
+.section-divider .divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+.section-divider .divider-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  width: 560px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: var(--shadow-elevated);
+  transform: scale(0.96) translateY(10px);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-overlay.open .modal { transform: scale(1) translateY(0); }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  gap: 12px;
+}
+
+.modal-header h3 { font-size: 15px; font-weight: 600; }
+.modal-close {
+  margin-left: auto;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.15s;
+  background: none;
+  border: none;
+  font-size: 16px;
+}
+.modal-close:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+
+.modal-body { padding: 20px; max-height: 60vh; overflow-y: auto; }
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ── Validation indicator ── */
+.validation-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.validation-icon.valid { background: rgba(34,197,94,0.15); color: var(--success); }
+.validation-icon.invalid { background: var(--danger-dim); color: var(--danger); }
+
+/* ── Leafref dropdown enhancement ── */
+.leafref-dropdown {
+  position: relative;
+}
+
+.leafref-dropdown .leafref-tag {
+  position: absolute;
+  right: 36px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+
+/* ── Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-in { animation: fadeIn 0.3s ease-out both; }
+.animate-in-delay-1 { animation-delay: 0.05s; }
+.animate-in-delay-2 { animation-delay: 0.1s; }
+.animate-in-delay-3 { animation-delay: 0.15s; }
+.animate-in-delay-4 { animation-delay: 0.2s; }
+
+/* ── Component showcase specific ── */
+.showcase-section {
+  margin-bottom: 32px;
+}
+
+.showcase-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.showcase-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.showcase-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.showcase-item-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-muted);
+}
+
+.empty-state .empty-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.empty-state p { font-size: 13px; margin-bottom: 16px; }
+
+/* ── Page transitions ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── Identity tree ── */
+.identity-tree {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.identity-tree .tree-item {
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.identity-tree .tree-item:hover { background: rgba(45,212,191,0.06); color: var(--text-primary); }
+.identity-tree .tree-item.selected { background: var(--accent-glow); color: var(--accent); }
+.identity-tree .tree-indent { padding-left: 20px; }
+
+/* ── Topology canvas ── */
+.topology-canvas {
+  background: var(--bg-deep);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  position: relative;
+  height: 260px;
+  overflow: hidden;
+}
+
+.topology-canvas svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Tab panels ── */
+.tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: var(--font-sans);
+}
+
+.tab-btn:hover { color: var(--text-primary); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── Inline code ── */
+code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--bg-deep);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: var(--accent);
+}
+
+/* ── Prefix input composite ── */
+.prefix-composite {
+  display: flex;
+  gap: 0;
+}
+
+.prefix-composite .form-input:first-child {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  flex: 1;
+}
+
+.prefix-composite .prefix-divider {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-left: none;
+  border-right: none;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.prefix-composite .form-input:last-child {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  width: 72px;
+  text-align: center;
+}
+
+/* ── JSON preview ── */
+.json-preview {
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  overflow-x: auto;
+  color: var(--text-secondary);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.json-preview .json-key { color: var(--accent); }
+.json-preview .json-string { color: #f59e0b; }
+.json-preview .json-number { color: #a78bfa; }
+.json-preview .json-bool { color: #f472b6; }
+
+/* ── Responsive helpers ── */
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-center { display: flex; align-items: center; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.gap-16 { gap: 16px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+.mb-24 { margin-bottom: 24px; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+.text-muted { color: var(--text-muted); }
+.text-accent { color: var(--accent); }
+.text-mono { font-family: var(--font-mono); }
+
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ─── Sidebar ─── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">SW</div>
+      <span class="logo-text">StratoWeave</span>
+      <span class="logo-version">v0.9</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-label">Overview</div>
+        <div class="nav-item active" data-page="dashboard">
+          <span class="nav-icon">◩</span>
+          Dashboard
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Network Infra</div>
+        <div class="nav-item" data-page="routers">
+          <span class="nav-icon">⬡</span>
+          Routers
+          <span class="nav-badge">6</span>
+        </div>
+        <div class="nav-item" data-page="bb-links">
+          <span class="nav-icon">⟷</span>
+          Backbone Links
+          <span class="nav-badge">8</span>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Services</div>
+        <div class="nav-item" data-page="l3vpn">
+          <span class="nav-icon">◈</span>
+          L3VPN Services
+          <span class="nav-badge">3</span>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Developer</div>
+        <div class="nav-item" data-page="components">
+          <span class="nav-icon">❖</span>
+          Component Library
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ─── Main ─── -->
+  <div class="main">
+    <header class="header">
+      <div class="yang-path" id="yangPath">
+        <span class="segment">netinfra</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-ghost btn-sm" onclick="toggleJsonPreview()">{ } JSON</button>
+        <button class="btn btn-ghost btn-sm">⟳ Sync</button>
+      </div>
+    </header>
+
+    <div class="content" id="mainContent">
+
+      <!-- ═══════════ DASHBOARD ═══════════ -->
+      <div class="page active" id="page-dashboard">
+        <h1 class="page-title animate-in">Dashboard</h1>
+        <p class="page-subtitle animate-in animate-in-delay-1">Network infrastructure and service overview</p>
+
+        <div class="grid-4 mb-24">
+          <div class="stat-card animate-in animate-in-delay-1">
+            <div class="stat-icon" style="background: var(--accent-glow); color: var(--accent);">⬡</div>
+            <div class="stat-value">6</div>
+            <div class="stat-label">Routers</div>
+            <div class="stat-trend up">↑ 2</div>
+          </div>
+          <div class="stat-card animate-in animate-in-delay-2">
+            <div class="stat-icon" style="background: rgba(59,130,246,0.15); color: #3b82f6;">⟷</div>
+            <div class="stat-value">8</div>
+            <div class="stat-label">Backbone Links</div>
+            <div class="stat-trend up">↑ 1</div>
+          </div>
+          <div class="stat-card animate-in animate-in-delay-3">
+            <div class="stat-icon" style="background: rgba(168,85,247,0.15); color: #a855f7;">◈</div>
+            <div class="stat-value">3</div>
+            <div class="stat-label">L3VPN Services</div>
+          </div>
+          <div class="stat-card animate-in animate-in-delay-4">
+            <div class="stat-icon" style="background: rgba(34,197,94,0.15); color: #22c55e;">●</div>
+            <div class="stat-value">94<span style="font-size:16px; color: var(--text-muted);">%</span></div>
+            <div class="stat-label">Health Score</div>
+          </div>
+        </div>
+
+        <div class="grid-2 gap-24">
+          <!-- Topology mini view -->
+          <div class="card animate-in animate-in-delay-2">
+            <div class="card-header">
+              <h3>Network Topology</h3>
+              <span class="card-badge">netinfra:router</span>
+            </div>
+            <div class="card-body no-pad">
+              <div class="topology-canvas" id="topoCanvas">
+                <svg id="topoSvg"></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent activity -->
+          <div class="card animate-in animate-in-delay-3">
+            <div class="card-header">
+              <h3>Transform Activity</h3>
+              <div class="card-actions">
+                <button class="btn btn-ghost btn-sm">View All</button>
+              </div>
+            </div>
+            <div class="card-body no-pad">
+              <table>
+                <tbody>
+                  <tr>
+                    <td><span class="mono">sorespo.cfs.Router</span></td>
+                    <td><span class="status active"><span class="dot"></span> Applied</span></td>
+                    <td class="text-muted" style="font-size:12px;">2 min ago</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">sorespo.cfs.BBLink</span></td>
+                    <td><span class="status active"><span class="dot"></span> Applied</span></td>
+                    <td class="text-muted" style="font-size:12px;">5 min ago</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">sorespo.cfs.L3VPN</span></td>
+                    <td><span class="status pending"><span class="dot"></span> Pending</span></td>
+                    <td class="text-muted" style="font-size:12px;">12 min ago</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">sorespo.cfs.Router</span></td>
+                    <td><span class="status error"><span class="dot"></span> Failed</span></td>
+                    <td class="text-muted" style="font-size:12px;">1 hr ago</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">sorespo.cfs.BBLink</span></td>
+                    <td><span class="status active"><span class="dot"></span> Applied</span></td>
+                    <td class="text-muted" style="font-size:12px;">2 hr ago</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service summary -->
+        <div class="card mt-24 animate-in animate-in-delay-4">
+          <div class="card-header">
+            <h3>L3VPN Service Instances</h3>
+            <span class="card-badge">ietf-l3vpn-svc:l3vpn-svc</span>
+            <div class="card-actions">
+              <button class="btn btn-primary btn-sm" onclick="navigateTo('l3vpn')">+ New Service</button>
+            </div>
+          </div>
+          <div class="card-body no-pad">
+            <table>
+              <thead>
+                <tr>
+                  <th>VPN ID</th>
+                  <th>Customer</th>
+                  <th>Topology</th>
+                  <th>Sites</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="mono">VPN-CORP-001</span></td>
+                  <td>Acme Corporation</td>
+                  <td><code>any-to-any</code></td>
+                  <td>4</td>
+                  <td><span class="status active"><span class="dot"></span> Active</span></td>
+                  <td><button class="btn btn-ghost btn-sm">Edit</button></td>
+                </tr>
+                <tr>
+                  <td><span class="mono">VPN-BRANCH-042</span></td>
+                  <td>Globex Inc.</td>
+                  <td><code>hub-spoke</code></td>
+                  <td>12</td>
+                  <td><span class="status active"><span class="dot"></span> Active</span></td>
+                  <td><button class="btn btn-ghost btn-sm">Edit</button></td>
+                </tr>
+                <tr>
+                  <td><span class="mono">VPN-DEV-099</span></td>
+                  <td>Initech Labs</td>
+                  <td><code>any-to-any</code></td>
+                  <td>2</td>
+                  <td><span class="status draft"><span class="dot"></span> Draft</span></td>
+                  <td><button class="btn btn-ghost btn-sm">Edit</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ ROUTERS ═══════════ -->
+      <div class="page" id="page-routers">
+        <div class="flex-between mb-24">
+          <div>
+            <h1 class="page-title">Routers</h1>
+            <p class="page-subtitle">netinfra → router — Network Infrastructure Routers</p>
+          </div>
+          <button class="btn btn-primary" onclick="openRouterModal()">+ Add Router</button>
+        </div>
+
+        <div class="card">
+          <div class="card-body no-pad">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name <span style="color:var(--accent);">⌗</span></th>
+                    <th>ID</th>
+                    <th>Type</th>
+                    <th>Role</th>
+                    <th>ASN</th>
+                    <th>Mock</th>
+                    <th>Approval</th>
+                    <th>Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="mono">pe-ams-01</span></td>
+                    <td><span class="text-mono" style="font-size:12px;">101</span></td>
+                    <td>SR Linux</td>
+                    <td>PE</td>
+                    <td><span class="text-mono" style="font-size:12px;">65001</span></td>
+                    <td><span class="toggle" onclick="this.classList.toggle('on')"></span></td>
+                    <td><span class="toggle" onclick="this.classList.toggle('on')"></span></td>
+                    <td><span class="status active"><span class="dot"></span> Active</span></td>
+                    <td>
+                      <button class="btn btn-ghost btn-sm btn-icon" onclick="openRouterModal('pe-ams-01')">✎</button>
+                      <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">pe-fra-01</span></td>
+                    <td><span class="text-mono" style="font-size:12px;">102</span></td>
+                    <td>SR Linux</td>
+                    <td>PE</td>
+                    <td><span class="text-mono" style="font-size:12px;">65001</span></td>
+                    <td><span class="toggle" onclick="this.classList.toggle('on')"></span></td>
+                    <td><span class="toggle" onclick="this.classList.toggle('on')"></span></td>
+                    <td><span class="status active"><span class="dot"></span> Active</span></td>
+                    <td>
+                      <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                      <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">p-core-01</span></td>
+                    <td><span class="text-mono" style="font-size:12px;">201</span></td>
+                    <td>cRPD</td>
+                    <td>P</td>
+                    <td><span class="text-mono" style="font-size:12px;">65000</span></td>
+                    <td><span class="toggle on" onclick="this.classList.toggle('on')"></span></td>
+                    <td><span class="toggle" onclick="this.classList.toggle('on')"></span></td>
+                    <td><span class="status pending"><span class="dot"></span> Pending</span></td>
+                    <td>
+                      <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                      <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">p-core-02</span></td>
+                    <td><span class="text-mono" style="font-size:12px;">202</span></td>
+                    <td>cRPD</td>
+                    <td>P</td>
+                    <td><span class="text-mono" style="font-size:12px;">65000</span></td>
+                    <td><span class="toggle on" onclick="this.classList.toggle('on')"></span></td>
+                    <td><span class="toggle" onclick="this.classList.toggle('on')"></span></td>
+                    <td><span class="status active"><span class="dot"></span> Active</span></td>
+                    <td>
+                      <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                      <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">pe-lon-01</span></td>
+                    <td><span class="text-mono" style="font-size:12px;">103</span></td>
+                    <td>Arista EOS</td>
+                    <td>PE</td>
+                    <td><span class="text-mono" style="font-size:12px;">65002</span></td>
+                    <td><span class="toggle" onclick="this.classList.toggle('on')"></span></td>
+                    <td><span class="toggle on" onclick="this.classList.toggle('on')"></span></td>
+                    <td><span class="status active"><span class="dot"></span> Active</span></td>
+                    <td>
+                      <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                      <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">rr-01</span></td>
+                    <td><span class="text-mono" style="font-size:12px;">301</span></td>
+                    <td>cRPD</td>
+                    <td>RR</td>
+                    <td><span class="text-mono" style="font-size:12px;">65000</span></td>
+                    <td><span class="toggle on" onclick="this.classList.toggle('on')"></span></td>
+                    <td><span class="toggle" onclick="this.classList.toggle('on')"></span></td>
+                    <td><span class="status active"><span class="dot"></span> Active</span></td>
+                    <td>
+                      <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                      <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ BACKBONE LINKS ═══════════ -->
+      <div class="page" id="page-bb-links">
+        <div class="flex-between mb-24">
+          <div>
+            <h1 class="page-title">Backbone Links</h1>
+            <p class="page-subtitle">netinfra → backbone-link — Point-to-point infrastructure links</p>
+          </div>
+          <button class="btn btn-primary" onclick="openBBLinkModal()">+ Add Link</button>
+        </div>
+
+        <div class="card">
+          <div class="card-body no-pad">
+            <table>
+              <thead>
+                <tr>
+                  <th>Left Router</th>
+                  <th>Left Interface</th>
+                  <th>Right Router</th>
+                  <th>Right Interface</th>
+                  <th>Monitor</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="mono">pe-ams-01</span></td>
+                  <td><code>ethernet-1/1</code></td>
+                  <td><span class="mono">p-core-01</span></td>
+                  <td><code>ethernet-1/1</code></td>
+                  <td><span class="toggle on" onclick="this.classList.toggle('on')"></span></td>
+                  <td><span class="status active"><span class="dot"></span> Up</span></td>
+                  <td><button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button></td>
+                </tr>
+                <tr>
+                  <td><span class="mono">pe-ams-01</span></td>
+                  <td><code>ethernet-1/2</code></td>
+                  <td><span class="mono">p-core-02</span></td>
+                  <td><code>ethernet-1/1</code></td>
+                  <td><span class="toggle on" onclick="this.classList.toggle('on')"></span></td>
+                  <td><span class="status active"><span class="dot"></span> Up</span></td>
+                  <td><button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button></td>
+                </tr>
+                <tr>
+                  <td><span class="mono">pe-fra-01</span></td>
+                  <td><code>ethernet-1/1</code></td>
+                  <td><span class="mono">p-core-01</span></td>
+                  <td><code>ethernet-1/2</code></td>
+                  <td><span class="toggle" onclick="this.classList.toggle('on')"></span></td>
+                  <td><span class="status active"><span class="dot"></span> Up</span></td>
+                  <td><button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button></td>
+                </tr>
+                <tr>
+                  <td><span class="mono">pe-fra-01</span></td>
+                  <td><code>ethernet-1/2</code></td>
+                  <td><span class="mono">p-core-02</span></td>
+                  <td><code>ethernet-1/2</code></td>
+                  <td><span class="toggle on" onclick="this.classList.toggle('on')"></span></td>
+                  <td><span class="status active"><span class="dot"></span> Up</span></td>
+                  <td><button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button></td>
+                </tr>
+                <tr>
+                  <td><span class="mono">p-core-01</span></td>
+                  <td><code>ethernet-1/3</code></td>
+                  <td><span class="mono">p-core-02</span></td>
+                  <td><code>ethernet-1/3</code></td>
+                  <td><span class="toggle on" onclick="this.classList.toggle('on')"></span></td>
+                  <td><span class="status active"><span class="dot"></span> Up</span></td>
+                  <td><button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button></td>
+                </tr>
+                <tr>
+                  <td><span class="mono">pe-lon-01</span></td>
+                  <td><code>Ethernet1</code></td>
+                  <td><span class="mono">p-core-01</span></td>
+                  <td><code>ethernet-1/4</code></td>
+                  <td><span class="toggle" onclick="this.classList.toggle('on')"></span></td>
+                  <td><span class="status active"><span class="dot"></span> Up</span></td>
+                  <td><button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button></td>
+                </tr>
+                <tr>
+                  <td><span class="mono">pe-lon-01</span></td>
+                  <td><code>Ethernet2</code></td>
+                  <td><span class="mono">p-core-02</span></td>
+                  <td><code>ethernet-1/4</code></td>
+                  <td><span class="toggle on" onclick="this.classList.toggle('on')"></span></td>
+                  <td><span class="status active"><span class="dot"></span> Up</span></td>
+                  <td><button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button></td>
+                </tr>
+                <tr>
+                  <td><span class="mono">rr-01</span></td>
+                  <td><code>eth0</code></td>
+                  <td><span class="mono">p-core-01</span></td>
+                  <td><code>ethernet-1/5</code></td>
+                  <td><span class="toggle" onclick="this.classList.toggle('on')"></span></td>
+                  <td><span class="status pending"><span class="dot"></span> Config</span></td>
+                  <td><button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ L3VPN SERVICE WIZARD ═══════════ -->
+      <div class="page" id="page-l3vpn">
+        <h1 class="page-title">L3VPN Service Configuration</h1>
+        <p class="page-subtitle mb-24">ietf-l3vpn-svc — IETF L3 VPN Service Model (RFC 8299)</p>
+
+        <!-- Wizard steps -->
+        <div class="wizard-steps" id="wizardSteps">
+          <div class="wizard-step completed" data-step="1" onclick="setWizardStep(1)">
+            <div class="step-number">✓</div>
+            <div class="step-label">VPN Profiles</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="wizard-step active" data-step="2" onclick="setWizardStep(2)">
+            <div class="step-number">2</div>
+            <div class="step-label">VPN Service</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="wizard-step" data-step="3" onclick="setWizardStep(3)">
+            <div class="step-number">3</div>
+            <div class="step-label">Sites</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="wizard-step" data-step="4" onclick="setWizardStep(4)">
+            <div class="step-number">4</div>
+            <div class="step-label">IP Connection</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="wizard-step" data-step="5" onclick="setWizardStep(5)">
+            <div class="step-number">5</div>
+            <div class="step-label">Routing</div>
+            <div class="step-line"></div>
+          </div>
+        </div>
+
+        <!-- Step 1: VPN Profiles (completed state) -->
+        <div class="wizard-panel" id="wizard-step-1" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <h3>VPN Profiles</h3>
+              <span class="card-badge">vpn-profiles / valid-provider-identifiers</span>
+            </div>
+            <div class="card-body">
+              <div class="section-divider">
+                <span class="divider-label">QoS Profile Identifiers</span>
+                <span class="divider-line"></span>
+              </div>
+              <div class="list-manager mb-16">
+                <div class="list-item">
+                  <span class="drag-handle">⋮⋮</span>
+                  <div class="list-item-content">
+                    <div class="list-item-key">GOLD</div>
+                    <div class="list-item-desc">Premium low-latency QoS profile</div>
+                  </div>
+                  <div class="list-item-actions">
+                    <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                    <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                  </div>
+                </div>
+                <div class="list-item">
+                  <span class="drag-handle">⋮⋮</span>
+                  <div class="list-item-content">
+                    <div class="list-item-key">SILVER</div>
+                    <div class="list-item-desc">Standard business QoS profile</div>
+                  </div>
+                  <div class="list-item-actions">
+                    <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                    <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                  </div>
+                </div>
+                <button class="add-item-btn">+ Add QoS Profile</button>
+              </div>
+
+              <div class="section-divider">
+                <span class="divider-label">BFD Profile Identifiers</span>
+                <span class="divider-line"></span>
+              </div>
+              <div class="list-manager mb-16">
+                <div class="list-item">
+                  <span class="drag-handle">⋮⋮</span>
+                  <div class="list-item-content">
+                    <div class="list-item-key">BFD-FAST</div>
+                    <div class="list-item-desc">Aggressive BFD timers (50ms)</div>
+                  </div>
+                  <div class="list-item-actions">
+                    <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                    <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                  </div>
+                </div>
+                <button class="add-item-btn">+ Add BFD Profile</button>
+              </div>
+
+              <div class="flex-between mt-24">
+                <div></div>
+                <button class="btn btn-primary" onclick="setWizardStep(2)">Next: VPN Service →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: VPN Service -->
+        <div class="wizard-panel" id="wizard-step-2">
+          <div class="card">
+            <div class="card-header">
+              <h3>VPN Service Configuration</h3>
+              <span class="card-badge">vpn-services / vpn-service</span>
+            </div>
+            <div class="card-body">
+              <div class="form-row cols-2">
+                <div class="form-group">
+                  <label class="form-label">
+                    VPN Identifier
+                    <span class="required">*</span>
+                    <span class="yang-type">svc-id</span>
+                  </label>
+                  <input class="form-input mono" type="text" placeholder="e.g., VPN-CORP-001" value="VPN-CORP-001">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    Customer Name
+                    <span class="yang-type">string</span>
+                  </label>
+                  <input class="form-input" type="text" placeholder="Customer name" value="Acme Corporation">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  VPN Service Topology
+                  <span class="yang-type">identityref → vpn-topology</span>
+                </label>
+                <div class="choice-tabs">
+                  <div class="choice-tab active" onclick="selectChoiceTab(this)">any-to-any</div>
+                  <div class="choice-tab" onclick="selectChoiceTab(this)">hub-spoke</div>
+                  <div class="choice-tab" onclick="selectChoiceTab(this)">hub-spoke-disjoint</div>
+                </div>
+                <div class="form-hint">Default: any-to-any — All sites can communicate with each other</div>
+              </div>
+
+              <div class="section-divider">
+                <span class="divider-label">Multicast Configuration</span>
+                <span class="divider-line"></span>
+              </div>
+
+              <div class="collapsible" onclick="this.classList.toggle('open')">
+                <div class="collapsible-header">
+                  <span class="collapsible-arrow">▸</span>
+                  <span class="collapsible-title">Multicast Settings</span>
+                  <span class="collapsible-yang">container: multicast</span>
+                </div>
+                <div class="collapsible-body" onclick="event.stopPropagation()">
+                  <div class="form-group">
+                    <div class="toggle-wrap">
+                      <span class="toggle" onclick="this.classList.toggle('on'); event.stopPropagation();"></span>
+                      <span class="toggle-label">Enable Multicast</span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">
+                      Tree Flavor
+                      <span class="yang-type">identityref → multicast-tree-type</span>
+                    </label>
+                    <select class="form-input">
+                      <option value="">Select tree type...</option>
+                      <option>ssm-tree-type</option>
+                      <option>asm-tree-type</option>
+                      <option>bidir-tree-type</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="collapsible" onclick="this.classList.toggle('open')">
+                <div class="collapsible-header">
+                  <span class="collapsible-arrow">▸</span>
+                  <span class="collapsible-title">Extranet VPNs</span>
+                  <span class="collapsible-yang">container: extranet-vpns</span>
+                </div>
+                <div class="collapsible-body" onclick="event.stopPropagation()">
+                  <div class="empty-state">
+                    <div class="empty-icon">◇</div>
+                    <p>No extranet VPN connections configured</p>
+                    <button class="btn btn-secondary btn-sm">+ Add Extranet VPN</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex-between mt-24">
+                <button class="btn btn-secondary" onclick="setWizardStep(1)">← VPN Profiles</button>
+                <button class="btn btn-primary" onclick="setWizardStep(3)">Next: Sites →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Sites -->
+        <div class="wizard-panel" id="wizard-step-3" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <h3>Site Configuration</h3>
+              <span class="card-badge">sites / site</span>
+              <div class="card-actions">
+                <button class="btn btn-primary btn-sm">+ Add Site</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <!-- Site list -->
+              <div class="list-manager mb-16">
+                <div class="list-item" style="border-color: var(--accent-dim);">
+                  <span class="drag-handle">⋮⋮</span>
+                  <div class="list-item-content">
+                    <div class="list-item-key">SITE-AMS-HQ</div>
+                    <div class="list-item-desc">Amsterdam HQ — provider-managed · 2 network accesses</div>
+                  </div>
+                  <span class="status active"><span class="dot"></span> Active</span>
+                  <div class="list-item-actions">
+                    <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                    <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                  </div>
+                </div>
+                <div class="list-item">
+                  <span class="drag-handle">⋮⋮</span>
+                  <div class="list-item-content">
+                    <div class="list-item-key">SITE-FRA-DC</div>
+                    <div class="list-item-desc">Frankfurt DC — co-managed · 1 network access</div>
+                  </div>
+                  <span class="status active"><span class="dot"></span> Active</span>
+                  <div class="list-item-actions">
+                    <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                    <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                  </div>
+                </div>
+                <div class="list-item">
+                  <span class="drag-handle">⋮⋮</span>
+                  <div class="list-item-content">
+                    <div class="list-item-key">SITE-LON-BR</div>
+                    <div class="list-item-desc">London Branch — customer-managed · 1 network access</div>
+                  </div>
+                  <span class="status pending"><span class="dot"></span> Pending</span>
+                  <div class="list-item-actions">
+                    <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                    <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Expanded site detail -->
+              <div class="section-divider">
+                <span class="divider-label">Site Detail: SITE-AMS-HQ</span>
+                <span class="divider-line"></span>
+              </div>
+
+              <div class="form-row cols-2 mb-16">
+                <div class="form-group">
+                  <label class="form-label">Site ID <span class="required">*</span> <span class="yang-type">svc-id</span></label>
+                  <input class="form-input mono" value="SITE-AMS-HQ">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    Management Type <span class="required">*</span>
+                    <span class="yang-type">identityref → management</span>
+                  </label>
+                  <select class="form-input">
+                    <option value="provider-managed" selected>provider-managed</option>
+                    <option value="co-managed">co-managed</option>
+                    <option value="customer-managed">customer-managed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group mb-16">
+                <label class="form-label">
+                  Site VPN Flavor
+                  <span class="yang-type">identityref → site-vpn-flavor</span>
+                </label>
+                <div class="choice-tabs">
+                  <div class="choice-tab active" onclick="selectChoiceTab(this)">single</div>
+                  <div class="choice-tab" onclick="selectChoiceTab(this)">multi</div>
+                  <div class="choice-tab" onclick="selectChoiceTab(this)">sub</div>
+                  <div class="choice-tab" onclick="selectChoiceTab(this)">nni</div>
+                </div>
+              </div>
+
+              <div class="collapsible open" onclick="this.classList.toggle('open')">
+                <div class="collapsible-header">
+                  <span class="collapsible-arrow">▸</span>
+                  <span class="collapsible-title">Site Network Accesses</span>
+                  <span class="collapsible-yang">list: site-network-access</span>
+                </div>
+                <div class="collapsible-body" onclick="event.stopPropagation()">
+                  <div class="list-manager">
+                    <div class="list-item">
+                      <span class="drag-handle">⋮⋮</span>
+                      <div class="list-item-content">
+                        <div class="list-item-key">SNA-AMS-1</div>
+                        <div class="list-item-desc">point-to-point · VPN: VPN-CORP-001 · any-to-any-role</div>
+                      </div>
+                      <div class="list-item-actions">
+                        <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                        <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                      </div>
+                    </div>
+                    <div class="list-item">
+                      <span class="drag-handle">⋮⋮</span>
+                      <div class="list-item-content">
+                        <div class="list-item-key">SNA-AMS-2</div>
+                        <div class="list-item-desc">point-to-point · VPN: VPN-CORP-001 · any-to-any-role</div>
+                      </div>
+                      <div class="list-item-actions">
+                        <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                        <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                      </div>
+                    </div>
+                    <button class="add-item-btn">+ Add Site Network Access</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex-between mt-24">
+                <button class="btn btn-secondary" onclick="setWizardStep(2)">← VPN Service</button>
+                <button class="btn btn-primary" onclick="setWizardStep(4)">Next: IP Connection →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: IP Connection -->
+        <div class="wizard-panel" id="wizard-step-4" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <h3>IP Connection</h3>
+              <span class="card-badge">ip-connection</span>
+            </div>
+            <div class="card-body">
+              <!-- IPv4 / IPv6 choice -->
+              <div class="tab-bar">
+                <button class="tab-btn active" onclick="switchTab(this, 'ipv4-panel')">IPv4</button>
+                <button class="tab-btn" onclick="switchTab(this, 'ipv6-panel')">IPv6</button>
+                <button class="tab-btn" onclick="switchTab(this, 'oam-panel')">OAM / BFD</button>
+              </div>
+
+              <div class="tab-panel active" id="ipv4-panel">
+                <div class="form-group mb-16">
+                  <label class="form-label">
+                    Address Allocation Type
+                    <span class="yang-type">identityref → address-allocation-type</span>
+                  </label>
+                  <div class="choice-tabs" id="ipv4AllocChoice">
+                    <div class="choice-tab" onclick="selectAllocType(this, 'provider-dhcp')">provider-dhcp</div>
+                    <div class="choice-tab" onclick="selectAllocType(this, 'dhcp-relay')">dhcp-relay</div>
+                    <div class="choice-tab active" onclick="selectAllocType(this, 'static')">static-address</div>
+                  </div>
+                </div>
+
+                <!-- Static address case -->
+                <div id="ipv4-static-fields">
+                  <div class="form-row cols-2 mb-16">
+                    <div class="form-group">
+                      <label class="form-label">
+                        Provider Address
+                        <span class="yang-type">inet:ipv4-address</span>
+                      </label>
+                      <div class="flex-center gap-8">
+                        <input class="form-input mono" type="text" placeholder="e.g., 10.0.0.1" value="10.0.0.1" style="flex:1;">
+                        <div class="validation-icon valid">✓</div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">
+                        Customer Address
+                        <span class="yang-type">inet:ipv4-address</span>
+                      </label>
+                      <div class="flex-center gap-8">
+                        <input class="form-input mono" type="text" placeholder="e.g., 10.0.0.2" value="10.0.0.2" style="flex:1;">
+                        <div class="validation-icon valid">✓</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group" style="max-width: 200px;">
+                    <label class="form-label">
+                      Prefix Length
+                      <span class="yang-type">uint8 [0..32]</span>
+                    </label>
+                    <input class="form-input mono" type="number" min="0" max="32" value="30">
+                  </div>
+                </div>
+              </div>
+
+              <div class="tab-panel" id="ipv6-panel">
+                <div class="form-group mb-16">
+                  <label class="form-label">
+                    Address Allocation Type
+                    <span class="yang-type">identityref → address-allocation-type</span>
+                  </label>
+                  <div class="choice-tabs">
+                    <div class="choice-tab" onclick="selectChoiceTab(this)">provider-dhcp</div>
+                    <div class="choice-tab" onclick="selectChoiceTab(this)">dhcp-relay</div>
+                    <div class="choice-tab active" onclick="selectChoiceTab(this)">static-address</div>
+                    <div class="choice-tab" onclick="selectChoiceTab(this)">slaac</div>
+                  </div>
+                </div>
+                <div class="form-row cols-2 mb-16">
+                  <div class="form-group">
+                    <label class="form-label">Provider Address <span class="yang-type">inet:ipv6-address</span></label>
+                    <div class="flex-center gap-8">
+                      <input class="form-input mono" type="text" placeholder="e.g., 2001:db8::1" value="2001:db8:1::1" style="flex:1;">
+                      <div class="validation-icon valid">✓</div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Customer Address <span class="yang-type">inet:ipv6-address</span></label>
+                    <div class="flex-center gap-8">
+                      <input class="form-input mono" type="text" placeholder="e.g., 2001:db8::2" value="2001:db8:1::2" style="flex:1;">
+                      <div class="validation-icon valid">✓</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group" style="max-width: 200px;">
+                  <label class="form-label">Prefix Length <span class="yang-type">uint8 [0..128]</span></label>
+                  <input class="form-input mono" type="number" min="0" max="128" value="64">
+                </div>
+              </div>
+
+              <div class="tab-panel" id="oam-panel">
+                <div class="collapsible open" onclick="this.classList.toggle('open')">
+                  <div class="collapsible-header">
+                    <span class="collapsible-arrow">▸</span>
+                    <span class="collapsible-title">BFD Configuration</span>
+                    <span class="collapsible-yang">container: bfd</span>
+                  </div>
+                  <div class="collapsible-body" onclick="event.stopPropagation();">
+                    <div class="form-group mb-16">
+                      <div class="toggle-wrap">
+                        <span class="toggle on" onclick="this.classList.toggle('on')"></span>
+                        <span class="toggle-label">Enable BFD</span>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Holdtime</label>
+                      <div class="choice-tabs">
+                        <div class="choice-tab active" onclick="selectChoiceTab(this)">Fixed Value</div>
+                        <div class="choice-tab" onclick="selectChoiceTab(this)">SP Profile</div>
+                      </div>
+                    </div>
+                    <div class="form-group" style="max-width: 240px;">
+                      <label class="form-label">
+                        Fixed Value
+                        <span class="yang-type">uint32 (msec)</span>
+                      </label>
+                      <input class="form-input mono" type="number" placeholder="msec" value="300">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex-between mt-24">
+                <button class="btn btn-secondary" onclick="setWizardStep(3)">← Sites</button>
+                <button class="btn btn-primary" onclick="setWizardStep(5)">Next: Routing →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5: Routing -->
+        <div class="wizard-panel" id="wizard-step-5" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <h3>Routing Protocols</h3>
+              <span class="card-badge">routing-protocols / routing-protocol</span>
+            </div>
+            <div class="card-body">
+              <div class="form-group mb-16">
+                <label class="form-label">
+                  Protocol Type <span class="required">*</span>
+                  <span class="yang-type">identityref → routing-protocol-type</span>
+                </label>
+                <div class="choice-tabs" id="routingProtocolChoice">
+                  <div class="choice-tab" onclick="selectRoutingProtocol(this, 'ospf')">OSPF</div>
+                  <div class="choice-tab active" onclick="selectRoutingProtocol(this, 'bgp')">BGP</div>
+                  <div class="choice-tab" onclick="selectRoutingProtocol(this, 'static')">Static</div>
+                  <div class="choice-tab" onclick="selectRoutingProtocol(this, 'rip')">RIP</div>
+                  <div class="choice-tab" onclick="selectRoutingProtocol(this, 'vrrp')">VRRP</div>
+                  <div class="choice-tab" onclick="selectRoutingProtocol(this, 'direct')">Direct</div>
+                </div>
+              </div>
+
+              <!-- BGP config (visible by default) -->
+              <div id="routing-bgp" class="routing-config-panel">
+                <div class="form-row cols-2 mb-16">
+                  <div class="form-group">
+                    <label class="form-label">
+                      Autonomous System
+                      <span class="required">*</span>
+                      <span class="yang-type">uint32</span>
+                    </label>
+                    <input class="form-input mono" type="number" placeholder="e.g., 65001" value="65001">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">
+                      Address Family
+                      <span class="required">*</span>
+                      <span class="yang-type">address-family (min 1)</span>
+                    </label>
+                    <div class="flex-center gap-8">
+                      <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                        <input type="checkbox" checked> <span style="font-size:13px;">IPv4</span>
+                      </label>
+                      <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                        <input type="checkbox"> <span style="font-size:13px;">IPv6</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- OSPF config (hidden by default) -->
+              <div id="routing-ospf" class="routing-config-panel" style="display:none;">
+                <div class="form-row cols-3 mb-16">
+                  <div class="form-group">
+                    <label class="form-label">
+                      Area Address <span class="required">*</span>
+                      <span class="yang-type">dotted-quad</span>
+                    </label>
+                    <input class="form-input mono" type="text" placeholder="e.g., 0.0.0.0" value="0.0.0.0">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">
+                      Metric
+                      <span class="yang-type">uint16 (default: 1)</span>
+                    </label>
+                    <input class="form-input mono" type="number" placeholder="1" value="1">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">
+                      Address Family
+                      <span class="required">*</span>
+                      <span class="yang-type">address-family</span>
+                    </label>
+                    <div class="flex-center gap-8">
+                      <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                        <input type="checkbox" checked> <span style="font-size:13px;">IPv4</span>
+                      </label>
+                      <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                        <input type="checkbox"> <span style="font-size:13px;">IPv6</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="collapsible" onclick="this.classList.toggle('open')">
+                  <div class="collapsible-header">
+                    <span class="collapsible-arrow">▸</span>
+                    <span class="collapsible-title">Sham Links</span>
+                    <span class="collapsible-yang">list: sham-link</span>
+                  </div>
+                  <div class="collapsible-body" onclick="event.stopPropagation()">
+                    <button class="add-item-btn">+ Add Sham Link</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Static config (hidden by default) -->
+              <div id="routing-static" class="routing-config-panel" style="display:none;">
+                <div class="section-divider">
+                  <span class="divider-label">Cascaded LAN Prefixes</span>
+                  <span class="divider-line"></span>
+                </div>
+                <div class="tab-bar">
+                  <button class="tab-btn active">IPv4 LAN Prefixes</button>
+                  <button class="tab-btn">IPv6 LAN Prefixes</button>
+                </div>
+                <div class="list-manager">
+                  <div class="list-item">
+                    <div class="list-item-content">
+                      <div class="list-item-key">192.168.10.0/24 → 10.0.0.2</div>
+                      <div class="list-item-desc">LAN tag: office-lan</div>
+                    </div>
+                    <div class="list-item-actions">
+                      <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                      <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                    </div>
+                  </div>
+                  <button class="add-item-btn">+ Add IPv4 LAN Prefix</button>
+                </div>
+              </div>
+
+              <div class="flex-between mt-24">
+                <button class="btn btn-secondary" onclick="setWizardStep(4)">← IP Connection</button>
+                <button class="btn btn-primary">Deploy Service ⬡</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ COMPONENT LIBRARY ═══════════ -->
+      <div class="page" id="page-components">
+        <h1 class="page-title">Component Library</h1>
+        <p class="page-subtitle mb-24">YANG-to-UI type mappings and reusable form components</p>
+
+        <!-- Type-specific inputs -->
+        <div class="showcase-label">YANG Leaf Type → Input Widgets</div>
+        <div class="showcase-grid mb-24">
+          <div class="showcase-item">
+            <div class="showcase-item-label">inet:ipv4-address</div>
+            <div class="form-group mb-8">
+              <label class="form-label">Valid address <span class="yang-type">inet:ipv4-address</span></label>
+              <div class="flex-center gap-8">
+                <input class="form-input mono" value="192.168.1.1" style="flex:1;">
+                <div class="validation-icon valid">✓</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Invalid address</label>
+              <div class="flex-center gap-8">
+                <input class="form-input mono error" value="192.168.1.256" style="flex:1;">
+                <div class="validation-icon invalid">!</div>
+              </div>
+              <div class="form-error">⚠ Octet 4 out of range (0-255)</div>
+            </div>
+          </div>
+
+          <div class="showcase-item">
+            <div class="showcase-item-label">inet:ipv4-prefix</div>
+            <div class="form-group">
+              <label class="form-label">Network Prefix <span class="yang-type">inet:ipv4-prefix</span></label>
+              <div class="prefix-composite">
+                <input class="form-input mono" value="10.0.0.0" placeholder="Network address">
+                <span class="prefix-divider">/</span>
+                <input class="form-input mono" value="24" placeholder="Len">
+              </div>
+              <div class="form-hint">Format: address / prefix-length (0-32)</div>
+            </div>
+          </div>
+
+          <div class="showcase-item">
+            <div class="showcase-item-label">inet:ipv6-address</div>
+            <div class="form-group">
+              <label class="form-label">IPv6 Address <span class="yang-type">inet:ipv6-address</span></label>
+              <div class="flex-center gap-8">
+                <input class="form-input mono" value="2001:db8:85a3::8a2e:370:7334" style="flex:1;">
+                <div class="validation-icon valid">✓</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="showcase-item">
+            <div class="showcase-item-label">inet:as-number</div>
+            <div class="form-group mb-8">
+              <label class="form-label">AS Number <span class="yang-type">inet:as-number</span></label>
+              <input class="form-input mono" type="number" value="65001" min="0" max="4294967295">
+              <div class="form-hint">Range: 0 — 4,294,967,295 (4-byte ASN)</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Private range preset</label>
+              <select class="form-input" style="font-family: var(--font-mono); font-size: 12px;">
+                <option>64512 — 65534 (2-byte private)</option>
+                <option>4200000000 — 4294967294 (4-byte private)</option>
+                <option>Custom...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="showcase-item">
+            <div class="showcase-item-label">uint32 with range constraint</div>
+            <div class="form-group mb-8">
+              <label class="form-label">Router ID <span class="required">*</span> <span class="yang-type">uint32</span></label>
+              <input class="form-input mono" type="number" value="101" min="0" max="4294967295">
+            </div>
+            <div class="form-group">
+              <label class="form-label">uint16 — OSPF Metric <span class="yang-type">uint16 (default: 1)</span></label>
+              <input class="form-input mono" type="number" value="1" min="0" max="65535" placeholder="Default: 1">
+            </div>
+          </div>
+
+          <div class="showcase-item">
+            <div class="showcase-item-label">decimal64 (fraction-digits 5)</div>
+            <div class="form-group">
+              <label class="form-label">Rate Limit <span class="yang-type">decimal64 [0..100] percent</span></label>
+              <div class="flex-center gap-12">
+                <input class="form-input mono" type="number" value="25.50000" step="0.00001" min="0" max="100" style="flex:1;">
+                <span style="font-size:12px; color: var(--text-muted);">%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Boolean toggles -->
+        <div class="showcase-label">Boolean Leaf → Toggle Switch</div>
+        <div class="showcase-grid mb-24">
+          <div class="showcase-item">
+            <div class="showcase-item-label">boolean (default false)</div>
+            <div class="form-group mb-16">
+              <div class="toggle-wrap">
+                <span class="toggle" onclick="this.classList.toggle('on')"></span>
+                <span class="toggle-label">Mock Mode</span>
+              </div>
+              <div class="form-hint">netinfra:router/mock — default: false</div>
+            </div>
+            <div class="form-group mb-16">
+              <div class="toggle-wrap">
+                <span class="toggle" onclick="this.classList.toggle('on')"></span>
+                <span class="toggle-label">Approval Required</span>
+              </div>
+              <div class="form-hint">netinfra:router/approval-required — default: false</div>
+            </div>
+            <div class="form-group">
+              <div class="toggle-wrap">
+                <span class="toggle on" onclick="this.classList.toggle('on')"></span>
+                <span class="toggle-label">Monitor Traffic</span>
+              </div>
+              <div class="form-hint">netinfra:backbone-link/monitor-traffic — currently: true</div>
+            </div>
+          </div>
+
+          <div class="showcase-item">
+            <div class="showcase-item-label">boolean in container context</div>
+            <div class="collapsible open" onclick="this.classList.toggle('open')">
+              <div class="collapsible-header">
+                <span class="collapsible-arrow">▸</span>
+                <span class="collapsible-title">Feature Flags</span>
+                <span class="collapsible-yang">container</span>
+              </div>
+              <div class="collapsible-body" onclick="event.stopPropagation()">
+                <div class="form-group">
+                  <div class="toggle-wrap">
+                    <span class="toggle" onclick="this.classList.toggle('on')"></span>
+                    <span class="toggle-label">Runtime Schema Fetch</span>
+                  </div>
+                  <div class="form-hint">feature-flags/runtime-schema-fetch — default: false</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Identity selectors -->
+        <div class="showcase-label">Identityref → Selector Components</div>
+        <div class="showcase-grid mb-24">
+          <div class="showcase-item">
+            <div class="showcase-item-label">Tab-style (few options)</div>
+            <div class="form-group mb-16">
+              <label class="form-label">VPN Topology <span class="yang-type">identityref → vpn-topology</span></label>
+              <div class="choice-tabs">
+                <div class="choice-tab active" onclick="selectChoiceTab(this)">any-to-any</div>
+                <div class="choice-tab" onclick="selectChoiceTab(this)">hub-spoke</div>
+                <div class="choice-tab" onclick="selectChoiceTab(this)">hub-spoke-disjoint</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Site Role <span class="yang-type">identityref → site-role</span></label>
+              <div class="choice-tabs">
+                <div class="choice-tab active" onclick="selectChoiceTab(this)">any-to-any-role</div>
+                <div class="choice-tab" onclick="selectChoiceTab(this)">spoke-role</div>
+                <div class="choice-tab" onclick="selectChoiceTab(this)">hub-role</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="showcase-item">
+            <div class="showcase-item-label">Dropdown (many options)</div>
+            <div class="form-group mb-16">
+              <label class="form-label">
+                Routing Protocol
+                <span class="yang-type">identityref → routing-protocol-type</span>
+              </label>
+              <select class="form-input">
+                <option value="">Select protocol...</option>
+                <option value="ospf">ospf</option>
+                <option value="bgp" selected>bgp</option>
+                <option value="static">static</option>
+                <option value="rip">rip</option>
+                <option value="vrrp">vrrp</option>
+                <option value="direct">direct</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                Customer Application
+                <span class="yang-type">identityref → customer-application</span>
+              </label>
+              <select class="form-input">
+                <option value="">Select application...</option>
+                <option>web</option>
+                <option>mail</option>
+                <option>file-transfer</option>
+                <option>database</option>
+                <option>social</option>
+                <option>games</option>
+                <option>p2p</option>
+                <option>network-management</option>
+                <option>voice</option>
+                <option>video</option>
+                <option>embb</option>
+                <option>urllc</option>
+                <option>mmtc</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leafref -->
+        <div class="showcase-label">Leafref → Reference Dropdown</div>
+        <div class="showcase-grid mb-24">
+          <div class="showcase-item">
+            <div class="showcase-item-label">leafref → router list</div>
+            <div class="form-group">
+              <label class="form-label">
+                Left Router
+                <span class="yang-type">leafref → /netinfra/router/name</span>
+              </label>
+              <div class="leafref-dropdown">
+                <select class="form-input">
+                  <option value="">Select router...</option>
+                  <option value="pe-ams-01" selected>pe-ams-01</option>
+                  <option value="pe-fra-01">pe-fra-01</option>
+                  <option value="p-core-01">p-core-01</option>
+                  <option value="p-core-02">p-core-02</option>
+                  <option value="pe-lon-01">pe-lon-01</option>
+                  <option value="rr-01">rr-01</option>
+                </select>
+                <span class="leafref-tag">leafref</span>
+              </div>
+              <div class="form-hint">Populated from netinfra/router[name]</div>
+            </div>
+          </div>
+
+          <div class="showcase-item">
+            <div class="showcase-item-label">leafref → VPN service list</div>
+            <div class="form-group">
+              <label class="form-label">
+                VPN Reference
+                <span class="yang-type">leafref → /l3vpn-svc/vpn-services/vpn-service/vpn-id</span>
+              </label>
+              <div class="leafref-dropdown">
+                <select class="form-input">
+                  <option value="">Select VPN...</option>
+                  <option value="VPN-CORP-001">VPN-CORP-001</option>
+                  <option value="VPN-BRANCH-042">VPN-BRANCH-042</option>
+                  <option value="VPN-DEV-099">VPN-DEV-099</option>
+                </select>
+                <span class="leafref-tag">leafref</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Choice / Case -->
+        <div class="showcase-label">Choice / Case → Conditional Fields</div>
+        <div class="showcase-grid mb-24">
+          <div class="showcase-item" style="grid-column: span 2;">
+            <div class="showcase-item-label">Address allocation choice (IPv4)</div>
+            <div class="form-group mb-16">
+              <label class="form-label">Address Allocation Type <span class="yang-type">choice: allocation</span></label>
+              <div class="choice-tabs" id="demoAllocTabs">
+                <div class="choice-tab" onclick="switchDemoAlloc(this, 'demo-dhcp')">provider-dhcp</div>
+                <div class="choice-tab" onclick="switchDemoAlloc(this, 'demo-relay')">dhcp-relay</div>
+                <div class="choice-tab active" onclick="switchDemoAlloc(this, 'demo-static')">static-address</div>
+              </div>
+            </div>
+            <div id="demo-dhcp" style="display:none;">
+              <div class="form-row cols-3">
+                <div class="form-group">
+                  <label class="form-label">Provider Address <span class="yang-type">inet:ipv4-address</span></label>
+                  <input class="form-input mono" placeholder="10.0.0.1">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Prefix Length <span class="yang-type">uint8 [0..32]</span></label>
+                  <input class="form-input mono" type="number" placeholder="24">
+                </div>
+                <div class="form-group">
+                  <label class="form-label"># Dynamic Addresses <span class="yang-type">uint16</span></label>
+                  <input class="form-input mono" type="number" value="1">
+                </div>
+              </div>
+            </div>
+            <div id="demo-relay" style="display:none;">
+              <div class="form-row cols-2">
+                <div class="form-group">
+                  <label class="form-label">Provider Address <span class="yang-type">inet:ipv4-address</span></label>
+                  <input class="form-input mono" placeholder="10.0.0.1">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">DHCP Server IPs <span class="yang-type">leaf-list inet:ipv4-address</span></label>
+                  <input class="form-input mono" placeholder="Comma-separated IPs">
+                </div>
+              </div>
+            </div>
+            <div id="demo-static">
+              <div class="form-row cols-3">
+                <div class="form-group">
+                  <label class="form-label">Provider Address <span class="yang-type">inet:ipv4-address</span></label>
+                  <input class="form-input mono" value="10.0.0.1">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Customer Address <span class="yang-type">inet:ipv4-address</span></label>
+                  <input class="form-input mono" value="10.0.0.2">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Prefix Length <span class="yang-type">uint8 [0..32]</span></label>
+                  <input class="form-input mono" type="number" value="30">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- List management -->
+        <div class="showcase-label">YANG List → List Management UI</div>
+        <div class="showcase-grid mb-24">
+          <div class="showcase-item" style="grid-column: span 2;">
+            <div class="showcase-item-label">list with composite key</div>
+            <div class="list-manager">
+              <div class="list-item">
+                <span class="drag-handle">⋮⋮</span>
+                <div class="list-item-content">
+                  <div class="list-item-key">pe-ams-01 : ethernet-1/1 ↔ p-core-01 : ethernet-1/1</div>
+                  <div class="list-item-desc">key: left-router left-interface right-router right-interface</div>
+                </div>
+                <span class="status active"><span class="dot"></span> Up</span>
+                <div class="list-item-actions">
+                  <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                  <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                </div>
+              </div>
+              <div class="list-item">
+                <span class="drag-handle">⋮⋮</span>
+                <div class="list-item-content">
+                  <div class="list-item-key">pe-fra-01 : ethernet-1/1 ↔ p-core-01 : ethernet-1/2</div>
+                  <div class="list-item-desc">key: left-router left-interface right-router right-interface</div>
+                </div>
+                <span class="status active"><span class="dot"></span> Up</span>
+                <div class="list-item-actions">
+                  <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                  <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                </div>
+              </div>
+              <div class="list-item">
+                <span class="drag-handle">⋮⋮</span>
+                <div class="list-item-content">
+                  <div class="list-item-key">pe-lon-01 : Ethernet1 ↔ p-core-01 : ethernet-1/4</div>
+                  <div class="list-item-desc">key: left-router left-interface right-router right-interface</div>
+                </div>
+                <span class="status pending"><span class="dot"></span> Pending</span>
+                <div class="list-item-actions">
+                  <button class="btn btn-ghost btn-sm btn-icon">✎</button>
+                  <button class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);">✕</button>
+                </div>
+              </div>
+              <button class="add-item-btn">+ Add Backbone Link</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nested container navigation -->
+        <div class="showcase-label">Container → Collapsible Sections</div>
+        <div class="card mb-24">
+          <div class="card-body">
+            <div class="collapsible open" onclick="this.classList.toggle('open')">
+              <div class="collapsible-header">
+                <span class="collapsible-arrow">▸</span>
+                <span class="collapsible-title">Security</span>
+                <span class="collapsible-yang">container: security</span>
+              </div>
+              <div class="collapsible-body" onclick="event.stopPropagation()">
+                <div class="collapsible" onclick="this.classList.toggle('open'); event.stopPropagation();">
+                  <div class="collapsible-header">
+                    <span class="collapsible-arrow">▸</span>
+                    <span class="collapsible-title">Authentication</span>
+                    <span class="collapsible-yang">container</span>
+                  </div>
+                  <div class="collapsible-body" onclick="event.stopPropagation();">
+                    <p class="text-muted" style="font-size:12px;">No authentication parameters configured</p>
+                  </div>
+                </div>
+                <div class="collapsible open" onclick="this.classList.toggle('open'); event.stopPropagation();">
+                  <div class="collapsible-header">
+                    <span class="collapsible-arrow">▸</span>
+                    <span class="collapsible-title">Encryption</span>
+                    <span class="collapsible-yang">container (if-feature encryption)</span>
+                  </div>
+                  <div class="collapsible-body" onclick="event.stopPropagation();">
+                    <div class="form-group mb-16">
+                      <div class="toggle-wrap">
+                        <span class="toggle on" onclick="this.classList.toggle('on')"></span>
+                        <span class="toggle-label">Enable Encryption</span>
+                      </div>
+                    </div>
+                    <div class="form-group mb-16">
+                      <label class="form-label">Layer <span class="yang-type">enumeration</span></label>
+                      <div class="choice-tabs">
+                        <div class="choice-tab" onclick="selectChoiceTab(this)">Layer 2</div>
+                        <div class="choice-tab active" onclick="selectChoiceTab(this)">Layer 3</div>
+                      </div>
+                    </div>
+                    <div class="collapsible" onclick="this.classList.toggle('open'); event.stopPropagation();">
+                      <div class="collapsible-header">
+                        <span class="collapsible-arrow">▸</span>
+                        <span class="collapsible-title">Encryption Profile</span>
+                        <span class="collapsible-yang">choice: profile</span>
+                      </div>
+                      <div class="collapsible-body" onclick="event.stopPropagation();">
+                        <div class="choice-tabs mb-16">
+                          <div class="choice-tab active" onclick="selectChoiceTab(this)">Provider Profile</div>
+                          <div class="choice-tab" onclick="selectChoiceTab(this)">Customer Profile</div>
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Profile Name <span class="yang-type">leafref</span></label>
+                          <div class="leafref-dropdown">
+                            <select class="form-input">
+                              <option value="">Select encryption profile...</option>
+                              <option>IPSEC-AES256</option>
+                              <option>IPSEC-AES128</option>
+                            </select>
+                            <span class="leafref-tag">leafref</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- JSON Preview panel -->
+        <div class="showcase-label">YANG → JSON Payload Preview</div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Generated Configuration</h3>
+            <div class="card-actions">
+              <button class="btn btn-ghost btn-sm">Copy</button>
+            </div>
+          </div>
+          <div class="card-body no-pad" style="padding:2px;">
+            <div class="json-preview"><span class="json-key">"netinfra:netinfra"</span>: {
+  <span class="json-key">"router"</span>: [
+    {
+      <span class="json-key">"name"</span>: <span class="json-string">"pe-ams-01"</span>,
+      <span class="json-key">"id"</span>: <span class="json-number">101</span>,
+      <span class="json-key">"type"</span>: <span class="json-string">"SR Linux"</span>,
+      <span class="json-key">"role"</span>: <span class="json-string">"PE"</span>,
+      <span class="json-key">"asn"</span>: <span class="json-number">65001</span>,
+      <span class="json-key">"mock"</span>: <span class="json-bool">false</span>,
+      <span class="json-key">"approval-required"</span>: <span class="json-bool">false</span>,
+      <span class="json-key">"feature-flags"</span>: {
+        <span class="json-key">"runtime-schema-fetch"</span>: <span class="json-bool">false</span>
+      }
+    }
+  ],
+  <span class="json-key">"backbone-link"</span>: [
+    {
+      <span class="json-key">"left-router"</span>: <span class="json-string">"pe-ams-01"</span>,
+      <span class="json-key">"left-interface"</span>: <span class="json-string">"ethernet-1/1"</span>,
+      <span class="json-key">"right-router"</span>: <span class="json-string">"p-core-01"</span>,
+      <span class="json-key">"right-interface"</span>: <span class="json-string">"ethernet-1/1"</span>,
+      <span class="json-key">"monitor-traffic"</span>: <span class="json-bool">true</span>
+    }
+  ]
+}</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ Router Modal ═══════════ -->
+<div class="modal-overlay" id="routerModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="routerModalTitle">Add Router</h3>
+      <span class="card-badge">netinfra:router</span>
+      <button class="modal-close" onclick="closeRouterModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Name <span class="required">*</span> <span class="yang-type">string (key)</span></label>
+        <input class="form-input mono" id="routerName" placeholder="e.g., pe-ams-01">
+        <div class="form-hint">List key — must be unique across all routers</div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">ID <span class="required">*</span> <span class="yang-type">uint32</span></label>
+          <input class="form-input mono" id="routerId" type="number" placeholder="e.g., 101">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type <span class="required">*</span> <span class="yang-type">string</span></label>
+          <input class="form-input" id="routerType" placeholder="e.g., SR Linux, cRPD, Arista EOS">
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">Role <span class="yang-type">string</span></label>
+          <input class="form-input" id="routerRole" placeholder="e.g., PE, P, RR">
+        </div>
+        <div class="form-group">
+          <label class="form-label">ASN <span class="required">*</span> <span class="yang-type">inet:as-number</span></label>
+          <input class="form-input mono" id="routerAsn" type="number" placeholder="e.g., 65001">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="toggle-wrap mb-16">
+          <span class="toggle" onclick="this.classList.toggle('on')"></span>
+          <span class="toggle-label">Mock Mode</span>
+          <span class="form-hint" style="margin:0; margin-left:auto;">default: false</span>
+        </div>
+        <div class="toggle-wrap mb-16">
+          <span class="toggle" onclick="this.classList.toggle('on')"></span>
+          <span class="toggle-label">Approval Required</span>
+          <span class="form-hint" style="margin:0; margin-left:auto;">default: false</span>
+        </div>
+      </div>
+      <div class="collapsible" onclick="this.classList.toggle('open')">
+        <div class="collapsible-header">
+          <span class="collapsible-arrow">▸</span>
+          <span class="collapsible-title">Feature Flags</span>
+          <span class="collapsible-yang">container</span>
+        </div>
+        <div class="collapsible-body" onclick="event.stopPropagation()">
+          <div class="toggle-wrap">
+            <span class="toggle" onclick="this.classList.toggle('on')"></span>
+            <span class="toggle-label">Runtime Schema Fetch</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeRouterModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="closeRouterModal()">Save Router</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ BB Link Modal ═══════════ -->
+<div class="modal-overlay" id="bbLinkModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Add Backbone Link</h3>
+      <span class="card-badge">netinfra:backbone-link</span>
+      <button class="modal-close" onclick="closeBBLinkModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="section-divider" style="margin-top:0;">
+        <span class="divider-label">Left Endpoint</span>
+        <span class="divider-line"></span>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">
+            Left Router <span class="required">*</span>
+            <span class="yang-type">string (key)</span>
+          </label>
+          <div class="leafref-dropdown">
+            <select class="form-input">
+              <option value="">Select router...</option>
+              <option>pe-ams-01</option>
+              <option>pe-fra-01</option>
+              <option>p-core-01</option>
+              <option>p-core-02</option>
+              <option>pe-lon-01</option>
+              <option>rr-01</option>
+            </select>
+            <span class="leafref-tag">leafref</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Left Interface <span class="required">*</span> <span class="yang-type">string (key)</span></label>
+          <input class="form-input mono" placeholder="e.g., ethernet-1/1">
+        </div>
+      </div>
+      <div class="section-divider">
+        <span class="divider-label">Right Endpoint</span>
+        <span class="divider-line"></span>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">
+            Right Router <span class="required">*</span>
+            <span class="yang-type">string (key)</span>
+          </label>
+          <div class="leafref-dropdown">
+            <select class="form-input">
+              <option value="">Select router...</option>
+              <option>pe-ams-01</option>
+              <option>pe-fra-01</option>
+              <option>p-core-01</option>
+              <option>p-core-02</option>
+              <option>pe-lon-01</option>
+              <option>rr-01</option>
+            </select>
+            <span class="leafref-tag">leafref</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Right Interface <span class="required">*</span> <span class="yang-type">string (key)</span></label>
+          <input class="form-input mono" placeholder="e.g., ethernet-1/1">
+        </div>
+      </div>
+      <div class="section-divider">
+        <span class="divider-label">Options</span>
+        <span class="divider-line"></span>
+      </div>
+      <div class="toggle-wrap">
+        <span class="toggle" onclick="this.classList.toggle('on')"></span>
+        <span class="toggle-label">Monitor Traffic</span>
+        <span class="form-hint" style="margin:0; margin-left:auto;">default: false</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeBBLinkModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="closeBBLinkModal()">Save Link</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Navigation ──
+function navigateTo(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  const page = document.getElementById('page-' + pageId);
+  if (page) page.classList.add('active');
+
+  const nav = document.querySelector(`.nav-item[data-page="${pageId}"]`);
+  if (nav) nav.classList.add('active');
+
+  // Update YANG path
+  const paths = {
+    'dashboard': '<span class="segment current">netinfra</span>',
+    'routers': '<span class="segment" onclick="navigateTo(\'dashboard\')">netinfra</span><span class="separator"> / </span><span class="segment current">router</span>',
+    'bb-links': '<span class="segment" onclick="navigateTo(\'dashboard\')">netinfra</span><span class="separator"> / </span><span class="segment current">backbone-link</span>',
+    'l3vpn': '<span class="segment current">ietf-l3vpn-svc</span><span class="separator"> / </span><span class="segment current">l3vpn-svc</span>',
+    'components': '<span class="segment current">component-library</span>'
+  };
+  document.getElementById('yangPath').innerHTML = paths[pageId] || '';
+
+  // Scroll to top
+  document.getElementById('mainContent').scrollTop = 0;
+}
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const page = item.dataset.page;
+    if (page) navigateTo(page);
+  });
+});
+
+// ── Choice tabs ──
+function selectChoiceTab(el) {
+  el.parentElement.querySelectorAll('.choice-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── Wizard ──
+function setWizardStep(step) {
+  // Update step indicators
+  document.querySelectorAll('.wizard-step').forEach(s => {
+    const stepNum = parseInt(s.dataset.step);
+    s.classList.remove('active', 'completed');
+    if (stepNum < step) s.classList.add('completed');
+    if (stepNum === step) s.classList.add('active');
+  });
+
+  // Show/hide panels
+  document.querySelectorAll('.wizard-panel').forEach(p => p.style.display = 'none');
+  const panel = document.getElementById('wizard-step-' + step);
+  if (panel) panel.style.display = 'block';
+}
+
+// ── Tabs ──
+function switchTab(btn, panelId) {
+  btn.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const container = btn.closest('.card-body') || btn.closest('.wizard-panel');
+  container.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(panelId).classList.add('active');
+}
+
+// ── Routing protocol switch ──
+function selectRoutingProtocol(el, protocol) {
+  selectChoiceTab(el);
+  document.querySelectorAll('.routing-config-panel').forEach(p => p.style.display = 'none');
+  const panel = document.getElementById('routing-' + protocol);
+  if (panel) panel.style.display = 'block';
+}
+
+// ── Address allocation choice demo ──
+function selectAllocType(el, type) {
+  selectChoiceTab(el);
+  document.getElementById('ipv4-static-fields').style.display = type === 'static' ? 'block' : 'none';
+}
+
+function switchDemoAlloc(el, panelId) {
+  el.parentElement.querySelectorAll('.choice-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['demo-dhcp', 'demo-relay', 'demo-static'].forEach(id => {
+    document.getElementById(id).style.display = id === panelId ? 'block' : 'none';
+  });
+}
+
+// ── Modals ──
+function openRouterModal(name) {
+  document.getElementById('routerModalTitle').textContent = name ? `Edit Router: ${name}` : 'Add Router';
+  document.getElementById('routerModal').classList.add('open');
+}
+
+function closeRouterModal() {
+  document.getElementById('routerModal').classList.remove('open');
+}
+
+function openBBLinkModal() {
+  document.getElementById('bbLinkModal').classList.add('open');
+}
+
+function closeBBLinkModal() {
+  document.getElementById('bbLinkModal').classList.remove('open');
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// ── Topology diagram ──
+function drawTopology() {
+  const svg = document.getElementById('topoSvg');
+  if (!svg) return;
+
+  const nodes = [
+    { id: 'pe-ams-01', x: 60, y: 50, label: 'AMS' },
+    { id: 'pe-fra-01', x: 60, y: 190, label: 'FRA' },
+    { id: 'p-core-01', x: 240, y: 80, label: 'P1' },
+    { id: 'p-core-02', x: 240, y: 170, label: 'P2' },
+    { id: 'pe-lon-01', x: 420, y: 50, label: 'LON' },
+    { id: 'rr-01', x: 420, y: 190, label: 'RR' },
+  ];
+
+  const links = [
+    ['pe-ams-01', 'p-core-01'],
+    ['pe-ams-01', 'p-core-02'],
+    ['pe-fra-01', 'p-core-01'],
+    ['pe-fra-01', 'p-core-02'],
+    ['p-core-01', 'p-core-02'],
+    ['pe-lon-01', 'p-core-01'],
+    ['pe-lon-01', 'p-core-02'],
+    ['rr-01', 'p-core-01'],
+  ];
+
+  const nodeMap = {};
+  nodes.forEach(n => nodeMap[n.id] = n);
+
+  let svgContent = '';
+
+  // Draw links
+  links.forEach(([from, to]) => {
+    const a = nodeMap[from];
+    const b = nodeMap[to];
+    svgContent += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="rgba(45,212,191,0.2)" stroke-width="1.5"/>`;
+  });
+
+  // Draw nodes
+  nodes.forEach(n => {
+    const isCore = n.id.startsWith('p-');
+    const isRR = n.id.startsWith('rr');
+    const color = isCore ? 'rgba(59,130,246,0.3)' : isRR ? 'rgba(168,85,247,0.3)' : 'rgba(45,212,191,0.2)';
+    const stroke = isCore ? '#3b82f6' : isRR ? '#a855f7' : '#2dd4bf';
+    const textColor = isCore ? '#3b82f6' : isRR ? '#a855f7' : '#2dd4bf';
+
+    svgContent += `
+      <circle cx="${n.x}" cy="${n.y}" r="22" fill="${color}" stroke="${stroke}" stroke-width="1.5" style="cursor:pointer;"/>
+      <text x="${n.x}" y="${n.y + 4}" text-anchor="middle" fill="${textColor}" font-family="JetBrains Mono, monospace" font-size="10" font-weight="500">${n.label}</text>
+    `;
+  });
+
+  // Legend
+  svgContent += `
+    <text x="500" y="240" text-anchor="end" fill="rgba(85,102,119,0.7)" font-family="JetBrains Mono, monospace" font-size="9">
+      <tspan fill="#2dd4bf">●</tspan> PE  <tspan fill="#3b82f6">●</tspan> P  <tspan fill="#a855f7">●</tspan> RR
+    </text>
+  `;
+
+  svg.innerHTML = svgContent;
+}
+
+drawTopology();
+
+function toggleJsonPreview() {
+  // placeholder
+}
+</script>
+
+</body>
+</html>
