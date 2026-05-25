@@ -1,7 +1,10 @@
 build-sweave-image:
 	docker build --build-arg http_proxy=$(http_proxy) --build-arg https_proxy=$(https_proxy) -t sorespo-sweave-base -f ../common/Dockerfile.sweave .
 
-STRATOWEAVE_HTTP_ORIGIN ?= http://localhost:15000
+# The sweave container publishes RESTCONF on port 80 with a Docker-assigned
+# host port (see the `ports:` stanza in each *.clab.yml). Discover the actual
+# host port at parse time.
+STRATOWEAVE_API_ORIGIN := $(shell port=$$(docker port $(TESTENV)-sweave 80/tcp 2>/dev/null | sed -n 's/.*:\([0-9][0-9]*\)$$/\1/p' | head -n 1); if [ -n "$$port" ]; then echo "http://localhost:$$port"; fi)
 
 licenses/%:
 # Ensure the symlink to the licenses private repo exists in the project root
@@ -29,17 +32,99 @@ licenses/%:
 .PHONY: start
 start: build-sweave-image
 	$(CLAB_BIN) deploy --topo $(TESTENV:sorespo-%=%).clab.yml --log-level debug --reconfigure
+	@$(MAKE) --no-print-directory api-url
 	@if [ "$(WEBUI)" = "true" ]; then \
-		$(MAKE) -C ../../ start-webui STRATOWEAVE_API_ORIGIN="$(STRATOWEAVE_HTTP_ORIGIN)"; \
+		$(MAKE) start-webui; \
 	fi
+
+WEBUI_HOST ?= 127.0.0.1
+WEBUI_PORT ?= 3000
+WEBUI_PIDFILE ?= logs/webui-dev.pid
+WEBUI_LOG ?= logs/webui-dev.log
+WEBUI_PATH := $(abspath ../../webui)
+
+.PHONY: api-url
+api-url:
+	@echo "$(STRATOWEAVE_API_ORIGIN)"
 
 .PHONY: start-webui
 start-webui:
-	$(MAKE) -C ../../ start-webui STRATOWEAVE_API_ORIGIN="$(STRATOWEAVE_HTTP_ORIGIN)"
+	@mkdir -p logs
+	@listener_pid=$$(lsof -iTCP:$(WEBUI_PORT) -sTCP:LISTEN -n -P -t 2>/dev/null | head -n 1); \
+	if [ -n "$$listener_pid" ]; then \
+		cmd=$$(ps -p "$$listener_pid" -o args= 2>/dev/null); \
+		if printf '%s' "$$cmd" | grep -Fq 'webui/node_modules/.bin/vite dev'; then \
+			echo "$$listener_pid" > "$(WEBUI_PIDFILE)"; \
+			echo "WebUI dev server already running on http://$(WEBUI_HOST):$(WEBUI_PORT) (pid $$listener_pid)"; \
+			echo "Log: $(WEBUI_LOG)"; \
+			exit 0; \
+		fi; \
+		echo "Port $(WEBUI_PORT) is already in use by: $$cmd"; \
+		exit 1; \
+	fi
+	@other_webui_pids=$$(pgrep -f "$(WEBUI_PATH)/[n]ode_modules/.bin/vite dev" 2>/dev/null); \
+	if [ -n "$$other_webui_pids" ]; then \
+		echo "Found existing WebUI dev process(es): $$other_webui_pids"; \
+		echo "Run 'make stop-webui' first"; \
+		exit 1; \
+	fi
+	@if [ -f "$(WEBUI_PIDFILE)" ]; then \
+		pid=$$(cat "$(WEBUI_PIDFILE)"); \
+		if kill -0 "$$pid" 2>/dev/null; then \
+			echo "Tracked WebUI process $$pid is still running but not listening on port $(WEBUI_PORT)"; \
+			echo "Run 'make stop-webui' first"; \
+			exit 1; \
+		fi; \
+		rm -f "$(WEBUI_PIDFILE)"; \
+	fi
+	@echo "Starting WebUI dev server on http://$(WEBUI_HOST):$(WEBUI_PORT)"
+	@echo "Proxying API requests to $(STRATOWEAVE_API_ORIGIN)"
+	@cd $(WEBUI_PATH) && nohup env STRATOWEAVE_API_ORIGIN="$(STRATOWEAVE_API_ORIGIN)" bun run dev -- --host $(WEBUI_HOST) --port $(WEBUI_PORT) --strictPort </dev/null >"$(abspath $(WEBUI_LOG))" 2>&1 &
+	@sleep 3
+	@listener_pid=$$(lsof -iTCP:$(WEBUI_PORT) -sTCP:LISTEN -n -P -t 2>/dev/null | head -n 1); \
+	if [ -n "$$listener_pid" ]; then \
+		echo "$$listener_pid" > "$(WEBUI_PIDFILE)"; \
+		echo "WebUI dev server started (pid $$listener_pid)"; \
+		echo "Log: $(WEBUI_LOG)"; \
+	else \
+		echo "Failed to start WebUI dev server"; \
+		rm -f "$(WEBUI_PIDFILE)"; \
+		tail -n 40 "$(WEBUI_LOG)" 2>/dev/null || true; \
+		exit 1; \
+	fi
 
 .PHONY: stop-webui
 stop-webui:
-	$(MAKE) -C ../../ stop-webui
+	@stopped=0; \
+	for pid in $$(pgrep -f "$(WEBUI_PATH)/[n]ode_modules/.bin/vite dev" 2>/dev/null); do \
+		if [ "$$pid" != "$$$$" ]; then \
+			kill "$$pid" 2>/dev/null || true; \
+			stopped=1; \
+		fi; \
+	done; \
+	listener_pid=$$(lsof -iTCP:$(WEBUI_PORT) -sTCP:LISTEN -n -P -t 2>/dev/null | head -n 1); \
+	if [ -n "$$listener_pid" ]; then \
+		cmd=$$(ps -p "$$listener_pid" -o args= 2>/dev/null); \
+		if printf '%s' "$$cmd" | grep -Fq 'webui/node_modules/.bin/vite dev'; then \
+			kill "$$listener_pid" 2>/dev/null || true; \
+			stopped=1; \
+		else \
+			echo "Port $(WEBUI_PORT) is in use by a non-WebUI process: $$cmd"; \
+		fi; \
+	fi; \
+	if [ -f "$(WEBUI_PIDFILE)" ]; then \
+		pid=$$(cat "$(WEBUI_PIDFILE)"); \
+		if [ -n "$$pid" ] && [ "$$pid" != "$$$$" ] && kill -0 "$$pid" 2>/dev/null; then \
+			kill "$$pid" 2>/dev/null || true; \
+			stopped=1; \
+		fi; \
+		rm -f "$(WEBUI_PIDFILE)"; \
+	fi; \
+	if [ "$$stopped" -eq 1 ]; then \
+		echo "WebUI dev server stopped"; \
+	else \
+		echo "WebUI dev server is not running"; \
+	fi
 
 .PHONY: stop
 stop:
@@ -110,72 +195,72 @@ shell:
 
 .PHONY: send-config-async
 send-config-async:
-	curl -f -X PATCH -H "Content-Type: application/yang-data+xml" -H "Async: true" -d @$(FILE) $(STRATOWEAVE_HTTP_ORIGIN)/restconf/data
+	curl -f -X PATCH -H "Content-Type: application/yang-data+xml" -H "Async: true" -d @$(FILE) $(STRATOWEAVE_API_ORIGIN)/restconf/data
 
 .PHONY: send-config-wait
 send-config-wait:
-	curl -f -X PATCH -H "Content-Type: application/yang-data+xml" -d @$(FILE) $(STRATOWEAVE_HTTP_ORIGIN)/restconf/data
+	curl -f -X PATCH -H "Content-Type: application/yang-data+xml" -d @$(FILE) $(STRATOWEAVE_API_ORIGIN)/restconf/data
 
 .PHONY: send-config-json-async
 send-config-json-async:
-	curl -f -X PATCH -H "Content-Type: application/yang-data+json" -H "Async: true" -d @$(FILE) $(STRATOWEAVE_HTTP_ORIGIN)/restconf/data
+	curl -f -X PATCH -H "Content-Type: application/yang-data+json" -H "Async: true" -d @$(FILE) $(STRATOWEAVE_API_ORIGIN)/restconf/data
 
 .PHONY: send-config-json-wait
 send-config-json-wait:
-	curl -f -X PATCH -H "Content-Type: application/yang-data+json" -d @$(FILE) $(STRATOWEAVE_HTTP_ORIGIN)/restconf/data
+	curl -f -X PATCH -H "Content-Type: application/yang-data+json" -d @$(FILE) $(STRATOWEAVE_API_ORIGIN)/restconf/data
 
 .PHONY: send-config-tmf640
 send-config-tmf640:
-	curl  -k -sS -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d @$(FILE) $(STRATOWEAVE_HTTP_ORIGIN)/tmf-api/ServiceActivationAndConfiguration/v4/service | jq '.'
+	curl  -k -sS -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d @$(FILE) $(STRATOWEAVE_API_ORIGIN)/tmf-api/ServiceActivationAndConfiguration/v4/service | jq '.'
 
 .PHONY: send-config-tmf640-stream
 send-config-tmf640-stream:
 	set -e; \
 	json_services=$$(jq -c -f "$(FILTER)" "$(FILE)"); \
 	printf '%s\n' "$$json_services" | while IFS= read -r service; do \
-		response=$$(curl -f -k -sS -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "$$service" $(STRATOWEAVE_HTTP_ORIGIN)/tmf-api/ServiceActivationAndConfiguration/v4/service); \
+		response=$$(curl -f -k -sS -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "$$service" $(STRATOWEAVE_API_ORIGIN)/tmf-api/ServiceActivationAndConfiguration/v4/service); \
 		printf '%s\n' "$$response" | jq '.'; \
 	done
 
 .PHONY: get-config-tmf640
 get-config-tmf640:
-	curl -k -sS -H "Accept: application/json" $(STRATOWEAVE_HTTP_ORIGIN)/tmf-api/ServiceActivationAndConfiguration/v4/service$(if $(ID),/$(ID),) | jq '.'
+	curl -k -sS -H "Accept: application/json" $(STRATOWEAVE_API_ORIGIN)/tmf-api/ServiceActivationAndConfiguration/v4/service$(if $(ID),/$(ID),) | jq '.'
 
 .PHONY: get-tmf633-service-catalog
 get-tmf633-service-catalog:
-	curl -k -sS -H "Accept: application/json" $(STRATOWEAVE_HTTP_ORIGIN)/tmf-api/serviceCatalogManagement/v4/serviceCatalog$(if $(ID),/$(ID),) | jq '.'
+	curl -k -sS -H "Accept: application/json" $(STRATOWEAVE_API_ORIGIN)/tmf-api/serviceCatalogManagement/v4/serviceCatalog$(if $(ID),/$(ID),) | jq '.'
 
 .PHONY: get-tmf633-service-category
 get-tmf633-service-category:
-	curl -k -sS -H "Accept: application/json" $(STRATOWEAVE_HTTP_ORIGIN)/tmf-api/serviceCatalogManagement/v4/serviceCategory$(if $(ID),/$(ID),) | jq '.'
+	curl -k -sS -H "Accept: application/json" $(STRATOWEAVE_API_ORIGIN)/tmf-api/serviceCatalogManagement/v4/serviceCategory$(if $(ID),/$(ID),) | jq '.'
 
 .PHONY: get-tmf633-service-candidate
 get-tmf633-service-candidate:
-	curl -k -sS -H "Accept: application/json" $(STRATOWEAVE_HTTP_ORIGIN)/tmf-api/serviceCatalogManagement/v4/serviceCandidate$(if $(ID),/$(ID),) | jq '.'
+	curl -k -sS -H "Accept: application/json" $(STRATOWEAVE_API_ORIGIN)/tmf-api/serviceCatalogManagement/v4/serviceCandidate$(if $(ID),/$(ID),) | jq '.'
 
 .PHONY: get-tmf633-service-specification
 get-tmf633-service-specification:
-	curl -k -sS -H "Accept: application/json" $(STRATOWEAVE_HTTP_ORIGIN)/tmf-api/serviceCatalogManagement/v4/serviceSpecification$(if $(ID),/$(ID),) | jq '.'
+	curl -k -sS -H "Accept: application/json" $(STRATOWEAVE_API_ORIGIN)/tmf-api/serviceCatalogManagement/v4/serviceSpecification$(if $(ID),/$(ID),) | jq '.'
 
 .PHONY: get-config-restconf
 get-config-restconf:
-	curl -f -sS -H "Accept: application/yang-data+xml" $(STRATOWEAVE_HTTP_ORIGIN)/restconf/data
+	curl -f -sS -H "Accept: application/yang-data+xml" $(STRATOWEAVE_API_ORIGIN)/restconf/data
 
 .PHONY: get-config-restconf-json
 get-config-restconf-json:
-	curl -f -sS -H "Accept: application/yang-data+json" $(STRATOWEAVE_HTTP_ORIGIN)/restconf/data | jq '.'
+	curl -f -sS -H "Accept: application/yang-data+json" $(STRATOWEAVE_API_ORIGIN)/restconf/data | jq '.'
 
 .PHONY: get-config0 get-config1 get-config2 get-config3
 get-config0 get-config1 get-config2 get-config3:
-	curl -H "Accept: application/yang-data+xml" $(STRATOWEAVE_HTTP_ORIGIN)/layer/$(subst get-config,,$@)
+	curl -H "Accept: application/yang-data+xml" $(STRATOWEAVE_API_ORIGIN)/layer/$(subst get-config,,$@)
 
 .PHONY: get-config-json0 get-config-json1 get-config-json2 get-config-json3
 get-config-json0 get-config-json1 get-config-json2 get-config-json3:
-	@curl -H "Accept: application/yang-data+json" $(STRATOWEAVE_HTTP_ORIGIN)/layer/$(subst get-config-json,,$@)
+	@curl -H "Accept: application/yang-data+json" $(STRATOWEAVE_API_ORIGIN)/layer/$(subst get-config-json,,$@)
 
 .PHONY: get-config-adata0 get-config-adata1 get-config-adata2 get-config-adata3
 get-config-adata0 get-config-adata1 get-config-adata2 get-config-adata3:
-	@curl -H "Accept: application/yang-data+acton-adata" $(STRATOWEAVE_HTTP_ORIGIN)/layer/$(subst get-config-adata,,$@)?loose=$(LAYER_CONFIG_LOOSE)
+	@curl -H "Accept: application/yang-data+acton-adata" $(STRATOWEAVE_API_ORIGIN)/layer/$(subst get-config-adata,,$@)?loose=$(LAYER_CONFIG_LOOSE)
 
 # Default for /layer/<idx> adata output (query param).
 LAYER_CONFIG_LOOSE?=true
@@ -195,7 +280,7 @@ upper = $(shell printf '%s' "$(1)" | tr '[:lower:]' '[:upper:]')
 # configuration" of the device itself.
 .PHONY: $(addprefix get-target-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-target-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
-	@curl $(STRATOWEAVE_HTTP_ORIGIN)/device/$(call upper,$(subst get-target-,,$@))/target?format=$(DEVICE_CONFIG_FORMAT)
+	@curl $(STRATOWEAVE_API_ORIGIN)/device/$(call upper,$(subst get-target-,,$@))/target?format=$(DEVICE_CONFIG_FORMAT)
 
 .PHONY: $(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
@@ -205,7 +290,7 @@ $(addprefix get-target-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 # NMDA-speak is the "intended configuration".
 .PHONY: $(addprefix get-running-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-running-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
-	@curl $(STRATOWEAVE_HTTP_ORIGIN)/device/$(call upper,$(subst get-running-,,$@))/running?format=$(DEVICE_CONFIG_FORMAT)
+	@curl $(STRATOWEAVE_API_ORIGIN)/device/$(call upper,$(subst get-running-,,$@))/running?format=$(DEVICE_CONFIG_FORMAT)
 
 .PHONY: $(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
@@ -213,7 +298,7 @@ $(addprefix get-running-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 
 .PHONY: $(addprefix get-diff-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-diff-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
-	@curl $(STRATOWEAVE_HTTP_ORIGIN)/device/$(call upper,$(subst get-diff-,,$@))/diff?format=$(DEVICE_CONFIG_FORMAT)
+	@curl $(STRATOWEAVE_API_ORIGIN)/device/$(call upper,$(subst get-diff-,,$@))/diff?format=$(DEVICE_CONFIG_FORMAT)
 
 .PHONY: $(addprefix get-diff-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix get-diff-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
@@ -221,11 +306,11 @@ $(addprefix get-diff-adata-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 
 .PHONY: $(addprefix resync-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL))
 $(addprefix resync-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
-	@curl $(STRATOWEAVE_HTTP_ORIGIN)/device/$(call upper,$(subst resync-,,$@))/resync
+	@curl $(STRATOWEAVE_API_ORIGIN)/device/$(call upper,$(subst resync-,,$@))/resync
 
 .PHONY: delete-config
 delete-config:
-	curl -f -X DELETE $(STRATOWEAVE_HTTP_ORIGIN)/restconf/data/netinfra:netinfra/router=STO-CORE-1
+	curl -f -X DELETE $(STRATOWEAVE_API_ORIGIN)/restconf/data/netinfra:netinfra/router=STO-CORE-1
 
 .PHONY: $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL) $(ROUTERS_FRR))
 $(addprefix cli-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL) $(ROUTERS_FRR)): cli-%: platform-cli-%
@@ -236,7 +321,7 @@ $(addprefix get-dev-config-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL)):
 
 .PHONY: test-restconf-get
 test-restconf-get:
-	curl -sS -f -H "Accept: application/yang-data+json" $(STRATOWEAVE_HTTP_ORIGIN)/restconf/data/netinfra:netinfra/router=AMS-CORE-1 | jq '.["netinfra:router"][0].name' | grep -q "AMS-CORE-1"
+	curl -sS -f -H "Accept: application/yang-data+json" $(STRATOWEAVE_API_ORIGIN)/restconf/data/netinfra:netinfra/router=AMS-CORE-1 | jq '.["netinfra:router"][0].name' | grep -q "AMS-CORE-1"
 
 .PHONY: test
 test:

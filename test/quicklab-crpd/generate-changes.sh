@@ -1,9 +1,16 @@
 #!/bin/bash
 # Generate config changes for testing the approval queue
 
-STRATOWEAVE_HTTP_ORIGIN="${STRATOWEAVE_HTTP_ORIGIN:-http://localhost:15000}"
+if [ -z "$STRATOWEAVE_API_ORIGIN" ]; then
+    port=$(docker port sorespo-quicklab-crpd-sweave 80/tcp 2>/dev/null | sed -n 's/.*:\([0-9][0-9]*\)$/\1/p' | head -n 1)
+    if [ -z "$port" ]; then
+        echo "Error: sorespo-quicklab-crpd-sweave is not running or port 80 is not published; start the lab first or export STRATOWEAVE_API_ORIGIN" >&2
+        exit 1
+    fi
+    STRATOWEAVE_API_ORIGIN="http://localhost:$port"
+fi
 
-echo "Using StratoWeave at: $STRATOWEAVE_HTTP_ORIGIN"
+echo "Using StratoWeave at: $STRATOWEAVE_API_ORIGIN"
 
 # Function to send config
 send_config() {
@@ -27,7 +34,7 @@ EOF
         -H "Content-Type: application/yang-data+xml" \
         -H "Async: true" \
         -d @/tmp/temp-config.xml \
-        "${STRATOWEAVE_HTTP_ORIGIN}/restconf/data"
+        "${STRATOWEAVE_API_ORIGIN}/restconf/data"
     echo ""
 }
 

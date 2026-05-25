@@ -1,5 +1,3 @@
-const DEFAULT_API_ORIGIN = 'http://localhost:15000';
-
 function canHaveBody(method: string): boolean {
   return method !== 'GET' && method !== 'HEAD';
 }
@@ -13,18 +11,29 @@ async function readProxyBody(request: Request): Promise<ArrayBuffer | undefined>
   return body.byteLength > 0 ? body : undefined;
 }
 
-export function getApiOrigin(): string {
-  return process.env.STRATOWEAVE_API_ORIGIN ?? DEFAULT_API_ORIGIN;
+export function getApiOrigin(): string | null {
+  return process.env.STRATOWEAVE_API_ORIGIN || null;
 }
 
 export async function proxyRequest(request: Request, targetPath: string, search = ''): Promise<Response> {
+  const origin = getApiOrigin();
+  if (!origin) {
+    return Response.json(
+      {
+        message:
+          'STRATOWEAVE_API_ORIGIN is not set. Start the webui via `make -C test/quicklab-* start-webui` (auto-discovers the lab) or export STRATOWEAVE_API_ORIGIN explicitly.'
+      },
+      { status: 502 }
+    );
+  }
+
   const headers = new Headers(request.headers);
   headers.delete('connection');
   headers.delete('content-length');
   headers.delete('host');
 
   const body = await readProxyBody(request);
-  const targetUrl = new URL(targetPath.startsWith('/') ? targetPath : `/${targetPath}`, getApiOrigin());
+  const targetUrl = new URL(targetPath.startsWith('/') ? targetPath : `/${targetPath}`, origin);
   targetUrl.search = search;
 
   try {
