@@ -275,7 +275,10 @@ SRC_DNODE_CHILD_29: DContainer = DContainer(module='Cisco-IOS-XR-pfi-im-cmd-oper
                     DLeaf(module='Cisco-IOS-XR-pfi-im-cmd-oper', namespace='http://cisco.com/ns/yang/Cisco-IOS-XR-pfi-im-cmd-oper', prefix='pfi-im-cmd-oper', name='packets-received', config=False, description='Total Packets received', mandatory=False, type_=DTypeIntegerUnsigned(name='uint64', description=None, reference=None, exts=[], builtin_type='uint64', default=None, ranges=Ranges([(0, 18446744073709551615)])))
                 ]),
                 DLeaf(module='Cisco-IOS-XR-pfi-im-cmd-oper', namespace='http://cisco.com/ns/yang/Cisco-IOS-XR-pfi-im-cmd-oper', prefix='pfi-im-cmd-oper', name='stats-type', config=False, description='StatsType', mandatory=False, type_=DTypeEnum(name='Im-cmd-stats-enum', description='List of different interface stats structures', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'full':1, 'basic':2}))
-            ])
+            ]),
+            DLeaf(module='Cisco-IOS-XR-pfi-im-cmd-oper', namespace='http://cisco.com/ns/yang/Cisco-IOS-XR-pfi-im-cmd-oper', prefix='pfi-im-cmd-oper', name='state', config=False, description='Interface state', mandatory=False, type_=DTypeEnum(name='Im-state-enum', description='Im state enum', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'im-state-not-ready':0, 'im-state-admin-down':1, 'im-state-down':2, 'im-state-up':3, 'im-state-shutdown':4, 'im-state-err-disable':5, 'im-state-down-immediate':6, 'im-state-down-immediate-admin':7, 'im-state-down-graceful':8, 'im-state-begin-shutdown':9, 'im-state-end-shutdown':10, 'im-state-begin-error-disable':11, 'im-state-end-error-disable':12, 'im-state-begin-down-graceful':13, 'im-state-reset':14, 'im-state-operational':15, 'im-state-not-operational':16, 'im-state-unknown':17, 'im-state-last':18}), exts=[
+                    DExt(module='Cisco-IOS-XR-types', namespace='http://cisco.com/ns/yang/cisco-xr-types', prefix='xr', name='event-telemetry', arg='Subscribe Telemetry Event', exts=[])
+                ])
         ])
     ])
 ])
@@ -355804,23 +355807,27 @@ _breaker99: None = None
 class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry(yang.adata.MNode):
     interface_name: str
     interface_statistics: Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface__interface_statistics
+    state: ?str
 
-    mut def __init__(self, interface_name: str, interface_statistics: ?Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface__interface_statistics=None) -> None:
+    mut def __init__(self, interface_name: str, interface_statistics: ?Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface__interface_statistics=None, state: ?str) -> None:
         self.interface_name = interface_name
         self.interface_statistics = interface_statistics if interface_statistics is not None else Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface__interface_statistics()
+        self.state = state
 
     pure def _get_attr(self, name: str) -> ?value:
         if name == 'pfi-im-cmd-oper:interface-name':
             return self.interface_name
         if name == 'pfi-im-cmd-oper:interface-statistics':
             return self.interface_statistics
+        if name == 'pfi-im-cmd-oper:state':
+            return self.state
 
     mut def to_gdata(self) -> yang.gdata.Node:
         return yang.adata.from_adata(SRC_DNODE, self, loose=True, root_path=['Cisco-IOS-XR-pfi-im-cmd-oper:interfaces', 'interface-xr', 'interface'])
 
     @staticmethod
     mut def from_gdata(n: yang.gdata.Node) -> Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry:
-        return Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry(interface_name=n.get_str(yang.gdata.Id(NS_Cisco_IOS_XR_pfi_im_cmd_oper, 'interface-name')), interface_statistics=Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface__interface_statistics.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_Cisco_IOS_XR_pfi_im_cmd_oper, 'interface-statistics'))))
+        return Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry(interface_name=n.get_str(yang.gdata.Id(NS_Cisco_IOS_XR_pfi_im_cmd_oper, 'interface-name')), interface_statistics=Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface__interface_statistics.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_Cisco_IOS_XR_pfi_im_cmd_oper, 'interface-statistics'))), state=n.get_opt_str(yang.gdata.Id(NS_Cisco_IOS_XR_pfi_im_cmd_oper, 'state')))
 
     mut def copy(self) -> Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry:
         """Create a deep copy of this adata object"""
@@ -355838,11 +355845,13 @@ class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__in
                 continue
             return e
 
-    mut def create(self, interface_name: str) -> Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry:
+    mut def create(self, interface_name: str, state: ?str=None) -> Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry:
         e = self.get(interface_name)
         if e is not None:
+            if state is not None:
+                e.state = state
             return e
-        res = Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry(interface_name=interface_name)
+        res = Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry(interface_name=interface_name, state=state)
         self.elements.append(res)
         return res
 
@@ -357499,24 +357508,28 @@ _breaker202: None = None
 class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry_subs(SubscriptionNode):
     interface_name: SubscriptionNode
     interface_statistics: Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface__interface_statistics_subs
+    state: SubscriptionNode
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
         self.interface_name = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_Cisco_IOS_XR_pfi_im_cmd_oper, 'interface-name'), parent=path))
         self.interface_statistics = Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface__interface_statistics_subs(SubscriptionPath(yang.gdata.Id(NS_Cisco_IOS_XR_pfi_im_cmd_oper, 'interface-statistics'), parent=path))
+        self.state = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_Cisco_IOS_XR_pfi_im_cmd_oper, 'state'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.interface_name, self.interface_statistics]
+        direct: list[SubscriptionNode] = [self.interface_name, self.interface_statistics, self.state]
         return direct
 
 _breaker203: None = None
 class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_subs(SubscriptionNode):
     interface_name: SubscriptionNode
     interface_statistics: Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface__interface_statistics_subs
+    state: SubscriptionNode
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
         self.interface_name = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_Cisco_IOS_XR_pfi_im_cmd_oper, 'interface-name'), parent=path))
         self.interface_statistics = Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface__interface_statistics_subs(SubscriptionPath(yang.gdata.Id(NS_Cisco_IOS_XR_pfi_im_cmd_oper, 'interface-statistics'), parent=path))
+        self.state = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_Cisco_IOS_XR_pfi_im_cmd_oper, 'state'), parent=path))
 
     pure def entry(self, interface_name: str) -> Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry_subs:
         predicates = [
@@ -357526,7 +357539,7 @@ class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__in
         return Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry_subs(SubscriptionPath(yang.gdata.Id(NS_Cisco_IOS_XR_pfi_im_cmd_oper, 'interface'), predicates=predicates, parent=base_path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.interface_name, self.interface_statistics]
+        direct: list[SubscriptionNode] = [self.interface_name, self.interface_statistics, self.state]
         return direct
 
 _breaker204: None = None

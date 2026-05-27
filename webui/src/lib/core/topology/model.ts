@@ -118,6 +118,8 @@ export const TOPOLOGY_SITE_CARD_WIDTH = 154;
 export const TOPOLOGY_SITE_CARD_HEIGHT = 58;
 export const TOPOLOGY_SITE_CARD_GAP = 28;
 export const TOPOLOGY_LINK_LABEL_HEIGHT = 56;
+export const TOPOLOGY_LINK_LABEL_MIN_WIDTH = 140;
+export const TOPOLOGY_LINK_LABEL_MAX_WIDTH = 260;
 export const TOPOLOGY_VIEW_PADDING = 48;
 
 function parsePps(value: number | string | undefined): number | null {
@@ -246,14 +248,59 @@ export function getLinkPpsLabel(link: TopologyLink): string {
   return `→ ${formatPps(link.leftPps)} pps    ← ${formatPps(link.rightPps)}`;
 }
 
+const LINK_LABEL_CHAR_WIDTH = 7;
+const LINK_LABEL_PADDING = 28;
+const LINK_LABEL_SEPARATOR = ' ↔ ';
+
+/**
+ * Shorten `name` to fit `maxChars`: abbreviate the leading type word to two
+ * letters and keep the numeric port suffix ("GigabitEthernet0/0/0/0" → "Gi0/0/0/0"),
+ * ellipsis-truncating the tail as a fallback.
+ */
+export function shortenInterfaceName(name: string, maxChars: number): string {
+  const trimmed = name.trim();
+  if (trimmed.length <= maxChars) {
+    return trimmed;
+  }
+  const [, type = '', port = ''] = trimmed.match(/^(\D*)(\d.*)$/) ?? [];
+  const candidate = type ? type.replace(/\W/g, '').slice(0, 2) + port : trimmed;
+  if (candidate.length <= maxChars) {
+    return candidate;
+  }
+  return maxChars <= 1 ? candidate.slice(0, Math.max(0, maxChars)) : `…${candidate.slice(1 - maxChars)}`;
+}
+
+// Per-interface character budget so that "<left> ↔ <right>" fits the widest
+// allowed link-label box.
+function getInterfaceLabelCharBudget(): number {
+  const maxLineChars = Math.floor(
+    (TOPOLOGY_LINK_LABEL_MAX_WIDTH - LINK_LABEL_PADDING) / LINK_LABEL_CHAR_WIDTH
+  );
+  return Math.max(4, Math.floor((maxLineChars - LINK_LABEL_SEPARATOR.length) / 2));
+}
+
+/**
+ * Build the "<left> ↔ <right>" interface line shown on a backbone link,
+ * shortening either side that would otherwise overflow the label box.
+ */
+export function getLinkInterfaceLabel(leftInterface: string, rightInterface: string): string {
+  const budget = getInterfaceLabelCharBudget();
+  const left = shortenInterfaceName(leftInterface.trim() || 'left interface', budget);
+  const right = shortenInterfaceName(rightInterface.trim() || 'right interface', budget);
+  return `${left}${LINK_LABEL_SEPARATOR}${right}`;
+}
+
 export function getLinkLabelWidth(
   leftInterface: string,
   rightInterface: string,
   ppsLabel: string = ''
 ): number {
-  const interfaceLineLength = leftInterface.trim().length + rightInterface.trim().length + 3;
-  const longest = Math.max(interfaceLineLength, ppsLabel.length);
-  return Math.max(140, Math.min(260, 28 + longest * 7));
+  const interfaceLine = getLinkInterfaceLabel(leftInterface, rightInterface);
+  const longest = Math.max(interfaceLine.length, ppsLabel.length);
+  return Math.max(
+    TOPOLOGY_LINK_LABEL_MIN_WIDTH,
+    Math.min(TOPOLOGY_LINK_LABEL_MAX_WIDTH, LINK_LABEL_PADDING + longest * LINK_LABEL_CHAR_WIDTH)
+  );
 }
 
 export function getLinkLabelPosition(
