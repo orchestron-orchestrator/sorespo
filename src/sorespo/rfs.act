@@ -14,7 +14,6 @@ import sorespo.layers.y_2 as y_2
 import sorespo.layers.y_2_oper as y_2_oper
 
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface_entry
-from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface__dynstate as BackboneInterfaceDynstate
 
 import sorespo.devices.CiscoIosXr_25_3_1 as xr25
 import sorespo.devices.CiscoIosXr_25_3_1_oper as xr25_oper
@@ -186,7 +185,7 @@ end-policy
 
         raise UnsupportedDevice()
 
-actor BBInterfaceTransform(path, update_dynstate: proc(?BackboneInterfaceDynstate)->None, update_oper: proc(?y_2_oper.stratoweave_rfs__rfs__backbone_interface_entry)->None, dev: swdev.DeviceMgr):
+actor BBInterfaceTransform(path, update_oper: proc(?y_2_oper.stratoweave_rfs__rfs__backbone_interface_entry)->None, dev: swdev.DeviceMgr):
     _subs = gdata.SubscriptionManager(dev.tree_provider(), str(path))
     _oper = base.BBInterface.new_state(path)
     var rx_packets: timeseries.Counter[u64] = timeseries.Counter(None, 2)
@@ -273,9 +272,7 @@ actor BBInterfaceTransform(path, update_dynstate: proc(?BackboneInterfaceDynstat
         _subs.declare(want)
 
 class BBInterface(base.BBInterface):
-    def transform(self, i, di, dynstate):
-        # dynstate is part of the framework actor contract; intentionally
-        # unused. See BBInterfaceTransform for rationale.
+    def transform(self, i, di):
         print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}]", err=True)
         if_description = _bb_interface_description(i.remote.device, i.remote.interface)
 
