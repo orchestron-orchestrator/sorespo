@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     formatPps,
+    getLinkInterfaceLabel,
     getLinkLabelPosition,
     getLinkLabelWidth,
     getLinkPpsLabel,
@@ -105,7 +106,7 @@
                       rx="12"
                     ></rect>
                     <text class="topology__link-label" text-anchor="middle">
-                      <tspan x="0" y={link.monitorTraffic ? -13 : -4}>{link.leftInterface || 'left interface'} ↔ {link.rightInterface || 'right interface'}</tspan>
+                      <tspan x="0" y={link.monitorTraffic ? -13 : -4}>{getLinkInterfaceLabel(link.leftInterface, link.rightInterface)}</tspan>
                       {#if link.monitorTraffic}
                         <tspan class="topology__link-pps" x="0" y="9">→ {formatPps(link.leftPps)} pps    ← {formatPps(link.rightPps)}</tspan>
                       {/if}

@@ -220,6 +220,18 @@ actor BBInterfaceTransform(path, update_dynstate: proc(?BackboneInterfaceDynstat
         elif root is not None:
             for interface in root.pfi_im_cmd_oper_interfaces.interface_xr.interface:
                 stats.rx_packets = interface.interface_statistics.full_interface_stats.packets_received
+                raw = interface.state
+                if raw == "im-state-up" or raw == "im-state-operational":
+                    stats.oper_status = "up"
+                elif raw == "im-state-unknown" or raw == "im-state-not-ready" or raw == "im-state-last":
+                    stats.oper_status = "unknown"
+                elif raw is not None and raw.startswith("im-state-"):
+                    # Any other im-state-* value (admin/non-admin down,
+                    # shutdown, err-disable, begin/end transitions, reset,
+                    # not-operational, …) is operationally down.
+                    stats.oper_status = "down"
+                elif raw is not None:
+                    stats.oper_status = "unknown"
         handle_stats(stats)
 
     def on_srl_state(root: ?srl25_oper_root, err: ?Exception):
@@ -245,7 +257,8 @@ actor BBInterfaceTransform(path, update_dynstate: proc(?BackboneInterfaceDynstat
             if "Cisco-IOS-XR-um-hostname-cfg" in modset:
                 xr_dst = xr25_oper.dst(on_xr_state)
                 want.add(xr_dst.deliver({
-                    xr25_oper.subs.pfi_im_cmd_oper_interfaces.interface_xr.interface.entry(conf.name).interface_statistics.full_interface_stats.packets_received.subscribe(period=5.0)
+                    xr25_oper.subs.pfi_im_cmd_oper_interfaces.interface_xr.interface.entry(conf.name).interface_statistics.full_interface_stats.packets_received.subscribe(period=5.0),
+                    xr25_oper.subs.pfi_im_cmd_oper_interfaces.interface_xr.interface.entry(conf.name).state.subscribe(period=5.0)
                 }))
             elif "srl_nokia-system" in modset:
                 srl_dst = srl25_oper.dst(on_srl_state)
