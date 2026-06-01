@@ -1,15 +1,9 @@
 import testing
 
-import yang.gdata as gdata
-import yang.data
 import stratoweave
+import stratoweave.testing as swts
 
 import sorespo.sysspec
-import sorespo.layers.y_0 as cfs_layer
-import sorespo.devices.CiscoIosXr_25_3_1 as xr25
-import sorespo.devices.JuniperCRPD_24_4R1_9 as crpd24
-
-NS_SW_DEV = "http://stratoweave.org/yang/stratoweave-device";
 
 netinfra1_in = """<data>
     <netinfra xmlns="http://example.com/netinfra">
@@ -49,24 +43,19 @@ netinfra1_in = """<data>
 actor _test_netinfra1(t: testing.AsyncT):
     tr = stratoweave.test_main(sorespo.sysspec.SYSSPEC, t.log_handler)
 
-    def cont(_r: value):
-        print("Test Config applied successfully", str(_r), err=True)
-        # Get XML config for all layers. We do this to check whether the gdata
-        # we get from TTT is still valid and can be converted to XML.
+    def cont(r: value):
+        if isinstance(r, Exception):
+            t.failure(r)
+            return
+        # Convert every layer's config to XML to confirm the gdata produced by
+        # TTT is valid and round-trips through XML serialization.
         ln_cfg = None
         for n in range(4):
-            ln = tr.layer_config(n)
-            ln_cfg = ln.to_xmlstr(deterministic=True)
-            print(f"layer {n}:\n{ln_cfg}", err=True)
-        # Return last (device) layer config
+            ln_cfg = tr.layer_config(n).to_xmlstr(deterministic=True)
+        # Report the last (device) layer config.
         t.success(ln_cfg)
 
     tr.edit_config_xml(netinfra1_in, cont)
-
-    def fail():
-        print("Test Config failed", err=True)
-        t.failure(ValueError())
-    after 2.5: fail()
 
 
 l3vpn_in = """<data>
@@ -338,46 +327,37 @@ l3vpn_in = """<data>
 </data>
 """
 
-actor l3vpn_tester(t: testing.AsyncT, output_formatter: mut(gdata.Node) -> str):
+# Device-layer (layer 3) output formatters for the l3vpn test. Named functions
+# (rather than lambdas) so `tr` is pinned to TestRig and its methods resolve.
+def _l3vpn_xml(tr: swts.TestRig) -> str:
+    return tr.layer_config(3).to_xmlstr(deterministic=True)
+
+def _l3vpn_json(tr: swts.TestRig) -> str:
+    return tr.layer_config(3).to_yang_jsonstr(deterministic=True)
+
+def _l3vpn_adata(tr: swts.TestRig) -> str:
+    return tr.device_adata_snapshot()
+
+actor l3vpn_tester(t: testing.AsyncT, output_formatter: proc(swts.TestRig) -> str):
     tr = stratoweave.test_main(sorespo.sysspec.SYSSPEC, t.log_handler)
 
-    def cont(_r: value):
-        res = tr.layer_config(3)
-        output = output_formatter(res)
-        t.success(output)
+    def cont(r: value):
+        if isinstance(r, Exception):
+            t.failure(r)
+            return
+        t.success(output_formatter(tr))
 
     tr.edit_config_xml(l3vpn_in, cont)
 
 actor _test_l3vpn_svc(t: testing.AsyncT):
-    l3vpn_tester(t, lambda n: n.to_xmlstr(deterministic=True))
+    l3vpn_tester(t, _l3vpn_xml)
 
 actor _test_l3vpn_svc_json(t: testing.AsyncT):
-    l3vpn_tester(t, lambda n: n.to_yang_jsonstr(deterministic=True))
+    l3vpn_tester(t, _l3vpn_json)
 
 actor _test_l3vpn_svc_adata(t: testing.AsyncT):
-    def _adata_formatter(n: gdata.Node) -> str:
-        res = {}
-        device_list = n.get_cnt(gdata.Id(NS_SW_DEV, "devices")).get_list(gdata.Id(NS_SW_DEV, "device"))
-        # We must sort the elements to ensure the output is deterministic
-        for device_entry in gdata.sorted_elements(device_list.elements, device_list.keys):
-            config = device_entry.get_cnt(gdata.Id(NS_SW_DEV, "config"))
-            device_name = str(device_entry.get_leaf(gdata.Id(NS_SW_DEV, "name")).val)
-            if device_name == "AMS-CORE-1" or device_name == "FRA-CORE-1":
-                res[device_name] = yang.data.pradata(xr25.SRC_DNODE, config, loose=True)
-            elif device_name == "STO-CORE-1" or device_name == "LJU-CORE-1":
-                res[device_name] = yang.data.pradata(crpd24.SRC_DNODE, config, loose=True)
-            else:
-                raise ValueError(f"Unknown device {device_name}")
-
-        # Convert the result to a string representation
-        text = ""
-        for device, adata in res.items():
-            indented_lines = "\n".join([" " * 4 + line for line in adata.splitlines()])
-            text += f"def adata_{device.replace('-', '_')}():\n{indented_lines}\n\n"
-        return text
-
-    l3vpn_tester(t, _adata_formatter)
+    l3vpn_tester(t, _l3vpn_adata)
 
 # TODO: enable once gdata after transform is valid (= sorted where it needs to be)
 # def _test_l3vpn_svc_gdata(t: testing.AsyncT):
-#     l3vpn_tester(t, lambda n: n.prsrc())
+#     l3vpn_tester(t, lambda tr: tr.layer_config(3).prsrc())
