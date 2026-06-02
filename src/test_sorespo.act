@@ -327,17 +327,6 @@ l3vpn_in = """<data>
 </data>
 """
 
-# Device-layer (layer 3) output formatters for the l3vpn test. Named functions
-# (rather than lambdas) so `tr` is pinned to TestRig and its methods resolve.
-def _l3vpn_xml(tr: swts.TestRig) -> str:
-    return tr.layer_config(3).to_xmlstr(deterministic=True)
-
-def _l3vpn_json(tr: swts.TestRig) -> str:
-    return tr.layer_config(3).to_yang_jsonstr(deterministic=True)
-
-def _l3vpn_adata(tr: swts.TestRig) -> str:
-    return tr.device_adata_snapshot()
-
 actor l3vpn_tester(t: testing.AsyncT, output_formatter: proc(swts.TestRig) -> str):
     tr = stratoweave.test_main(sorespo.sysspec.SYSSPEC, t.log_handler)
 
@@ -350,13 +339,15 @@ actor l3vpn_tester(t: testing.AsyncT, output_formatter: proc(swts.TestRig) -> st
     tr.edit_config_xml(l3vpn_in, cont)
 
 actor _test_l3vpn_svc(t: testing.AsyncT):
-    l3vpn_tester(t, _l3vpn_xml)
+    l3vpn_tester(t, lambda tr: tr.layer_config(-1).to_xmlstr(deterministic=True))
 
 actor _test_l3vpn_svc_json(t: testing.AsyncT):
-    l3vpn_tester(t, _l3vpn_json)
+    l3vpn_tester(t, lambda tr: tr.layer_config(-1).to_yang_jsonstr(deterministic=True))
 
 actor _test_l3vpn_svc_adata(t: testing.AsyncT):
-    l3vpn_tester(t, _l3vpn_adata)
+    def _lambda_workaround(tr):
+        return tr.device_adata_snapshot()
+    l3vpn_tester(t, _lambda_workaround)
 
 # TODO: enable once gdata after transform is valid (= sorted where it needs to be)
 # def _test_l3vpn_svc_gdata(t: testing.AsyncT):
