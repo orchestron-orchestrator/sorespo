@@ -1090,7 +1090,8 @@ SRC_DNODE_CHILD_42: DContainer = DContainer(module='ietf-l3vpn-svc', namespace='
 
 SRC_DNODE_CHILD_129: DList = DList(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='router', key=['name'], config=True, description='Network Infrastructure Router', min_elements=0, ordered_by='system', exts=[
         DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='transform', arg='sorespo.cfs.Router', exts=[]),
-        DExt(module='ietf-yang-tmf-map', namespace='urn:ietf:params:xml:ns:yang:ietf-yang-tmf-map', prefix='tmf', name='cfs-service', arg='Router', exts=[])
+        DExt(module='ietf-yang-tmf-map', namespace='urn:ietf:params:xml:ns:yang:ietf-yang-tmf-map', prefix='tmf', name='cfs-service', arg='Router', exts=[]),
+        DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='link', arg='global', exts=[DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='path', arg='/netinfra:netinfra/netinfra:global-settings', exts=[])])
     ], children=[
     DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='name', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='id', config=True, description='router id', mandatory=True, type_=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)]))),
@@ -1128,7 +1129,13 @@ SRC_DNODE_CHILD_130: DList = DList(module='netinfra', namespace='http://example.
     ])
 ])
 
-SRC_DNODE_CHILD_128: DContainer = DContainer(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='netinfra', config=True, description='Network infrastructure', presence=False, children=[SRC_DNODE_CHILD_129, SRC_DNODE_CHILD_130])
+SRC_DNODE_CHILD_131: DContainer = DContainer(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='global-settings', config=True, description='Network-wide settings shared across all routers.', presence=False, exts=[
+        DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='transform', arg='sorespo.cfs.GlobalSettings', exts=[])
+    ], children=[
+    DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='ibgp-authentication-key', config=True, description="Shared iBGP authentication key applied to every router's\niBGP full-mesh neighbors.", mandatory=True, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
+])
+
+SRC_DNODE_CHILD_128: DContainer = DContainer(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='netinfra', config=True, description='Network infrastructure', presence=False, children=[SRC_DNODE_CHILD_129, SRC_DNODE_CHILD_130, SRC_DNODE_CHILD_131])
 
 SRC_DNODE_IDENTITY_0: DIdentity = DIdentity(module='ietf-l3vpn-svc', namespace='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', prefix='l3vpn-svc', name='site-network-access-type')
 
@@ -4735,6 +4742,9 @@ SRC_YANG_2: str = r"""module netinfra {
 
       sw:transform sorespo.cfs.Router;
       tmf:cfs-service "Router";
+      sw:link global {
+        sw:path /netinfra:netinfra/netinfra:global-settings;
+      }
 
       leaf name {
         type string;
@@ -4818,6 +4828,19 @@ SRC_YANG_2: str = r"""module netinfra {
             enum unknown;
           }
         }
+      }
+    }
+
+    container global-settings {
+      sw:transform sorespo.cfs.GlobalSettings;
+      description
+        "Network-wide settings shared across all routers.";
+      leaf ibgp-authentication-key {
+        type string;
+        mandatory true;
+        description
+          "Shared iBGP authentication key applied to every router's
+           iBGP full-mesh neighbors.";
       }
     }
   }
@@ -16320,19 +16343,48 @@ extension netinfra__netinfra__backbone_link(Iterable[netinfra__netinfra__backbon
         return self.elements.__iter__()
 
 _breaker221: None = None
+class netinfra__netinfra__global_settings(yang.adata.MNode):
+    ibgp_authentication_key: ?str
+
+    mut def __init__(self, ibgp_authentication_key: ?str) -> None:
+        self.ibgp_authentication_key = ibgp_authentication_key
+
+    pure def _get_attr(self, name: str) -> ?value:
+        if name == 'netinfra:ibgp-authentication-key':
+            return self.ibgp_authentication_key
+
+    mut def to_gdata(self) -> yang.gdata.Node:
+        return yang.adata.from_adata(SRC_DNODE, self, loose=True, root_path=['netinfra:netinfra', 'global-settings'])
+
+    @staticmethod
+    mut def from_gdata(n: ?yang.gdata.Node) -> netinfra__netinfra__global_settings:
+        if n is not None:
+            return netinfra__netinfra__global_settings(ibgp_authentication_key=n.get_opt_str(yang.gdata.Id(NS_netinfra, 'ibgp-authentication-key')))
+        return netinfra__netinfra__global_settings()
+
+    mut def copy(self) -> netinfra__netinfra__global_settings:
+        """Create a deep copy of this adata object"""
+        return netinfra__netinfra__global_settings.from_gdata(self.to_gdata())
+
+
+_breaker222: None = None
 class netinfra__netinfra(yang.adata.MNode):
     router: netinfra__netinfra__router
     backbone_link: netinfra__netinfra__backbone_link
+    global_settings: netinfra__netinfra__global_settings
 
-    mut def __init__(self, router: list[netinfra__netinfra__router_entry]=[], backbone_link: list[netinfra__netinfra__backbone_link_entry]=[]) -> None:
+    mut def __init__(self, router: list[netinfra__netinfra__router_entry]=[], backbone_link: list[netinfra__netinfra__backbone_link_entry]=[], global_settings: ?netinfra__netinfra__global_settings=None) -> None:
         self.router = netinfra__netinfra__router(elements=router)
         self.backbone_link = netinfra__netinfra__backbone_link(elements=backbone_link)
+        self.global_settings = global_settings if global_settings is not None else netinfra__netinfra__global_settings()
 
     pure def _get_attr(self, name: str) -> ?value:
         if name == 'netinfra:router':
             return iter(self.router)
         if name == 'netinfra:backbone-link':
             return iter(self.backbone_link)
+        if name == 'netinfra:global-settings':
+            return self.global_settings
 
     mut def to_gdata(self) -> yang.gdata.Node:
         return yang.adata.from_adata(SRC_DNODE, self, loose=True, root_path=['netinfra:netinfra'])
@@ -16340,7 +16392,7 @@ class netinfra__netinfra(yang.adata.MNode):
     @staticmethod
     mut def from_gdata(n: ?yang.gdata.Node) -> netinfra__netinfra:
         if n is not None:
-            return netinfra__netinfra(router=netinfra__netinfra__router.from_gdata(n.get_opt_list(yang.gdata.Id(NS_netinfra, 'router'))), backbone_link=netinfra__netinfra__backbone_link.from_gdata(n.get_opt_list(yang.gdata.Id(NS_netinfra, 'backbone-link'))))
+            return netinfra__netinfra(router=netinfra__netinfra__router.from_gdata(n.get_opt_list(yang.gdata.Id(NS_netinfra, 'router'))), backbone_link=netinfra__netinfra__backbone_link.from_gdata(n.get_opt_list(yang.gdata.Id(NS_netinfra, 'backbone-link'))), global_settings=netinfra__netinfra__global_settings.from_gdata(n.get_opt_cnt(yang.gdata.Id(NS_netinfra, 'global-settings'))))
         return netinfra__netinfra()
 
     mut def copy(self) -> netinfra__netinfra:
@@ -16348,7 +16400,7 @@ class netinfra__netinfra(yang.adata.MNode):
         return netinfra__netinfra.from_gdata(self.to_gdata())
 
 
-_breaker222: None = None
+_breaker223: None = None
 class root(yang.adata.MNode):
     tmf_store: stratoweave_tmf__tmf_store
     l3vpn_svc: ietf_l3vpn_svc__l3vpn_svc
@@ -16386,7 +16438,7 @@ actor rpc_root(tp: yang.gdata.TreeProvider):
 
 
 
-_breaker223: None = None
+_breaker224: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__feature__constraint_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     href: SubscriptionNode
@@ -16412,7 +16464,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__feature__constraint_entry_sub
         direct: list[SubscriptionNode] = [self.id, self.href, self.name, self.version, self.baseType, self.schemaLocation, self.type, self.referredType]
         return direct
 
-_breaker224: None = None
+_breaker225: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__feature__constraint_subs(SubscriptionNode):
     id: SubscriptionNode
     href: SubscriptionNode
@@ -16444,7 +16496,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__feature__constraint_subs(Subs
         direct: list[SubscriptionNode] = [self.id, self.href, self.name, self.version, self.baseType, self.schemaLocation, self.type, self.referredType]
         return direct
 
-_breaker225: None = None
+_breaker226: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__feature__featureCharacteristic__characteristicRelationship_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     relationshipType: SubscriptionNode
@@ -16464,7 +16516,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__feature__featureCharacteristi
         direct: list[SubscriptionNode] = [self.id, self.relationshipType, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker226: None = None
+_breaker227: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__feature__featureCharacteristic__characteristicRelationship_subs(SubscriptionNode):
     id: SubscriptionNode
     relationshipType: SubscriptionNode
@@ -16490,7 +16542,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__feature__featureCharacteristi
         direct: list[SubscriptionNode] = [self.id, self.relationshipType, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker227: None = None
+_breaker228: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__feature__featureCharacteristic_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     name: SubscriptionNode
@@ -16512,7 +16564,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__feature__featureCharacteristi
         direct: list[SubscriptionNode] = [self.id, self.name, self.characteristicRelationship, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker228: None = None
+_breaker229: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__feature__featureCharacteristic_subs(SubscriptionNode):
     id: SubscriptionNode
     name: SubscriptionNode
@@ -16540,7 +16592,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__feature__featureCharacteristi
         direct: list[SubscriptionNode] = [self.id, self.name, self.characteristicRelationship, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker229: None = None
+_breaker230: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__feature__featureRelationship__validFor_subs(SubscriptionNode):
     endDateTime: SubscriptionNode
     startDateTime: SubscriptionNode
@@ -16560,7 +16612,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__feature__featureRelationship_
         direct: list[SubscriptionNode] = [self.endDateTime, self.startDateTime, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker230: None = None
+_breaker231: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__feature__featureRelationship_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     name: SubscriptionNode
@@ -16584,7 +16636,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__feature__featureRelationship_
         direct: list[SubscriptionNode] = [self.id, self.name, self.relationshipType, self.validFor, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker231: None = None
+_breaker232: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__feature__featureRelationship_subs(SubscriptionNode):
     id: SubscriptionNode
     name: SubscriptionNode
@@ -16614,7 +16666,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__feature__featureRelationship_
         direct: list[SubscriptionNode] = [self.id, self.name, self.relationshipType, self.validFor, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker232: None = None
+_breaker233: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__feature_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     isBundle: SubscriptionNode
@@ -16644,7 +16696,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__feature_entry_subs(Subscripti
         direct: list[SubscriptionNode] = [self.id, self.isBundle, self.isEnabled, self.name, self.constraint, self.featureCharacteristic, self.featureRelationship, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker233: None = None
+_breaker234: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__feature_subs(SubscriptionNode):
     id: SubscriptionNode
     isBundle: SubscriptionNode
@@ -16680,7 +16732,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__feature_subs(SubscriptionNode
         direct: list[SubscriptionNode] = [self.id, self.isBundle, self.isEnabled, self.name, self.constraint, self.featureCharacteristic, self.featureRelationship, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker234: None = None
+_breaker235: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__note_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     author: SubscriptionNode
@@ -16704,7 +16756,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__note_entry_subs(SubscriptionN
         direct: list[SubscriptionNode] = [self.id, self.author, self.date, self.text, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker235: None = None
+_breaker236: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__note_subs(SubscriptionNode):
     id: SubscriptionNode
     author: SubscriptionNode
@@ -16734,7 +16786,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__note_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.id, self.author, self.date, self.text, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker236: None = None
+_breaker237: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__place_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     href: SubscriptionNode
@@ -16760,7 +16812,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__place_entry_subs(Subscription
         direct: list[SubscriptionNode] = [self.id, self.href, self.name, self.role, self.baseType, self.schemaLocation, self.type, self.referredType]
         return direct
 
-_breaker237: None = None
+_breaker238: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__place_subs(SubscriptionNode):
     id: SubscriptionNode
     href: SubscriptionNode
@@ -16792,7 +16844,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__place_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.id, self.href, self.name, self.role, self.baseType, self.schemaLocation, self.type, self.referredType]
         return direct
 
-_breaker238: None = None
+_breaker239: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__relatedEntity_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     href: SubscriptionNode
@@ -16818,7 +16870,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__relatedEntity_entry_subs(Subs
         direct: list[SubscriptionNode] = [self.id, self.href, self.name, self.role, self.baseType, self.schemaLocation, self.type, self.referredType]
         return direct
 
-_breaker239: None = None
+_breaker240: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__relatedEntity_subs(SubscriptionNode):
     id: SubscriptionNode
     href: SubscriptionNode
@@ -16850,7 +16902,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__relatedEntity_subs(Subscripti
         direct: list[SubscriptionNode] = [self.id, self.href, self.name, self.role, self.baseType, self.schemaLocation, self.type, self.referredType]
         return direct
 
-_breaker240: None = None
+_breaker241: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__relatedParty_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     href: SubscriptionNode
@@ -16876,7 +16928,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__relatedParty_entry_subs(Subsc
         direct: list[SubscriptionNode] = [self.id, self.href, self.name, self.role, self.baseType, self.schemaLocation, self.type, self.referredType]
         return direct
 
-_breaker241: None = None
+_breaker242: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__relatedParty_subs(SubscriptionNode):
     id: SubscriptionNode
     href: SubscriptionNode
@@ -16908,7 +16960,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__relatedParty_subs(Subscriptio
         direct: list[SubscriptionNode] = [self.id, self.href, self.name, self.role, self.baseType, self.schemaLocation, self.type, self.referredType]
         return direct
 
-_breaker242: None = None
+_breaker243: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__serviceCharacteristic__characteristicRelationship_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     relationshipType: SubscriptionNode
@@ -16928,7 +16980,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__serviceCharacteristic__charac
         direct: list[SubscriptionNode] = [self.id, self.relationshipType, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker243: None = None
+_breaker244: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__serviceCharacteristic__characteristicRelationship_subs(SubscriptionNode):
     id: SubscriptionNode
     relationshipType: SubscriptionNode
@@ -16954,7 +17006,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__serviceCharacteristic__charac
         direct: list[SubscriptionNode] = [self.id, self.relationshipType, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker244: None = None
+_breaker245: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__serviceCharacteristic_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     name: SubscriptionNode
@@ -16976,7 +17028,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__serviceCharacteristic_entry_s
         direct: list[SubscriptionNode] = [self.id, self.name, self.characteristicRelationship, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker245: None = None
+_breaker246: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__serviceCharacteristic_subs(SubscriptionNode):
     id: SubscriptionNode
     name: SubscriptionNode
@@ -17004,7 +17056,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__serviceCharacteristic_subs(Su
         direct: list[SubscriptionNode] = [self.id, self.name, self.characteristicRelationship, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker246: None = None
+_breaker247: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__serviceOrderItem_entry_subs(SubscriptionNode):
     itemId: SubscriptionNode
     role: SubscriptionNode
@@ -17032,7 +17084,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__serviceOrderItem_entry_subs(S
         direct: list[SubscriptionNode] = [self.itemId, self.role, self.serviceOrderHref, self.serviceOrderId, self.itemAction, self.baseType, self.schemaLocation, self.type, self.referredType]
         return direct
 
-_breaker247: None = None
+_breaker248: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__serviceOrderItem_subs(SubscriptionNode):
     itemId: SubscriptionNode
     role: SubscriptionNode
@@ -17066,7 +17118,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__serviceOrderItem_subs(Subscri
         direct: list[SubscriptionNode] = [self.itemId, self.role, self.serviceOrderHref, self.serviceOrderId, self.itemAction, self.baseType, self.schemaLocation, self.type, self.referredType]
         return direct
 
-_breaker248: None = None
+_breaker249: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__serviceRelationship__ServiceRelationshipCharacteristic__characteristicRelationship_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     relationshipType: SubscriptionNode
@@ -17086,7 +17138,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__serviceRelationship__ServiceR
         direct: list[SubscriptionNode] = [self.id, self.relationshipType, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker249: None = None
+_breaker250: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__serviceRelationship__ServiceRelationshipCharacteristic__characteristicRelationship_subs(SubscriptionNode):
     id: SubscriptionNode
     relationshipType: SubscriptionNode
@@ -17112,7 +17164,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__serviceRelationship__ServiceR
         direct: list[SubscriptionNode] = [self.id, self.relationshipType, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker250: None = None
+_breaker251: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__serviceRelationship__ServiceRelationshipCharacteristic_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     name: SubscriptionNode
@@ -17134,7 +17186,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__serviceRelationship__ServiceR
         direct: list[SubscriptionNode] = [self.id, self.name, self.characteristicRelationship, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker251: None = None
+_breaker252: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__serviceRelationship__ServiceRelationshipCharacteristic_subs(SubscriptionNode):
     id: SubscriptionNode
     name: SubscriptionNode
@@ -17162,7 +17214,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__serviceRelationship__ServiceR
         direct: list[SubscriptionNode] = [self.id, self.name, self.characteristicRelationship, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker252: None = None
+_breaker253: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__serviceRelationship_entry_subs(SubscriptionNode):
     service: SubscriptionNode
     relationshipType: SubscriptionNode
@@ -17184,7 +17236,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__serviceRelationship_entry_sub
         direct: list[SubscriptionNode] = [self.service, self.relationshipType, self.ServiceRelationshipCharacteristic, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker253: None = None
+_breaker254: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__serviceRelationship_subs(SubscriptionNode):
     service: SubscriptionNode
     relationshipType: SubscriptionNode
@@ -17212,7 +17264,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__serviceRelationship_subs(Subs
         direct: list[SubscriptionNode] = [self.service, self.relationshipType, self.ServiceRelationshipCharacteristic, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker254: None = None
+_breaker255: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__serviceSpecification_subs(SubscriptionNode):
     id: SubscriptionNode
     href: SubscriptionNode
@@ -17238,7 +17290,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__serviceSpecification_subs(Sub
         direct: list[SubscriptionNode] = [self.id, self.href, self.name, self.version, self.baseType, self.schemaLocation, self.type, self.referredType]
         return direct
 
-_breaker255: None = None
+_breaker256: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__supportingResource_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     href: SubscriptionNode
@@ -17262,7 +17314,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__supportingResource_entry_subs
         direct: list[SubscriptionNode] = [self.id, self.href, self.name, self.baseType, self.schemaLocation, self.type, self.referredType]
         return direct
 
-_breaker256: None = None
+_breaker257: None = None
 class stratoweave_tmf__tmf_store__tmf640__service__supportingResource_subs(SubscriptionNode):
     id: SubscriptionNode
     href: SubscriptionNode
@@ -17292,7 +17344,7 @@ class stratoweave_tmf__tmf_store__tmf640__service__supportingResource_subs(Subsc
         direct: list[SubscriptionNode] = [self.id, self.href, self.name, self.baseType, self.schemaLocation, self.type, self.referredType]
         return direct
 
-_breaker257: None = None
+_breaker258: None = None
 class stratoweave_tmf__tmf_store__tmf640__service_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     href: SubscriptionNode
@@ -17360,7 +17412,7 @@ class stratoweave_tmf__tmf_store__tmf640__service_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.id, self.href, self.category, self.description, self.endDate, self.hasStarted, self.isBundle, self.isServiceEnabled, self.isStateful, self.name, self.serviceDate, self.serviceType, self.startDate, self.startMode, self.feature, self.note, self.place, self.relatedEntity, self.relatedParty, self.serviceCharacteristic, self.serviceOrderItem, self.serviceRelationship, self.serviceSpecification, self.state, self.supportingResource, self.supportingService, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker258: None = None
+_breaker259: None = None
 class stratoweave_tmf__tmf_store__tmf640__service_subs(SubscriptionNode):
     id: SubscriptionNode
     href: SubscriptionNode
@@ -17434,7 +17486,7 @@ class stratoweave_tmf__tmf_store__tmf640__service_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.id, self.href, self.category, self.description, self.endDate, self.hasStarted, self.isBundle, self.isServiceEnabled, self.isStateful, self.name, self.serviceDate, self.serviceType, self.startDate, self.startMode, self.feature, self.note, self.place, self.relatedEntity, self.relatedParty, self.serviceCharacteristic, self.serviceOrderItem, self.serviceRelationship, self.serviceSpecification, self.state, self.supportingResource, self.supportingService, self.baseType, self.schemaLocation, self.type]
         return direct
 
-_breaker259: None = None
+_breaker260: None = None
 class stratoweave_tmf__tmf_store__tmf640_subs(SubscriptionNode):
     service: stratoweave_tmf__tmf_store__tmf640__service_subs
 
@@ -17446,7 +17498,7 @@ class stratoweave_tmf__tmf_store__tmf640_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.service]
         return direct
 
-_breaker260: None = None
+_breaker261: None = None
 class stratoweave_tmf__tmf_store_subs(SubscriptionNode):
     tmf640: stratoweave_tmf__tmf_store__tmf640_subs
 
@@ -17458,7 +17510,7 @@ class stratoweave_tmf__tmf_store_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.tmf640]
         return direct
 
-_breaker261: None = None
+_breaker262: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier_entry_subs(SubscriptionNode):
     id: SubscriptionNode
 
@@ -17470,7 +17522,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud
         direct: list[SubscriptionNode] = [self.id]
         return direct
 
-_breaker262: None = None
+_breaker263: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier_subs(SubscriptionNode):
     id: SubscriptionNode
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -17488,7 +17540,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud
         direct: list[SubscriptionNode] = [self.id]
         return direct
 
-_breaker263: None = None
+_breaker264: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier_entry_subs(SubscriptionNode):
     id: SubscriptionNode
 
@@ -17500,7 +17552,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encry
         direct: list[SubscriptionNode] = [self.id]
         return direct
 
-_breaker264: None = None
+_breaker265: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier_subs(SubscriptionNode):
     id: SubscriptionNode
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -17518,7 +17570,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encry
         direct: list[SubscriptionNode] = [self.id]
         return direct
 
-_breaker265: None = None
+_breaker266: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier_entry_subs(SubscriptionNode):
     id: SubscriptionNode
 
@@ -17530,7 +17582,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_p
         direct: list[SubscriptionNode] = [self.id]
         return direct
 
-_breaker266: None = None
+_breaker267: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_profile_identifier_subs(SubscriptionNode):
     id: SubscriptionNode
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -17548,7 +17600,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__qos_p
         direct: list[SubscriptionNode] = [self.id]
         return direct
 
-_breaker267: None = None
+_breaker268: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier_entry_subs(SubscriptionNode):
     id: SubscriptionNode
 
@@ -17560,7 +17612,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_p
         direct: list[SubscriptionNode] = [self.id]
         return direct
 
-_breaker268: None = None
+_breaker269: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_profile_identifier_subs(SubscriptionNode):
     id: SubscriptionNode
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -17578,7 +17630,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__bfd_p
         direct: list[SubscriptionNode] = [self.id]
         return direct
 
-_breaker269: None = None
+_breaker270: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers_subs(SubscriptionNode):
     cloud_identifier: ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__cloud_identifier_subs
     encryption_profile_identifier: ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers__encryption_profile_identifier_subs
@@ -17596,7 +17648,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers_subs(S
         direct: list[SubscriptionNode] = [self.cloud_identifier, self.encryption_profile_identifier, self.qos_profile_identifier, self.bfd_profile_identifier]
         return direct
 
-_breaker270: None = None
+_breaker271: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles_subs(SubscriptionNode):
     valid_provider_identifiers: ietf_l3vpn_svc__l3vpn_svc__vpn_profiles__valid_provider_identifiers_subs
 
@@ -17608,7 +17660,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_profiles_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.valid_provider_identifiers]
         return direct
 
-_breaker271: None = None
+_breaker272: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access__address_translation__nat44_subs(SubscriptionNode):
     enabled: SubscriptionNode
     nat44_customer_address: SubscriptionNode
@@ -17622,7 +17674,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__clou
         direct: list[SubscriptionNode] = [self.enabled, self.nat44_customer_address]
         return direct
 
-_breaker272: None = None
+_breaker273: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access__address_translation_subs(SubscriptionNode):
     nat44: ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access__address_translation__nat44_subs
 
@@ -17634,7 +17686,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__clou
         direct: list[SubscriptionNode] = [self.nat44]
         return direct
 
-_breaker273: None = None
+_breaker274: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access_entry_subs(SubscriptionNode):
     cloud_identifier: SubscriptionNode
     permit_any: SubscriptionNode
@@ -17654,7 +17706,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__clou
         direct: list[SubscriptionNode] = [self.cloud_identifier, self.permit_any, self.permit_site, self.deny_site, self.address_translation]
         return direct
 
-_breaker274: None = None
+_breaker275: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access_subs(SubscriptionNode):
     cloud_identifier: SubscriptionNode
     permit_any: SubscriptionNode
@@ -17680,7 +17732,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__clou
         direct: list[SubscriptionNode] = [self.cloud_identifier, self.permit_any, self.permit_site, self.deny_site, self.address_translation]
         return direct
 
-_breaker275: None = None
+_breaker276: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses_subs(SubscriptionNode):
     cloud_access: ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses__cloud_access_subs
 
@@ -17692,7 +17744,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__cloud_accesses_subs(
         direct: list[SubscriptionNode] = [self.cloud_access]
         return direct
 
-_breaker276: None = None
+_breaker277: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors_subs(SubscriptionNode):
     tree_flavor: SubscriptionNode
 
@@ -17704,7 +17756,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_
         direct: list[SubscriptionNode] = [self.tree_flavor]
         return direct
 
-_breaker277: None = None
+_breaker278: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__provider_managed_subs(SubscriptionNode):
     enabled: SubscriptionNode
     rp_redundancy: SubscriptionNode
@@ -17720,7 +17772,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
         direct: list[SubscriptionNode] = [self.enabled, self.rp_redundancy, self.optimal_traffic_delivery]
         return direct
 
-_breaker278: None = None
+_breaker279: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     group_address: SubscriptionNode
@@ -17738,7 +17790,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
         direct: list[SubscriptionNode] = [self.id, self.group_address, self.group_start, self.group_end]
         return direct
 
-_breaker279: None = None
+_breaker280: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group_subs(SubscriptionNode):
     id: SubscriptionNode
     group_address: SubscriptionNode
@@ -17762,7 +17814,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
         direct: list[SubscriptionNode] = [self.id, self.group_address, self.group_start, self.group_end]
         return direct
 
-_breaker280: None = None
+_breaker281: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups_subs(SubscriptionNode):
     group: ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__groups__group_subs
 
@@ -17774,7 +17826,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
         direct: list[SubscriptionNode] = [self.group]
         return direct
 
-_breaker281: None = None
+_breaker282: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     provider_managed: ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__provider_managed_subs
@@ -17792,7 +17844,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
         direct: list[SubscriptionNode] = [self.id, self.provider_managed, self.rp_address, self.groups]
         return direct
 
-_breaker282: None = None
+_breaker283: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping_subs(SubscriptionNode):
     id: SubscriptionNode
     provider_managed: ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping__provider_managed_subs
@@ -17816,7 +17868,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
         direct: list[SubscriptionNode] = [self.id, self.provider_managed, self.rp_address, self.groups]
         return direct
 
-_breaker283: None = None
+_breaker284: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings_subs(SubscriptionNode):
     rp_group_mapping: ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings__rp_group_mapping_subs
 
@@ -17828,7 +17880,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_gr
         direct: list[SubscriptionNode] = [self.rp_group_mapping]
         return direct
 
-_breaker284: None = None
+_breaker285: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__bsr_candidates_subs(SubscriptionNode):
     bsr_candidate_address: SubscriptionNode
 
@@ -17840,7 +17892,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_di
         direct: list[SubscriptionNode] = [self.bsr_candidate_address]
         return direct
 
-_breaker285: None = None
+_breaker286: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery_subs(SubscriptionNode):
     rp_discovery_type: SubscriptionNode
     bsr_candidates: ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery__bsr_candidates_subs
@@ -17854,7 +17906,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_di
         direct: list[SubscriptionNode] = [self.rp_discovery_type, self.bsr_candidates]
         return direct
 
-_breaker286: None = None
+_breaker287: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp_subs(SubscriptionNode):
     rp_group_mappings: ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_group_mappings_subs
     rp_discovery: ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp__rp_discovery_subs
@@ -17868,7 +17920,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__rp_subs(S
         direct: list[SubscriptionNode] = [self.rp_group_mappings, self.rp_discovery]
         return direct
 
-_breaker287: None = None
+_breaker288: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast_subs(SubscriptionNode):
     enabled: SubscriptionNode
     customer_tree_flavors: ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast__customer_tree_flavors_subs
@@ -17884,7 +17936,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__multicast_subs(Subsc
         direct: list[SubscriptionNode] = [self.enabled, self.customer_tree_flavors, self.rp]
         return direct
 
-_breaker288: None = None
+_breaker289: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn_entry_subs(SubscriptionNode):
     vpn_id: SubscriptionNode
     local_sites_role: SubscriptionNode
@@ -17898,7 +17950,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extra
         direct: list[SubscriptionNode] = [self.vpn_id, self.local_sites_role]
         return direct
 
-_breaker289: None = None
+_breaker290: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn_subs(SubscriptionNode):
     vpn_id: SubscriptionNode
     local_sites_role: SubscriptionNode
@@ -17918,7 +17970,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extra
         direct: list[SubscriptionNode] = [self.vpn_id, self.local_sites_role]
         return direct
 
-_breaker290: None = None
+_breaker291: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns_subs(SubscriptionNode):
     extranet_vpn: ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns__extranet_vpn_subs
 
@@ -17930,7 +17982,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service__extranet_vpns_subs(S
         direct: list[SubscriptionNode] = [self.extranet_vpn]
         return direct
 
-_breaker291: None = None
+_breaker292: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry_subs(SubscriptionNode):
     vpn_id: SubscriptionNode
     customer_name: SubscriptionNode
@@ -17954,7 +18006,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry_subs(Subscripti
         direct: list[SubscriptionNode] = [self.vpn_id, self.customer_name, self.vpn_service_topology, self.cloud_accesses, self.multicast, self.carrierscarrier, self.extranet_vpns]
         return direct
 
-_breaker292: None = None
+_breaker293: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_subs(SubscriptionNode):
     vpn_id: SubscriptionNode
     customer_name: SubscriptionNode
@@ -17984,7 +18036,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_subs(SubscriptionNode
         direct: list[SubscriptionNode] = [self.vpn_id, self.customer_name, self.vpn_service_topology, self.cloud_accesses, self.multicast, self.carrierscarrier, self.extranet_vpns]
         return direct
 
-_breaker293: None = None
+_breaker294: None = None
 class ietf_l3vpn_svc__l3vpn_svc__vpn_services_subs(SubscriptionNode):
     vpn_service: ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_subs
 
@@ -17996,7 +18048,7 @@ class ietf_l3vpn_svc__l3vpn_svc__vpn_services_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.vpn_service]
         return direct
 
-_breaker294: None = None
+_breaker295: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location_entry_subs(SubscriptionNode):
     location_id: SubscriptionNode
     address: SubscriptionNode
@@ -18018,7 +18070,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location_entry_subs(Sub
         direct: list[SubscriptionNode] = [self.location_id, self.address, self.postal_code, self.state, self.city, self.country_code]
         return direct
 
-_breaker295: None = None
+_breaker296: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location_subs(SubscriptionNode):
     location_id: SubscriptionNode
     address: SubscriptionNode
@@ -18046,7 +18098,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location_subs(Subscript
         direct: list[SubscriptionNode] = [self.location_id, self.address, self.postal_code, self.state, self.city, self.country_code]
         return direct
 
-_breaker296: None = None
+_breaker297: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__locations_subs(SubscriptionNode):
     location: ietf_l3vpn_svc__l3vpn_svc__sites__site__locations__location_subs
 
@@ -18058,7 +18110,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__locations_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.location]
         return direct
 
-_breaker297: None = None
+_breaker298: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device__management_subs(SubscriptionNode):
     address_family: SubscriptionNode
     address: SubscriptionNode
@@ -18072,7 +18124,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device__management_subs(S
         direct: list[SubscriptionNode] = [self.address_family, self.address]
         return direct
 
-_breaker298: None = None
+_breaker299: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_entry_subs(SubscriptionNode):
     device_id: SubscriptionNode
     location: SubscriptionNode
@@ -18088,7 +18140,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_entry_subs(Subscri
         direct: list[SubscriptionNode] = [self.device_id, self.location, self.management]
         return direct
 
-_breaker299: None = None
+_breaker300: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_subs(SubscriptionNode):
     device_id: SubscriptionNode
     location: SubscriptionNode
@@ -18110,7 +18162,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_subs(SubscriptionN
         direct: list[SubscriptionNode] = [self.device_id, self.location, self.management]
         return direct
 
-_breaker300: None = None
+_breaker301: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__devices_subs(SubscriptionNode):
     device: ietf_l3vpn_svc__l3vpn_svc__sites__site__devices__device_subs
 
@@ -18122,7 +18174,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__devices_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.device]
         return direct
 
-_breaker301: None = None
+_breaker302: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group_entry_subs(SubscriptionNode):
     group_id: SubscriptionNode
 
@@ -18134,7 +18186,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group_entr
         direct: list[SubscriptionNode] = [self.group_id]
         return direct
 
-_breaker302: None = None
+_breaker303: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group_subs(SubscriptionNode):
     group_id: SubscriptionNode
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -18152,7 +18204,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group_subs
         direct: list[SubscriptionNode] = [self.group_id]
         return direct
 
-_breaker303: None = None
+_breaker304: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups_subs(SubscriptionNode):
     group: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups__group_subs
 
@@ -18164,7 +18216,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups_subs(Subscr
         direct: list[SubscriptionNode] = [self.group]
         return direct
 
-_breaker304: None = None
+_breaker305: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity_subs(SubscriptionNode):
     groups: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity__groups_subs
 
@@ -18176,7 +18228,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_diversity_subs(SubscriptionNo
         direct: list[SubscriptionNode] = [self.groups]
         return direct
 
-_breaker305: None = None
+_breaker306: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__management_subs(SubscriptionNode):
     type: SubscriptionNode
 
@@ -18188,7 +18240,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__management_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.type]
         return direct
 
-_breaker306: None = None
+_breaker307: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter_entry_subs(SubscriptionNode):
     type: SubscriptionNode
     lan_tag: SubscriptionNode
@@ -18206,7 +18258,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
         direct: list[SubscriptionNode] = [self.type, self.lan_tag, self.ipv4_lan_prefix, self.ipv6_lan_prefix]
         return direct
 
-_breaker307: None = None
+_breaker308: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter_subs(SubscriptionNode):
     type: SubscriptionNode
     lan_tag: SubscriptionNode
@@ -18230,7 +18282,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
         direct: list[SubscriptionNode] = [self.type, self.lan_tag, self.ipv4_lan_prefix, self.ipv6_lan_prefix]
         return direct
 
-_breaker308: None = None
+_breaker309: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters_subs(SubscriptionNode):
     filter: ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters__filter_subs
 
@@ -18242,7 +18294,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
         direct: list[SubscriptionNode] = [self.filter]
         return direct
 
-_breaker309: None = None
+_breaker310: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn_entry_subs(SubscriptionNode):
     vpn_id: SubscriptionNode
     site_role: SubscriptionNode
@@ -18256,7 +18308,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
         direct: list[SubscriptionNode] = [self.vpn_id, self.site_role]
         return direct
 
-_breaker310: None = None
+_breaker311: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__vpn_subs(SubscriptionNode):
     vpn_id: SubscriptionNode
     site_role: SubscriptionNode
@@ -18276,7 +18328,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
         direct: list[SubscriptionNode] = [self.vpn_id, self.site_role]
         return direct
 
-_breaker311: None = None
+_breaker312: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     filters: ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters_subs
@@ -18292,7 +18344,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
         direct: list[SubscriptionNode] = [self.id, self.filters, self.vpn]
         return direct
 
-_breaker312: None = None
+_breaker313: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_subs(SubscriptionNode):
     id: SubscriptionNode
     filters: ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries__filters_subs
@@ -18314,7 +18366,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_
         direct: list[SubscriptionNode] = [self.id, self.filters, self.vpn]
         return direct
 
-_breaker313: None = None
+_breaker314: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy_entry_subs(SubscriptionNode):
     vpn_policy_id: SubscriptionNode
     entries: ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_subs
@@ -18328,7 +18380,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy_entry_sub
         direct: list[SubscriptionNode] = [self.vpn_policy_id, self.entries]
         return direct
 
-_breaker314: None = None
+_breaker315: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy_subs(SubscriptionNode):
     vpn_policy_id: SubscriptionNode
     entries: ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy__entries_subs
@@ -18348,7 +18400,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy_subs(Subs
         direct: list[SubscriptionNode] = [self.vpn_policy_id, self.entries]
         return direct
 
-_breaker315: None = None
+_breaker316: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies_subs(SubscriptionNode):
     vpn_policy: ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies__vpn_policy_subs
 
@@ -18360,7 +18412,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__vpn_policies_subs(SubscriptionNode
         direct: list[SubscriptionNode] = [self.vpn_policy]
         return direct
 
-_breaker316: None = None
+_breaker317: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family_entry_subs(SubscriptionNode):
     af: SubscriptionNode
     maximum_routes: SubscriptionNode
@@ -18374,7 +18426,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family_ent
         direct: list[SubscriptionNode] = [self.af, self.maximum_routes]
         return direct
 
-_breaker317: None = None
+_breaker318: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family_subs(SubscriptionNode):
     af: SubscriptionNode
     maximum_routes: SubscriptionNode
@@ -18394,7 +18446,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family_sub
         direct: list[SubscriptionNode] = [self.af, self.maximum_routes]
         return direct
 
-_breaker318: None = None
+_breaker319: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes_subs(SubscriptionNode):
     address_family: ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes__address_family_subs
 
@@ -18406,7 +18458,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__maximum_routes_subs(SubscriptionNo
         direct: list[SubscriptionNode] = [self.address_family]
         return direct
 
-_breaker319: None = None
+_breaker320: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__security__authentication_subs(SubscriptionNode):
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -18416,7 +18468,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__security__authentication_subs(Subs
         direct: list[SubscriptionNode] = []
         return direct
 
-_breaker320: None = None
+_breaker321: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__security__encryption__encryption_profile_subs(SubscriptionNode):
     profile_name: SubscriptionNode
     algorithm: SubscriptionNode
@@ -18432,7 +18484,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__security__encryption__encryption_p
         direct: list[SubscriptionNode] = [self.profile_name, self.algorithm, self.preshared_key]
         return direct
 
-_breaker321: None = None
+_breaker322: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__security__encryption_subs(SubscriptionNode):
     enabled: SubscriptionNode
     layer: SubscriptionNode
@@ -18448,7 +18500,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__security__encryption_subs(Subscrip
         direct: list[SubscriptionNode] = [self.enabled, self.layer, self.encryption_profile]
         return direct
 
-_breaker322: None = None
+_breaker323: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__security_subs(SubscriptionNode):
     authentication: ietf_l3vpn_svc__l3vpn_svc__sites__site__security__authentication_subs
     encryption: ietf_l3vpn_svc__l3vpn_svc__sites__site__security__encryption_subs
@@ -18462,7 +18514,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__security_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.authentication, self.encryption]
         return direct
 
-_breaker323: None = None
+_breaker324: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow__l4_src_port_range_subs(SubscriptionNode):
     lower_port: SubscriptionNode
     upper_port: SubscriptionNode
@@ -18476,7 +18528,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_p
         direct: list[SubscriptionNode] = [self.lower_port, self.upper_port]
         return direct
 
-_breaker324: None = None
+_breaker325: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow__l4_dst_port_range_subs(SubscriptionNode):
     lower_port: SubscriptionNode
     upper_port: SubscriptionNode
@@ -18490,7 +18542,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_p
         direct: list[SubscriptionNode] = [self.lower_port, self.upper_port]
         return direct
 
-_breaker325: None = None
+_breaker326: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow_subs(SubscriptionNode):
     dscp: SubscriptionNode
     dot1p: SubscriptionNode
@@ -18524,7 +18576,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_p
         direct: list[SubscriptionNode] = [self.dscp, self.dot1p, self.ipv4_src_prefix, self.ipv6_src_prefix, self.ipv4_dst_prefix, self.ipv6_dst_prefix, self.l4_src_port, self.target_sites, self.l4_src_port_range, self.l4_dst_port, self.l4_dst_port_range, self.protocol_field]
         return direct
 
-_breaker326: None = None
+_breaker327: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     match_flow: ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow_subs
@@ -18542,7 +18594,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_p
         direct: list[SubscriptionNode] = [self.id, self.match_flow, self.match_application, self.target_class_id]
         return direct
 
-_breaker327: None = None
+_breaker328: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule_subs(SubscriptionNode):
     id: SubscriptionNode
     match_flow: ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule__match_flow_subs
@@ -18566,7 +18618,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_p
         direct: list[SubscriptionNode] = [self.id, self.match_flow, self.match_application, self.target_class_id]
         return direct
 
-_breaker328: None = None
+_breaker329: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy_subs(SubscriptionNode):
     rule: ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy__rule_subs
 
@@ -18578,7 +18630,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_p
         direct: list[SubscriptionNode] = [self.rule]
         return direct
 
-_breaker329: None = None
+_breaker330: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__latency_subs(SubscriptionNode):
     use_lowest_latency: SubscriptionNode
     latency_boundary: SubscriptionNode
@@ -18592,7 +18644,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes
         direct: list[SubscriptionNode] = [self.use_lowest_latency, self.latency_boundary]
         return direct
 
-_breaker330: None = None
+_breaker331: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__jitter_subs(SubscriptionNode):
     use_lowest_jitter: SubscriptionNode
     latency_boundary: SubscriptionNode
@@ -18606,7 +18658,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes
         direct: list[SubscriptionNode] = [self.use_lowest_jitter, self.latency_boundary]
         return direct
 
-_breaker331: None = None
+_breaker332: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class__bandwidth_subs(SubscriptionNode):
     guaranteed_bw_percent: SubscriptionNode
     end_to_end: SubscriptionNode
@@ -18620,7 +18672,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes
         direct: list[SubscriptionNode] = [self.guaranteed_bw_percent, self.end_to_end]
         return direct
 
-_breaker332: None = None
+_breaker333: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class_entry_subs(SubscriptionNode):
     class_id: SubscriptionNode
     direction: SubscriptionNode
@@ -18642,7 +18694,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes
         direct: list[SubscriptionNode] = [self.class_id, self.direction, self.rate_limit, self.latency, self.jitter, self.bandwidth]
         return direct
 
-_breaker333: None = None
+_breaker334: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class_subs(SubscriptionNode):
     class_id: SubscriptionNode
     direction: SubscriptionNode
@@ -18670,7 +18722,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes
         direct: list[SubscriptionNode] = [self.class_id, self.direction, self.rate_limit, self.latency, self.jitter, self.bandwidth]
         return direct
 
-_breaker334: None = None
+_breaker335: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes_subs(SubscriptionNode):
     class_: ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes__class_subs
 
@@ -18682,7 +18734,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes
         direct: list[SubscriptionNode] = [self.class_]
         return direct
 
-_breaker335: None = None
+_breaker336: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile_subs(SubscriptionNode):
     profile: SubscriptionNode
     classes: ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile__classes_subs
@@ -18696,7 +18748,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile_subs(Sub
         direct: list[SubscriptionNode] = [self.profile, self.classes]
         return direct
 
-_breaker336: None = None
+_breaker337: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos_subs(SubscriptionNode):
     qos_classification_policy: ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_classification_policy_subs
     qos_profile: ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos__qos_profile_subs
@@ -18710,7 +18762,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos_subs(SubscriptionNode
         direct: list[SubscriptionNode] = [self.qos_classification_policy, self.qos_profile]
         return direct
 
-_breaker337: None = None
+_breaker338: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__carrierscarrier_subs(SubscriptionNode):
     signalling_type: SubscriptionNode
 
@@ -18722,7 +18774,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__carrierscarrier_subs(Subs
         direct: list[SubscriptionNode] = [self.signalling_type]
         return direct
 
-_breaker338: None = None
+_breaker339: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__multicast__multicast_address_family_subs(SubscriptionNode):
     ipv4: SubscriptionNode
     ipv6: SubscriptionNode
@@ -18736,7 +18788,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__multicast__multicast_addr
         direct: list[SubscriptionNode] = [self.ipv4, self.ipv6]
         return direct
 
-_breaker339: None = None
+_breaker340: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__multicast_subs(SubscriptionNode):
     multicast_site_type: SubscriptionNode
     multicast_address_family: ietf_l3vpn_svc__l3vpn_svc__sites__site__service__multicast__multicast_address_family_subs
@@ -18752,7 +18804,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service__multicast_subs(Subscripti
         direct: list[SubscriptionNode] = [self.multicast_site_type, self.multicast_address_family, self.protocol_type]
         return direct
 
-_breaker340: None = None
+_breaker341: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__service_subs(SubscriptionNode):
     qos: ietf_l3vpn_svc__l3vpn_svc__sites__site__service__qos_subs
     carrierscarrier: ietf_l3vpn_svc__l3vpn_svc__sites__site__service__carrierscarrier_subs
@@ -18768,7 +18820,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__service_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.qos, self.carrierscarrier, self.multicast]
         return direct
 
-_breaker341: None = None
+_breaker342: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection_subs(SubscriptionNode):
     enabled: SubscriptionNode
 
@@ -18780,7 +18832,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__traffic_protection_subs(Subscripti
         direct: list[SubscriptionNode] = [self.enabled]
         return direct
 
-_breaker342: None = None
+_breaker343: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link_entry_subs(SubscriptionNode):
     target_site: SubscriptionNode
     metric: SubscriptionNode
@@ -18794,7 +18846,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         direct: list[SubscriptionNode] = [self.target_site, self.metric]
         return direct
 
-_breaker343: None = None
+_breaker344: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link_subs(SubscriptionNode):
     target_site: SubscriptionNode
     metric: SubscriptionNode
@@ -18814,7 +18866,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         direct: list[SubscriptionNode] = [self.target_site, self.metric]
         return direct
 
-_breaker344: None = None
+_breaker345: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links_subs(SubscriptionNode):
     sham_link: ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf__sham_links__sham_link_subs
 
@@ -18826,7 +18878,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         direct: list[SubscriptionNode] = [self.sham_link]
         return direct
 
-_breaker345: None = None
+_breaker346: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf_subs(SubscriptionNode):
     address_family: SubscriptionNode
     area_address: SubscriptionNode
@@ -18844,7 +18896,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         direct: list[SubscriptionNode] = [self.address_family, self.area_address, self.metric, self.sham_links]
         return direct
 
-_breaker346: None = None
+_breaker347: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__bgp_subs(SubscriptionNode):
     autonomous_system: SubscriptionNode
     address_family: SubscriptionNode
@@ -18858,7 +18910,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         direct: list[SubscriptionNode] = [self.autonomous_system, self.address_family]
         return direct
 
-_breaker347: None = None
+_breaker348: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_entry_subs(SubscriptionNode):
     lan: SubscriptionNode
     next_hop: SubscriptionNode
@@ -18874,7 +18926,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         direct: list[SubscriptionNode] = [self.lan, self.next_hop, self.lan_tag]
         return direct
 
-_breaker348: None = None
+_breaker349: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_subs(SubscriptionNode):
     lan: SubscriptionNode
     next_hop: SubscriptionNode
@@ -18897,7 +18949,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         direct: list[SubscriptionNode] = [self.lan, self.next_hop, self.lan_tag]
         return direct
 
-_breaker349: None = None
+_breaker350: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_entry_subs(SubscriptionNode):
     lan: SubscriptionNode
     next_hop: SubscriptionNode
@@ -18913,7 +18965,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         direct: list[SubscriptionNode] = [self.lan, self.next_hop, self.lan_tag]
         return direct
 
-_breaker350: None = None
+_breaker351: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_subs(SubscriptionNode):
     lan: SubscriptionNode
     next_hop: SubscriptionNode
@@ -18936,7 +18988,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         direct: list[SubscriptionNode] = [self.lan, self.next_hop, self.lan_tag]
         return direct
 
-_breaker351: None = None
+_breaker352: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes_subs(SubscriptionNode):
     ipv4_lan_prefixes: ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_subs
     ipv6_lan_prefixes: ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_subs
@@ -18950,7 +19002,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         direct: list[SubscriptionNode] = [self.ipv4_lan_prefixes, self.ipv6_lan_prefixes]
         return direct
 
-_breaker352: None = None
+_breaker353: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static_subs(SubscriptionNode):
     cascaded_lan_prefixes: ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__static__cascaded_lan_prefixes_subs
 
@@ -18962,7 +19014,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         direct: list[SubscriptionNode] = [self.cascaded_lan_prefixes]
         return direct
 
-_breaker353: None = None
+_breaker354: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__rip_subs(SubscriptionNode):
     address_family: SubscriptionNode
 
@@ -18974,7 +19026,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         direct: list[SubscriptionNode] = [self.address_family]
         return direct
 
-_breaker354: None = None
+_breaker355: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__vrrp_subs(SubscriptionNode):
     address_family: SubscriptionNode
 
@@ -18986,7 +19038,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         direct: list[SubscriptionNode] = [self.address_family]
         return direct
 
-_breaker355: None = None
+_breaker356: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol_entry_subs(SubscriptionNode):
     type: SubscriptionNode
     ospf: ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf_subs
@@ -19008,7 +19060,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         direct: list[SubscriptionNode] = [self.type, self.ospf, self.bgp, self.static, self.rip, self.vrrp]
         return direct
 
-_breaker356: None = None
+_breaker357: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol_subs(SubscriptionNode):
     type: SubscriptionNode
     ospf: ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol__ospf_subs
@@ -19036,7 +19088,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protoco
         direct: list[SubscriptionNode] = [self.type, self.ospf, self.bgp, self.static, self.rip, self.vrrp]
         return direct
 
-_breaker357: None = None
+_breaker358: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols_subs(SubscriptionNode):
     routing_protocol: ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols__routing_protocol_subs
 
@@ -19048,7 +19100,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__routing_protocols_subs(Subscriptio
         direct: list[SubscriptionNode] = [self.routing_protocol]
         return direct
 
-_breaker358: None = None
+_breaker359: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group_entry_subs(SubscriptionNode):
     group_id: SubscriptionNode
 
@@ -19060,7 +19112,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.group_id]
         return direct
 
-_breaker359: None = None
+_breaker360: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group_subs(SubscriptionNode):
     group_id: SubscriptionNode
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -19078,7 +19130,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.group_id]
         return direct
 
-_breaker360: None = None
+_breaker361: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups_subs(SubscriptionNode):
     group: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups__group_subs
 
@@ -19090,7 +19142,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.group]
         return direct
 
-_breaker361: None = None
+_breaker362: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group_entry_subs(SubscriptionNode):
     group_id: SubscriptionNode
 
@@ -19102,7 +19154,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.group_id]
         return direct
 
-_breaker362: None = None
+_breaker363: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group_subs(SubscriptionNode):
     group_id: SubscriptionNode
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -19120,7 +19172,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.group_id]
         return direct
 
-_breaker363: None = None
+_breaker364: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target_subs(SubscriptionNode):
     group: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target__group_subs
     all_other_accesses: SubscriptionNode
@@ -19136,7 +19188,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.group, self.all_other_accesses, self.all_other_groups]
         return direct
 
-_breaker364: None = None
+_breaker365: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint_entry_subs(SubscriptionNode):
     constraint_type: SubscriptionNode
     target: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target_subs
@@ -19150,7 +19202,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.constraint_type, self.target]
         return direct
 
-_breaker365: None = None
+_breaker366: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint_subs(SubscriptionNode):
     constraint_type: SubscriptionNode
     target: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint__target_subs
@@ -19170,7 +19222,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.constraint_type, self.target]
         return direct
 
-_breaker366: None = None
+_breaker367: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints_subs(SubscriptionNode):
     constraint: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints__constraint_subs
 
@@ -19182,7 +19234,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.constraint]
         return direct
 
-_breaker367: None = None
+_breaker368: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity_subs(SubscriptionNode):
     groups: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__groups_subs
     constraints: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__access_diversity__constraints_subs
@@ -19196,7 +19248,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.groups, self.constraints]
         return direct
 
-_breaker368: None = None
+_breaker369: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__bearer__requested_type_subs(SubscriptionNode):
     requested_type: SubscriptionNode
     strict: SubscriptionNode
@@ -19210,7 +19262,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.requested_type, self.strict]
         return direct
 
-_breaker369: None = None
+_breaker370: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__bearer_subs(SubscriptionNode):
     requested_type: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__bearer__requested_type_subs
     always_on: SubscriptionNode
@@ -19226,7 +19278,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.requested_type, self.always_on, self.bearer_reference]
         return direct
 
-_breaker370: None = None
+_breaker371: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group_entry_subs(SubscriptionNode):
     group_id: SubscriptionNode
     start_address: SubscriptionNode
@@ -19242,7 +19294,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.group_id, self.start_address, self.end_address]
         return direct
 
-_breaker371: None = None
+_breaker372: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group_subs(SubscriptionNode):
     group_id: SubscriptionNode
     start_address: SubscriptionNode
@@ -19264,7 +19316,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.group_id, self.start_address, self.end_address]
         return direct
 
-_breaker372: None = None
+_breaker373: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses_subs(SubscriptionNode):
     address_group: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp__customer_addresses__address_group_subs
 
@@ -19276,7 +19328,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.address_group]
         return direct
 
-_breaker373: None = None
+_breaker374: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp_subs(SubscriptionNode):
     provider_address: SubscriptionNode
     prefix_length: SubscriptionNode
@@ -19294,7 +19346,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.provider_address, self.prefix_length, self.number_of_dynamic_address, self.customer_addresses]
         return direct
 
-_breaker374: None = None
+_breaker375: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__dhcp_relay__customer_dhcp_servers_subs(SubscriptionNode):
     server_ip_address: SubscriptionNode
 
@@ -19306,7 +19358,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.server_ip_address]
         return direct
 
-_breaker375: None = None
+_breaker376: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__dhcp_relay_subs(SubscriptionNode):
     provider_address: SubscriptionNode
     prefix_length: SubscriptionNode
@@ -19322,7 +19374,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.provider_address, self.prefix_length, self.customer_dhcp_servers]
         return direct
 
-_breaker376: None = None
+_breaker377: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__addresses_subs(SubscriptionNode):
     provider_address: SubscriptionNode
     customer_address: SubscriptionNode
@@ -19338,7 +19390,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.provider_address, self.customer_address, self.prefix_length]
         return direct
 
-_breaker377: None = None
+_breaker378: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4_subs(SubscriptionNode):
     address_allocation_type: SubscriptionNode
     provider_dhcp: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4__provider_dhcp_subs
@@ -19356,7 +19408,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.address_allocation_type, self.provider_dhcp, self.dhcp_relay, self.addresses]
         return direct
 
-_breaker378: None = None
+_breaker379: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group_entry_subs(SubscriptionNode):
     group_id: SubscriptionNode
     start_address: SubscriptionNode
@@ -19372,7 +19424,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.group_id, self.start_address, self.end_address]
         return direct
 
-_breaker379: None = None
+_breaker380: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group_subs(SubscriptionNode):
     group_id: SubscriptionNode
     start_address: SubscriptionNode
@@ -19394,7 +19446,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.group_id, self.start_address, self.end_address]
         return direct
 
-_breaker380: None = None
+_breaker381: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses_subs(SubscriptionNode):
     address_group: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp__customer_addresses__address_group_subs
 
@@ -19406,7 +19458,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.address_group]
         return direct
 
-_breaker381: None = None
+_breaker382: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp_subs(SubscriptionNode):
     provider_address: SubscriptionNode
     prefix_length: SubscriptionNode
@@ -19424,7 +19476,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.provider_address, self.prefix_length, self.number_of_dynamic_address, self.customer_addresses]
         return direct
 
-_breaker382: None = None
+_breaker383: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__dhcp_relay__customer_dhcp_servers_subs(SubscriptionNode):
     server_ip_address: SubscriptionNode
 
@@ -19436,7 +19488,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.server_ip_address]
         return direct
 
-_breaker383: None = None
+_breaker384: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__dhcp_relay_subs(SubscriptionNode):
     provider_address: SubscriptionNode
     prefix_length: SubscriptionNode
@@ -19452,7 +19504,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.provider_address, self.prefix_length, self.customer_dhcp_servers]
         return direct
 
-_breaker384: None = None
+_breaker385: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__addresses_subs(SubscriptionNode):
     provider_address: SubscriptionNode
     customer_address: SubscriptionNode
@@ -19468,7 +19520,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.provider_address, self.customer_address, self.prefix_length]
         return direct
 
-_breaker385: None = None
+_breaker386: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6_subs(SubscriptionNode):
     address_allocation_type: SubscriptionNode
     provider_dhcp: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6__provider_dhcp_subs
@@ -19486,7 +19538,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.address_allocation_type, self.provider_dhcp, self.dhcp_relay, self.addresses]
         return direct
 
-_breaker386: None = None
+_breaker387: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__oam__bfd_subs(SubscriptionNode):
     enabled: SubscriptionNode
     fixed_value: SubscriptionNode
@@ -19502,7 +19554,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.enabled, self.fixed_value, self.profile_name]
         return direct
 
-_breaker387: None = None
+_breaker388: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__oam_subs(SubscriptionNode):
     bfd: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__oam__bfd_subs
 
@@ -19514,7 +19566,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.bfd]
         return direct
 
-_breaker388: None = None
+_breaker389: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection_subs(SubscriptionNode):
     ipv4: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv4_subs
     ipv6: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__ip_connection__ipv6_subs
@@ -19530,7 +19582,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.ipv4, self.ipv6, self.oam]
         return direct
 
-_breaker389: None = None
+_breaker390: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__authentication_subs(SubscriptionNode):
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -19540,7 +19592,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = []
         return direct
 
-_breaker390: None = None
+_breaker391: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__encryption__encryption_profile_subs(SubscriptionNode):
     profile_name: SubscriptionNode
     algorithm: SubscriptionNode
@@ -19556,7 +19608,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.profile_name, self.algorithm, self.preshared_key]
         return direct
 
-_breaker391: None = None
+_breaker392: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__encryption_subs(SubscriptionNode):
     enabled: SubscriptionNode
     layer: SubscriptionNode
@@ -19572,7 +19624,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.enabled, self.layer, self.encryption_profile]
         return direct
 
-_breaker392: None = None
+_breaker393: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security_subs(SubscriptionNode):
     authentication: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__authentication_subs
     encryption: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__security__encryption_subs
@@ -19586,7 +19638,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.authentication, self.encryption]
         return direct
 
-_breaker393: None = None
+_breaker394: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow__l4_src_port_range_subs(SubscriptionNode):
     lower_port: SubscriptionNode
     upper_port: SubscriptionNode
@@ -19600,7 +19652,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.lower_port, self.upper_port]
         return direct
 
-_breaker394: None = None
+_breaker395: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow__l4_dst_port_range_subs(SubscriptionNode):
     lower_port: SubscriptionNode
     upper_port: SubscriptionNode
@@ -19614,7 +19666,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.lower_port, self.upper_port]
         return direct
 
-_breaker395: None = None
+_breaker396: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow_subs(SubscriptionNode):
     dscp: SubscriptionNode
     dot1p: SubscriptionNode
@@ -19648,7 +19700,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.dscp, self.dot1p, self.ipv4_src_prefix, self.ipv6_src_prefix, self.ipv4_dst_prefix, self.ipv6_dst_prefix, self.l4_src_port, self.target_sites, self.l4_src_port_range, self.l4_dst_port, self.l4_dst_port_range, self.protocol_field]
         return direct
 
-_breaker396: None = None
+_breaker397: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule_entry_subs(SubscriptionNode):
     id: SubscriptionNode
     match_flow: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow_subs
@@ -19666,7 +19718,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.id, self.match_flow, self.match_application, self.target_class_id]
         return direct
 
-_breaker397: None = None
+_breaker398: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule_subs(SubscriptionNode):
     id: SubscriptionNode
     match_flow: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule__match_flow_subs
@@ -19690,7 +19742,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.id, self.match_flow, self.match_application, self.target_class_id]
         return direct
 
-_breaker398: None = None
+_breaker399: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy_subs(SubscriptionNode):
     rule: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy__rule_subs
 
@@ -19702,7 +19754,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.rule]
         return direct
 
-_breaker399: None = None
+_breaker400: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__latency_subs(SubscriptionNode):
     use_lowest_latency: SubscriptionNode
     latency_boundary: SubscriptionNode
@@ -19716,7 +19768,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.use_lowest_latency, self.latency_boundary]
         return direct
 
-_breaker400: None = None
+_breaker401: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__jitter_subs(SubscriptionNode):
     use_lowest_jitter: SubscriptionNode
     latency_boundary: SubscriptionNode
@@ -19730,7 +19782,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.use_lowest_jitter, self.latency_boundary]
         return direct
 
-_breaker401: None = None
+_breaker402: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class__bandwidth_subs(SubscriptionNode):
     guaranteed_bw_percent: SubscriptionNode
     end_to_end: SubscriptionNode
@@ -19744,7 +19796,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.guaranteed_bw_percent, self.end_to_end]
         return direct
 
-_breaker402: None = None
+_breaker403: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class_entry_subs(SubscriptionNode):
     class_id: SubscriptionNode
     direction: SubscriptionNode
@@ -19766,7 +19818,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.class_id, self.direction, self.rate_limit, self.latency, self.jitter, self.bandwidth]
         return direct
 
-_breaker403: None = None
+_breaker404: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class_subs(SubscriptionNode):
     class_id: SubscriptionNode
     direction: SubscriptionNode
@@ -19794,7 +19846,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.class_id, self.direction, self.rate_limit, self.latency, self.jitter, self.bandwidth]
         return direct
 
-_breaker404: None = None
+_breaker405: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes_subs(SubscriptionNode):
     class_: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes__class_subs
 
@@ -19806,7 +19858,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.class_]
         return direct
 
-_breaker405: None = None
+_breaker406: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile_subs(SubscriptionNode):
     profile: SubscriptionNode
     classes: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile__classes_subs
@@ -19820,7 +19872,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.profile, self.classes]
         return direct
 
-_breaker406: None = None
+_breaker407: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos_subs(SubscriptionNode):
     qos_classification_policy: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_classification_policy_subs
     qos_profile: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__qos__qos_profile_subs
@@ -19834,7 +19886,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.qos_classification_policy, self.qos_profile]
         return direct
 
-_breaker407: None = None
+_breaker408: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__carrierscarrier_subs(SubscriptionNode):
     signalling_type: SubscriptionNode
 
@@ -19846,7 +19898,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.signalling_type]
         return direct
 
-_breaker408: None = None
+_breaker409: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__multicast__multicast_address_family_subs(SubscriptionNode):
     ipv4: SubscriptionNode
     ipv6: SubscriptionNode
@@ -19860,7 +19912,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.ipv4, self.ipv6]
         return direct
 
-_breaker409: None = None
+_breaker410: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__multicast_subs(SubscriptionNode):
     multicast_site_type: SubscriptionNode
     multicast_address_family: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service__multicast__multicast_address_family_subs
@@ -19876,7 +19928,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.multicast_site_type, self.multicast_address_family, self.protocol_type]
         return direct
 
-_breaker410: None = None
+_breaker411: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__service_subs(SubscriptionNode):
     svc_input_bandwidth: SubscriptionNode
     svc_output_bandwidth: SubscriptionNode
@@ -19898,7 +19950,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.svc_input_bandwidth, self.svc_output_bandwidth, self.svc_mtu, self.qos, self.carrierscarrier, self.multicast]
         return direct
 
-_breaker411: None = None
+_breaker412: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link_entry_subs(SubscriptionNode):
     target_site: SubscriptionNode
     metric: SubscriptionNode
@@ -19912,7 +19964,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.target_site, self.metric]
         return direct
 
-_breaker412: None = None
+_breaker413: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link_subs(SubscriptionNode):
     target_site: SubscriptionNode
     metric: SubscriptionNode
@@ -19932,7 +19984,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.target_site, self.metric]
         return direct
 
-_breaker413: None = None
+_breaker414: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links_subs(SubscriptionNode):
     sham_link: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf__sham_links__sham_link_subs
 
@@ -19944,7 +19996,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.sham_link]
         return direct
 
-_breaker414: None = None
+_breaker415: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf_subs(SubscriptionNode):
     address_family: SubscriptionNode
     area_address: SubscriptionNode
@@ -19962,7 +20014,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.address_family, self.area_address, self.metric, self.sham_links]
         return direct
 
-_breaker415: None = None
+_breaker416: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp_subs(SubscriptionNode):
     autonomous_system: SubscriptionNode
     address_family: SubscriptionNode
@@ -19976,7 +20028,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.autonomous_system, self.address_family]
         return direct
 
-_breaker416: None = None
+_breaker417: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_entry_subs(SubscriptionNode):
     lan: SubscriptionNode
     next_hop: SubscriptionNode
@@ -19992,7 +20044,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.lan, self.next_hop, self.lan_tag]
         return direct
 
-_breaker417: None = None
+_breaker418: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_subs(SubscriptionNode):
     lan: SubscriptionNode
     next_hop: SubscriptionNode
@@ -20015,7 +20067,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.lan, self.next_hop, self.lan_tag]
         return direct
 
-_breaker418: None = None
+_breaker419: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_entry_subs(SubscriptionNode):
     lan: SubscriptionNode
     next_hop: SubscriptionNode
@@ -20031,7 +20083,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.lan, self.next_hop, self.lan_tag]
         return direct
 
-_breaker419: None = None
+_breaker420: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_subs(SubscriptionNode):
     lan: SubscriptionNode
     next_hop: SubscriptionNode
@@ -20054,7 +20106,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.lan, self.next_hop, self.lan_tag]
         return direct
 
-_breaker420: None = None
+_breaker421: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes_subs(SubscriptionNode):
     ipv4_lan_prefixes: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv4_lan_prefixes_subs
     ipv6_lan_prefixes: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes__ipv6_lan_prefixes_subs
@@ -20068,7 +20120,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.ipv4_lan_prefixes, self.ipv6_lan_prefixes]
         return direct
 
-_breaker421: None = None
+_breaker422: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static_subs(SubscriptionNode):
     cascaded_lan_prefixes: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__static__cascaded_lan_prefixes_subs
 
@@ -20080,7 +20132,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.cascaded_lan_prefixes]
         return direct
 
-_breaker422: None = None
+_breaker423: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__rip_subs(SubscriptionNode):
     address_family: SubscriptionNode
 
@@ -20092,7 +20144,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.address_family]
         return direct
 
-_breaker423: None = None
+_breaker424: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__vrrp_subs(SubscriptionNode):
     address_family: SubscriptionNode
 
@@ -20104,7 +20156,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.address_family]
         return direct
 
-_breaker424: None = None
+_breaker425: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol_entry_subs(SubscriptionNode):
     type: SubscriptionNode
     ospf: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf_subs
@@ -20126,7 +20178,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.type, self.ospf, self.bgp, self.static, self.rip, self.vrrp]
         return direct
 
-_breaker425: None = None
+_breaker426: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol_subs(SubscriptionNode):
     type: SubscriptionNode
     ospf: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__ospf_subs
@@ -20154,7 +20206,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.type, self.ospf, self.bgp, self.static, self.rip, self.vrrp]
         return direct
 
-_breaker426: None = None
+_breaker427: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols_subs(SubscriptionNode):
     routing_protocol: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol_subs
 
@@ -20166,7 +20218,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.routing_protocol]
         return direct
 
-_breaker427: None = None
+_breaker428: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__availability_subs(SubscriptionNode):
     access_priority: SubscriptionNode
 
@@ -20178,7 +20230,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.access_priority]
         return direct
 
-_breaker428: None = None
+_breaker429: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__vpn_attachment_subs(SubscriptionNode):
     vpn_policy_id: SubscriptionNode
     vpn_id: SubscriptionNode
@@ -20194,7 +20246,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.vpn_policy_id, self.vpn_id, self.site_role]
         return direct
 
-_breaker429: None = None
+_breaker430: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access_entry_subs(SubscriptionNode):
     site_network_access_id: SubscriptionNode
     site_network_access_type: SubscriptionNode
@@ -20228,7 +20280,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.site_network_access_id, self.site_network_access_type, self.location_reference, self.device_reference, self.access_diversity, self.bearer, self.ip_connection, self.security, self.service, self.routing_protocols, self.availability, self.vpn_attachment]
         return direct
 
-_breaker430: None = None
+_breaker431: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access_subs(SubscriptionNode):
     site_network_access_id: SubscriptionNode
     site_network_access_type: SubscriptionNode
@@ -20268,7 +20320,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         direct: list[SubscriptionNode] = [self.site_network_access_id, self.site_network_access_type, self.location_reference, self.device_reference, self.access_diversity, self.bearer, self.ip_connection, self.security, self.service, self.routing_protocols, self.availability, self.vpn_attachment]
         return direct
 
-_breaker431: None = None
+_breaker432: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_subs(SubscriptionNode):
     site_network_access: ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access_subs
 
@@ -20280,7 +20332,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses_subs(Subscri
         direct: list[SubscriptionNode] = [self.site_network_access]
         return direct
 
-_breaker432: None = None
+_breaker433: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site_entry_subs(SubscriptionNode):
     site_id: SubscriptionNode
     requested_site_start: SubscriptionNode
@@ -20324,7 +20376,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.site_id, self.requested_site_start, self.requested_site_stop, self.locations, self.devices, self.site_diversity, self.management, self.vpn_policies, self.site_vpn_flavor, self.maximum_routes, self.security, self.service, self.traffic_protection, self.routing_protocols, self.actual_site_start, self.actual_site_stop, self.site_network_accesses]
         return direct
 
-_breaker433: None = None
+_breaker434: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site_subs(SubscriptionNode):
     site_id: SubscriptionNode
     requested_site_start: SubscriptionNode
@@ -20374,7 +20426,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.site_id, self.requested_site_start, self.requested_site_stop, self.locations, self.devices, self.site_diversity, self.management, self.vpn_policies, self.site_vpn_flavor, self.maximum_routes, self.security, self.service, self.traffic_protection, self.routing_protocols, self.actual_site_start, self.actual_site_stop, self.site_network_accesses]
         return direct
 
-_breaker434: None = None
+_breaker435: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites_subs(SubscriptionNode):
     site: ietf_l3vpn_svc__l3vpn_svc__sites__site_subs
 
@@ -20386,7 +20438,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.site]
         return direct
 
-_breaker435: None = None
+_breaker436: None = None
 class ietf_l3vpn_svc__l3vpn_svc_subs(SubscriptionNode):
     vpn_profiles: ietf_l3vpn_svc__l3vpn_svc__vpn_profiles_subs
     vpn_services: ietf_l3vpn_svc__l3vpn_svc__vpn_services_subs
@@ -20402,7 +20454,7 @@ class ietf_l3vpn_svc__l3vpn_svc_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.vpn_profiles, self.vpn_services, self.sites]
         return direct
 
-_breaker436: None = None
+_breaker437: None = None
 class netinfra__netinfra__router__feature_flags_subs(SubscriptionNode):
     runtime_schema_fetch: SubscriptionNode
 
@@ -20414,7 +20466,7 @@ class netinfra__netinfra__router__feature_flags_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.runtime_schema_fetch]
         return direct
 
-_breaker437: None = None
+_breaker438: None = None
 class netinfra__netinfra__router_entry_subs(SubscriptionNode):
     name: SubscriptionNode
     id: SubscriptionNode
@@ -20440,7 +20492,7 @@ class netinfra__netinfra__router_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.id, self.type, self.role, self.asn, self.mock, self.approval_required, self.feature_flags]
         return direct
 
-_breaker438: None = None
+_breaker439: None = None
 class netinfra__netinfra__router_subs(SubscriptionNode):
     name: SubscriptionNode
     id: SubscriptionNode
@@ -20472,7 +20524,7 @@ class netinfra__netinfra__router_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.id, self.type, self.role, self.asn, self.mock, self.approval_required, self.feature_flags]
         return direct
 
-_breaker439: None = None
+_breaker440: None = None
 class netinfra__netinfra__backbone_link__dynstate_subs(SubscriptionNode):
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -20482,7 +20534,7 @@ class netinfra__netinfra__backbone_link__dynstate_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = []
         return direct
 
-_breaker440: None = None
+_breaker441: None = None
 class netinfra__netinfra__backbone_link__state_subs(SubscriptionNode):
     left_pps: SubscriptionNode
     right_pps: SubscriptionNode
@@ -20498,7 +20550,7 @@ class netinfra__netinfra__backbone_link__state_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.left_pps, self.right_pps, self.link_status]
         return direct
 
-_breaker441: None = None
+_breaker442: None = None
 class netinfra__netinfra__backbone_link_entry_subs(SubscriptionNode):
     left_router: SubscriptionNode
     left_interface: SubscriptionNode
@@ -20522,7 +20574,7 @@ class netinfra__netinfra__backbone_link_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.left_router, self.left_interface, self.right_router, self.right_interface, self.monitor_traffic, self.dynstate, self.state]
         return direct
 
-_breaker442: None = None
+_breaker443: None = None
 class netinfra__netinfra__backbone_link_subs(SubscriptionNode):
     left_router: SubscriptionNode
     left_interface: SubscriptionNode
@@ -20555,21 +20607,35 @@ class netinfra__netinfra__backbone_link_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.left_router, self.left_interface, self.right_router, self.right_interface, self.monitor_traffic, self.dynstate, self.state]
         return direct
 
-_breaker443: None = None
+_breaker444: None = None
+class netinfra__netinfra__global_settings_subs(SubscriptionNode):
+    ibgp_authentication_key: SubscriptionNode
+
+    pure def __init__(self, path: ?SubscriptionPath=None) -> None:
+        SubscriptionNode.__init__(self, path)
+        self.ibgp_authentication_key = SubscriptionNode(SubscriptionPath(yang.gdata.Id(NS_netinfra, 'ibgp-authentication-key'), parent=path))
+
+    pure def _direct_children(self) -> list[SubscriptionNode]:
+        direct: list[SubscriptionNode] = [self.ibgp_authentication_key]
+        return direct
+
+_breaker445: None = None
 class netinfra__netinfra_subs(SubscriptionNode):
     router: netinfra__netinfra__router_subs
     backbone_link: netinfra__netinfra__backbone_link_subs
+    global_settings: netinfra__netinfra__global_settings_subs
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
         self.router = netinfra__netinfra__router_subs(SubscriptionPath(yang.gdata.Id(NS_netinfra, 'router'), parent=path))
         self.backbone_link = netinfra__netinfra__backbone_link_subs(SubscriptionPath(yang.gdata.Id(NS_netinfra, 'backbone-link'), parent=path))
+        self.global_settings = netinfra__netinfra__global_settings_subs(SubscriptionPath(yang.gdata.Id(NS_netinfra, 'global-settings'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.router, self.backbone_link]
+        direct: list[SubscriptionNode] = [self.router, self.backbone_link, self.global_settings]
         return direct
 
-_breaker444: None = None
+_breaker446: None = None
 class root_subs(SubscriptionNode):
     tmf_store: stratoweave_tmf__tmf_store_subs
     l3vpn_svc: ietf_l3vpn_svc__l3vpn_svc_subs

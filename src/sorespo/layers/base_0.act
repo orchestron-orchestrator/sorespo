@@ -21,6 +21,8 @@ from sorespo.layers.y_0 import netinfra__netinfra__backbone_link_entry
 from sorespo.layers.y_0_oper import netinfra__netinfra__backbone_link_entry as netinfra__netinfra__backbone_link_entry__oper
 from sorespo.layers.y_0 import netinfra__netinfra__backbone_link__dynstate
 from sorespo.layers.y_0_oper import netinfra__netinfra__backbone_link__dynstate as netinfra__netinfra__backbone_link__dynstate__oper
+from sorespo.layers.y_0 import netinfra__netinfra__global_settings
+from sorespo.layers.y_0_oper import netinfra__netinfra__global_settings as netinfra__netinfra__global_settings__oper
 from sorespo.layers.y_0 import SRC_DNODE
 from sorespo.layers.y_1_loose import root as output_root
 
@@ -134,7 +136,7 @@ class L3VpnSite(ttt.TransformFunction):
         return self.transform(modeled_input).to_gdata(), None
 
 class Router(ttt.TransformFunction):
-    transform: mut(netinfra__netinfra__router_entry) -> yang.adata.MNode
+    transform: mut(netinfra__netinfra__router_entry, linked: yang.gdata.Node) -> yang.adata.MNode
 
     @staticmethod
     def input_type():
@@ -157,7 +159,7 @@ class Router(ttt.TransformFunction):
         """
         modeled_input = netinfra__netinfra__router_entry.from_gdata(i)
 
-        return self.transform(modeled_input).to_gdata(), None
+        return self.transform(modeled_input, linked).to_gdata(), None
 
     mut def transform_xml(self, i: xml.Node, linked: yang.gdata.Node, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from XML to
@@ -166,7 +168,7 @@ class Router(ttt.TransformFunction):
         gdata_input = yang.xml.from_xml(SRC_DNODE, i, loose=False, root_path=['netinfra:netinfra', 'router'])
         modeled_input = netinfra__netinfra__router_entry.from_gdata(gdata_input)
 
-        return self.transform(modeled_input).to_gdata(), None
+        return self.transform(modeled_input, linked).to_gdata(), None
 
 class BBLink(ttt.TransformFunction):
     transform: mut(netinfra__netinfra__backbone_link_entry, dynstate: ?netinfra__netinfra__backbone_link__dynstate) -> yang.adata.MNode
@@ -209,3 +211,38 @@ class BBLink(ttt.TransformFunction):
         modeled_dynstate = netinfra__netinfra__backbone_link__dynstate.from_gdata(dynstate) if dynstate is not None else None
 
         return self.transform(modeled_input, modeled_dynstate).to_gdata(), None
+
+class GlobalSettings(ttt.TransformFunction):
+    transform: mut(netinfra__netinfra__global_settings) -> yang.adata.MNode
+
+    @staticmethod
+    def input_type():
+        """Return the modeled input type for this transform"""
+        return netinfra__netinfra__global_settings
+
+    @staticmethod
+    def state_type():
+        """Return the modeled operational state type for this transform"""
+        return netinfra__netinfra__global_settings__oper
+
+    @staticmethod
+    def new_state(path: ttt.Path):
+        """Create modeled operational state for this transform path"""
+        return netinfra__netinfra__global_settings__oper.from_gdata(ttt.path_key_data(path))
+
+    mut def transform_wrapper(self, i: yang.gdata.Node, linked: yang.gdata.Node, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
+        """Wrap the user provided transform method to convert from gdata to
+        modeled input and back to gdata
+        """
+        modeled_input = netinfra__netinfra__global_settings.from_gdata(i)
+
+        return self.transform(modeled_input).to_gdata(), None
+
+    mut def transform_xml(self, i: xml.Node, linked: yang.gdata.Node, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
+        """Wrap the user provided transform method to convert from XML to
+        modeled input and return gdata
+        """
+        gdata_input = yang.xml.from_xml(SRC_DNODE, i, loose=False, root_path=['netinfra:netinfra', 'global-settings'])
+        modeled_input = netinfra__netinfra__global_settings.from_gdata(gdata_input)
+
+        return self.transform(modeled_input).to_gdata(), None

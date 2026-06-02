@@ -90,6 +90,8 @@
         } else if (part === 'config-queue') {
           label = 'Config Queue';
         }
+      } else if (parts[0] === 'global-settings') {
+        label = 'Global Settings';
       }
 
       crumbs.push({ label, href, current: i === parts.length - 1 });
@@ -173,6 +175,18 @@
         >
           <span class="nav-icon">⤴</span>
           Apply Config
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-label">Settings</div>
+        <a
+          class="nav-item"
+          class:active={currentPathname.startsWith('/global-settings')}
+          href="/global-settings"
+        >
+          <span class="nav-icon">⚙</span>
+          Global Settings
         </a>
       </div>
 
