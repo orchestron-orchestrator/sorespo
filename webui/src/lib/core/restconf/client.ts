@@ -88,6 +88,32 @@ export function restconfPatchJson<T>(path: string, body: unknown): Promise<T> {
   });
 }
 
+/**
+ * Send a raw string body with a caller-chosen method + Content-Type.
+ * Use this when the body is already serialized (e.g. an XML payload, or
+ * a JSON string the caller produced manually) and the JSON helpers
+ * would double-encode by `JSON.stringify`'ing it.
+ */
+export function restconfRaw<T = string>(
+  method: 'PUT' | 'PATCH' | 'POST',
+  path: string,
+  body: string,
+  contentType: string,
+  readBody = false,
+  headers?: HeadersInit,
+  signal?: AbortSignal
+): Promise<T> {
+  return restconfRequest<T>(path, {
+    method,
+    body,
+    headers,
+    signal,
+    accept: contentType,
+    contentType,
+    readBody
+  });
+}
+
 export function restconfDelete(path: string): Promise<unknown> {
   return restconfRequest(path, {
     method: 'DELETE',
