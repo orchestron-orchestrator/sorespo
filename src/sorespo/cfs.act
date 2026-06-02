@@ -2,7 +2,6 @@ import yang.adata
 import yang.gdata as gdata
 import stratoweave.ttt as ttt
 
-from sorespo.conf import IGBP_AUTHENTICATION_KEY
 import sorespo.layers.base_0 as base
 import sorespo.layers.y_1_loose
 import sorespo.layers.y_0 as y_0
@@ -14,8 +13,14 @@ import yang.identityref
 
 from sorespo.layers.y_0 import netinfra__netinfra__backbone_link__dynstate as BackboneLinkDynstate
 
-class Router(base.Router):
+class GlobalSettings(base.GlobalSettings):
     def transform(self, i):
+        print("CFS global-settings transform running", err=True)
+        return base.o_root()
+
+
+class Router(base.Router):
+    def transform(self, i, linked):
         o = base.o_root()
         print("CFS router transform running", i.name, i.id)
         o_router = o.netinfra.router.create(i.name, id=i.id, type=i.type, role=i.role, mock=i.mock, approval_required=i.approval_required)
@@ -27,7 +32,11 @@ class Router(base.Router):
         bc.ipv6_address = "2001:db8:0:0::{i.id}"
         bc.asn = i.asn
 
-        fm = o.netinfra.ibgp_fullmesh.create(i.asn, IGBP_AUTHENTICATION_KEY)
+        # Source the iBGP authentication key from the network-wide
+        # global-settings, linked via /netinfra:netinfra/global-settings.
+        gs = y_0.root.from_gdata(linked).netinfra.global_settings
+
+        fm = o.netinfra.ibgp_fullmesh.create(i.asn, gs.ibgp_authentication_key)
         fm.router.create(i.name, bc.ipv4_address)
 
         return o

@@ -25,6 +25,9 @@ module netinfra {
 
       sw:transform sorespo.cfs.Router;
       tmf:cfs-service "Router";
+      sw:link global {
+        sw:path /netinfra:netinfra/netinfra:global-settings;
+      }
 
       leaf name {
         type string;
@@ -108,6 +111,19 @@ module netinfra {
             enum unknown;
           }
         }
+      }
+    }
+
+    container global-settings {
+      sw:transform sorespo.cfs.GlobalSettings;
+      description
+        "Network-wide settings shared across all routers.";
+      leaf ibgp-authentication-key {
+        type string;
+        mandatory true;
+        description
+          "Shared iBGP authentication key applied to every router's
+           iBGP full-mesh neighbors.";
       }
     }
   }
