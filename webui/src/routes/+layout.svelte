@@ -166,6 +166,14 @@
             <span class="nav-badge">{totalPendingCount}</span>
           {/if}
         </a>
+        <a
+          class="nav-item"
+          class:active={currentPathname.startsWith('/configure')}
+          href="/configure"
+        >
+          <span class="nav-icon">⤴</span>
+          Apply Config
+        </a>
       </div>
 
       <div class="nav-section">
