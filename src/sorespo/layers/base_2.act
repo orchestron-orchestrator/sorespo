@@ -10,19 +10,12 @@ import yang.gdata
 import yang.xml
 
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__base_config
-from sorespo.layers.y_2_oper import stratoweave_rfs__rfs__base_config as stratoweave_rfs__rfs__base_config__oper
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface_entry
-from sorespo.layers.y_2_oper import stratoweave_rfs__rfs__backbone_interface_entry as stratoweave_rfs__rfs__backbone_interface_entry__oper
-from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface__dynstate
-from sorespo.layers.y_2_oper import stratoweave_rfs__rfs__backbone_interface__dynstate as stratoweave_rfs__rfs__backbone_interface__dynstate__oper
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__ibgp_neighbor_entry
-from sorespo.layers.y_2_oper import stratoweave_rfs__rfs__ibgp_neighbor_entry as stratoweave_rfs__rfs__ibgp_neighbor_entry__oper
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__vrf_entry
-from sorespo.layers.y_2_oper import stratoweave_rfs__rfs__vrf_entry as stratoweave_rfs__rfs__vrf_entry__oper
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__vrf_interface_entry
-from sorespo.layers.y_2_oper import stratoweave_rfs__rfs__vrf_interface_entry as stratoweave_rfs__rfs__vrf_interface_entry__oper
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__ebgp_customer_entry
-from sorespo.layers.y_2_oper import stratoweave_rfs__rfs__ebgp_customer_entry as stratoweave_rfs__rfs__ebgp_customer_entry__oper
+from sorespo.layers.y_2_oper import stratoweave_rfs__rfs__backbone_interface_entry as stratoweave_rfs__rfs__backbone_interface_entry__oper
 from sorespo.layers.y_2 import SRC_DNODE
 from sorespo.layers.y_3_loose import root as output_root
 
@@ -37,16 +30,6 @@ class BaseConfig(ttt.RFSFunction):
     def input_type():
         """Return the modeled input type for this transform"""
         return stratoweave_rfs__rfs__base_config
-
-    @staticmethod
-    def state_type():
-        """Return the modeled operational state type for this transform"""
-        return stratoweave_rfs__rfs__base_config__oper
-
-    @staticmethod
-    def new_state(path: ttt.Path):
-        """Create modeled operational state for this transform path"""
-        return stratoweave_rfs__rfs__base_config__oper.from_gdata(ttt.path_key_data(path))
 
     mut def transform_wrapper(self, i: yang.gdata.Node, device_info: ttt.DeviceInfo, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from gdata to
@@ -66,7 +49,7 @@ class BaseConfig(ttt.RFSFunction):
         return self.transform(modeled_input, device_info).to_gdata(), None
 
 class BBInterface(ttt.RFSFunction):
-    transform: mut(stratoweave_rfs__rfs__backbone_interface_entry, ttt.DeviceInfo, dynstate: ?stratoweave_rfs__rfs__backbone_interface__dynstate) -> yang.adata.MNode
+    transform: mut(stratoweave_rfs__rfs__backbone_interface_entry, ttt.DeviceInfo) -> yang.adata.MNode
 
     @staticmethod
     def input_type():
@@ -83,19 +66,13 @@ class BBInterface(ttt.RFSFunction):
         """Create modeled operational state for this transform path"""
         return stratoweave_rfs__rfs__backbone_interface_entry__oper.from_gdata(ttt.path_key_data(path))
 
-    @staticmethod
-    def dynstate_type():
-        """Return the modeled dynstate type for this transform"""
-        return stratoweave_rfs__rfs__backbone_interface__dynstate
-
     mut def transform_wrapper(self, i: yang.gdata.Node, device_info: ttt.DeviceInfo, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from gdata to
         modeled input and back to gdata
         """
         modeled_input = stratoweave_rfs__rfs__backbone_interface_entry.from_gdata(i)
-        modeled_dynstate = stratoweave_rfs__rfs__backbone_interface__dynstate.from_gdata(dynstate) if dynstate is not None else None
 
-        return self.transform(modeled_input, device_info, modeled_dynstate).to_gdata(), None
+        return self.transform(modeled_input, device_info).to_gdata(), None
 
     mut def transform_xml(self, i: xml.Node, device_info: ttt.DeviceInfo, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from XML to
@@ -103,9 +80,8 @@ class BBInterface(ttt.RFSFunction):
         """
         gdata_input = yang.xml.from_xml(SRC_DNODE, i, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:backbone-interface'])
         modeled_input = stratoweave_rfs__rfs__backbone_interface_entry.from_gdata(gdata_input)
-        modeled_dynstate = stratoweave_rfs__rfs__backbone_interface__dynstate.from_gdata(dynstate) if dynstate is not None else None
 
-        return self.transform(modeled_input, device_info, modeled_dynstate).to_gdata(), None
+        return self.transform(modeled_input, device_info).to_gdata(), None
 
 class IbgpNeighbor(ttt.RFSFunction):
     transform: mut(stratoweave_rfs__rfs__ibgp_neighbor_entry, ttt.DeviceInfo) -> yang.adata.MNode
@@ -114,16 +90,6 @@ class IbgpNeighbor(ttt.RFSFunction):
     def input_type():
         """Return the modeled input type for this transform"""
         return stratoweave_rfs__rfs__ibgp_neighbor_entry
-
-    @staticmethod
-    def state_type():
-        """Return the modeled operational state type for this transform"""
-        return stratoweave_rfs__rfs__ibgp_neighbor_entry__oper
-
-    @staticmethod
-    def new_state(path: ttt.Path):
-        """Create modeled operational state for this transform path"""
-        return stratoweave_rfs__rfs__ibgp_neighbor_entry__oper.from_gdata(ttt.path_key_data(path))
 
     mut def transform_wrapper(self, i: yang.gdata.Node, device_info: ttt.DeviceInfo, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from gdata to
@@ -150,16 +116,6 @@ class Vrf(ttt.RFSFunction):
         """Return the modeled input type for this transform"""
         return stratoweave_rfs__rfs__vrf_entry
 
-    @staticmethod
-    def state_type():
-        """Return the modeled operational state type for this transform"""
-        return stratoweave_rfs__rfs__vrf_entry__oper
-
-    @staticmethod
-    def new_state(path: ttt.Path):
-        """Create modeled operational state for this transform path"""
-        return stratoweave_rfs__rfs__vrf_entry__oper.from_gdata(ttt.path_key_data(path))
-
     mut def transform_wrapper(self, i: yang.gdata.Node, device_info: ttt.DeviceInfo, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from gdata to
         modeled input and back to gdata
@@ -185,16 +141,6 @@ class VrfInterface(ttt.RFSFunction):
         """Return the modeled input type for this transform"""
         return stratoweave_rfs__rfs__vrf_interface_entry
 
-    @staticmethod
-    def state_type():
-        """Return the modeled operational state type for this transform"""
-        return stratoweave_rfs__rfs__vrf_interface_entry__oper
-
-    @staticmethod
-    def new_state(path: ttt.Path):
-        """Create modeled operational state for this transform path"""
-        return stratoweave_rfs__rfs__vrf_interface_entry__oper.from_gdata(ttt.path_key_data(path))
-
     mut def transform_wrapper(self, i: yang.gdata.Node, device_info: ttt.DeviceInfo, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from gdata to
         modeled input and back to gdata
@@ -219,16 +165,6 @@ class EbgpCustomer(ttt.RFSFunction):
     def input_type():
         """Return the modeled input type for this transform"""
         return stratoweave_rfs__rfs__ebgp_customer_entry
-
-    @staticmethod
-    def state_type():
-        """Return the modeled operational state type for this transform"""
-        return stratoweave_rfs__rfs__ebgp_customer_entry__oper
-
-    @staticmethod
-    def new_state(path: ttt.Path):
-        """Create modeled operational state for this transform path"""
-        return stratoweave_rfs__rfs__ebgp_customer_entry__oper.from_gdata(ttt.path_key_data(path))
 
     mut def transform_wrapper(self, i: yang.gdata.Node, device_info: ttt.DeviceInfo, memory: ?yang.gdata.Node, dynstate: ?yang.gdata.Node) -> (yang.gdata.Node, ?yang.gdata.Node):
         """Wrap the user provided transform method to convert from gdata to

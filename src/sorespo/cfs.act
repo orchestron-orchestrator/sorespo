@@ -11,7 +11,6 @@ import sorespo.layers.y_1_oper as y_1_oper
 # https://github.com/actonlang/acton/issues/2390
 import yang.identityref
 
-from sorespo.layers.y_0 import netinfra__netinfra__backbone_link__dynstate as BackboneLinkDynstate
 
 class GlobalSettings(base.GlobalSettings):
     def transform(self, i):
@@ -43,7 +42,6 @@ class Router(base.Router):
 
 
 actor BBLinkTransform(path: ttt.Path,
-                       update_dynstate: proc(?BackboneLinkDynstate)->None,
                        update_oper: proc(?y_0_oper.netinfra__netinfra__backbone_link_entry)->None,
                        lower_tree_provider: ?gdata.TreeProvider):
     _oper = base.BBLink.new_state(path)
@@ -90,7 +88,7 @@ actor BBLinkTransform(path: ttt.Path,
 
 
 class BBLink(base.BBLink):
-    def transform(self, i, dynstate):
+    def transform(self, i):
         print("CFS backbonelink transform running %s [%s] <-> %s [%s]" % (i.left_router, i.left_interface, i.right_router, i.right_interface))
         o = base.o_root()
         o.netinfra.backbone_link.create(i.left_router, i.left_interface, i.right_router, i.right_interface, monitor_traffic=i.monitor_traffic)
@@ -105,6 +103,10 @@ class L3VpnVpnService(base.L3VpnVpnService):
         o.l3vpns.l3vpn.create(i.vpn_id, description="Customer VPN for %s" % customer_name if customer_name is not None else "")
         return o
 
+
+actor L3VpnSiteTransform(path: ttt.Path, update_oper: proc(y_0_oper.ietf_l3vpn_svc__l3vpn_svc__sites__site_entry) -> None, lower_tree_provider: ?gdata.TreeProvider):
+    def on_conf(conf: y_0.ietf_l3vpn_svc__l3vpn_svc__sites__site_entry):
+        pass
 
 class L3VpnSite(base.L3VpnSite):
     def transform(self, i):
