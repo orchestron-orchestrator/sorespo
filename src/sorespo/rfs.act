@@ -546,7 +546,8 @@ class EbgpCustomer(base.EbgpCustomer):
             af.route_policy.in_ = "ACCEPT"
             af.route_policy.out = "ACCEPT"
             af.create_as_override()
-            neighbor.password.encrypted = cisco_type7_encrypt(i.authentication_key, 4)
+            if i.authentication_key is not None:
+                neighbor.password.encrypted = cisco_type7_encrypt(i.authentication_key!, 4)
 
             return dev
 
@@ -558,7 +559,8 @@ class EbgpCustomer(base.EbgpCustomer):
             # TODO: why group?!
             group = ri.protocols.bgp.group.create("customer")
 
-            group.neighbor.create(i.address, description=i.description, authentication_key=junos_encrypt(i.authentication_key, "4"), peer_as=str(i.peer_asn), as_override=True)
+            authentication_key = junos_encrypt(i.authentication_key!, "4") if i.authentication_key is not None else None
+            group.neighbor.create(i.address, description=i.description, authentication_key=authentication_key, peer_as=str(i.peer_asn), as_override=True)
 
             return dev
 
@@ -570,7 +572,8 @@ class EbgpCustomer(base.EbgpCustomer):
             # Neighbor config
             bgp = ni.protocols.create_bgp()
             neighbor = bgp.neighbor.create(i.address, peer_as=i.peer_asn, peer_group="customer")
-            neighbor.authentication.password = i.authentication_key
+            if i.authentication_key is not None:
+                neighbor.authentication.password = i.authentication_key!
 
             return dev
 
