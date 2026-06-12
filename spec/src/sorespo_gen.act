@@ -2,10 +2,10 @@ import file
 import process
 
 import stratoweave.build
-import stratoweave.yang as swyang
-import tmf.yang
-from transform_list_order import remove_list_user_order
-from transform_filter_schema import filter_schema
+import stratoweave.swyang as swyang
+import tmf.tmf_yang as tmf_yang
+from yang.transform_list_order import remove_list_user_order
+from yang.transform_filter_schema import filter_schema
 
 actor main(env):
     fc = file.FileCap(env.cap)
@@ -368,9 +368,9 @@ actor main(env):
         cfs_layer.models.extend([
             swyang.stratoweave,
             swyang.ietf_inet_types,
-            tmf.yang.ietf_yang_tmf_map,
-            tmf.yang.swtmf.replace("TMF640_STORE_TRANSFORM", "sorespo.tmf.Tmf640Store"),
-            tmf.yang.swtmf640
+            tmf_yang.ietf_yang_tmf_map,
+            tmf_yang.swtmf.replace("TMF640_STORE_TRANSFORM", "sorespo.tmf.Tmf640Store"),
+            tmf_yang.swtmf640
         ])
         inter_layer = stratoweave.build.Layer.from_dir(fc, "yang/inter")
         inter_layer.models.extend([swyang.stratoweave, swyang.ietf_inet_types])

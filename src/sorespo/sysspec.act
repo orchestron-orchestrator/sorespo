@@ -11,26 +11,26 @@ import stratoweave.adapters.netconf as swna
 import stratoweave.ttt as ttt
 
 import sorespo.device_types as sw_device_types
-import sorespo.layers.t_3
-import sorespo.layers.y_3
-import sorespo.layers.t_2
-import sorespo.layers.y_2
-import sorespo.layers.t_1
-import sorespo.layers.y_1
-import sorespo.layers.t_0
-import sorespo.layers.y_0
-import sorespo.devices.CiscoIosXr_25_3_1
-import sorespo.devices.CiscoIosXr_25_3_1_oper
-import sorespo.devices.JuniperCRPD_24_4R1_9
-import sorespo.devices.JuniperCRPD_24_4R1_9_oper
-import sorespo.devices.NokiaSRLinux_25_3_2
-import sorespo.devices.NokiaSRLinux_25_3_2_oper
+import sorespo.layers.t_3 as t_3
+import sorespo.layers.y_3 as y_3
+import sorespo.layers.t_2 as t_2
+import sorespo.layers.y_2 as y_2
+import sorespo.layers.t_1 as t_1
+import sorespo.layers.y_1 as y_1
+import sorespo.layers.t_0 as t_0
+import sorespo.layers.y_0 as y_0
+import sorespo.devices.CiscoIosXr_25_3_1 as dev_CiscoIosXr_25_3_1
+import sorespo.devices.CiscoIosXr_25_3_1_oper as dev_CiscoIosXr_25_3_1_oper
+import sorespo.devices.JuniperCRPD_24_4R1_9 as dev_JuniperCRPD_24_4R1_9
+import sorespo.devices.JuniperCRPD_24_4R1_9_oper as dev_JuniperCRPD_24_4R1_9_oper
+import sorespo.devices.NokiaSRLinux_25_3_2 as dev_NokiaSRLinux_25_3_2
+import sorespo.devices.NokiaSRLinux_25_3_2_oper as dev_NokiaSRLinux_25_3_2_oper
 
 def get_layers(dev_registry: swdev.DeviceRegistry, log_handler: ?logging.Handler=None, db: ?lmdb.Db=None):
-    layer3 = ttt.Layer('3', sorespo.layers.t_3.get_ttt(None, dev_registry, log_handler), None, db)
-    layer2 = ttt.Layer('2', sorespo.layers.t_2.get_ttt(layer3, dev_registry, log_handler), layer3, db)
-    layer1 = ttt.Layer('1', sorespo.layers.t_1.get_ttt(layer2, dev_registry, log_handler), layer2, db)
-    layer0 = ttt.Layer('0', sorespo.layers.t_0.get_ttt(layer1, dev_registry, log_handler), layer1, db)
+    layer3 = ttt.Layer('3', t_3.get_ttt(None, dev_registry, log_handler), None, db)
+    layer2 = ttt.Layer('2', t_2.get_ttt(layer3, dev_registry, log_handler), layer3, db)
+    layer1 = ttt.Layer('1', t_1.get_ttt(layer2, dev_registry, log_handler), layer2, db)
+    layer0 = ttt.Layer('0', t_0.get_ttt(layer1, dev_registry, log_handler), layer1, db)
     return layer0
 
 
@@ -42,31 +42,31 @@ def schema_for_layer(layer):
         # and selected with the chosen device type.
         # The contents of layer 3 (gdata) is a combination of both, here we
         # return the device manager tree.
-        return sorespo.layers.y_3.SRC_DNODE
+        return y_3.SRC_DNODE
     if layer == 2:
-        return sorespo.layers.y_2.SRC_DNODE
+        return y_2.SRC_DNODE
     if layer == 1:
-        return sorespo.layers.y_1.SRC_DNODE
+        return y_1.SRC_DNODE
     if layer == 0:
-        return sorespo.layers.y_0.SRC_DNODE
+        return y_0.SRC_DNODE
     raise ValueError('Invalid layer: {layer}')
 
 
 generated_device_types: dict[str, swdev.DeviceType] = {
     "CiscoIosXr_25_3_1": swdev.DeviceType(name="CiscoIosXr_25_3_1",
             adapter_type=swna.NetconfAdapter,
-            src_dnode=sorespo.devices.CiscoIosXr_25_3_1.SRC_DNODE,
-            oper_src_dnode=sorespo.devices.CiscoIosXr_25_3_1_oper.SRC_DNODE,
+            src_dnode=dev_CiscoIosXr_25_3_1.SRC_DNODE,
+            oper_src_dnode=dev_CiscoIosXr_25_3_1_oper.SRC_DNODE,
         ),
     "JuniperCRPD_24_4R1_9": swdev.DeviceType(name="JuniperCRPD_24_4R1_9",
             adapter_type=swna.NetconfAdapter,
-            src_dnode=sorespo.devices.JuniperCRPD_24_4R1_9.SRC_DNODE,
-            oper_src_dnode=sorespo.devices.JuniperCRPD_24_4R1_9_oper.SRC_DNODE,
+            src_dnode=dev_JuniperCRPD_24_4R1_9.SRC_DNODE,
+            oper_src_dnode=dev_JuniperCRPD_24_4R1_9_oper.SRC_DNODE,
         ),
     "NokiaSRLinux_25_3_2": swdev.DeviceType(name="NokiaSRLinux_25_3_2",
             adapter_type=swna.NetconfAdapter,
-            src_dnode=sorespo.devices.NokiaSRLinux_25_3_2.SRC_DNODE,
-            oper_src_dnode=sorespo.devices.NokiaSRLinux_25_3_2_oper.SRC_DNODE,
+            src_dnode=dev_NokiaSRLinux_25_3_2.SRC_DNODE,
+            oper_src_dnode=dev_NokiaSRLinux_25_3_2_oper.SRC_DNODE,
         ),
 }
 

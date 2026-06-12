@@ -1,11 +1,11 @@
 import testing
-import xml
+import std.xml as xml
 
 import yang.adata
-import yang.gdata
+import yang.gdata as ygdata
 import stratoweave.ttt
 
-import sorespo.inter
+import sorespo.inter as inter
 
 def _test_inter_bblink():
     xmlin = """
@@ -15,8 +15,8 @@ def _test_inter_bblink():
     <right-router>FRA-CORE-1</right-router>
     <right-interface>GigabitEthernet0/0/0/0</right-interface>
 </backbone-link>"""
-    transform = sorespo.inter.BBLink()
-    out, _ = transform.transform_xml(xml.decode(xmlin), yang.gdata.Container())
+    transform = inter.BBLink()
+    out, _ = transform.transform_xml(xml.decode(xmlin), ygdata.Container())
     return out.to_xmlstr()
 
 def _test_inter_ibgp_fullmesh():
@@ -40,6 +40,6 @@ def _test_inter_ibgp_fullmesh():
         <ipv4-address>10.0.0.4</ipv4-address>
     </router>
 </ibgp-fullmesh>"""
-    transform = sorespo.inter.IbgpFullmesh()
-    out, _ = transform.transform_xml(xml.decode(xmlin), yang.gdata.Container())
+    transform = inter.IbgpFullmesh()
+    out, _ = transform.transform_xml(xml.decode(xmlin), ygdata.Container())
     return out.to_xmlstr()
