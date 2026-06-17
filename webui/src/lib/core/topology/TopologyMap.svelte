@@ -94,10 +94,7 @@
                       rx="12"
                     ></rect>
                     <text class="topology__link-label" text-anchor="middle">
-                      <tspan x="0" y={label.ppsLine ? -13 : -4}>{label.interfaceLine}</tspan>
-                      {#if label.ppsLine}
-                        <tspan class="topology__link-pps" x="0" y="9">{label.ppsLine}</tspan>
-                      {/if}
+                      <tspan x="0" y="-4">{label.interfaceLine}</tspan>
                     </text>
                   </g>
                 {/if}
@@ -124,6 +121,8 @@
                 x2={attachment.x - unitX * siteEdgeOffset}
                 y2={attachment.y - unitY * siteEdgeOffset}
                 class="topology__attachment-link"
+                class:topology__attachment-link--established={attachment.bgpStatus === 'established'}
+                class:topology__attachment-link--down={attachment.bgpStatus === 'down'}
               />
             {/each}
           {/each}
@@ -161,8 +160,13 @@
               <a href={appHref(`/services/l3vpn-site/${encodeURIComponent(attachment.siteId)}`)}>
                 <g
                   class="topology__site"
+                  class:topology__site--established={attachment.bgpStatus === 'established'}
+                  class:topology__site--down={attachment.bgpStatus === 'down'}
                   transform={`translate(${attachment.x}, ${attachment.y})`}
                 >
+                  <title>{attachment.bgpStatus === 'unknown'
+                    ? `${attachment.siteId}: no eBGP session`
+                    : `${attachment.siteId}: eBGP ${attachment.bgpSessionState ?? attachment.bgpStatus}${attachment.bgpDebugActive ? ' · debug-active — click for escalated detail' : ''}`}</title>
                   <rect
                     class="topology__site-card"
                     x={-siteCardWidth / 2}
@@ -177,6 +181,12 @@
                       {attachment.vpnIds[0] || 'No vpn-id'}
                     </tspan>
                   </text>
+                  {#if attachment.bgpDebugActive}
+                    <g class="topology__site-debug" transform={`translate(${-siteCardWidth / 2 + 14}, ${-siteCardHeight / 2 + 14})`}>
+                      <circle class="topology__site-debug-dot" r="7"></circle>
+                      <text class="topology__site-debug-text" text-anchor="middle" dominant-baseline="middle">!</text>
+                    </g>
+                  {/if}
                   {#if attachment.accessIds.length > 1}
                     <g transform={`translate(${siteCardWidth / 2 - 16}, ${-siteCardHeight / 2 + 14})`}>
                       <circle class="topology__site-count-bg" r="11"></circle>
@@ -304,20 +314,22 @@
     pointer-events: none;
   }
 
-  .topology__link-label tspan:last-child {
-    fill: var(--sw-text-muted);
-  }
-
-  .topology__link-label .topology__link-pps {
-    fill: var(--sw-accent);
-    font-size: 11px;
-    font-weight: 600;
-  }
-
   .topology__attachment-link {
     stroke: rgba(226, 232, 240, 0.20);
     stroke-width: 1;
     stroke-dasharray: 2 3;
+  }
+
+  .topology__attachment-link--established {
+    stroke: rgba(34, 197, 94, 0.85);
+    stroke-width: 1.6;
+    stroke-dasharray: none;
+  }
+
+  .topology__attachment-link--down {
+    stroke: rgba(239, 68, 68, 0.9);
+    stroke-width: 1.6;
+    stroke-dasharray: none;
   }
 
   .topology__router {
@@ -383,6 +395,28 @@
 
   .topology__site:hover .topology__site-card {
     stroke: #a78bfa;
+  }
+
+  .topology__site--established .topology__site-card {
+    stroke: rgba(34, 197, 94, 0.9);
+  }
+
+  .topology__site--down .topology__site-card {
+    stroke: rgba(239, 68, 68, 0.95);
+    stroke-width: 1.6;
+  }
+
+  .topology__site-debug-dot {
+    fill: var(--sw-warning);
+    stroke: rgba(8, 16, 32, 0.92);
+    stroke-width: 2;
+  }
+
+  .topology__site-debug-text {
+    fill: var(--sw-navy);
+    font-size: 10px;
+    font-weight: 800;
+    pointer-events: none;
   }
 
   .topology__site-text {

@@ -84,7 +84,7 @@
     }
   }
 
-  const TOPOLOGY_REFRESH_MS = 5000;
+  const TOPOLOGY_REFRESH_MS = 2000;
 
   onMount(() => {
     loadDevices();

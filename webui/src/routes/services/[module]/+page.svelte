@@ -94,22 +94,24 @@
         <article class="card service-list__item">
           <a class="service-list__link" href={appHref(`/services/${serviceModule.id}/${encodeURIComponent(item.id)}`)}>
             <div class="service-list__copy">
-              <h3>{item.label}</h3>
+              <div class="service-list__heading">
+                <h3>{item.label}</h3>
+                {#if item.badges && item.badges.length > 0}
+                  <div class="service-list__badges">
+                    {#each item.badges as badge}
+                      <span
+                        class="pill service-list__badge"
+                        class:service-list__badge--up={badge.tone === 'up'}
+                        class:service-list__badge--down={badge.tone === 'down'}
+                        class:service-list__badge--unknown={badge.tone === 'unknown'}
+                        title={badge.title ?? ''}
+                      >{badge.text}</span>
+                    {/each}
+                  </div>
+                {/if}
+              </div>
               {#if item.description}
                 <p>{item.description}</p>
-              {/if}
-              {#if item.badges && item.badges.length > 0}
-                <div class="service-list__badges">
-                  {#each item.badges as badge}
-                    <span
-                      class="pill service-list__badge"
-                      class:service-list__badge--up={badge.tone === 'up'}
-                      class:service-list__badge--down={badge.tone === 'down'}
-                      class:service-list__badge--unknown={badge.tone === 'unknown'}
-                      title={badge.title ?? ''}
-                    >{badge.text}</span>
-                  {/each}
-                </div>
               {/if}
             </div>
             <span class="pill monospace service-list__id-pill">{formatServiceRouteId(serviceModule, item.id)}</span>
@@ -188,6 +190,7 @@
   }
 
   .service-list__copy {
+    flex: 1;
     min-width: 0;
   }
 
@@ -201,8 +204,15 @@
     color: var(--text-muted);
   }
 
+  .service-list__heading {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
   .service-list__badges {
-    margin-top: 0.5rem;
+    margin-left: auto;
     display: flex;
     flex-wrap: wrap;
     gap: 6px;

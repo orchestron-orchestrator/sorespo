@@ -30,16 +30,14 @@ export const NETINFRA_BACKBONE_LINKS: NetinfraBackboneLinkApi[] = [
     'left-interface': 'ethernet-1/1',
     'right-router': 'FRA-CORE-1',
     'right-interface': 'ethernet-1/1',
-    'monitor-traffic': true,
-    state: { 'left-pps': 18420, 'right-pps': 17155, 'link-status': 'up' }
+    state: { 'link-status': 'up' }
   },
   {
     'left-router': 'AMS-CORE-1',
     'left-interface': 'ethernet-1/2',
     'right-router': 'STO-CORE-1',
     'right-interface': 'ethernet-1/1',
-    'monitor-traffic': true,
-    state: { 'left-pps': 9640, 'right-pps': 10480, 'link-status': 'up' }
+    state: { 'link-status': 'up' }
   },
   {
     'left-router': 'FRA-CORE-1',
@@ -58,7 +56,6 @@ export const NETINFRA_BACKBONE_LINKS: NetinfraBackboneLinkApi[] = [
     'left-interface': 'ethernet-1/3',
     'right-router': 'LJU-CORE-1',
     'right-interface': 'ethernet-1/2',
-    'monitor-traffic': true,
-    state: { 'left-pps': 0, 'right-pps': 0, 'link-status': 'down' }
+    state: { 'link-status': 'down' }
   }
 ];

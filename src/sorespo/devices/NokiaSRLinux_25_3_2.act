@@ -1270,6 +1270,29 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__au
 
 
 _breaker36: None = None
+class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers(yadata.MNode):
+    hold_time: ?u64
+    keepalive_interval: ?u64
+
+    mut def __init__(self, hold_time: ?u64, keepalive_interval: ?u64) -> None:
+        self.hold_time = hold_time
+        self.keepalive_interval = keepalive_interval
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['srl_nokia-network-instance:network-instance', 'protocols', 'srl_nokia-bgp:bgp', 'neighbor', 'timers'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers:
+        if n is not None:
+            return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers(hold_time=n.get_opt_u64(ygdata.Id(NS_srl_nokia_bgp, 'hold-time')), keepalive_interval=n.get_opt_u64(ygdata.Id(NS_srl_nokia_bgp, 'keepalive-interval')))
+        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers()
+
+    mut def copy(self) -> srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers:
+        """Create a deep copy of this adata object"""
+        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers.from_gdata(self.to_gdata())
+
+
+_breaker37: None = None
 class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry(yadata.MNode):
     peer_address: str
     admin_state: ?str
@@ -1277,27 +1300,29 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_ent
     peer_as: ?u64
     peer_group: ?str
     authentication: srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication
+    timers: srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers
 
-    mut def __init__(self, peer_address: str, admin_state: ?str, description: ?str, peer_as: ?u64, peer_group: ?str, authentication: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication=None) -> None:
+    mut def __init__(self, peer_address: str, admin_state: ?str, description: ?str, peer_as: ?u64, peer_group: ?str, authentication: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication=None, timers: ?srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers=None) -> None:
         self.peer_address = peer_address
         self.admin_state = admin_state
         self.description = description
         self.peer_as = peer_as
         self.peer_group = peer_group
         self.authentication = authentication if authentication is not None else srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication()
+        self.timers = timers if timers is not None else srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers()
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['srl_nokia-network-instance:network-instance', 'protocols', 'srl_nokia-bgp:bgp', 'neighbor'])
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry:
-        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry(peer_address=n.get_str(ygdata.Id(NS_srl_nokia_bgp, 'peer-address')), admin_state=n.get_opt_str(ygdata.Id(NS_srl_nokia_bgp, 'admin-state')), description=n.get_opt_str(ygdata.Id(NS_srl_nokia_bgp, 'description')), peer_as=n.get_opt_u64(ygdata.Id(NS_srl_nokia_bgp, 'peer-as')), peer_group=n.get_opt_str(ygdata.Id(NS_srl_nokia_bgp, 'peer-group')), authentication=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication.from_gdata(n.get_opt_cnt(ygdata.Id(NS_srl_nokia_bgp, 'authentication'))))
+        return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry(peer_address=n.get_str(ygdata.Id(NS_srl_nokia_bgp, 'peer-address')), admin_state=n.get_opt_str(ygdata.Id(NS_srl_nokia_bgp, 'admin-state')), description=n.get_opt_str(ygdata.Id(NS_srl_nokia_bgp, 'description')), peer_as=n.get_opt_u64(ygdata.Id(NS_srl_nokia_bgp, 'peer-as')), peer_group=n.get_opt_str(ygdata.Id(NS_srl_nokia_bgp, 'peer-group')), authentication=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__authentication.from_gdata(n.get_opt_cnt(ygdata.Id(NS_srl_nokia_bgp, 'authentication'))), timers=srl_nokia_network_instance__network_instance__protocols__bgp__neighbor__timers.from_gdata(n.get_opt_cnt(ygdata.Id(NS_srl_nokia_bgp, 'timers'))))
 
     mut def copy(self) -> srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry:
         """Create a deep copy of this adata object"""
         return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry.from_gdata(self.to_gdata())
 
-_breaker37: None = None
+_breaker38: None = None
 class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor(yadata.MKeyedList[str, srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry]):
     mut def __init__(self, elements: list[srl_nokia_network_instance__network_instance__protocols__bgp__neighbor_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.peer_address == k, elements)
@@ -1336,7 +1361,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp__neighbor(yad
         return srl_nokia_network_instance__network_instance__protocols__bgp__neighbor(elements=copied_elements)
 
 
-_breaker38: None = None
+_breaker39: None = None
 class srl_nokia_network_instance__network_instance__protocols__bgp(yadata.MNode):
     autonomous_system: ?u64
     router_id: ?str
@@ -1370,7 +1395,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp(yadata.MNode)
         raise Exception('Unreachable in srl_nokia_network_instance__network_instance__protocols__bgp.copy()')
 
 
-_breaker39: None = None
+_breaker40: None = None
 class srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance__route_target(yadata.MNode):
     export_rt: ?str
     import_rt: ?str
@@ -1393,7 +1418,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_inst
         return srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance__route_target.from_gdata(self.to_gdata())
 
 
-_breaker40: None = None
+_breaker41: None = None
 class srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance_entry(yadata.MNode):
     id: u64
     route_target: srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance__route_target
@@ -1413,7 +1438,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_inst
         """Create a deep copy of this adata object"""
         return srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance_entry.from_gdata(self.to_gdata())
 
-_breaker41: None = None
+_breaker42: None = None
 class srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance(yadata.MKeyedList[u64, srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance_entry]):
     mut def __init__(self, elements: list[srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.id == k, elements)
@@ -1444,7 +1469,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_inst
         return srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance(elements=copied_elements)
 
 
-_breaker42: None = None
+_breaker43: None = None
 class srl_nokia_network_instance__network_instance__protocols__bgp_vpn(yadata.MNode):
     bgp_instance: srl_nokia_network_instance__network_instance__protocols__bgp_vpn__bgp_instance
 
@@ -1468,7 +1493,7 @@ class srl_nokia_network_instance__network_instance__protocols__bgp_vpn(yadata.MN
         raise Exception('Unreachable in srl_nokia_network_instance__network_instance__protocols__bgp_vpn.copy()')
 
 
-_breaker43: None = None
+_breaker44: None = None
 class srl_nokia_network_instance__network_instance__protocols(yadata.MNode):
     bgp_evpn: ?srl_nokia_network_instance__network_instance__protocols__bgp_evpn
     isis: ?srl_nokia_network_instance__network_instance__protocols__isis
@@ -1531,7 +1556,7 @@ class srl_nokia_network_instance__network_instance__protocols(yadata.MNode):
         return srl_nokia_network_instance__network_instance__protocols.from_gdata(self.to_gdata())
 
 
-_breaker44: None = None
+_breaker45: None = None
 class srl_nokia_network_instance__network_instance_entry(yadata.MNode):
     name: str
     type: ?Identityref
@@ -1561,7 +1586,7 @@ class srl_nokia_network_instance__network_instance_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return srl_nokia_network_instance__network_instance_entry.from_gdata(self.to_gdata())
 
-_breaker45: None = None
+_breaker46: None = None
 class srl_nokia_network_instance__network_instance(yadata.MKeyedList[str, srl_nokia_network_instance__network_instance_entry]):
     mut def __init__(self, elements: list[srl_nokia_network_instance__network_instance_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
@@ -1598,7 +1623,7 @@ class srl_nokia_network_instance__network_instance(yadata.MKeyedList[str, srl_no
         return srl_nokia_network_instance__network_instance(elements=copied_elements)
 
 
-_breaker46: None = None
+_breaker47: None = None
 class srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress(yadata.MNode):
     vni: ?u64
 
@@ -1619,7 +1644,7 @@ class srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress(ya
         return srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface__ingress.from_gdata(self.to_gdata())
 
 
-_breaker47: None = None
+_breaker48: None = None
 class srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry(yadata.MNode):
     index: u64
     type: ?Identityref
@@ -1641,7 +1666,7 @@ class srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry(yadat
         """Create a deep copy of this adata object"""
         return srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry.from_gdata(self.to_gdata())
 
-_breaker48: None = None
+_breaker49: None = None
 class srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface(yadata.MKeyedList[u64, srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry]):
     mut def __init__(self, elements: list[srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.index == k, elements)
@@ -1674,7 +1699,7 @@ class srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface(yadata.MKey
         return srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface(elements=copied_elements)
 
 
-_breaker49: None = None
+_breaker50: None = None
 class srl_nokia_tunnel_interfaces__tunnel_interface_entry(yadata.MNode):
     name: str
     vxlan_interface: srl_nokia_tunnel_interfaces__tunnel_interface__vxlan_interface
@@ -1694,7 +1719,7 @@ class srl_nokia_tunnel_interfaces__tunnel_interface_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return srl_nokia_tunnel_interfaces__tunnel_interface_entry.from_gdata(self.to_gdata())
 
-_breaker50: None = None
+_breaker51: None = None
 class srl_nokia_tunnel_interfaces__tunnel_interface(yadata.MKeyedList[str, srl_nokia_tunnel_interfaces__tunnel_interface_entry]):
     mut def __init__(self, elements: list[srl_nokia_tunnel_interfaces__tunnel_interface_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
@@ -1725,7 +1750,7 @@ class srl_nokia_tunnel_interfaces__tunnel_interface(yadata.MKeyedList[str, srl_n
         return srl_nokia_tunnel_interfaces__tunnel_interface(elements=copied_elements)
 
 
-_breaker51: None = None
+_breaker52: None = None
 class root(yadata.MNode):
     system: srl_nokia_system__system
     interface: srl_nokia_interfaces__interface

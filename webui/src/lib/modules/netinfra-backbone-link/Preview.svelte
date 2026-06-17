@@ -1,6 +1,5 @@
 <script lang="ts">
   import { encodeListKey } from '$lib/core/restconf/client';
-  import { formatPps } from '$lib/core/topology/model';
   import { formatNetinfraBackboneLinkEndpoints } from '$lib/modules/netinfra-backbone-link/model';
 
   import type { NetinfraBackboneLinkDraft } from '$lib/modules/netinfra-backbone-link/model';
@@ -27,28 +26,6 @@
       <dt>Endpoints</dt>
       <dd>{formatNetinfraBackboneLinkEndpoints(draft)}</dd>
     </div>
-    <div class="preview__meta-item">
-      <dt>Monitoring</dt>
-      <dd>{draft.monitorTraffic ? 'Enabled' : 'Disabled'}</dd>
-    </div>
-    {#if draft.monitorTraffic}
-      <div class="preview__meta-item">
-        <dt>Link status</dt>
-        <dd
-          class="status"
-          class:status--up={draft.linkStatus === 'up'}
-          class:status--down={draft.linkStatus === 'down'}
-        >● {draft.linkStatus}</dd>
-      </div>
-      <div class="preview__meta-item">
-        <dt>Left PPS (rx on left iface)</dt>
-        <dd class="mono">{formatPps(draft.leftPps)}{draft.leftPps !== null ? ' pps' : ''}</dd>
-      </div>
-      <div class="preview__meta-item">
-        <dt>Right PPS (rx on right iface)</dt>
-        <dd class="mono">{formatPps(draft.rightPps)}{draft.rightPps !== null ? ' pps' : ''}</dd>
-      </div>
-    {/if}
   </dl>
   <pre>{JSON.stringify(payload, null, 2)}</pre>
 </div>
@@ -82,24 +59,5 @@
     margin: 0;
     font-size: 13px;
     color: var(--sw-text-secondary);
-  }
-
-  .preview__meta dd.mono {
-    font-family: var(--sw-font-mono);
-    color: var(--sw-text-primary);
-  }
-
-  .preview__meta dd.status {
-    font-family: var(--sw-font-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-
-  .preview__meta dd.status--up {
-    color: rgba(34, 197, 94, 0.95);
-  }
-
-  .preview__meta dd.status--down {
-    color: rgba(239, 68, 68, 0.95);
   }
 </style>

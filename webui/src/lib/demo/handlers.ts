@@ -68,32 +68,11 @@ function notFound(message: string): Response {
 
 // ── shared payload shapes ──
 
-function netinfraTree(state: DemoState, jitterPps: boolean): Record<string, unknown> {
-  const links = jitterPps
-    ? state.backboneLinks.map((link) => jitterLink(link))
-    : state.backboneLinks;
+function netinfraTree(state: DemoState): Record<string, unknown> {
   return {
     'global-settings': state.globalSettings,
     router: state.routers,
-    'backbone-link': links
-  };
-}
-
-function jitterLink(link: NetinfraBackboneLinkApi): NetinfraBackboneLinkApi {
-  if (!link['monitor-traffic'] || !link.state || link.state['link-status'] !== 'up') {
-    return link;
-  }
-  const wiggle = (pps: number | string | undefined) => {
-    const base = Number(pps ?? 0);
-    return Math.max(0, Math.round(base * (0.9 + Math.random() * 0.2)));
-  };
-  return {
-    ...link,
-    state: {
-      ...link.state,
-      'left-pps': wiggle(link.state['left-pps']),
-      'right-pps': wiggle(link.state['right-pps'])
-    }
+    'backbone-link': state.backboneLinks
   };
 }
 
@@ -269,7 +248,7 @@ async function handleRestconf(
 
   if (top === 'netinfra:netinfra') {
     if (rest.length === 0) {
-      if (method === 'GET') return json({ 'netinfra:netinfra': netinfraTree(state, true) });
+      if (method === 'GET') return json({ 'netinfra:netinfra': netinfraTree(state) });
       return restconfNotFound(`unsupported ${method} on netinfra:netinfra`);
     }
 
@@ -532,7 +511,7 @@ async function handleOrchestron(
         ? 'json'
         : 'xml';
     const body = layerConfigText(layer, format, {
-      netinfra: { 'netinfra:netinfra': netinfraTree(state, false) },
+      netinfra: { 'netinfra:netinfra': netinfraTree(state) },
       l3vpn: { 'ietf-l3vpn-svc:l3vpn-svc': l3vpnTree(state) },
       routers: managedRouters(state)
     });

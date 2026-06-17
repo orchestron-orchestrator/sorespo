@@ -46,6 +46,9 @@ export interface ServiceModule<TDraft = unknown> {
   }>;
   Summary?: Component<{ draft: TDraft }>;
   Preview?: Component<{ draft: TDraft; payload: unknown }>;
+  /** Optional read-only panel rendered as a separate box above the editor card
+   * (e.g. live telemetry). Renders nothing when there is nothing to show. */
+  StatePanel?: Component<{ draft: TDraft }>;
 }
 
 export function getDraftKey<TDraft>(module: ServiceModule<TDraft>, draft: TDraft): string {

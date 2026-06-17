@@ -1,4 +1,4 @@
-import { parseLinkStatus, parsePps } from '$lib/core/topology/model';
+import { parseLinkStatus } from '$lib/core/topology/model';
 import { createNetinfraBackboneLinkDraft } from '$lib/modules/netinfra-backbone-link/defaults';
 import {
   formatNetinfraBackboneLinkEndpoints,
@@ -32,17 +32,12 @@ export function parseNetinfraBackboneLink(input: unknown): NetinfraBackboneLinkD
     return defaults;
   }
 
-  const state = backboneLink.state;
-
   return {
     leftRouter: String(backboneLink['left-router'] ?? ''),
     leftInterface: String(backboneLink['left-interface'] ?? ''),
     rightRouter: String(backboneLink['right-router'] ?? ''),
     rightInterface: String(backboneLink['right-interface'] ?? ''),
-    monitorTraffic: Boolean(backboneLink['monitor-traffic'] ?? false),
-    leftPps: parsePps(state?.['left-pps']),
-    rightPps: parsePps(state?.['right-pps']),
-    linkStatus: parseLinkStatus(state?.['link-status'])
+    linkStatus: parseLinkStatus(backboneLink['state']?.['link-status'])
   };
 }
 
@@ -56,23 +51,18 @@ export function listNetinfraBackboneLinks(input: any): ServiceListItem[] {
 
   return backboneLinks.map((backboneLink) => {
     const draft = parseNetinfraBackboneLink(backboneLink);
-    const badges = draft.monitorTraffic
-      ? [
-          {
-            text: `● ${draft.linkStatus}`,
-            tone: draft.linkStatus,
-            title: 'Combined link oper-status (AND of both endpoints)'
-          }
-        ]
-      : undefined;
+    const status = draft.linkStatus;
 
     return {
       id: getNetinfraBackboneLinkRouteId(draft),
       label: formatNetinfraBackboneLinkEndpoints(draft),
-      description: draft.monitorTraffic
-        ? 'Traffic monitoring enabled'
-        : 'Traffic monitoring disabled',
-      badges
+      badges: [
+        {
+          text: status === 'up' ? 'UP' : status === 'down' ? 'DOWN' : 'UNKNOWN',
+          tone: status,
+          title: 'Backbone link operational status'
+        }
+      ]
     };
   });
 }

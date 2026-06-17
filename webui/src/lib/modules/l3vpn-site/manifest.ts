@@ -1,5 +1,6 @@
 import Editor from '$lib/modules/l3vpn-site/Editor.svelte';
 import Preview from '$lib/modules/l3vpn-site/Preview.svelte';
+import StatePanel from '$lib/modules/l3vpn-site/StatePanel.svelte';
 import Summary from '$lib/modules/l3vpn-site/Summary.svelte';
 import { createL3VpnSiteDraft } from '$lib/modules/l3vpn-site/defaults';
 import { listL3VpnSites, parseL3VpnSite } from '$lib/modules/l3vpn-site/parse';
@@ -25,5 +26,6 @@ export const module: ServiceModule<L3VpnSiteDraft> = {
   serialize: serializeL3VpnSiteDraft,
   Editor,
   Summary,
-  Preview
+  Preview,
+  StatePanel
 };

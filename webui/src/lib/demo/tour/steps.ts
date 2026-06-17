@@ -10,7 +10,7 @@ export const TOUR_STEPS: TourStep[] = [
     route: '/',
     target: 'topology',
     title: 'Live network topology',
-    body: 'The dashboard draws the network straight from the netinfra service model: core routers, backbone links with live traffic counters, and the customer sites attached to them. It refreshes every few seconds — watch the pps numbers move.'
+    body: 'The dashboard draws the network straight from the netinfra service model: core routers, backbone links with live link status, and the customer sites attached to them. It refreshes every few seconds to pick up state changes.'
   },
   {
     route: '/',

@@ -7,8 +7,6 @@ from stratoweave.exception import UnsupportedDevice
 from rtrsecrets.junos import *
 from rtrsecrets.cisco import cisco_type7_encrypt
 
-import timeseries
-
 import sorespo.layers.base_2 as base
 import sorespo.layers.y_2 as y_2
 import sorespo.layers.y_2_oper as y_2_oper
@@ -51,19 +49,53 @@ def net_from_ip_address(ip_address):
     net_clns_address = '49.0001.' + join_str[0:4] + '.' + join_str[4:8] + '.' + join_str[8:] + '.00'
     return net_clns_address
 
-class InterfaceStats(object):
-    rx_packets: ?u64
-    oper_status: ?str
-
-    def __init__(self, rx_packets: ?u64, oper_status: ?str=None):
-        self.rx_packets = rx_packets
-        self.oper_status = oper_status
-
 def _bb_interface_description(remote_device: str, remote_interface: str) -> str:
     return "Link to {remote_device} [{remote_interface}]"
 
 def bb_interface_subscription_owner_id(interface_name: str) -> str:
     return "backbone-interface:{interface_name}"
+
+# --- BGP neighbor session telemetry (SR Linux) -------------------------------
+# Poll SR Linux BGP session-state normally; subscribe to details only in debug.
+
+class BgpNeighborStats(object):
+    session_state: ?str
+    last_event: ?str
+    established_transitions: ?u64
+    negotiated_hold_time: ?u64
+    last_notification: ?str
+
+    def __init__(self):
+        self.session_state = None
+        self.last_event = None
+        self.established_transitions = None
+        self.negotiated_hold_time = None
+        self.last_notification = None
+
+def _fmt_notification(sent: ?str, received: ?str) -> ?str:
+    # Tag notification direction so local and peer teardowns stay distinct.
+    if sent is not None and received is not None:
+        return "sent:{sent} received:{received}"
+    if sent is not None:
+        return "sent:{sent}"
+    if received is not None:
+        return "received:{received}"
+    return None
+
+def _read_srl_bgp(root: srl25_oper_root, ni: str, addr: str) -> BgpNeighborStats:
+    s = BgpNeighborStats()
+    for n in root.network_instance:
+        if n.name == ni:
+            bgp = n.protocols.bgp
+            if bgp is not None:
+                for nb in bgp.neighbor:
+                    if nb.peer_address == addr:
+                        s.session_state = nb.session_state
+                        s.last_event = nb.last_event
+                        s.established_transitions = nb.established_transitions
+                        s.negotiated_hold_time = nb.timers.negotiated_hold_time
+                        s.last_notification = _fmt_notification(nb.sent_messages.last_notification_error_code, nb.received_messages.last_notification_error_code)
+    return s
 
 class BaseConfig(base.BaseConfig):
     def transform(self, i, di):
@@ -185,92 +217,6 @@ end-policy
 
         raise UnsupportedDevice()
 
-actor BBInterfaceTransform(path, update_oper: proc(?y_2_oper.stratoweave_rfs__rfs__backbone_interface_entry)->None, dev: swdev.DeviceMgr):
-    _subs = gdata.SubscriptionManager(dev.tree_provider(), str(path))
-    _oper = base.BBInterface.new_state(path)
-    var rx_packets: timeseries.Counter[u64] = timeseries.Counter(None, 2)
-
-    def reset_stats():
-        rx_packets.clear()
-        _oper.state.rx_packets = None
-        _oper.state.pps = None
-        _oper.state.oper_status = None
-        update_oper(_oper)
-
-    def handle_stats(stats: InterfaceStats):
-        # oper_status updates independently of rx_packets so we always publish it
-        _oper.state.oper_status = stats.oper_status
-        if stats.rx_packets is None:
-            rx_packets.clear()
-            _oper.state.rx_packets = None
-            _oper.state.pps = None
-            update_oper(_oper)
-            return
-        rx_packets.add(stats.rx_packets!)
-        rate = rx_packets.rate()
-        _oper.state.rx_packets = stats.rx_packets!
-        _oper.state.pps = rate
-        update_oper(_oper)
-
-    def on_xr_state(root: ?xr25_oper_root, err: ?Exception):
-        stats = InterfaceStats(None)
-        if err is not None:
-            print("BBInterfaceTransform subscription error: {err}", err=True)
-        elif root is not None:
-            for interface in root.pfi_im_cmd_oper_interfaces.interface_xr.interface:
-                stats.rx_packets = interface.interface_statistics.full_interface_stats.packets_received
-                raw = interface.state
-                if raw == "im-state-up" or raw == "im-state-operational":
-                    stats.oper_status = "up"
-                elif raw == "im-state-unknown" or raw == "im-state-not-ready" or raw == "im-state-last":
-                    stats.oper_status = "unknown"
-                elif raw is not None and raw.startswith("im-state-"):
-                    # Any other im-state-* value (admin/non-admin down,
-                    # shutdown, err-disable, begin/end transitions, reset,
-                    # not-operational, …) is operationally down.
-                    stats.oper_status = "down"
-                elif raw is not None:
-                    stats.oper_status = "unknown"
-        handle_stats(stats)
-
-    def on_srl_state(root: ?srl25_oper_root, err: ?Exception):
-        stats = InterfaceStats(None)
-        if err is not None:
-            print("BBInterfaceTransform subscription error: {err}", err=True)
-        elif root is not None:
-            for interface in root.interface:
-                stats.rx_packets = interface.statistics.in_unicast_packets
-                raw = interface.oper_state
-                if raw == "up":
-                    stats.oper_status = "up"
-                elif raw == "down":
-                    stats.oper_status = "down"
-                elif raw is not None:
-                    stats.oper_status = "unknown"
-        handle_stats(stats)
-
-    def on_conf(conf: y_2.stratoweave_rfs__rfs__backbone_interface_entry):
-        want: set[gdata.Delivery] = set()
-        modset = dev.get_modules().0
-        if conf.monitor_traffic:
-            if "Cisco-IOS-XR-um-hostname-cfg" in modset:
-                xr_dst = xr25_oper.dst(on_xr_state)
-                want.add(xr_dst.deliver({
-                    xr25_oper.subs.pfi_im_cmd_oper_interfaces.interface_xr.interface.entry(conf.name).interface_statistics.full_interface_stats.packets_received.subscribe(period=5.0),
-                    xr25_oper.subs.pfi_im_cmd_oper_interfaces.interface_xr.interface.entry(conf.name).state.subscribe(period=5.0)
-                }))
-            elif "srl_nokia-system" in modset:
-                srl_dst = srl25_oper.dst(on_srl_state)
-                want.add(srl_dst.deliver({
-                    srl25_oper.subs.interface.entry(conf.name).statistics.in_unicast_packets.subscribe(period=5.0),
-                    srl25_oper.subs.interface.entry(conf.name).oper_state.subscribe(period=5.0)
-                }))
-            else:
-                reset_stats()
-        else:
-            reset_stats()
-        _subs.declare(want)
-
 class BBInterface(base.BBInterface):
     def transform(self, i, di):
         print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}]", err=True)
@@ -359,6 +305,68 @@ class BBInterface(base.BBInterface):
             return dev
 
         raise UnsupportedDevice()
+
+
+# --- Backbone interface oper-status -------------------------------------------
+# Poll each backbone interface's oper-state from the device. The inter/CFS
+# BBLinkTransform lift combines the two endpoints into a link-status (up only
+# when both ends are up). SR Linux and IOS XR expose interface oper-state.
+actor BBInterfaceTransform(path, update_oper: proc(?y_2_oper.stratoweave_rfs__rfs__backbone_interface_entry)->None, dev: swdev.DeviceMgr):
+    _subs = gdata.SubscriptionManager(dev.tree_provider(), str(path))
+    _oper = base.BBInterface.new_state(path)
+
+    def publish(oper_status: ?str):
+        _oper.state.oper_status = oper_status
+        update_oper(_oper)
+
+    def on_xr_state(root: ?xr25_oper_root, err: ?Exception):
+        status: ?str = None
+        if err is not None:
+            print("BBInterfaceTransform subscription error: {err}", err=True)
+        elif root is not None:
+            for interface in root.pfi_im_cmd_oper_interfaces.interface_xr.interface:
+                raw = interface.state
+                if raw == "im-state-up" or raw == "im-state-operational":
+                    status = "up"
+                elif raw == "im-state-unknown" or raw == "im-state-not-ready" or raw == "im-state-last":
+                    status = "unknown"
+                elif raw is not None and raw.startswith("im-state-"):
+                    # Any other im-state-* (admin/non-admin down, shutdown,
+                    # err-disable, transitions, reset, …) is operationally down.
+                    status = "down"
+                elif raw is not None:
+                    status = "unknown"
+        publish(status)
+
+    def on_srl_state(root: ?srl25_oper_root, err: ?Exception):
+        status: ?str = None
+        if err is not None:
+            print("BBInterfaceTransform subscription error: {err}", err=True)
+        elif root is not None:
+            for interface in root.interface:
+                raw = interface.oper_state
+                if raw == "up":
+                    status = "up"
+                elif raw == "down":
+                    status = "down"
+                elif raw is not None:
+                    status = "unknown"
+        publish(status)
+
+    def on_conf(conf: y_2.stratoweave_rfs__rfs__backbone_interface_entry):
+        want: set[gdata.Delivery] = set()
+        modset = dev.get_modules().0
+        if "Cisco-IOS-XR-um-hostname-cfg" in modset:
+            xr_dst = xr25_oper.dst(on_xr_state)
+            want.add(xr_dst.deliver({
+                xr25_oper.subs.pfi_im_cmd_oper_interfaces.interface_xr.interface.entry(conf.name).state.subscribe(period=5.0)
+            }))
+        elif "srl_nokia-system" in modset:
+            srl_dst = srl25_oper.dst(on_srl_state)
+            want.add(srl_dst.deliver({
+                srl25_oper.subs.interface.entry(conf.name).oper_state.subscribe(period=5.0)
+            }))
+        _subs.declare(want)
 
 
 class IbgpNeighbor(base.IbgpNeighbor):
@@ -574,7 +582,81 @@ class EbgpCustomer(base.EbgpCustomer):
             neighbor = bgp.neighbor.create(i.address, peer_as=i.peer_asn, peer_group="customer")
             if i.authentication_key is not None:
                 neighbor.authentication.password = i.authentication_key!
+            neighbor.timers.hold_time = 3
+            neighbor.timers.keepalive_interval = 1
 
             return dev
 
         raise UnsupportedDevice()
+
+
+actor EbgpCustomerTransform(path, update_oper: proc(?y_2_oper.stratoweave_rfs__rfs__ebgp_customer_entry)->None, dev: swdev.DeviceMgr):
+    # eBGP customer neighbor: a single-hop PE<->CE peer in the VRF network-instance.
+    _subs = gdata.SubscriptionManager(dev.tree_provider(), str(path))
+    _oper = base.EbgpCustomer.new_state(path)
+    var debug: bool = False
+    var _addr: ?str = None
+    var _vrf: ?str = None
+
+    def declare():
+        want: set[gdata.Delivery] = set()
+        modset = dev.get_modules().0
+        addr = _addr
+        vrf = _vrf
+        if addr is not None and vrf is not None and "srl_nokia-system" in modset:
+            dst = srl25_oper.dst(on_srl_state)
+            nb = srl25_oper.subs.network_instance.entry(vrf).protocols.bgp.neighbor.entry(addr)
+            period = 1.0 if debug else 2.0
+            specs: set[gdata.SubscriptionSpec] = { nb.session_state.subscribe(period=period) }
+            if debug:
+                specs.add(nb.last_event.subscribe(period=1.0))
+                specs.add(nb.established_transitions.subscribe(period=1.0))
+                specs.add(nb.timers.negotiated_hold_time.subscribe(period=1.0))
+                specs.add(nb.received_messages.last_notification_error_code.subscribe(period=1.0))
+                specs.add(nb.sent_messages.last_notification_error_code.subscribe(period=1.0))
+            want.add(dst.deliver(specs))
+        _subs.declare(want)
+
+    def on_srl_state(root: ?srl25_oper_root, err: ?Exception):
+        if err is not None:
+            print("EbgpCustomerTransform subscription error: {err}", err=True)
+            return
+        addr = _addr
+        vrf = _vrf
+        s = BgpNeighborStats()
+        if root is not None and addr is not None and vrf is not None:
+            s = _read_srl_bgp(root, vrf, addr)
+        publish(s)
+
+    def publish(s: BgpNeighborStats):
+        # Deliveries may contain only changed leaves; keep prior values when absent.
+        if s.session_state is not None:
+            _oper.state.session_state = s.session_state
+        ss = _oper.state.session_state
+        new_debug = ss is not None and ss != "established"
+        if new_debug:
+            # Fold in whatever detail this delivery carried.
+            if s.last_event is not None:
+                _oper.state.last_event = s.last_event
+            if s.established_transitions is not None:
+                _oper.state.established_transitions = s.established_transitions
+            if s.negotiated_hold_time is not None:
+                _oper.state.negotiated_hold_time = s.negotiated_hold_time
+            if s.last_notification is not None:
+                _oper.state.last_notification = s.last_notification
+        else:
+            # Clear details outside debug.
+            _oper.state.last_event = None
+            _oper.state.established_transitions = None
+            _oper.state.negotiated_hold_time = None
+            _oper.state.last_notification = None
+        _oper.state.debug_active = new_debug
+        if new_debug != debug:
+            debug = new_debug
+            declare()
+        update_oper(_oper)
+
+    def on_conf(conf: y_2.stratoweave_rfs__rfs__ebgp_customer_entry):
+        _addr = conf.address
+        _vrf = conf.vrf
+        declare()
