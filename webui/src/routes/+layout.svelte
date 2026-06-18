@@ -191,18 +191,6 @@
       </div>
 
       <div class="nav-section">
-        <div class="nav-section-label">Settings</div>
-        <a
-          class="nav-item"
-          class:active={currentPathname.startsWith('/global-settings')}
-          href="/global-settings"
-        >
-          <span class="nav-icon">⚙</span>
-          Global Settings
-        </a>
-      </div>
-
-      <div class="nav-section">
         <div class="nav-section-label">Services</div>
         <a
           class="nav-item"
@@ -224,6 +212,15 @@
               {serviceModule.title}
             </a>
           {/each}
+
+          <a
+            class="nav-item nav-item--sub"
+            class:active={currentPathname.startsWith('/global-settings')}
+            href="/global-settings"
+          >
+            <span class="nav-icon nav-icon--gear">⚙</span>
+            Global Settings
+          </a>
         </div>
       </div>
     </nav>
@@ -280,6 +277,11 @@
   .nav-item--sub .nav-icon {
     width: 12px;
     font-size: 14px;
+  }
+
+  /* The ⚙ glyph's ink sits lower than the · dots; nudge it up to align. */
+  .nav-icon--gear {
+    transform: translateY(-2px);
   }
 
   .cmdk-trigger {
