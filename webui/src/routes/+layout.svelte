@@ -179,6 +179,18 @@
       </div>
 
       <div class="nav-section">
+        <div class="nav-section-label">Layers</div>
+        <a
+          class="nav-item"
+          class:active={currentPathname.startsWith('/layers')}
+          href="/layers"
+        >
+          <span class="nav-icon">▤</span>
+          Config
+        </a>
+      </div>
+
+      <div class="nav-section">
         <div class="nav-section-label">Settings</div>
         <a
           class="nav-item"

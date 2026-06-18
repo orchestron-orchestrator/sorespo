@@ -232,3 +232,21 @@ export async function fetchDeviceConfigLog(
 ): Promise<{ log?: ConfigLogEntry[] }> {
   return apiRequest(`/device/${deviceId.toUpperCase()}/log?format=${format}`);
 }
+
+// The /layer/<index> endpoint selects its serialization via the Accept header
+// (unlike the /device config endpoints, which use a ?format= query param).
+const LAYER_ACCEPT: Record<string, string> = {
+  xml: 'application/yang-data+xml',
+  json: 'application/yang-data+json',
+  adata: 'application/yang-data+acton-adata'
+};
+
+export async function fetchLayerConfig(index: number, format = 'xml'): Promise<string> {
+  const accept = LAYER_ACCEPT[format] ?? LAYER_ACCEPT.xml;
+  const suffix = format === 'adata' ? '?loose=true' : '';
+  const response = await fetch(`${API_BASE}/layer/${index}${suffix}`, { headers: { accept } });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch layer ${index} config (HTTP ${response.status})`);
+  }
+  return response.text();
+}
