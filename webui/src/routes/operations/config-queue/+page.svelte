@@ -8,6 +8,7 @@
     type QueueItemSummary
   } from '$lib/core/orchestron/client';
   import { queuesPoll, refreshQueues, type QueuesPollValue } from '$lib/core/orchestron/poll-store';
+  import { highlightXmlDiff } from '$lib/core/diff/xml-diff';
 
   let allQueues: QueueItemSummary[] = $state([]);
   let loading = $state(true);
@@ -39,6 +40,11 @@
       ? deviceGroups[selectedDevice][selectedQueueIndex] ?? null
       : null
   );
+  let diffRuns = $derived.by(() => {
+    const diff = itemDetail?.config_diff;
+    if (diffFormat !== 'xml' || !diff) return [];
+    return highlightXmlDiff(diff);
+  });
 
   onMount(() => {
     const unsubscribePoll = queuesPoll.subscribe((value) => {
@@ -264,7 +270,11 @@
       </div>
 
       {#if itemDetail.config_diff}
-        <pre>{itemDetail.config_diff}</pre>
+        {#if diffFormat === 'xml' && diffRuns.length > 0}
+          <pre>{#each diffRuns as run}<span class:diff-add={run.kind === 'add'} class:diff-remove={run.kind === 'remove'}>{run.text}</span>{/each}</pre>
+        {:else}
+          <pre>{itemDetail.config_diff}</pre>
+        {/if}
       {:else}
         <div class="empty-state">No configuration diff available for this queue item.</div>
       {/if}
@@ -420,6 +430,18 @@
     background: var(--sw-bg-deep);
     border: 1px solid var(--sw-border-subtle);
     color: var(--sw-text-secondary);
+  }
+
+  .diff-add {
+    color: var(--sw-success);
+  }
+
+  .diff-remove {
+    color: var(--sw-danger);
+    background: var(--sw-danger-dim);
+    border-radius: 4px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
   }
 
   @media (max-width: 980px) {
