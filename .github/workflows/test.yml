@@ -2,9 +2,15 @@ name: Test
 
 on:
   push:
+  pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   build-and-test:
+    # Local push + fork PRs only (local PRs are skipped because push ran them).
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     steps:
       - id: setup-acton
@@ -87,16 +93,22 @@ jobs:
           replacesArtifacts: true
 
   net-test:
+    # Local push + fork PRs only (local PRs are skipped because push ran them).
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     strategy:
       fail-fast: false
       matrix:
-        TESTENV: [quicklab, quicklab-crpd, quicklab-notconf, quicklab-srl]
+        # Fork PRs have no access to secrets / private registry, so only run with public images
+        TESTENV: ${{ fromJSON(github.event_name == 'push' && '["quicklab","quicklab-crpd","quicklab-notconf","quicklab-srl"]' || '["quicklab-notconf","quicklab-srl"]') }}
         ARCH: [linux-x86_64, linux-aarch64]
         exclude:
           # No Cisco IOS XRd support for aarch64 :/
           - TESTENV: quicklab
             ARCH: linux-aarch64
     runs-on: ${{ matrix.arch == 'linux-x86_64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
+    permissions:
+      contents: read
+      packages: read
     env:
       IMAGE_PATH: ${{ secrets.IMAGE_PATH || format('ghcr.io/{0}/', github.repository) }}
     needs: build-and-test
@@ -117,6 +129,7 @@ jobs:
           path: out/bin/
       - run: chmod a+x out/bin/sorespo
       - name: "Check out licenses repo"
+        if: ${{ matrix.TESTENV == 'quicklab' || matrix.TESTENV == 'quicklab-crpd' }}
         uses: actions/checkout@v4
         with:
           repository: ${{ github.repository_owner }}/licenses
@@ -125,7 +138,7 @@ jobs:
       # If we're using IMAGE_PATH=ghcr.io/... login to ghcr.io using GITHUB_TOKEN
       # TODO: what about other (external) registries that require login?
       - name: Login to ghcr.io
-        if: ${{ startsWith(env.IMAGE_PATH, 'ghcr.io') }}
+        if: ${{ startsWith(env.IMAGE_PATH, 'ghcr.io') && (matrix.TESTENV == 'quicklab' || matrix.TESTENV == 'quicklab-crpd') }}
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: "Start quicklab"
