@@ -6,6 +6,7 @@ from stratoweave.exception import UnsupportedDevice
 
 from rtrsecrets.junos import *
 from rtrsecrets.cisco import cisco_type7_encrypt
+from rtrsecrets.nokia import nokia_srl_aes1_encrypt
 
 import sorespo.layers.base_2 as base
 import sorespo.layers.y_2 as y_2
@@ -22,6 +23,8 @@ import sorespo.devices.NokiaSRLinux_25_3_2_oper as srl25_oper
 from sorespo.devices.NokiaSRLinux_25_3_2_oper import root as srl25_oper_root
 
 CRPD = True
+
+_SRL_AES1_SALT = b"\x01\x00sorespo!\x6f"
 
 def prefix_length_to_netmask(prefix_length):
     binary_netmask = ("1" * prefix_length).ljust(32, "0")
@@ -581,7 +584,7 @@ class EbgpCustomer(base.EbgpCustomer):
             bgp = ni.protocols.create_bgp()
             neighbor = bgp.neighbor.create(i.address, peer_as=i.peer_asn, peer_group="customer")
             if i.authentication_key is not None:
-                neighbor.authentication.password = i.authentication_key!
+                neighbor.authentication.password = nokia_srl_aes1_encrypt(i.authentication_key!, _SRL_AES1_SALT)
             neighbor.timers.hold_time = 3
             neighbor.timers.keepalive_interval = 1
 
