@@ -11,6 +11,7 @@
     type DeviceInfo,
     type QueueItemDetail
   } from '$lib/core/orchestron/client';
+  import { highlightXmlDiff } from '$lib/core/diff/xml-diff';
 
   let {
     data
@@ -29,6 +30,10 @@
   let device = $derived(data.device);
   let deviceId = $derived(data.deviceId);
   let error = $derived(data.loadError);
+  let diffRuns = $derived.by(() => {
+    const diff = queueItemDetail?.config_diff;
+    return diff ? highlightXmlDiff(diff) : [];
+  });
 
   $effect(() => {
     if (browser && deviceId && deviceId !== lastLoadedId) {
@@ -289,7 +294,7 @@
                   Status: {queueItemDetail.approved === true ? 'Approved' : 'Pending Approval'}
                 </p>
                 {#if queueItemDetail.config_diff}
-                  <pre>{queueItemDetail.config_diff}</pre>
+                  <pre>{#each diffRuns as run}<span class:diff-add={run.kind === 'add'} class:diff-remove={run.kind === 'remove'}>{run.text}</span>{/each}</pre>
                 {:else}
                   <p class="device-detail__muted">No configuration diff available for this item.</p>
                 {/if}
@@ -458,6 +463,18 @@
     background: var(--sw-bg-deep);
     border: 1px solid var(--sw-border-subtle);
     color: var(--sw-text-secondary);
+  }
+
+  .diff-add {
+    color: var(--sw-success);
+  }
+
+  .diff-remove {
+    color: var(--sw-danger);
+    background: var(--sw-danger-dim);
+    border-radius: 4px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
   }
 
   .module-table-wrap {
