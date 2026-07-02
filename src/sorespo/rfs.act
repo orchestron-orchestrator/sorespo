@@ -100,6 +100,58 @@ def _read_srl_bgp(root: srl25_oper_root, ni: str, addr: str) -> BgpNeighborStats
                         s.last_notification = _fmt_notification(nb.sent_messages.last_notification_error_code, nb.received_messages.last_notification_error_code)
     return s
 
+# --- BGP neighbor session telemetry (Cisco IOS XR) ---------------------------
+# XR exposes neighbor oper state under Cisco-IOS-XR-ipv4-bgp-oper; the eBGP
+# customer neighbor lives in the per-VRF table (vrfs/vrf), matching the RFS
+# ebgp-customer config which places it under `router bgp <as> / vrf <name>`.
+
+def _xr_conn_state(s: ?str) -> ?str:
+    # Normalise XR Bgp-conn-state ("bgp-st-estab", …) to the layer's session-state
+    # enum. Anything other than "established" keeps debug escalation armed.
+    if s is None:
+        return None
+    elif s == "bgp-st-idle":
+        return "idle"
+    elif s == "bgp-st-connect":
+        return "connect"
+    elif s == "bgp-st-active":
+        return "active"
+    elif s == "bgp-st-open-sent":
+        return "opensent"
+    elif s == "bgp-st-open-confirm":
+        return "openconfirm"
+    elif s == "bgp-st-estab":
+        return "established"
+    else:
+        # closing / closing-sync / dont-care: not established.
+        return "idle"
+
+def _xr_reset_reason(r: ?str) -> ?str:
+    # "bgp-none" means the session has never reset; treat as no event.
+    if r is None or r == "bgp-none":
+        return None
+    return r
+
+def _fmt_xr_notification(code: ?u64, subcode: ?u64) -> ?str:
+    # XR reports the last NOTIFICATION as numeric code/subcode; surface only real ones.
+    if code is not None and code != 0:
+        sc = subcode if subcode is not None else u64(0)
+        return "code:{code} subcode:{sc}"
+    return None
+
+def _read_xr_bgp(root: xr25_oper_root, vrf: str, addr: str) -> BgpNeighborStats:
+    s = BgpNeighborStats()
+    for inst in root.bgp.instances.instance:
+        for v in inst.instance_active.vrfs.vrf:
+            if v.vrf_name == vrf:
+                for nb in v.neighbors.neighbor:
+                    if nb.neighbor_address == addr:
+                        s.session_state = _xr_conn_state(nb.connection_state)
+                        s.negotiated_hold_time = nb.hold_time
+                        s.last_event = _xr_reset_reason(nb.reset_reason)
+                        s.last_notification = _fmt_xr_notification(nb.last_notify_error_code, nb.last_notify_error_subcode)
+    return s
+
 class BaseConfig(base.BaseConfig):
     def transform(self, i, di):
         print("RFS /rfs{{{di.name}}}/base-config transform running {i.role}", err=True)
@@ -618,6 +670,17 @@ actor EbgpCustomerTransform(path, update_oper: proc(?y_2_oper.stratoweave_rfs__r
                 specs.add(nb.received_messages.last_notification_error_code.subscribe(period=1.0))
                 specs.add(nb.sent_messages.last_notification_error_code.subscribe(period=1.0))
             want.add(dst.deliver(specs))
+        elif addr is not None and vrf is not None and "Cisco-IOS-XR-um-hostname-cfg" in modset:
+            dst = xr25_oper.dst(on_xr_state)
+            nb = xr25_oper.subs.bgp.instances.instance.entry("default").instance_active.vrfs.vrf.entry(vrf).neighbors.neighbor.entry(addr)
+            period = 1.0 if debug else 2.0
+            specs: set[gdata.SubscriptionSpec] = { nb.connection_state.subscribe(period=period) }
+            if debug:
+                specs.add(nb.reset_reason.subscribe(period=1.0))
+                specs.add(nb.hold_time.subscribe(period=1.0))
+                specs.add(nb.last_notify_error_code.subscribe(period=1.0))
+                specs.add(nb.last_notify_error_subcode.subscribe(period=1.0))
+            want.add(dst.deliver(specs))
         _subs.declare(want)
 
     def on_srl_state(root: ?srl25_oper_root, err: ?Exception):
@@ -629,6 +692,17 @@ actor EbgpCustomerTransform(path, update_oper: proc(?y_2_oper.stratoweave_rfs__r
         s = BgpNeighborStats()
         if root is not None and addr is not None and vrf is not None:
             s = _read_srl_bgp(root, vrf, addr)
+        publish(s)
+
+    def on_xr_state(root: ?xr25_oper_root, err: ?Exception):
+        if err is not None:
+            print("EbgpCustomerTransform subscription error: {err}", err=True)
+            return
+        addr = _addr
+        vrf = _vrf
+        s = BgpNeighborStats()
+        if root is not None and addr is not None and vrf is not None:
+            s = _read_xr_bgp(root, vrf, addr)
         publish(s)
 
     def publish(s: BgpNeighborStats):
