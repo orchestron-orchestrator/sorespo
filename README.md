@@ -22,7 +22,7 @@ foundation for your own network automation system design.
 
 ## Getting Started
 
-Head over to our [tutorials](docs/tutorials/README.md) to get started with
+Head over to our [tutorials](https://www.stratoweave.org/tutorials) to get started with
 running the SORESPO network and/or making your first changes to the code in
 minutes!
 
