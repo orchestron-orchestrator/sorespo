@@ -31,7 +31,7 @@ run:
  *NOTE*: Obtaining Juniper cRPD and Cisco XRd requires an active vendor support
  contract, you will need to obtain the necessary images and licenses yourself.
  Nokia SR Linux is however freely available and therefor the main focus for our
- [tutorials](../docs/tutorials/README.md).
+ [tutorials](https://www.stratoweave.org/tutorials).
 
 *NOTE*: The Nokia SR Linux lab topology and router configurations were heavily
 inspired by [this](https://learn.srlinux.dev/tutorials/l3evpn/rt5-only) Nokia
