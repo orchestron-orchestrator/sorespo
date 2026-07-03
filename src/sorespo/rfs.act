@@ -539,8 +539,10 @@ class VrfInterface(base.VrfInterface):
             print("RFS /rfs{{{di.name}}}/vrf-interface transform running {i.name} for Cisco IOS XR", err=True)
             dev = xr25.root()
 
-            # Main interface config
-            dev.interfaces.interface.create(main_intf)
+            # Main interface config. The description also anchors the entry in
+            # the XR running config: a default-only interface (just "no
+            # shutdown") is not stored by XR
+            dev.interfaces.interface.create(main_intf, description="Customer access port")
             sub_intf = dev.interfaces.interface.create(i.name, description=i.description, vrf=i.vrf)
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
