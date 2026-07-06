@@ -880,10 +880,6 @@ class netinfra_inter__netinfra__router__feature_flags(yadata.MNode):
     mut def __init__(self, runtime_schema_fetch: ?bool=None) -> None:
         self.runtime_schema_fetch = runtime_schema_fetch if runtime_schema_fetch is not None else False
 
-    pure def _get_attr(self, name: str) -> ?value:
-        if name == 'netinfra-inter:runtime-schema-fetch':
-            return self.runtime_schema_fetch
-
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['netinfra-inter:netinfra', 'router', 'feature-flags'])
 
@@ -909,14 +905,6 @@ class netinfra_inter__netinfra__router__base_config(yadata.MNode):
         self.ipv4_address = ipv4_address
         self.ipv6_address = ipv6_address
 
-    pure def _get_attr(self, name: str) -> ?value:
-        if name == 'netinfra-inter:asn':
-            return self.asn
-        if name == 'netinfra-inter:ipv4-address':
-            return self.ipv4_address
-        if name == 'netinfra-inter:ipv6-address':
-            return self.ipv6_address
-
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['netinfra-inter:netinfra', 'router', 'base-config'])
 
@@ -939,12 +927,6 @@ class netinfra_inter__netinfra__router__l3vpn_vrf_entry(yadata.MNode):
     mut def __init__(self, vpn_id: str, ebgp_customer_address: ?list[str]=None) -> None:
         self.vpn_id = vpn_id
         self.ebgp_customer_address = ebgp_customer_address if ebgp_customer_address is not None else []
-
-    pure def _get_attr(self, name: str) -> ?value:
-        if name == 'netinfra-inter:vpn-id':
-            return self.vpn_id
-        if name == 'netinfra-inter:ebgp-customer-address':
-            return self.ebgp_customer_address
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['netinfra-inter:netinfra', 'router', 'l3vpn-vrf'])
@@ -1040,26 +1022,6 @@ class netinfra_inter__netinfra__router_entry(yadata.MNode):
         self.feature_flags = feature_flags if feature_flags is not None else netinfra_inter__netinfra__router__feature_flags()
         self.base_config = base_config
         self.l3vpn_vrf = netinfra_inter__netinfra__router__l3vpn_vrf(elements=l3vpn_vrf)
-
-    pure def _get_attr(self, name: str) -> ?value:
-        if name == 'netinfra-inter:name':
-            return self.name
-        if name == 'netinfra-inter:id':
-            return self.id
-        if name == 'netinfra-inter:type':
-            return self.type
-        if name == 'netinfra-inter:role':
-            return self.role
-        if name == 'netinfra-inter:mock':
-            return self.mock
-        if name == 'netinfra-inter:approval-required':
-            return self.approval_required
-        if name == 'netinfra-inter:feature-flags':
-            return self.feature_flags
-        if name == 'netinfra-inter:base-config':
-            return self.base_config
-        if name == 'netinfra-inter:l3vpn-vrf':
-            return iter(self.l3vpn_vrf)
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['netinfra-inter:netinfra', 'router'])
@@ -1178,18 +1140,6 @@ class netinfra_inter__netinfra__backbone_link_entry(yadata.MNode):
         self.right_interface = right_interface
         self.monitor_traffic = monitor_traffic if monitor_traffic is not None else False
 
-    pure def _get_attr(self, name: str) -> ?value:
-        if name == 'netinfra-inter:left-router':
-            return self.left_router
-        if name == 'netinfra-inter:left-interface':
-            return self.left_interface
-        if name == 'netinfra-inter:right-router':
-            return self.right_router
-        if name == 'netinfra-inter:right-interface':
-            return self.right_interface
-        if name == 'netinfra-inter:monitor-traffic':
-            return self.monitor_traffic
-
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['netinfra-inter:netinfra', 'backbone-link'])
 
@@ -1257,12 +1207,6 @@ class netinfra_inter__netinfra__ibgp_fullmesh__router_entry(yadata.MNode):
     mut def __init__(self, name: str, ipv4_address: str) -> None:
         self.name = name
         self.ipv4_address = ipv4_address
-
-    pure def _get_attr(self, name: str) -> ?value:
-        if name == 'netinfra-inter:name':
-            return self.name
-        if name == 'netinfra-inter:ipv4-address':
-            return self.ipv4_address
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['netinfra-inter:netinfra', 'ibgp-fullmesh', 'router'])
@@ -1348,14 +1292,6 @@ class netinfra_inter__netinfra__ibgp_fullmesh_entry(yadata.MNode):
         self.authentication_key = authentication_key
         self.router = netinfra_inter__netinfra__ibgp_fullmesh__router(elements=router)
 
-    pure def _get_attr(self, name: str) -> ?value:
-        if name == 'netinfra-inter:asn':
-            return self.asn
-        if name == 'netinfra-inter:authentication-key':
-            return self.authentication_key
-        if name == 'netinfra-inter:router':
-            return iter(self.router)
-
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['netinfra-inter:netinfra', 'ibgp-fullmesh'])
 
@@ -1440,14 +1376,6 @@ class netinfra_inter__netinfra(yadata.MNode):
         self.backbone_link = netinfra_inter__netinfra__backbone_link(elements=backbone_link)
         self.ibgp_fullmesh = netinfra_inter__netinfra__ibgp_fullmesh(elements=ibgp_fullmesh)
 
-    pure def _get_attr(self, name: str) -> ?value:
-        if name == 'netinfra-inter:router':
-            return iter(self.router)
-        if name == 'netinfra-inter:backbone-link':
-            return iter(self.backbone_link)
-        if name == 'netinfra-inter:ibgp-fullmesh':
-            return iter(self.ibgp_fullmesh)
-
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['netinfra-inter:netinfra'])
 
@@ -1468,10 +1396,6 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(yadata.MNode):
 
     mut def __init__(self, as_number: u64) -> None:
         self.as_number = as_number
-
-    pure def _get_attr(self, name: str) -> ?value:
-        if name == 'l3vpn-inter:as-number':
-            return self.as_number
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['l3vpn-inter:l3vpns', 'l3vpn', 'endpoint', 'bgp'])
@@ -1519,24 +1443,6 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yadata.MNode):
         res = l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(as_number=as_number)
         self.bgp = res
         return res
-
-    pure def _get_attr(self, name: str) -> ?value:
-        if name == 'l3vpn-inter:device':
-            return self.device
-        if name == 'l3vpn-inter:interface':
-            return self.interface
-        if name == 'l3vpn-inter:site':
-            return self.site
-        if name == 'l3vpn-inter:site-network-access':
-            return self.site_network_access
-        if name == 'l3vpn-inter:provider-ipv4-address':
-            return self.provider_ipv4_address
-        if name == 'l3vpn-inter:customer-ipv4-address':
-            return self.customer_ipv4_address
-        if name == 'l3vpn-inter:ipv4-prefix-length':
-            return self.ipv4_prefix_length
-        if name == 'l3vpn-inter:bgp':
-            return self.bgp
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['l3vpn-inter:l3vpns', 'l3vpn', 'endpoint'])
@@ -1607,14 +1513,6 @@ class l3vpn_inter__l3vpns__l3vpn_entry(yadata.MNode):
         self.name = name
         self.description = description
         self.endpoint = l3vpn_inter__l3vpns__l3vpn__endpoint(elements=endpoint)
-
-    pure def _get_attr(self, name: str) -> ?value:
-        if name == 'l3vpn-inter:name':
-            return self.name
-        if name == 'l3vpn-inter:description':
-            return self.description
-        if name == 'l3vpn-inter:endpoint':
-            return iter(self.endpoint)
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['l3vpn-inter:l3vpns', 'l3vpn'])
@@ -1697,10 +1595,6 @@ class l3vpn_inter__l3vpns(yadata.MNode):
     mut def __init__(self, l3vpn: list[l3vpn_inter__l3vpns__l3vpn_entry]=[]) -> None:
         self.l3vpn = l3vpn_inter__l3vpns__l3vpn(elements=l3vpn)
 
-    pure def _get_attr(self, name: str) -> ?value:
-        if name == 'l3vpn-inter:l3vpn':
-            return iter(self.l3vpn)
-
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['l3vpn-inter:l3vpns'])
 
@@ -1723,12 +1617,6 @@ class root(yadata.MNode):
     mut def __init__(self, netinfra: ?netinfra_inter__netinfra=None, l3vpns: ?l3vpn_inter__l3vpns=None) -> None:
         self.netinfra = netinfra if netinfra is not None else netinfra_inter__netinfra()
         self.l3vpns = l3vpns if l3vpns is not None else l3vpn_inter__l3vpns()
-
-    pure def _get_attr(self, name: str) -> ?value:
-        if name == 'netinfra-inter:netinfra':
-            return self.netinfra
-        if name == 'l3vpn-inter:l3vpns':
-            return self.l3vpns
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False)
