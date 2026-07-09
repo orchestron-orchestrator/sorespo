@@ -1,0 +1,479 @@
+import yang.gdata as gdata
+
+import sorespo.devices.CiscoIosXr_25_3_1 as xr25
+import sorespo.devices.JuniperCRPD_24_4R1_9 as crpd24
+import sorespo.devices.NokiaSRLinux_25_3_2 as srl25
+import sorespo.layers.y_2_loose as rfs_layer
+from sorespo.layers.y_2_loose import stratoweave_rfs__rfs__base_config
+from sorespo.layers.y_2_loose import stratoweave_rfs__rfs__backbone_interface_entry
+from sorespo.layers.y_2_loose import stratoweave_rfs__rfs__backbone_interface__remote
+from rtrsecrets.cisco import cisco_type7_encrypt
+from rtrsecrets.junos import junos_encrypt
+
+
+DEV_TYPE_XR = "CiscoIosXr_25_3_1"
+DEV_TYPE_CRPD = "JuniperCRPD_24_4R1_9"
+DEV_TYPE_SRL = "NokiaSRLinux_25_3_2"
+
+_IBGP_NEIGHBOR_GROUP = "IPV4-IBGP"
+_DEFAULT_ROLE = "edge"
+
+
+def router_id_from_ipv4(ipv4_address: ?str) -> ?u64:
+    """Router id is encoded in the loopback IPv4 last octet."""
+    if ipv4_address is None:
+        return None
+    parts = ipv4_address!.split(".")
+    if len(parts) != 4:
+        return None
+    try:
+        return u64(parts[3])
+    except:
+        return None
+
+
+def _ipv6_from_loopback_ipv4(ipv4_address: ?str) -> ?str:
+    router_id = router_id_from_ipv4(ipv4_address)
+    if router_id is None:
+        return None
+    return "2001:db8:0:0::{router_id}"
+
+
+def _vrf_id_from_name(name: str) -> ?u64:
+    """VRF id is encoded in names like acme-65501."""
+    parts = name.split("-")
+    if len(parts) < 2:
+        return None
+    try:
+        return u64(parts[1])
+    except:
+        return None
+
+
+def get_device_type(dev: gdata.Node) -> ?str:
+    """Resolve a parsed config to its sysspec device type."""
+    if dev.get_opt_cnt(gdata.Id(xr25.NS_Cisco_IOS_XR_um_hostname_cfg, "hostname")) is not None:
+        return DEV_TYPE_XR
+    if dev.get_opt_cnt(gdata.Id(crpd24.NS_junos_conf_root, "configuration")) is not None:
+        return DEV_TYPE_CRPD
+    if dev.get_opt_cnt(gdata.Id(srl25.NS_srl_nokia_system, "system")) is not None:
+        return DEV_TYPE_SRL
+    return None
+
+
+def _require_hints(authentication_key_hints: list[str]) -> None:
+    if len(authentication_key_hints) == 0:
+        raise ValueError("No authentication key hints supplied")
+
+
+def _resolve_cisco_type7(encrypted: str, authentication_key_hints: list[str], what: str) -> str:
+    """Resolve Cisco type-7 secret from hints."""
+    _require_hints(authentication_key_hints)
+    if len(encrypted) < 2:
+        raise ValueError("Invalid Cisco XR {what}")
+    init: int = 0
+    try:
+        init = int(encrypted[0:2])
+    except:
+        raise ValueError("Invalid Cisco XR {what} seed")
+    for hint in authentication_key_hints:
+        if cisco_type7_encrypt(hint, init) == encrypted:
+            return hint
+    raise ValueError("Authentication key hints are incomplete: no hint matches Cisco XR {what}")
+
+
+def _resolve_junos(encrypted: str, authentication_key_hints: list[str], what: str) -> str:
+    """Resolve Junos $9$ secret from hints."""
+    _require_hints(authentication_key_hints)
+    if not encrypted.startswith("$9$") or len(encrypted) < 4:
+        raise ValueError("Invalid Junos {what}")
+    salt = encrypted[3:4]
+    for hint in authentication_key_hints:
+        if junos_encrypt(hint, salt) == encrypted:
+            return hint
+    raise ValueError("Authentication key hints are incomplete: no hint matches Junos {what}")
+
+
+def discover_base_config(dev: gdata.Node, device_type: str, authentication_key_hints: list[str]) -> ?stratoweave_rfs__rfs__base_config:
+    if device_type == DEV_TYPE_XR:
+        xr_dev = xr25.root.from_gdata(dev)
+        loopback = xr_dev.interfaces.interface.get("Loopback0")
+        if loopback is None:
+            return None
+        addr = loopback!.ipv4.addresses.address
+        ipv4_address: ?str = addr.address if addr is not None else None
+
+        asn: ?u64 = None
+        for as_entry in xr_dev.um_router_bgp_cfg_router.bgp.as_:
+            n = as_entry.as_number
+            if isinstance(n, u64):
+                asn = n
+            break
+
+        ibgp_authentication_key: ?str = None
+        for as_entry in xr_dev.um_router_bgp_cfg_router.bgp.as_:
+            group = as_entry.neighbor_groups.neighbor_group.get(_IBGP_NEIGHBOR_GROUP)
+            if group is not None:
+                encrypted = group!.password.encrypted
+                if encrypted is None:
+                    raise ValueError("No Cisco XR IPV4-IBGP password/encrypted in device input")
+                ibgp_authentication_key = _resolve_cisco_type7(
+                    encrypted!, authentication_key_hints, "IPV4-IBGP password/encrypted")
+                break
+        if ibgp_authentication_key is None:
+            raise ValueError("No Cisco XR IPV4-IBGP neighbor-group in device input")
+
+        return stratoweave_rfs__rfs__base_config(
+            role=_DEFAULT_ROLE,
+            ipv4_address=ipv4_address,
+            ipv6_address=_ipv6_from_loopback_ipv4(ipv4_address),
+            asn=asn,
+            ibgp_authentication_key=ibgp_authentication_key!,
+        )
+
+    if device_type == DEV_TYPE_CRPD:
+        crpd_dev = crpd24.root.from_gdata(dev)
+        lo0 = crpd_dev.configuration.interfaces.interface.get("lo0")
+        if lo0 is None:
+            return None
+
+        role: ?str = _DEFAULT_ROLE
+        desc = lo0!.description
+        if desc is not None and desc!.startswith("ROLE: "):
+            role = desc![len("ROLE: "):]
+
+        ipv4_address: ?str = None
+        unit0 = lo0!.unit.get("0")
+        if unit0 is not None:
+            inet = unit0!.family.inet
+            if inet is not None:
+                for ae in inet!.address:
+                    ipv4_address = ae.name.split("/")[0]
+                    break
+
+        asn: ?u64 = None
+        as_number_str = crpd_dev.configuration.routing_options.autonomous_system.as_number
+        if as_number_str is not None:
+            asn = u64(as_number_str!)
+
+        group = crpd_dev.configuration.protocols.bgp.group.get(_IBGP_NEIGHBOR_GROUP)
+        if group is None:
+            raise ValueError("No Junos IPV4-IBGP BGP group in device input")
+        encrypted = group!.authentication_key
+        if encrypted is None:
+            raise ValueError("No Junos IPV4-IBGP authentication-key in device input")
+
+        return stratoweave_rfs__rfs__base_config(
+            role=role,
+            ipv4_address=ipv4_address,
+            ipv6_address=_ipv6_from_loopback_ipv4(ipv4_address),
+            asn=asn,
+            ibgp_authentication_key=_resolve_junos(
+                encrypted!, authentication_key_hints, "IPV4-IBGP authentication-key"),
+        )
+
+    return None
+
+
+
+_BB_DESC_PREFIX = "Link to "
+
+def _parse_bb_description(desc: ?str) -> (?str, ?str):
+    if desc is None:
+        return (None, None)
+    if not desc!.startswith(_BB_DESC_PREFIX):
+        return (None, None)
+    rest = desc![len(_BB_DESC_PREFIX):]
+    lb = rest.find(" [")
+    if lb < 0 or not rest.endswith("]"):
+        return (None, None)
+    remote_device = rest[:lb]
+    remote_interface = rest[lb + 2 : len(rest) - 1]
+    return (remote_device, remote_interface)
+
+
+def _netmask_to_prefix_length(netmask: str) -> ?u64:
+    parts = netmask.split(".")
+    if len(parts) != 4:
+        return None
+    bits = 0
+    for p in parts:
+        b = int(p)
+        while b & 0x80 != 0:
+            bits += 1
+            b = (b << 1) & 0xff
+    return u64(bits)
+
+
+def _xr_interface_ipv4(addr: ?xr25.Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__address) -> (?str, ?u64):
+    if addr is None:
+        return (None, None)
+    prefix_length: ?u64 = None
+    nm = addr!.netmask
+    if nm is not None:
+        prefix_length = _netmask_to_prefix_length(nm!)
+    return (addr!.address, prefix_length)
+
+
+def _crpd_unit_ipv4(inet: ?crpd24.junos_conf_root__configuration__interfaces__interface__unit__family__inet) -> (?str, ?u64):
+    if inet is None:
+        return (None, None)
+    for ae in inet!.address:
+        parts = ae.name.split("/")
+        ipv4_address: ?str = parts[0]
+        prefix_length: ?u64 = None
+        if len(parts) == 2:
+            prefix_length = u64(parts[1])
+        return (ipv4_address, prefix_length)
+    return (None, None)
+
+
+def discover_bb_interfaces(dev: gdata.Node, device_type: str) -> list[stratoweave_rfs__rfs__backbone_interface_entry]:
+    result: list[stratoweave_rfs__rfs__backbone_interface_entry] = []
+    if device_type == DEV_TYPE_XR:
+        xr_dev = xr25.root.from_gdata(dev)
+        for intf in xr_dev.interfaces.interface:
+            (remote_device, remote_interface) = _parse_bb_description(intf.description)
+            if remote_device is None or remote_interface is None:
+                continue
+            (ipv4_address, ipv4_prefix_length) = _xr_interface_ipv4(intf.ipv4.addresses.address)
+            result.append(stratoweave_rfs__rfs__backbone_interface_entry(
+                name=intf.interface_name,
+                ipv4_address=ipv4_address,
+                ipv4_prefix_length=ipv4_prefix_length,
+                ipv6_address=None,
+                ipv6_prefix_length=None,
+                remote=stratoweave_rfs__rfs__backbone_interface__remote(
+                    device=remote_device, interface=remote_interface),
+                monitor_traffic=False,
+            ))
+
+    elif device_type == DEV_TYPE_CRPD:
+        crpd_dev = crpd24.root.from_gdata(dev)
+        for intf in crpd_dev.configuration.interfaces.interface:
+            if intf.name == "lo0":
+                continue
+            unit0 = intf.unit.get("0")
+            if unit0 is None:
+                continue
+            (remote_device, remote_interface) = _parse_bb_description(unit0!.description)
+            if remote_device is None or remote_interface is None:
+                continue
+            (ipv4_address, ipv4_prefix_length) = _crpd_unit_ipv4(unit0!.family.inet)
+            result.append(stratoweave_rfs__rfs__backbone_interface_entry(
+                name=intf.name,
+                ipv4_address=ipv4_address,
+                ipv4_prefix_length=ipv4_prefix_length,
+                ipv6_address=None,
+                ipv6_prefix_length=None,
+                remote=stratoweave_rfs__rfs__backbone_interface__remote(
+                    device=remote_device, interface=remote_interface),
+                monitor_traffic=False,
+            ))
+
+    return result
+
+
+_VRF_IF_DESC_PREFIX = "Customer VPN access "
+_EBGP_DESC_PREFIX = "Customer eBGP "
+_DESC_SNA_SEP = " ["
+_DESC_VPN_SEP = "] in VPN "
+_EBGP_DESC_TO_SEP = " to "
+
+
+def _parse_customer_description(desc: ?str, prefix: str) -> (?str, ?str, ?str):
+    if desc is None:
+        return (None, None, None)
+    if not desc!.startswith(prefix):
+        return (None, None, None)
+    rest = desc![len(prefix):]
+    lb = rest.find(_DESC_SNA_SEP)
+    if lb < 0:
+        return (None, None, None)
+    site_id = rest[:lb]
+    after_lb = rest[lb + len(_DESC_SNA_SEP):]
+    vsep = after_lb.find(_DESC_VPN_SEP)
+    if vsep < 0:
+        return (None, None, None)
+    sna_id = after_lb[:vsep]
+    vpn_id = after_lb[vsep + len(_DESC_VPN_SEP):]
+    return (site_id, sna_id, vpn_id)
+
+
+def parse_vrf_if_description(desc: ?str) -> (?str, ?str, ?str):
+    return _parse_customer_description(desc, _VRF_IF_DESC_PREFIX)
+
+
+def parse_ebgp_description(desc: ?str) -> (?str, ?str, ?str):
+    (site_id, sna_id, vpn_id) = _parse_customer_description(desc, _EBGP_DESC_PREFIX)
+    if vpn_id is None:
+        return (None, None, None)
+    to_sep = vpn_id!.find(_EBGP_DESC_TO_SEP)
+    if to_sep < 0:
+        return (None, None, None)
+    return (site_id, sna_id, vpn_id![:to_sep])
+
+
+def _append_vrf_interfaces(dev: gdata.Node, device_type: str, rfs_entry: rfs_layer.stratoweave_rfs__rfs_entry) -> None:
+    if device_type == DEV_TYPE_XR:
+        xr_dev = xr25.root.from_gdata(dev)
+        for intf in xr_dev.interfaces.interface:
+            if intf.vrf is None:
+                continue
+            (ipv4_address, ipv4_prefix_length) = _xr_interface_ipv4(intf.ipv4.addresses.address)
+            rfs_entry.vrf_interface.create(
+                intf.interface_name,
+                description=intf.description,
+                vrf=intf.vrf!,
+                ipv4_address=ipv4_address,
+                ipv4_prefix_length=ipv4_prefix_length,
+            )
+
+    elif device_type == DEV_TYPE_CRPD:
+        crpd_dev = crpd24.root.from_gdata(dev)
+        for ri in crpd_dev.configuration.routing_instances.instance:
+            if ri.instance_type != "vrf":
+                continue
+            for ifref in ri.interface:
+                parts = ifref.name.split(".")
+                if len(parts) != 2:
+                    continue
+                main = crpd_dev.configuration.interfaces.interface.get(parts[0])
+                if main is None:
+                    continue
+                unit = main!.unit.get(parts[1])
+                if unit is None:
+                    continue
+                (ipv4_address, ipv4_prefix_length) = _crpd_unit_ipv4(unit!.family.inet)
+                rfs_entry.vrf_interface.create(
+                    ifref.name,
+                    description=unit!.description,
+                    vrf=ri.name,
+                    ipv4_address=ipv4_address,
+                    ipv4_prefix_length=ipv4_prefix_length,
+                )
+
+
+def _append_ebgp_customers(dev: gdata.Node, device_type: str, rfs_entry: rfs_layer.stratoweave_rfs__rfs_entry, asn: ?u64, authentication_key_hints: list[str]) -> None:
+    if device_type == DEV_TYPE_XR:
+        xr_dev = xr25.root.from_gdata(dev)
+        for as_entry in xr_dev.um_router_bgp_cfg_router.bgp.as_:
+            for bgp_vrf in as_entry.vrfs.vrf:
+                for nb in bgp_vrf.neighbors.neighbor:
+                    peer_asn: ?u64 = None
+                    ras = nb.remote_as
+                    if ras is not None and isinstance(ras, u64):
+                        peer_asn = ras
+                    encrypted = nb.password.encrypted
+                    authentication_key = _resolve_cisco_type7(
+                        encrypted!, authentication_key_hints, "eBGP neighbor password/encrypted"
+                    ) if encrypted is not None else None
+                    rfs_entry.ebgp_customer.create(
+                        bgp_vrf.vrf_name,
+                        nb.address,
+                        local_asn=asn,
+                        peer_asn=peer_asn,
+                        description=nb.description,
+                        authentication_key=authentication_key,
+                    )
+
+    elif device_type == DEV_TYPE_CRPD:
+        crpd_dev = crpd24.root.from_gdata(dev)
+        for ri in crpd_dev.configuration.routing_instances.instance:
+            if ri.instance_type != "vrf":
+                continue
+            grp = ri.protocols.bgp.group.get("customer")
+            if grp is None:
+                continue
+            for nb in grp!.neighbor:
+                peer_asn: ?u64 = None
+                ras = nb.peer_as
+                if ras is not None:
+                    peer_asn = u64(ras!)
+                encrypted = nb.authentication_key
+                authentication_key = _resolve_junos(
+                    encrypted!, authentication_key_hints, "eBGP neighbor authentication-key"
+                ) if encrypted is not None else None
+                rfs_entry.ebgp_customer.create(
+                    ri.name,
+                    nb.name,
+                    local_asn=asn,
+                    peer_asn=peer_asn,
+                    description=nb.description,
+                    authentication_key=authentication_key,
+                )
+
+
+def _append_ibgp_neighbors(dev: gdata.Node, device_type: str, rfs_entry: rfs_layer.stratoweave_rfs__rfs_entry, asn: ?u64) -> None:
+    if device_type == DEV_TYPE_XR:
+        xr_dev = xr25.root.from_gdata(dev)
+        for as_entry in xr_dev.um_router_bgp_cfg_router.bgp.as_:
+            for nb in as_entry.neighbors.neighbor:
+                if nb.use.neighbor_group != _IBGP_NEIGHBOR_GROUP:
+                    continue
+                rfs_entry.ibgp_neighbor.create(nb.address, asn=asn, description=nb.description)
+
+    elif device_type == DEV_TYPE_CRPD:
+        crpd_dev = crpd24.root.from_gdata(dev)
+        grp = crpd_dev.configuration.protocols.bgp.group.get(_IBGP_NEIGHBOR_GROUP)
+        if grp is None:
+            return
+        for nb in grp!.neighbor:
+            rfs_entry.ibgp_neighbor.create(nb.name, asn=asn, description=nb.description)
+
+
+def _append_vrfs(dev: gdata.Node, device_type: str, rfs_entry: rfs_layer.stratoweave_rfs__rfs_entry, router_id: ?u64, asn: ?u64) -> None:
+    if device_type == DEV_TYPE_XR:
+        xr_dev = xr25.root.from_gdata(dev)
+        for vrf in xr_dev.vrfs.vrf:
+            rfs_entry.vrf.create(vrf.vrf_name, id=_vrf_id_from_name(vrf.vrf_name), router_id=router_id, asn=asn)
+
+    elif device_type == DEV_TYPE_CRPD:
+        crpd_dev = crpd24.root.from_gdata(dev)
+        for ri in crpd_dev.configuration.routing_instances.instance:
+            if ri.instance_type != "vrf":
+                continue
+            rfs_entry.vrf.create(ri.name, id=_vrf_id_from_name(ri.name), router_id=router_id, asn=asn)
+
+
+def _device_to_rfs(dev: gdata.Node, device_type: str, rfs_entry: rfs_layer.stratoweave_rfs__rfs_entry, authentication_key_hints: list[str]) -> None:
+    bc_opt = discover_base_config(dev, device_type, authentication_key_hints)
+    asn: ?u64 = None
+    ipv4_address: ?str = None
+    if bc_opt is not None:
+        rfs_entry.base_config = bc_opt!
+        asn = bc_opt!.asn
+        ipv4_address = bc_opt!.ipv4_address
+    router_id = router_id_from_ipv4(ipv4_address)
+
+    for bbi in discover_bb_interfaces(dev, device_type):
+        rfs_entry.backbone_interface.elements.append(bbi)
+
+    _append_ibgp_neighbors(dev, device_type, rfs_entry, asn)
+    _append_vrfs(dev, device_type, rfs_entry, router_id, asn)
+    _append_vrf_interfaces(dev, device_type, rfs_entry)
+    _append_ebgp_customers(dev, device_type, rfs_entry, asn, authentication_key_hints)
+
+
+def discover_rfs_root(devices: dict[str, gdata.Node], authentication_key_hints: list[str]) -> rfs_layer.root:
+    rfs_root = rfs_layer.root()
+    for name in sorted([n for n in devices.keys()]):
+        dev = devices[name]
+        device_type = get_device_type(dev)
+        if device_type is None:
+            continue
+
+        rfs_device = rfs_root.device.create(name, type=device_type!)
+        rfs_device.address.create("oob", address=name)
+        rfs_device.credentials.username = "clab"
+        rfs_device.credentials.password = "clab@123"
+        rfs_device.mock.enabled = True
+
+        rfs_entry = rfs_root.rfs.create(name)
+        _device_to_rfs(dev, device_type!, rfs_entry, authentication_key_hints)
+
+    return rfs_root
+
+
+def discover_rfs(devices: dict[str, gdata.Node], authentication_key_hints: list[str]) -> gdata.Node:
+    return discover_rfs_root(devices, authentication_key_hints).to_gdata()

@@ -1,0 +1,293 @@
+import yang.gdata as gdata
+
+import sorespo.layers.y_0_loose as cfs_layer
+from sorespo.layers.y_0_loose import netinfra__netinfra
+from sorespo.layers.y_0_loose import ietf_l3vpn_svc__l3vpn_svc
+from sorespo.layers.y_0_loose import ietf_l3vpn_svc_bgp
+from sorespo.layers.y_0_loose import ietf_l3vpn_svc_customer_managed
+from sorespo.layers.y_2_loose import stratoweave_rfs__rfs__backbone_interface_entry
+from sorespo.layers.y_2_loose import stratoweave_rfs__rfs__vrf_interface_entry
+from sorespo.layers.y_2_loose import stratoweave_rfs__rfs__ebgp_customer_entry
+import sorespo.discovery.rfs_discovery as rfsd
+
+
+def _same_ipv4_access_pair(provider_address: ?str, customer_address: str, prefix_length: ?u64) -> bool:
+    if provider_address is None or prefix_length is None:
+        return False
+    pfx = int(prefix_length!)
+    if pfx < 30 or pfx > 31:
+        return False
+    provider_parts = provider_address!.split(".")
+    customer_parts = customer_address.split(".")
+    if len(provider_parts) != 4 or len(customer_parts) != 4:
+        return False
+    if provider_parts[0] != customer_parts[0]:
+        return False
+    if provider_parts[1] != customer_parts[1]:
+        return False
+    if provider_parts[2] != customer_parts[2]:
+        return False
+    provider_last = 0
+    customer_last = 0
+    try:
+        provider_last = int(provider_parts[3])
+        customer_last = int(customer_parts[3])
+    except:
+        return False
+    diff = provider_last - customer_last
+    if diff < 0:
+        diff = customer_last - provider_last
+    return diff > 0 and diff < 2
+
+
+class BackboneEndpointKey(object):
+    router: str
+    interface: str
+
+    def __init__(self, router: str, interface: str) -> None:
+        self.router = router
+        self.interface = interface
+
+    def is_less(self, other: BackboneEndpointKey) -> bool:
+        if self.router != other.router:
+            return self.router < other.router
+        return self.interface < other.interface
+
+
+extension BackboneEndpointKey(Hashable):
+    def __eq__(self, other: BackboneEndpointKey) -> bool:
+        return self.router == other.router and self.interface == other.interface
+
+    def hash(self, hasher) -> None:
+        self.router.hash(hasher)
+        self.interface.hash(hasher)
+
+
+class BackboneLinkKey(object):
+    left: BackboneEndpointKey
+    right: BackboneEndpointKey
+
+    def __init__(self, left: BackboneEndpointKey, right: BackboneEndpointKey) -> None:
+        self.left = left
+        self.right = right
+
+    def is_less(self, other: BackboneLinkKey) -> bool:
+        if self.left != other.left:
+            return self.left.is_less(other.left)
+        return self.right.is_less(other.right)
+
+
+extension BackboneLinkKey(Hashable):
+    def __eq__(self, other: BackboneLinkKey) -> bool:
+        return self.left == other.left and self.right == other.right
+
+    def hash(self, hasher) -> None:
+        self.left.hash(hasher)
+        self.right.hash(hasher)
+
+
+def _is_left_side(ipv4_address: ?str) -> ?bool:
+    """Backbone link endpoints use .1 for left and .2 for right."""
+    if ipv4_address is None:
+        return None
+    parts = ipv4_address!.split(".")
+    if len(parts) != 4:
+        return None
+    if parts[3] == "1":
+        return True
+    if parts[3] == "2":
+        return False
+    return None
+
+
+def _aggregate_backbone_links(per_device: dict[str, list[stratoweave_rfs__rfs__backbone_interface_entry]], netinfra: netinfra__netinfra) -> None:
+    pairs: set[BackboneLinkKey] = set()
+    for local in sorted([n for n in per_device.keys()]):
+        for bbi in per_device[local]:
+            remote_device = bbi.remote.device
+            remote_interface = bbi.remote.interface
+            if remote_device is None or remote_interface is None:
+                continue
+            if per_device.get(remote_device!) is None:
+                continue
+            local_is_left = _is_left_side(bbi.ipv4_address)
+            if local_is_left == True:
+                left_r, left_i, right_r, right_i = local, bbi.name, remote_device!, remote_interface!
+            elif local_is_left == False:
+                left_r, left_i, right_r, right_i = remote_device!, remote_interface!, local, bbi.name
+            else:
+                local_endpoint = BackboneEndpointKey(local, bbi.name)
+                remote_endpoint = BackboneEndpointKey(remote_device!, remote_interface!)
+                if local_endpoint.is_less(remote_endpoint):
+                    left_r, left_i, right_r, right_i = local, bbi.name, remote_device!, remote_interface!
+                else:
+                    left_r, left_i, right_r, right_i = remote_device!, remote_interface!, local, bbi.name
+            pairs.add(BackboneLinkKey(BackboneEndpointKey(left_r, left_i), BackboneEndpointKey(right_r, right_i)))
+    ordered_pairs: list[BackboneLinkKey] = []
+    for pair in pairs:
+        inserted = False
+        for i in range(len(ordered_pairs)):
+            if pair.is_less(ordered_pairs[i]):
+                ordered_pairs.insert(i, pair)
+                inserted = True
+                break
+        if not inserted:
+            ordered_pairs.append(pair)
+    for pair in ordered_pairs:
+        netinfra.backbone_link.create(pair.left.router, pair.left.interface, pair.right.router, pair.right.interface)
+
+
+def _customer_name_from_vpn_id(vpn_id: str) -> ?str:
+    """Use the VPN id prefix when the original customer name is not on-device."""
+    if vpn_id == "":
+        return None
+    parts = vpn_id.split("-")
+    return parts[0]
+
+
+def _match_ebgp_customer(vif: stratoweave_rfs__rfs__vrf_interface_entry, ebgp_for_device: list[stratoweave_rfs__rfs__ebgp_customer_entry], vrf_interface_count: int) -> ?stratoweave_rfs__rfs__ebgp_customer_entry:
+    """Match an eBGP neighbor to one access, not just to the VRF."""
+    vrf = vif.vrf!
+    (site_id, sna_id, vpn_id) = rfsd.parse_vrf_if_description(vif.description)
+    if site_id is not None and sna_id is not None:
+        for ec in ebgp_for_device:
+            if ec.vrf != vrf:
+                continue
+            (ec_site, ec_sna, ec_vpn) = rfsd.parse_ebgp_description(ec.description)
+            if ec_site is None or ec_sna is None:
+                continue
+            if ec_site! != site_id! or ec_sna! != sna_id!:
+                continue
+            if ec_vpn is not None and vpn_id is not None and ec_vpn! != vpn_id!:
+                continue
+            return ec
+
+    subnet_match: ?stratoweave_rfs__rfs__ebgp_customer_entry = None
+    subnet_matches = 0
+    for ec in ebgp_for_device:
+        if ec.vrf != vrf:
+            continue
+        if not _same_ipv4_access_pair(vif.ipv4_address, ec.address, vif.ipv4_prefix_length):
+            continue
+        subnet_match = ec
+        subnet_matches += 1
+    if subnet_match is not None and subnet_matches < 2:
+        return subnet_match
+
+    if vrf_interface_count != 1:
+        return None
+
+    vrf_match: ?stratoweave_rfs__rfs__ebgp_customer_entry = None
+    vrf_matches = 0
+    for ec in ebgp_for_device:
+        if ec.vrf != vrf:
+            continue
+        vrf_match = ec
+        vrf_matches += 1
+    if vrf_match is not None and vrf_matches < 2:
+        return vrf_match
+    return None
+
+
+def _aggregate_l3vpn(per_device_vrf_ifs: dict[str, list[stratoweave_rfs__rfs__vrf_interface_entry]], per_device_ebgp: dict[str, list[stratoweave_rfs__rfs__ebgp_customer_entry]], l3vpn_svc: ietf_l3vpn_svc__l3vpn_svc) -> None:
+    for device in sorted([n for n in per_device_vrf_ifs.keys()]):
+        ebgp = per_device_ebgp.get(device)
+        ebgp_for_device: list[stratoweave_rfs__rfs__ebgp_customer_entry] = ebgp! if ebgp is not None else []
+
+        vrf_interface_count: dict[str, int] = {}
+        for vif in per_device_vrf_ifs[device]:
+            if vif.vrf is None:
+                continue
+            count = vrf_interface_count.get(vif.vrf!)
+            if count is None:
+                vrf_interface_count[vif.vrf!] = 1
+            else:
+                vrf_interface_count[vif.vrf!] = count! + 1
+
+        for vif in per_device_vrf_ifs[device]:
+            if vif.vrf is None:
+                continue
+            (p_site, p_sna, p_vpn) = rfsd.parse_vrf_if_description(vif.description)
+            vpn_id = p_vpn! if p_vpn is not None else vif.vrf!
+
+            l3vpn_svc.vpn_services.vpn_service.create(
+                vpn_id, customer_name=_customer_name_from_vpn_id(vpn_id))
+
+            site_id = p_site! if p_site is not None else "{device}-{vpn_id}"
+            site = l3vpn_svc.sites.site.create(site_id)
+            site.management.type = ietf_l3vpn_svc_customer_managed
+
+            sna_id = p_sna! if p_sna is not None else "{device}-{vif.name}"
+            sna = site.site_network_accesses.site_network_access.create(sna_id)
+            sna.bearer.bearer_reference = "{device},{vif.name}"
+            sna.vpn_attachment.vpn_id = vpn_id
+            # Required by ietf-l3vpn-svc, but not present in device config.
+            sna.service.svc_input_bandwidth = u64(1000000000)
+            sna.service.svc_output_bandwidth = u64(1000000000)
+            sna.service.svc_mtu = u64(9000)
+
+            sna.ip_connection.ipv4.addresses.provider_address = vif.ipv4_address
+            sna.ip_connection.ipv4.addresses.prefix_length = vif.ipv4_prefix_length
+            count = vrf_interface_count.get(vif.vrf!)
+            ec = _match_ebgp_customer(vif, ebgp_for_device, count! if count is not None else 0)
+            if ec is not None:
+                sna.ip_connection.ipv4.addresses.customer_address = ec!.address
+                if ec!.peer_asn is not None:
+                    rp = sna.routing_protocols.routing_protocol.create(ietf_l3vpn_svc_bgp)
+                    bgp = rp.create_bgp(autonomous_system=ec!.peer_asn!, authentication_key=ec!.authentication_key)
+                    bgp.address_family = ["ipv4"]
+
+
+def _set_or_assert_ibgp_authentication_key(existing: ?str, discovered: ?str) -> ?str:
+    if discovered is None:
+        return existing
+    if existing is None:
+        return discovered!
+    if existing! != discovered!:
+        raise ValueError("Discovered iBGP authentication key mismatch across devices")
+    return existing
+
+
+def discover(devices: dict[str, gdata.Node], authentication_key_hints: list[str]) -> gdata.Node:
+    cfs_root = cfs_layer.root()
+    rfs_root = rfsd.discover_rfs_root(devices, authentication_key_hints)
+    bb_interfaces_by_device: dict[str, list[stratoweave_rfs__rfs__backbone_interface_entry]] = {}
+    vrf_ifs_by_device: dict[str, list[stratoweave_rfs__rfs__vrf_interface_entry]] = {}
+    ebgp_by_device: dict[str, list[stratoweave_rfs__rfs__ebgp_customer_entry]] = {}
+    ibgp_authentication_key: ?str = None
+
+    for rfs_entry in rfs_root.rfs:
+        name = rfs_entry.name
+        base_config = rfs_entry.base_config
+        ibgp_authentication_key = _set_or_assert_ibgp_authentication_key(
+            ibgp_authentication_key, base_config.ibgp_authentication_key)
+        router_id = rfsd.router_id_from_ipv4(base_config.ipv4_address)
+        if router_id is None or base_config.asn is None:
+            continue
+
+        device_type: ?str = None
+        rfs_device = rfs_root.device.get(name)
+        if rfs_device is not None:
+            device_type = rfs_device!.type
+
+        cfs_root.netinfra.router.create(
+            name,
+            id=router_id!,
+            type=device_type,
+            role=base_config.role,
+            asn=base_config.asn!,
+            mock=True,
+        )
+
+        bb_interfaces_by_device[name] = rfs_entry.backbone_interface.elements
+        vrf_ifs_by_device[name] = rfs_entry.vrf_interface.elements
+        ebgp_by_device[name] = rfs_entry.ebgp_customer.elements
+
+    _aggregate_backbone_links(bb_interfaces_by_device, cfs_root.netinfra)
+    _aggregate_l3vpn(vrf_ifs_by_device, ebgp_by_device, cfs_root.l3vpn_svc)
+    if ibgp_authentication_key is None:
+        raise ValueError("No iBGP authentication key discovered from recognized devices")
+    cfs_root.netinfra.global_settings = cfs_layer.netinfra__netinfra__global_settings(
+        ibgp_authentication_key=ibgp_authentication_key!
+    )
+    return cfs_root.to_gdata()

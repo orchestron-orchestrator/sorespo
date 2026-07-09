@@ -90,7 +90,8 @@ SRC_DNODE_CHILD_4: DContainer = DContainer(module='l3vpn-inter', namespace='http
             DLeaf(module='l3vpn-inter', namespace='http://example.com/l3vpn-inter', prefix='l3vpn-inter', name='customer-ipv4-address', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
             DLeaf(module='l3vpn-inter', namespace='http://example.com/l3vpn-inter', prefix='l3vpn-inter', name='ipv4-prefix-length', config=True, mandatory=True, type_=DTypeIntegerUnsigned(name='uint8', description=None, reference=None, exts=[], builtin_type='uint8', default=None, ranges=Ranges([(0, 32)]))),
             DContainer(module='l3vpn-inter', namespace='http://example.com/l3vpn-inter', prefix='l3vpn-inter', name='bgp', config=True, presence=True, children=[
-                DLeaf(module='l3vpn-inter', namespace='http://example.com/l3vpn-inter', prefix='l3vpn-inter', name='as-number', config=True, mandatory=True, type_=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)])))
+                DLeaf(module='l3vpn-inter', namespace='http://example.com/l3vpn-inter', prefix='l3vpn-inter', name='as-number', config=True, mandatory=True, type_=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)]))),
+                DLeaf(module='l3vpn-inter', namespace='http://example.com/l3vpn-inter', prefix='l3vpn-inter', name='authentication-key', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
             ])
         ])
     ])
@@ -164,6 +165,9 @@ SRC_YANG_0: str = r"""module l3vpn-inter {
           leaf as-number {
             type uint32;
             mandatory true;
+          }
+          leaf authentication-key {
+            type string;
           }
         }
       }
@@ -1393,9 +1397,11 @@ class netinfra_inter__netinfra(yadata.MNode):
 _breaker15: None = None
 class l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(yadata.MNode):
     as_number: u64
+    authentication_key: ?str
 
-    mut def __init__(self, as_number: u64) -> None:
+    mut def __init__(self, as_number: u64, authentication_key: ?str) -> None:
         self.as_number = as_number
+        self.authentication_key = authentication_key
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['l3vpn-inter:l3vpns', 'l3vpn', 'endpoint', 'bgp'])
@@ -1403,7 +1409,7 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(yadata.MNode):
     @staticmethod
     mut def from_gdata(n: ?ygdata.Node) -> ?l3vpn_inter__l3vpns__l3vpn__endpoint__bgp:
         if n is not None:
-            return l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(as_number=n.get_u64(ygdata.Id(NS_l3vpn_inter, 'as-number')))
+            return l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(as_number=n.get_u64(ygdata.Id(NS_l3vpn_inter, 'as-number')), authentication_key=n.get_opt_str(ygdata.Id(NS_l3vpn_inter, 'authentication-key')))
         return None
 
     mut def copy(self) -> l3vpn_inter__l3vpns__l3vpn__endpoint__bgp:
@@ -1435,12 +1441,14 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yadata.MNode):
         self.ipv4_prefix_length = ipv4_prefix_length
         self.bgp = bgp
 
-    mut def create_bgp(self, as_number: u64) -> l3vpn_inter__l3vpns__l3vpn__endpoint__bgp:
+    mut def create_bgp(self, as_number: u64, authentication_key: ?str=None) -> l3vpn_inter__l3vpns__l3vpn__endpoint__bgp:
         existing = self.bgp
         if existing is not None:
             existing.as_number = as_number
+            if authentication_key is not None:
+                existing.authentication_key = authentication_key
             return existing
-        res = l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(as_number=as_number)
+        res = l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(as_number=as_number, authentication_key=authentication_key)
         self.bgp = res
         return res
 

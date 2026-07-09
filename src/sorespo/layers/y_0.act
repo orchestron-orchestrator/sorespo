@@ -1021,7 +1021,8 @@ SRC_DNODE_CHILD_119: DContainer = DContainer(module='ietf-l3vpn-svc', namespace=
 
 SRC_DNODE_CHILD_120: DContainer = DContainer(module='ietf-l3vpn-svc', namespace='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', prefix='l3vpn-svc', name='bgp', config=True, description='BGP-specific configuration.', if_feature=['rtg-bgp'], presence=True, when="derived-from-or-self(../type, 'l3vpn-svc:bgp')", children=[
     DLeaf(module='ietf-l3vpn-svc', namespace='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', prefix='l3vpn-svc', name='autonomous-system', config=True, description='Customer AS number in case the customer\nrequests BGP routing.', mandatory=True, type_=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)]))),
-    DLeafList(module='ietf-l3vpn-svc', namespace='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', prefix='l3vpn-svc', name='address-family', config=True, description='If BGP is used on this site, this node\ncontains a configured value.  This node\ncontains at least one address family\nto be activated.', min_elements=1, ordered_by='system', type_=DTypeEnum(name='address-family', description='Defines a type for the address family.', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'ipv4':0, 'ipv6':1}))
+    DLeafList(module='ietf-l3vpn-svc', namespace='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', prefix='l3vpn-svc', name='address-family', config=True, description='If BGP is used on this site, this node\ncontains a configured value.  This node\ncontains at least one address family\nto be activated.', min_elements=1, ordered_by='system', type_=DTypeEnum(name='address-family', description='Defines a type for the address family.', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'ipv4':0, 'ipv6':1})),
+    DLeaf(module='sorespo-ietf-l3vpn-svc', namespace='http://example.com/sorespo-ietf-l3vpn-svc', prefix='sorespo-l3vpn-svc', name='authentication-key', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
 ])
 
 SRC_DNODE_CHILD_121: DContainer = DContainer(module='ietf-l3vpn-svc', namespace='urn:ietf:params:xml:ns:yang:ietf-l3vpn-svc', prefix='l3vpn-svc', name='static', config=True, description='Configuration specific to static routing.', presence=True, when="derived-from-or-self(../type, 'l3vpn-svc:static')", children=[
@@ -4859,6 +4860,18 @@ SRC_YANG_3: str = r"""module sorespo-ietf-l3vpn-svc {
   augment "/l3vpn-svc:l3vpn-svc/l3vpn-svc:sites/l3vpn-svc:site" {
     sw:transform sorespo.cfs.L3VpnSite;
     tmf:cfs-service "L3VPN Site";
+  }
+
+  augment "/l3vpn-svc:l3vpn-svc/l3vpn-svc:sites/l3vpn-svc:site"
+        + "/l3vpn-svc:site-network-accesses/l3vpn-svc:site-network-access"
+        + "/l3vpn-svc:routing-protocols/l3vpn-svc:routing-protocol/l3vpn-svc:bgp" {
+    description
+      "Per-customer eBGP session authentication key. Optional: absent means the
+       session has no MD5/TCP-AO authentication. Modelled per site-network-access
+       because each customer session is an independent trust relationship.";
+    leaf authentication-key {
+      type string;
+    }
   }
 }
 """
@@ -13947,10 +13960,12 @@ _breaker193: None = None
 class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp(yadata.MNode):
     autonomous_system: u64
     address_family: list[str]
+    authentication_key: ?str
 
-    mut def __init__(self, autonomous_system: u64, address_family: ?list[str]=None) -> None:
+    mut def __init__(self, autonomous_system: u64, address_family: ?list[str]=None, authentication_key: ?str) -> None:
         self.autonomous_system = autonomous_system
         self.address_family = address_family if address_family is not None else []
+        self.authentication_key = authentication_key
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['ietf-l3vpn-svc:l3vpn-svc', 'sites', 'site', 'site-network-accesses', 'site-network-access', 'routing-protocols', 'routing-protocol', 'bgp'])
@@ -13958,7 +13973,7 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
     @staticmethod
     mut def from_gdata(n: ?ygdata.Node) -> ?ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp:
         if n is not None:
-            return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp(autonomous_system=n.get_u64(ygdata.Id(NS_ietf_l3vpn_svc, 'autonomous-system')), address_family=n.get_strs(ygdata.Id(NS_ietf_l3vpn_svc, 'address-family')))
+            return ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp(autonomous_system=n.get_u64(ygdata.Id(NS_ietf_l3vpn_svc, 'autonomous-system')), address_family=n.get_strs(ygdata.Id(NS_ietf_l3vpn_svc, 'address-family')), authentication_key=n.get_opt_str(ygdata.Id(NS_sorespo_ietf_l3vpn_svc, 'authentication-key')))
         return None
 
     mut def copy(self) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp:
@@ -14224,12 +14239,14 @@ class ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_networ
         self.ospf = res
         return res
 
-    mut def create_bgp(self, autonomous_system: u64) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp:
+    mut def create_bgp(self, autonomous_system: u64, authentication_key: ?str=None) -> ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp:
         existing = self.bgp
         if existing is not None:
             existing.autonomous_system = autonomous_system
+            if authentication_key is not None:
+                existing.authentication_key = authentication_key
             return existing
-        res = ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp(autonomous_system=autonomous_system)
+        res = ietf_l3vpn_svc__l3vpn_svc__sites__site__site_network_accesses__site_network_access__routing_protocols__routing_protocol__bgp(autonomous_system=autonomous_system, authentication_key=authentication_key)
         self.bgp = res
         return res
 

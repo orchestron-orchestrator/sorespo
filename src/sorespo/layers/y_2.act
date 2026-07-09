@@ -148,7 +148,7 @@ SRC_DNODE_CHILD_18: DList = DList(module='sorespo-rfs', namespace='http://exampl
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='local-asn', config=True, mandatory=True, type_=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)]))),
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='peer-asn', config=True, mandatory=True, type_=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)]))),
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='description', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
-    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='authentication-key', config=True, mandatory=True, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
+    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='authentication-key', config=True, description='Optional eBGP session authentication key (MD5/TCP-AO). Absent when\nthe customer session has no authentication configured.', mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
 ])
 
 SRC_DNODE_CHILD_11: DList = DList(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='rfs', key=['name'], config=True, min_elements=0, ordered_by='system', children=[SRC_DNODE_CHILD_12, SRC_DNODE_CHILD_13, SRC_DNODE_CHILD_14, SRC_DNODE_CHILD_15, SRC_DNODE_CHILD_16, SRC_DNODE_CHILD_17, SRC_DNODE_CHILD_18])
@@ -358,7 +358,9 @@ SRC_YANG_0: str = r"""module sorespo-rfs {
       }
       leaf authentication-key {
         type string;
-        mandatory true;
+        description
+          "Optional eBGP session authentication key (MD5/TCP-AO). Absent when
+           the customer session has no authentication configured.";
       }
     }
   }
@@ -2055,9 +2057,9 @@ class stratoweave_rfs__rfs__ebgp_customer_entry(yadata.MNode):
     local_asn: u64
     peer_asn: u64
     description: ?str
-    authentication_key: str
+    authentication_key: ?str
 
-    mut def __init__(self, vrf: str, address: str, local_asn: u64, peer_asn: u64, authentication_key: str, description: ?str) -> None:
+    mut def __init__(self, vrf: str, address: str, local_asn: u64, peer_asn: u64, description: ?str, authentication_key: ?str) -> None:
         self.vrf = vrf
         self.address = address
         self.local_asn = local_asn
@@ -2070,7 +2072,7 @@ class stratoweave_rfs__rfs__ebgp_customer_entry(yadata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> stratoweave_rfs__rfs__ebgp_customer_entry:
-        return stratoweave_rfs__rfs__ebgp_customer_entry(vrf=n.get_str(ygdata.Id(NS_sorespo_rfs, 'vrf')), address=n.get_str(ygdata.Id(NS_sorespo_rfs, 'address')), local_asn=n.get_u64(ygdata.Id(NS_sorespo_rfs, 'local-asn')), peer_asn=n.get_u64(ygdata.Id(NS_sorespo_rfs, 'peer-asn')), description=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'description')), authentication_key=n.get_str(ygdata.Id(NS_sorespo_rfs, 'authentication-key')))
+        return stratoweave_rfs__rfs__ebgp_customer_entry(vrf=n.get_str(ygdata.Id(NS_sorespo_rfs, 'vrf')), address=n.get_str(ygdata.Id(NS_sorespo_rfs, 'address')), local_asn=n.get_u64(ygdata.Id(NS_sorespo_rfs, 'local-asn')), peer_asn=n.get_u64(ygdata.Id(NS_sorespo_rfs, 'peer-asn')), description=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'description')), authentication_key=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'authentication-key')))
 
     mut def copy(self) -> stratoweave_rfs__rfs__ebgp_customer_entry:
         """Create a deep copy of this adata object"""
@@ -2095,16 +2097,17 @@ class stratoweave_rfs__rfs__ebgp_customer(yadata.MNode):
                 continue
             return e
 
-    mut def create(self, vrf: str, address: str, local_asn: u64, peer_asn: u64, authentication_key: str, description: ?str=None) -> stratoweave_rfs__rfs__ebgp_customer_entry:
+    mut def create(self, vrf: str, address: str, local_asn: u64, peer_asn: u64, description: ?str=None, authentication_key: ?str=None) -> stratoweave_rfs__rfs__ebgp_customer_entry:
         e = self.get(vrf, address)
         if e is not None:
             e.local_asn = local_asn
             e.peer_asn = peer_asn
-            e.authentication_key = authentication_key
             if description is not None:
                 e.description = description
+            if authentication_key is not None:
+                e.authentication_key = authentication_key
             return e
-        res = stratoweave_rfs__rfs__ebgp_customer_entry(vrf=vrf, address=address, local_asn=local_asn, peer_asn=peer_asn, authentication_key=authentication_key, description=description)
+        res = stratoweave_rfs__rfs__ebgp_customer_entry(vrf=vrf, address=address, local_asn=local_asn, peer_asn=peer_asn, description=description, authentication_key=authentication_key)
         self.elements.append(res)
         return res
 

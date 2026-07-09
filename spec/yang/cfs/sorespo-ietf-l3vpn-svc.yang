@@ -30,4 +30,16 @@ module sorespo-ietf-l3vpn-svc {
     sw:transform sorespo.cfs.L3VpnSite;
     tmf:cfs-service "L3VPN Site";
   }
+
+  augment "/l3vpn-svc:l3vpn-svc/l3vpn-svc:sites/l3vpn-svc:site"
+        + "/l3vpn-svc:site-network-accesses/l3vpn-svc:site-network-access"
+        + "/l3vpn-svc:routing-protocols/l3vpn-svc:routing-protocol/l3vpn-svc:bgp" {
+    description
+      "Per-customer eBGP session authentication key. Optional: absent means the
+       session has no MD5/TCP-AO authentication. Modelled per site-network-access
+       because each customer session is an independent trust relationship.";
+    leaf authentication-key {
+      type string;
+    }
+  }
 }
