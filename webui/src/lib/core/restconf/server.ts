@@ -47,6 +47,9 @@ export async function proxyRequest(request: Request, targetPath: string, search 
     const responseHeaders = new Headers(upstream.headers);
     responseHeaders.delete('connection');
     responseHeaders.delete('content-length');
+    // fetch has already decompressed/de-chunked the body it hands us.
+    responseHeaders.delete('content-encoding');
+    responseHeaders.delete('transfer-encoding');
 
     return new Response(upstream.body, {
       status: upstream.status,

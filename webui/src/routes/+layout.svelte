@@ -6,6 +6,7 @@
   import { onMount, type Snippet } from 'svelte';
 
   import CommandPalette from '$lib/core/command-palette/CommandPalette.svelte';
+  import { isPendingQueueItem } from '$lib/core/orchestron/client';
   import { queuesPoll, refreshQueues } from '$lib/core/orchestron/poll-store';
   import { getServiceModule, listServiceModuleMeta } from '$lib/core/registry/service-modules';
   import { formatServiceRouteId } from '$lib/core/registry/types';
@@ -14,7 +15,7 @@
 
   const serviceModules = listServiceModuleMeta();
 
-  let totalPendingCount = $derived($queuesPoll.queues.length);
+  let totalPendingCount = $derived($queuesPoll.queues.filter(isPendingQueueItem).length);
   let paletteOpen = $state(false);
 
   async function handleRefresh(): Promise<void> {
@@ -48,6 +49,20 @@
 
   type Crumb = { label: string; href: string; current: boolean };
 
+  // Static route-segment labels; anything not listed falls back to
+  // capitalize() plus the dynamic rules below (module titles, service ids,
+  // device names).
+  const SEGMENT_LABELS: Record<string, string> = {
+    services: 'Services',
+    devices: 'Devices',
+    operations: 'Operations',
+    'config-queue': 'Config Queue',
+    'global-settings': 'Global Settings',
+    layers: 'Layer Config',
+    configure: 'Apply Config',
+    new: 'New'
+  };
+
   /** Map a URL path to a friendly, clickable breadcrumb. */
   function getBreadcrumbs(pathname: string): Crumb[] {
     const parts = pathname.split('/').filter(Boolean).map(decodePathSegment);
@@ -58,40 +73,17 @@
 
     for (let i = 0; i < parts.length; i += 1) {
       const part = parts[i];
-      href += `/${part}`;
+      href += `/${encodeURIComponent(part)}`;
 
-      let label = capitalize(part);
+      let label = SEGMENT_LABELS[part] ?? capitalize(part);
 
-      if (parts[0] === 'services') {
-        if (i === 0) {
-          label = 'Services';
-        } else if (i === 1) {
-          const module = getServiceModule(part);
-          label = module?.title ?? part;
-        } else if (i === 2) {
-          if (part === 'new') {
-            label = 'New';
-          } else {
-            const module = getServiceModule(parts[1]);
-            label = module ? formatServiceRouteId(module, part) : part;
-          }
-        }
-      } else if (parts[0] === 'devices') {
-        if (i === 0) {
-          label = 'Devices';
-        } else if (i === 1) {
-          label = part;
-        } else {
-          label = capitalize(part);
-        }
-      } else if (parts[0] === 'operations') {
-        if (i === 0) {
-          label = 'Operations';
-        } else if (part === 'config-queue') {
-          label = 'Config Queue';
-        }
-      } else if (parts[0] === 'global-settings') {
-        label = 'Global Settings';
+      if (parts[0] === 'services' && i === 1) {
+        label = getServiceModule(part)?.title ?? part;
+      } else if (parts[0] === 'services' && i === 2 && part !== 'new') {
+        const module = getServiceModule(parts[1]);
+        label = module ? formatServiceRouteId(module, part) : part;
+      } else if (parts[0] === 'devices' && i === 1) {
+        label = part;
       }
 
       crumbs.push({ label, href, current: i === parts.length - 1 });

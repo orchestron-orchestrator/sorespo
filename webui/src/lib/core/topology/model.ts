@@ -1,3 +1,7 @@
+import { normalizeIdentity } from '$lib/core/restconf/identity';
+import { getSites as getL3VpnSites } from '$lib/modules/l3vpn-site/parse';
+import { parseNetinfraRouter } from '$lib/modules/netinfra-router/parse';
+
 export interface NetinfraRouterApi {
   name?: string;
   id?: number;
@@ -60,6 +64,22 @@ export interface L3VpnSitesPayload {
   };
 }
 
+export interface TopologyLinkLabel {
+  x: number;
+  y: number;
+  width: number;
+  interfaceLine: string;
+  ppsLine: string;
+}
+
+export interface TopologyLinkGeometry {
+  leftX: number;
+  leftY: number;
+  rightX: number;
+  rightY: number;
+  label: TopologyLinkLabel | null;
+}
+
 export interface TopologyLink {
   id: string;
   leftRouter: string;
@@ -70,6 +90,8 @@ export interface TopologyLink {
   leftPps: number | null;
   rightPps: number | null;
   linkStatus: LinkStatus;
+  /** Render coordinates; null when either endpoint router is unknown. */
+  geometry: TopologyLinkGeometry | null;
 }
 
 export interface TopologySiteAttachment {
@@ -122,7 +144,7 @@ export const TOPOLOGY_LINK_LABEL_MIN_WIDTH = 140;
 export const TOPOLOGY_LINK_LABEL_MAX_WIDTH = 260;
 export const TOPOLOGY_VIEW_PADDING = 48;
 
-function parsePps(value: number | string | undefined): number | null {
+export function parsePps(value: unknown): number | null {
   if (value === undefined || value === null) {
     return null;
   }
@@ -130,15 +152,10 @@ function parsePps(value: number | string | undefined): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-export function parseLinkStatus(value: string | undefined): LinkStatus {
+export function parseLinkStatus(value: unknown): LinkStatus {
   if (value === 'up') return 'up';
   if (value === 'down') return 'down';
   return 'unknown';
-}
-
-function normalizeIdentity(value: unknown): string {
-  const raw = String(value ?? '').trim();
-  return raw.includes(':') ? raw.split(':').pop() ?? '' : raw;
 }
 
 function getRouters(payload: NetinfraPayload | null | undefined): NetinfraRouterApi[] {
@@ -149,18 +166,6 @@ function getLinks(payload: NetinfraPayload | null | undefined): NetinfraBackbone
   return Array.isArray(payload?.['netinfra:netinfra']?.['backbone-link'])
     ? payload['netinfra:netinfra']!['backbone-link']!
     : [];
-}
-
-function getSites(payload: L3VpnSitesPayload | null | undefined): L3VpnSiteApi[] {
-  if (Array.isArray(payload?.['ietf-l3vpn-svc:sites']?.site)) {
-    return payload['ietf-l3vpn-svc:sites']!.site!;
-  }
-
-  if (Array.isArray(payload?.['ietf-l3vpn-svc:l3vpn-svc']?.sites?.site)) {
-    return payload['ietf-l3vpn-svc:l3vpn-svc']!.sites!.site!;
-  }
-
-  return [];
 }
 
 function getRouterHint(access: L3VpnSiteAccessApi): string {
@@ -241,7 +246,7 @@ export function formatPps(pps: number | null): string {
   return new Intl.NumberFormat('en').format(pps);
 }
 
-export function getLinkPpsLabel(link: TopologyLink): string {
+function getLinkPpsLabel(link: Pick<TopologyLink, 'monitorTraffic' | 'leftPps' | 'rightPps'>): string {
   if (!link.monitorTraffic) {
     return '';
   }
@@ -283,14 +288,14 @@ function getInterfaceLabelCharBudget(): number {
  * Build the "<left> ↔ <right>" interface line shown on a backbone link,
  * shortening either side that would otherwise overflow the label box.
  */
-export function getLinkInterfaceLabel(leftInterface: string, rightInterface: string): string {
+function getLinkInterfaceLabel(leftInterface: string, rightInterface: string): string {
   const budget = getInterfaceLabelCharBudget();
   const left = shortenInterfaceName(leftInterface.trim() || 'left interface', budget);
   const right = shortenInterfaceName(rightInterface.trim() || 'right interface', budget);
   return `${left}${LINK_LABEL_SEPARATOR}${right}`;
 }
 
-export function getLinkLabelWidth(
+function getLinkLabelWidth(
   leftInterface: string,
   rightInterface: string,
   ppsLabel: string = ''
@@ -303,7 +308,10 @@ export function getLinkLabelWidth(
   );
 }
 
-export function getLinkLabelPosition(
+// Pushes the label away from the layout origin (the ring center), so it must
+// be called with pre-shift coordinates — the sign of mid·normal is not
+// translation-invariant.
+function getLinkLabelPosition(
   leftX: number,
   leftY: number,
   rightX: number,
@@ -381,8 +389,6 @@ function getGraphBounds(routers: TopologyRouter[], links: TopologyLink[]): {
     maxY = Math.max(maxY, y + halfHeight);
   };
 
-  const routerMap = new Map(routers.map((router) => [router.name, router]));
-
   for (const router of routers) {
     includeBox(router.x, router.y, getRouterHalfWidth(router), TOPOLOGY_ROUTER_RADIUS + 18);
 
@@ -397,20 +403,12 @@ function getGraphBounds(routers: TopologyRouter[], links: TopologyLink[]): {
   }
 
   for (const link of links) {
-    const leftRouter = routerMap.get(link.leftRouter);
-    const rightRouter = routerMap.get(link.rightRouter);
-
-    if (!leftRouter || !rightRouter || (!link.leftInterface && !link.rightInterface)) {
+    const label = link.geometry?.label;
+    if (!label) {
       continue;
     }
 
-    const label = getLinkLabelPosition(leftRouter.x, leftRouter.y, rightRouter.x, rightRouter.y);
-    includeBox(
-      label.x,
-      label.y,
-      getLinkLabelWidth(link.leftInterface, link.rightInterface, getLinkPpsLabel(link)) / 2,
-      TOPOLOGY_LINK_LABEL_HEIGHT / 2
-    );
+    includeBox(label.x, label.y, label.width / 2, TOPOLOGY_LINK_LABEL_HEIGHT / 2);
   }
 
   if (!Number.isFinite(minX) || !Number.isFinite(minY) || !Number.isFinite(maxX) || !Number.isFinite(maxY)) {
@@ -425,12 +423,66 @@ function getGraphBounds(routers: TopologyRouter[], links: TopologyLink[]): {
   return { minX, minY, maxX, maxY };
 }
 
+function buildLinkGeometry(
+  link: Omit<TopologyLink, 'geometry'>,
+  routerMap: Map<string, TopologyRouter>
+): TopologyLinkGeometry | null {
+  const leftRouter = routerMap.get(link.leftRouter);
+  const rightRouter = routerMap.get(link.rightRouter);
+
+  if (!leftRouter || !rightRouter) {
+    return null;
+  }
+
+  let label: TopologyLinkLabel | null = null;
+
+  if (link.leftInterface || link.rightInterface) {
+    const position = getLinkLabelPosition(leftRouter.x, leftRouter.y, rightRouter.x, rightRouter.y);
+    const ppsLine = getLinkPpsLabel(link);
+    label = {
+      x: position.x,
+      y: position.y,
+      width: getLinkLabelWidth(link.leftInterface, link.rightInterface, ppsLine),
+      interfaceLine: getLinkInterfaceLabel(link.leftInterface, link.rightInterface),
+      ppsLine
+    };
+  }
+
+  return {
+    leftX: leftRouter.x,
+    leftY: leftRouter.y,
+    rightX: rightRouter.x,
+    rightY: rightRouter.y,
+    label
+  };
+}
+
+function shiftLinkGeometry(
+  geometry: TopologyLinkGeometry | null,
+  shiftX: number,
+  shiftY: number
+): TopologyLinkGeometry | null {
+  if (!geometry) {
+    return null;
+  }
+
+  return {
+    leftX: geometry.leftX + shiftX,
+    leftY: geometry.leftY + shiftY,
+    rightX: geometry.rightX + shiftX,
+    rightY: geometry.rightY + shiftY,
+    label: geometry.label
+      ? { ...geometry.label, x: geometry.label.x + shiftX, y: geometry.label.y + shiftY }
+      : null
+  };
+}
+
 export function buildTopologyGraph(
   netinfraPayload: NetinfraPayload,
   l3vpnSitesPayload: L3VpnSitesPayload | null = null
 ): TopologyGraph {
   const routerApis = getRouters(netinfraPayload).filter((router) => String(router?.name ?? '').trim());
-  const links = getLinks(netinfraPayload)
+  const bareLinks = getLinks(netinfraPayload)
     .filter((link) => String(link?.['left-router'] ?? '').trim() && String(link?.['right-router'] ?? '').trim())
     .map((link, index) => ({
       id: `${String(link['left-router'])}-${String(link['right-router'])}-${index}`,
@@ -446,23 +498,26 @@ export function buildTopologyGraph(
 
   const positions = computeRouterPositions(routerApis);
 
-  const routers: TopologyRouter[] = routerApis.map((router, index) => ({
-    name: String(router.name),
-    id: typeof router.id === 'number' ? router.id : router.id ? Number(router.id) : null,
-    type: String(router.type ?? ''),
-    role: String(router.role ?? ''),
-    asn: typeof router.asn === 'number' ? router.asn : router.asn ? Number(router.asn) : null,
-    approvalRequired: Boolean(router['approval-required'] ?? false),
-    x: positions[index]?.x ?? 0,
-    y: positions[index]?.y ?? 0,
-    angle: positions[index]?.angle ?? -Math.PI / 2,
-    attachments: []
-  }));
+  const routers: TopologyRouter[] = routerApis.map((routerApi, index) => {
+    const draft = parseNetinfraRouter(routerApi);
+    return {
+      name: draft.name,
+      id: draft.id,
+      type: draft.type,
+      role: draft.role,
+      asn: draft.asn,
+      approvalRequired: draft.approvalRequired,
+      x: positions[index]?.x ?? 0,
+      y: positions[index]?.y ?? 0,
+      angle: positions[index]?.angle ?? -Math.PI / 2,
+      attachments: []
+    };
+  });
 
   const routerMap = new Map(routers.map((router) => [router.name, router]));
   const orphanSiteAttachments: TopologySiteAttachment[] = [];
 
-  const attachmentGroups = buildSiteAttachmentGroups(getSites(l3vpnSitesPayload));
+  const attachmentGroups = buildSiteAttachmentGroups(getL3VpnSites(l3vpnSitesPayload));
 
   for (const group of attachmentGroups) {
     const attachment: TopologySiteAttachment = {
@@ -517,6 +572,13 @@ export function buildTopologyGraph(
 
   orphanSiteAttachments.sort((left, right) => left.siteId.localeCompare(right.siteId));
 
+  // Label placement depends on pre-shift coordinates (see getLinkLabelPosition),
+  // so geometry is computed once here and shifted together with the routers.
+  const links: TopologyLink[] = bareLinks.map((link) => ({
+    ...link,
+    geometry: buildLinkGeometry(link, routerMap)
+  }));
+
   const bounds = getGraphBounds(routers, links);
   const shiftX = TOPOLOGY_VIEW_PADDING - bounds.minX;
   const shiftY = TOPOLOGY_VIEW_PADDING - bounds.minY;
@@ -530,6 +592,10 @@ export function buildTopologyGraph(
       y: attachment.y + shiftY
     }))
   }));
+  const shiftedLinks = links.map((link) => ({
+    ...link,
+    geometry: shiftLinkGeometry(link.geometry, shiftX, shiftY)
+  }));
   const width = Math.ceil(bounds.maxX - bounds.minX + TOPOLOGY_VIEW_PADDING * 2);
   const height = Math.ceil(bounds.maxY - bounds.minY + TOPOLOGY_VIEW_PADDING * 2);
 
@@ -537,7 +603,7 @@ export function buildTopologyGraph(
     width,
     height,
     routers: shiftedRouters,
-    links,
+    links: shiftedLinks,
     orphanSiteAttachments
   };
 }

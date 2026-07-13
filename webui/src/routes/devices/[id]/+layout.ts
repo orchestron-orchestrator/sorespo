@@ -1,10 +1,10 @@
 import { fetchDevice } from '$lib/core/orchestron/client';
 
 import type { DeviceInfo } from '$lib/core/orchestron/client';
-import type { PageLoad } from './$types';
+import type { LayoutLoad } from './$types';
 
-export const load: PageLoad = async ({ params, fetch, depends }) => {
-  const deviceId = params.id.toUpperCase();
+export const load: LayoutLoad = async ({ params, fetch, depends }) => {
+  const deviceId = params.id;
   depends(`data:device:${deviceId}`);
 
   try {

@@ -1,3 +1,4 @@
+import { normalizeIdentity } from '$lib/core/restconf/identity';
 import { createL3VpnVpnServiceDraft } from '$lib/modules/l3vpn-vpn-service/defaults';
 import { L3VPN_VPN_SERVICE_TOPOLOGIES, formatL3VpnVpnServiceTopology } from '$lib/modules/l3vpn-vpn-service/model';
 
@@ -5,8 +6,7 @@ import type { ServiceListItem } from '$lib/core/registry/types';
 import type { L3VpnVpnServiceDraft, L3VpnVpnServiceTopology } from '$lib/modules/l3vpn-vpn-service/model';
 
 function normalizeTopology(value: unknown): L3VpnVpnServiceTopology {
-  const raw = String(value ?? '').trim();
-  const normalized = raw.includes(':') ? raw.split(':').pop() ?? '' : raw;
+  const normalized = normalizeIdentity(value);
 
   if (L3VPN_VPN_SERVICE_TOPOLOGIES.includes(normalized as L3VpnVpnServiceTopology)) {
     return normalized as L3VpnVpnServiceTopology;

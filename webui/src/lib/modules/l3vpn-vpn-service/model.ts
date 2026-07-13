@@ -8,12 +8,6 @@ export interface L3VpnVpnServiceDraft {
   topology: L3VpnVpnServiceTopology;
 }
 
-export const L3VPN_VPN_SERVICE_TOPOLOGY_OPTIONS = [
-  { value: 'any-to-any', label: 'Any to any' },
-  { value: 'hub-spoke', label: 'Hub and spoke' },
-  { value: 'hub-spoke-disjoint', label: 'Hub and spoke (disjoint hubs)' }
-];
-
 export function formatL3VpnVpnServiceTopology(value: string): string {
   switch (value) {
     case 'hub-spoke':
@@ -25,3 +19,8 @@ export function formatL3VpnVpnServiceTopology(value: string): string {
       return 'Any to any';
   }
 }
+
+export const L3VPN_VPN_SERVICE_TOPOLOGY_OPTIONS = L3VPN_VPN_SERVICE_TOPOLOGIES.map((value) => ({
+  value,
+  label: formatL3VpnVpnServiceTopology(value)
+}));

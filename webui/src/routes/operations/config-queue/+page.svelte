@@ -4,11 +4,15 @@
   import {
     approveConfigQueueItem,
     fetchConfigQueueItem,
+    isPendingQueueItem,
     type QueueItemDetail,
     type QueueItemSummary
   } from '$lib/core/orchestron/client';
   import { queuesPoll, refreshQueues, type QueuesPollValue } from '$lib/core/orchestron/poll-store';
-  import { highlightXmlDiff } from '$lib/core/diff/xml-diff';
+  import XmlDiff from '$lib/core/diff/XmlDiff.svelte';
+  import SegmentedControl from '$lib/core/ui/SegmentedControl.svelte';
+  import { onGlobalRefresh } from '$lib/core/util/global-refresh';
+  import { LatestRequest } from '$lib/core/util/latest-request';
 
   let allQueues: QueueItemSummary[] = $state([]);
   let loading = $state(true);
@@ -19,9 +23,7 @@
   let approvingItem: string | null = $state(null);
   let diffFormat = $state('xml');
 
-  let pendingCount = $derived(
-    allQueues.filter((item) => item.approved !== true && item.approved !== false).length
-  );
+  let pendingCount = $derived(allQueues.filter(isPendingQueueItem).length);
   let deviceGroups = $derived(
     allQueues.reduce<Record<string, QueueItemSummary[]>>((groups, item) => {
       groups[item.deviceId] = [...(groups[item.deviceId] ?? []), item];
@@ -32,7 +34,7 @@
     Object.entries(deviceGroups).map(([deviceId, items]) => ({
       deviceId,
       items,
-      count: items.filter((item) => item.approved !== true && item.approved !== false).length
+      count: items.filter(isPendingQueueItem).length
     }))
   );
   let selectedItem = $derived(
@@ -40,11 +42,6 @@
       ? deviceGroups[selectedDevice][selectedQueueIndex] ?? null
       : null
   );
-  let diffRuns = $derived.by(() => {
-    const diff = itemDetail?.config_diff;
-    if (diffFormat !== 'xml' || !diff) return [];
-    return highlightXmlDiff(diff);
-  });
 
   onMount(() => {
     const unsubscribePoll = queuesPoll.subscribe((value) => {
@@ -52,19 +49,20 @@
       applyPoll(value);
     });
 
-    const handleRefresh = () => {
+    const offRefresh = onGlobalRefresh(() => {
       void refreshQueues();
-    };
-    window.addEventListener('global-refresh', handleRefresh);
+    });
 
     return () => {
       unsubscribePoll();
-      window.removeEventListener('global-refresh', handleRefresh);
+      offRefresh();
     };
   });
 
   function applyPoll(value: QueuesPollValue): void {
-    const previousSelection = selectedItem ? `${selectedItem.deviceId}:${selectedItem.queueId}` : null;
+    const previous = selectedItem
+      ? { deviceId: selectedItem.deviceId, queueId: selectedItem.queueId }
+      : null;
 
     allQueues = value.queues;
     loading = false;
@@ -77,13 +75,22 @@
       return;
     }
 
-    if (previousSelection) {
-      const [deviceId, queueId] = previousSelection.split(':');
-      const deviceItems = value.queues.filter((item) => item.deviceId === deviceId);
-      const nextIndex = deviceItems.findIndex((item) => item.queueId === queueId);
+    if (previous) {
+      const deviceItems = value.queues.filter((item) => item.deviceId === previous.deviceId);
+      const nextIndex = deviceItems.findIndex((item) => item.queueId === previous.queueId);
       if (nextIndex >= 0) {
-        selectedDevice = deviceId;
+        selectedDevice = previous.deviceId;
         selectedQueueIndex = nextIndex;
+        return;
+      }
+
+      // The selected item was consumed (approved/rejected); stay on the same
+      // device's queue and advance to its new head rather than jumping to an
+      // unrelated device's diff.
+      if (deviceItems.length > 0) {
+        selectedDevice = previous.deviceId;
+        selectedQueueIndex = 0;
+        void loadItemDetail(previous.deviceId, deviceItems[0].queueId);
         return;
       }
     }
@@ -107,10 +114,17 @@
     }
   }
 
+  const detailRequest = new LatestRequest();
+
   async function loadItemDetail(deviceId: string, queueId: string): Promise<void> {
+    const token = detailRequest.begin();
+    itemDetail = null;
     try {
-      itemDetail = await fetchConfigQueueItem(deviceId, queueId, diffFormat);
+      const detail = await fetchConfigQueueItem(deviceId, queueId, diffFormat);
+      if (!detailRequest.isCurrent(token)) return;
+      itemDetail = detail;
     } catch (loadError) {
+      if (!detailRequest.isCurrent(token)) return;
       error = loadError instanceof Error ? loadError.message : 'Failed to load queue item detail.';
     }
   }
@@ -225,12 +239,17 @@
             {/if}
           </p>
         </div>
-        <div class="segmented">
-          <button class:active={diffFormat === 'xml'} type="button" onclick={() => changeFormat('xml')}>XML</button>
-          <button class:active={diffFormat === 'json'} type="button" onclick={() => changeFormat('json')}>JSON</button>
-          <button class:active={diffFormat === 'adata'} type="button" onclick={() => changeFormat('adata')}>AData</button>
-          <button class:active={diffFormat === 'gdata'} type="button" onclick={() => changeFormat('gdata')}>GData</button>
-        </div>
+        <SegmentedControl
+          ariaLabel="Diff format"
+          options={[
+            { value: 'xml', label: 'XML' },
+            { value: 'json', label: 'JSON' },
+            { value: 'adata', label: 'AData' },
+            { value: 'gdata', label: 'GData' }
+          ]}
+          value={diffFormat}
+          onchange={(format) => changeFormat(format)}
+        />
       </div>
 
       <div class="queue-layout__detail-toolbar">
@@ -270,11 +289,7 @@
       </div>
 
       {#if itemDetail.config_diff}
-        {#if diffFormat === 'xml' && diffRuns.length > 0}
-          <pre>{#each diffRuns as run}<span class:diff-add={run.kind === 'add'} class:diff-remove={run.kind === 'remove'}>{run.text}</span>{/each}</pre>
-        {:else}
-          <pre>{itemDetail.config_diff}</pre>
-        {/if}
+        <XmlDiff diff={itemDetail.config_diff} format={diffFormat} minHeight="28rem" />
       {:else}
         <div class="empty-state">No configuration diff available for this queue item.</div>
       {/if}
@@ -384,64 +399,10 @@
   }
 
   .queue-layout__nav,
-  .queue-layout__actions,
-  .segmented {
+  .queue-layout__actions {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
-  }
-
-  .segmented {
-    padding: 3px;
-    border-radius: var(--sw-radius-md);
-    background: var(--sw-bg-deep);
-    display: flex;
-    gap: 2px;
-  }
-
-  .segmented button {
-    padding: 7px 14px;
-    border: none;
-    border-radius: 6px;
-    background: transparent;
-    color: var(--sw-text-secondary);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .segmented button:hover {
-    color: var(--sw-text-primary);
-  }
-
-  .segmented button.active {
-    background: var(--sw-bg-elevated);
-    color: var(--sw-accent);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-  }
-
-  pre {
-    margin: 0;
-    min-height: 28rem;
-    overflow: auto;
-    padding: 1rem;
-    border-radius: var(--sw-radius-md);
-    background: var(--sw-bg-deep);
-    border: 1px solid var(--sw-border-subtle);
-    color: var(--sw-text-secondary);
-  }
-
-  .diff-add {
-    color: var(--sw-success);
-  }
-
-  .diff-remove {
-    color: var(--sw-danger);
-    background: var(--sw-danger-dim);
-    border-radius: 4px;
-    box-decoration-break: clone;
-    -webkit-box-decoration-break: clone;
   }
 
   @media (max-width: 980px) {

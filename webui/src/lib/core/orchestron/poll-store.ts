@@ -15,21 +15,34 @@ const internal = writable<QueuesPollValue>(INITIAL);
 let current = INITIAL;
 let subscriberCount = 0;
 let timer: ReturnType<typeof setInterval> | null = null;
-let inFlight = false;
+let inFlight: Promise<void> | null = null;
 
-async function tick(): Promise<void> {
-  if (inFlight) return;
-  inFlight = true;
-  try {
-    const queues = await fetchAllDeviceQueues();
-    current = { queues, error: null, loaded: true };
-    internal.set(current);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to load queue data.';
-    current = { ...current, error: message };
-    internal.set(current);
-  } finally {
-    inFlight = false;
+function fetchOnce(): Promise<void> {
+  if (!inFlight) {
+    inFlight = (async () => {
+      try {
+        const queues = await fetchAllDeviceQueues();
+        current = { queues, error: null, loaded: true };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Failed to load queue data.';
+        current = { ...current, error: message };
+      } finally {
+        inFlight = null;
+      }
+      internal.set(current);
+    })();
+  }
+  return inFlight;
+}
+
+function tick(): void {
+  if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+  void fetchOnce();
+}
+
+function handleVisibilityChange(): void {
+  if (document.visibilityState === 'visible') {
+    void fetchOnce();
   }
 }
 
@@ -38,6 +51,9 @@ export const queuesPoll: Readable<QueuesPollValue> = {
     if (subscriberCount === 0) {
       tick();
       timer = setInterval(tick, POLL_INTERVAL_MS);
+      if (typeof document !== 'undefined') {
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+      }
     }
     subscriberCount++;
 
@@ -45,15 +61,28 @@ export const queuesPoll: Readable<QueuesPollValue> = {
 
     return () => {
       subscriberCount--;
-      if (subscriberCount === 0 && timer !== null) {
-        clearInterval(timer);
-        timer = null;
+      if (subscriberCount === 0) {
+        if (timer !== null) {
+          clearInterval(timer);
+          timer = null;
+        }
+        if (typeof document !== 'undefined') {
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+        }
       }
       unsub();
     };
   }
 };
 
+/**
+ * Fetch the queues again, guaranteeing the result reflects server state at or
+ * after this call — an in-flight poll response (requested earlier) is awaited
+ * and then a fresh fetch is issued.
+ */
 export async function refreshQueues(): Promise<void> {
-  await tick();
+  if (inFlight) {
+    await inFlight;
+  }
+  await fetchOnce();
 }

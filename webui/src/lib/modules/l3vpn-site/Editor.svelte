@@ -17,8 +17,6 @@
     L3VPN_SITE_ADDRESS_FAMILY_OPTIONS,
     L3VPN_SITE_MANAGEMENT_OPTIONS,
     L3VPN_SITE_ROUTING_PROTOCOL_OPTIONS,
-    formatL3VpnSiteAccessType,
-    formatL3VpnSiteManagementType,
     formatL3VpnSiteRoutingProtocolType
   } from '$lib/modules/l3vpn-site/model';
 
@@ -42,6 +40,44 @@
   }
 
   let { draft, errors = {}, validationKey = 0, onchange, ontouch }: Props = $props();
+
+  type StaticLanPrefixField = 'staticIpv4LanPrefixes' | 'staticIpv6LanPrefixes';
+
+  const STATIC_LAN_PREFIX_FAMILIES: {
+    key: StaticLanPrefixField;
+    label: string;
+    yangPath: string;
+    lanPlaceholder: string;
+    lanYangType: string;
+    nextHopPlaceholder: string;
+    nextHopYangType: string;
+  }[] = [
+    {
+      key: 'staticIpv4LanPrefixes',
+      label: 'IPv4',
+      yangPath: 'static/cascaded-lan-prefixes/ipv4-lan-prefixes',
+      lanPlaceholder: 'e.g., 192.0.2.0/24',
+      lanYangType: 'inet:ipv4-prefix',
+      nextHopPlaceholder: 'e.g., 10.201.1.2',
+      nextHopYangType: 'inet:ipv4-address'
+    },
+    {
+      key: 'staticIpv6LanPrefixes',
+      label: 'IPv6',
+      yangPath: 'static/cascaded-lan-prefixes/ipv6-lan-prefixes',
+      lanPlaceholder: 'e.g., 2001:db8::/64',
+      lanYangType: 'inet:ipv6-prefix',
+      nextHopPlaceholder: 'e.g., 2001:db8::2',
+      nextHopYangType: 'inet:ipv6-address'
+    }
+  ];
+
+  function lanPrefixPatch(
+    key: StaticLanPrefixField,
+    prefixes: L3VpnSiteLanPrefixDraft[]
+  ): Partial<L3VpnSiteRoutingProtocolDraft> {
+    return { [key]: prefixes };
+  }
 
   function emit(next: L3VpnSiteDraft): void {
     onchange?.(next);
@@ -608,6 +644,21 @@
                           })}
                         ontouch={touch}
                       />
+
+                      <FieldText
+                        label="Authentication key"
+                        value={protocol.bgpAuthenticationKey}
+                        error={errorFor(`accesses.${index}.routingProtocols.${protocolIndex}.bgpAuthenticationKey`)}
+                        {validationKey}
+                        placeholder="Optional MD5/TCP-AO session key"
+                        yangType="string"
+                        mono={true}
+                        onchange={(value) =>
+                          updateRoutingProtocol(index, protocolIndex, {
+                            bgpAuthenticationKey: value
+                          })}
+                        ontouch={touch}
+                      />
                     {:else if protocol.type === 'ospf'}
                       <FieldText
                         label="OSPF area address"
@@ -673,145 +724,85 @@
                   {/if}
 
                   {#if protocol.type === 'static'}
-                    <div class="editor__subsection">
-                      <div class="editor__subsection-header">
-                        <h6>Static IPv4 LAN Prefixes</h6>
-                        <span class="editor__yang-path">static/cascaded-lan-prefixes/ipv4-lan-prefixes</span>
+                    {#each STATIC_LAN_PREFIX_FAMILIES as family}
+                      <div class="editor__subsection">
+                        <div class="editor__subsection-header">
+                          <h6>Static {family.label} LAN Prefixes</h6>
+                          <span class="editor__yang-path">{family.yangPath}</span>
+                        </div>
+
+                        <ListEditor
+                          title={`${family.label} LAN prefixes`}
+                          description="Repeatable static LAN prefix rows."
+                          items={protocol[family.key]}
+                          addLabel={`Add ${family.label} prefix`}
+                          emptyLabel={`No ${family.label} LAN prefixes configured.`}
+                          getItemLabel={(prefix, prefixIndex) =>
+                            prefix.lan || `${family.label} prefix ${prefixIndex + 1}`}
+                          onadd={() =>
+                            updateRoutingProtocol(
+                              index,
+                              protocolIndex,
+                              lanPrefixPatch(family.key, [
+                                ...protocol[family.key],
+                                createL3VpnSiteLanPrefixDraft()
+                              ])
+                            )}
+                          onremove={(prefixIndex) =>
+                            updateRoutingProtocol(
+                              index,
+                              protocolIndex,
+                              lanPrefixPatch(family.key, removeAt(protocol[family.key], prefixIndex))
+                            )}
+                        >
+                          {#snippet row(prefix, prefixIndex)}
+                            <div class="editor__grid editor__grid--3col">
+                              <FieldText
+                                label="LAN prefix"
+                                value={prefix.lan}
+                                error={errorFor(`accesses.${index}.routingProtocols.${protocolIndex}.${family.key}.${prefixIndex}.lan`)}
+                                {validationKey}
+                                placeholder={family.lanPlaceholder}
+                                yangType={family.lanYangType}
+                                mono={true}
+                                onchange={(value) =>
+                                  updateLanPrefix(index, protocolIndex, family.key, prefixIndex, {
+                                    lan: value
+                                  })}
+                                ontouch={touch}
+                              />
+                              <FieldText
+                                label="LAN tag"
+                                value={prefix.lanTag}
+                                error={errorFor(`accesses.${index}.routingProtocols.${protocolIndex}.${family.key}.${prefixIndex}.lanTag`)}
+                                {validationKey}
+                                placeholder="Optional policy tag"
+                                yangType="string"
+                                onchange={(value) =>
+                                  updateLanPrefix(index, protocolIndex, family.key, prefixIndex, {
+                                    lanTag: value
+                                  })}
+                                ontouch={touch}
+                              />
+                              <FieldText
+                                label="Next hop"
+                                value={prefix.nextHop}
+                                error={errorFor(`accesses.${index}.routingProtocols.${protocolIndex}.${family.key}.${prefixIndex}.nextHop`)}
+                                {validationKey}
+                                placeholder={family.nextHopPlaceholder}
+                                yangType={family.nextHopYangType}
+                                mono={true}
+                                onchange={(value) =>
+                                  updateLanPrefix(index, protocolIndex, family.key, prefixIndex, {
+                                    nextHop: value
+                                  })}
+                                ontouch={touch}
+                              />
+                            </div>
+                          {/snippet}
+                        </ListEditor>
                       </div>
-
-                      <ListEditor
-                        title="IPv4 LAN prefixes"
-                        description="Repeatable static LAN prefix rows."
-                        items={protocol.staticIpv4LanPrefixes}
-                        addLabel="Add IPv4 prefix"
-                        emptyLabel="No IPv4 LAN prefixes configured."
-                        getItemLabel={(prefix, prefixIndex) => prefix.lan || `IPv4 prefix ${prefixIndex + 1}`}
-                        onadd={() =>
-                          updateRoutingProtocol(index, protocolIndex, {
-                            staticIpv4LanPrefixes: [...protocol.staticIpv4LanPrefixes, createL3VpnSiteLanPrefixDraft()]
-                          })}
-                        onremove={(prefixIndex) =>
-                          updateRoutingProtocol(index, protocolIndex, {
-                            staticIpv4LanPrefixes: removeAt(protocol.staticIpv4LanPrefixes, prefixIndex)
-                          })}
-                      >
-                        {#snippet row(prefix, prefixIndex)}
-                          <div class="editor__grid editor__grid--3col">
-                            <FieldText
-                              label="LAN prefix"
-                              value={prefix.lan}
-                              error={errorFor(`accesses.${index}.routingProtocols.${protocolIndex}.staticIpv4LanPrefixes.${prefixIndex}.lan`)}
-                              {validationKey}
-                              placeholder="e.g., 192.0.2.0/24"
-                              yangType="inet:ipv4-prefix"
-                              mono={true}
-                              onchange={(value) =>
-                                updateLanPrefix(index, protocolIndex, 'staticIpv4LanPrefixes', prefixIndex, {
-                                  lan: value
-                                })}
-                              ontouch={touch}
-                            />
-                            <FieldText
-                              label="LAN tag"
-                              value={prefix.lanTag}
-                              error={errorFor(`accesses.${index}.routingProtocols.${protocolIndex}.staticIpv4LanPrefixes.${prefixIndex}.lanTag`)}
-                              {validationKey}
-                              placeholder="Optional policy tag"
-                              yangType="string"
-                              onchange={(value) =>
-                                updateLanPrefix(index, protocolIndex, 'staticIpv4LanPrefixes', prefixIndex, {
-                                  lanTag: value
-                                })}
-                              ontouch={touch}
-                            />
-                            <FieldText
-                              label="Next hop"
-                              value={prefix.nextHop}
-                              error={errorFor(`accesses.${index}.routingProtocols.${protocolIndex}.staticIpv4LanPrefixes.${prefixIndex}.nextHop`)}
-                              {validationKey}
-                              placeholder="e.g., 10.201.1.2"
-                              yangType="inet:ipv4-address"
-                              mono={true}
-                              onchange={(value) =>
-                                updateLanPrefix(index, protocolIndex, 'staticIpv4LanPrefixes', prefixIndex, {
-                                  nextHop: value
-                                })}
-                              ontouch={touch}
-                            />
-                          </div>
-                        {/snippet}
-                      </ListEditor>
-                    </div>
-
-                    <div class="editor__subsection">
-                      <div class="editor__subsection-header">
-                        <h6>Static IPv6 LAN Prefixes</h6>
-                        <span class="editor__yang-path">static/cascaded-lan-prefixes/ipv6-lan-prefixes</span>
-                      </div>
-
-                      <ListEditor
-                        title="IPv6 LAN prefixes"
-                        description="Repeatable IPv6 static LAN prefix rows."
-                        items={protocol.staticIpv6LanPrefixes}
-                        addLabel="Add IPv6 prefix"
-                        emptyLabel="No IPv6 LAN prefixes configured."
-                        getItemLabel={(prefix, prefixIndex) => prefix.lan || `IPv6 prefix ${prefixIndex + 1}`}
-                        onadd={() =>
-                          updateRoutingProtocol(index, protocolIndex, {
-                            staticIpv6LanPrefixes: [...protocol.staticIpv6LanPrefixes, createL3VpnSiteLanPrefixDraft()]
-                          })}
-                        onremove={(prefixIndex) =>
-                          updateRoutingProtocol(index, protocolIndex, {
-                            staticIpv6LanPrefixes: removeAt(protocol.staticIpv6LanPrefixes, prefixIndex)
-                          })}
-                      >
-                        {#snippet row(prefix, prefixIndex)}
-                          <div class="editor__grid editor__grid--3col">
-                            <FieldText
-                              label="LAN prefix"
-                              value={prefix.lan}
-                              error={errorFor(`accesses.${index}.routingProtocols.${protocolIndex}.staticIpv6LanPrefixes.${prefixIndex}.lan`)}
-                              {validationKey}
-                              placeholder="e.g., 2001:db8::/64"
-                              yangType="inet:ipv6-prefix"
-                              mono={true}
-                              onchange={(value) =>
-                                updateLanPrefix(index, protocolIndex, 'staticIpv6LanPrefixes', prefixIndex, {
-                                  lan: value
-                                })}
-                              ontouch={touch}
-                            />
-                            <FieldText
-                              label="LAN tag"
-                              value={prefix.lanTag}
-                              error={errorFor(`accesses.${index}.routingProtocols.${protocolIndex}.staticIpv6LanPrefixes.${prefixIndex}.lanTag`)}
-                              {validationKey}
-                              placeholder="Optional policy tag"
-                              yangType="string"
-                              onchange={(value) =>
-                                updateLanPrefix(index, protocolIndex, 'staticIpv6LanPrefixes', prefixIndex, {
-                                  lanTag: value
-                                })}
-                              ontouch={touch}
-                            />
-                            <FieldText
-                              label="Next hop"
-                              value={prefix.nextHop}
-                              error={errorFor(`accesses.${index}.routingProtocols.${protocolIndex}.staticIpv6LanPrefixes.${prefixIndex}.nextHop`)}
-                              {validationKey}
-                              placeholder="e.g., 2001:db8::2"
-                              yangType="inet:ipv6-address"
-                              mono={true}
-                              onchange={(value) =>
-                                updateLanPrefix(index, protocolIndex, 'staticIpv6LanPrefixes', prefixIndex, {
-                                  nextHop: value
-                                })}
-                              ontouch={touch}
-                            />
-                          </div>
-                        {/snippet}
-                      </ListEditor>
-                    </div>
+                    {/each}
                   {/if}
                 </div>
               {/snippet}

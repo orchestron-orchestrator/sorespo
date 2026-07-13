@@ -1,10 +1,5 @@
 <script lang="ts">
   import {
-    formatPps,
-    getLinkInterfaceLabel,
-    getLinkLabelPosition,
-    getLinkLabelWidth,
-    getLinkPpsLabel,
     TOPOLOGY_LINK_LABEL_HEIGHT,
     TOPOLOGY_ROUTER_RADIUS,
     TOPOLOGY_SITE_CARD_HEIGHT,
@@ -13,18 +8,18 @@
 
   import type { TopologyGraph } from '$lib/core/topology/model';
 
-  export let graph: TopologyGraph;
-  export let note = '';
+  let { graph, note = '' }: { graph: TopologyGraph; note?: string } = $props();
 
   const routerRadius = TOPOLOGY_ROUTER_RADIUS;
   const siteCardWidth = TOPOLOGY_SITE_CARD_WIDTH;
   const siteCardHeight = TOPOLOGY_SITE_CARD_HEIGHT;
   const linkLabelHeight = TOPOLOGY_LINK_LABEL_HEIGHT;
 
-  $: routerByName = new Map(graph.routers.map((router) => [router.name, router]));
-  $: routerCount = graph.routers.length;
-  $: linkCount = graph.links.length;
-  $: attachedSiteCount = graph.routers.reduce((count, router) => count + router.attachments.length, 0);
+  let routerCount = $derived(graph.routers.length);
+  let linkCount = $derived(graph.links.length);
+  let attachedSiteCount = $derived(
+    graph.routers.reduce((count, router) => count + router.attachments.length, 0)
+  );
 </script>
 
 <div class="topology">
@@ -58,11 +53,10 @@
 
         <g class="topology__links">
           {#each graph.links as link}
-            {#if routerByName.get(link.leftRouter) && routerByName.get(link.rightRouter)}
-              {@const leftRouter = routerByName.get(link.leftRouter)!}
-              {@const rightRouter = routerByName.get(link.rightRouter)!}
-              {@const deltaX = rightRouter.x - leftRouter.x}
-              {@const deltaY = rightRouter.y - leftRouter.y}
+            {#if link.geometry}
+              {@const geometry = link.geometry}
+              {@const deltaX = geometry.rightX - geometry.leftX}
+              {@const deltaY = geometry.rightY - geometry.leftY}
               {@const length = Math.hypot(deltaX, deltaY) || 1}
               {@const offsetX = (deltaX / length) * (routerRadius + 4)}
               {@const offsetY = (deltaY / length) * (routerRadius + 4)}
@@ -71,44 +65,37 @@
 
               <a {href} class="topology__link-link" aria-label={`Open backbone-link ${link.leftRouter} ${link.leftInterface} ↔ ${link.rightRouter} ${link.rightInterface}, status ${link.linkStatus}`}>
                 <line
-                  x1={leftRouter.x + offsetX}
-                  y1={leftRouter.y + offsetY}
-                  x2={rightRouter.x - offsetX}
-                  y2={rightRouter.y - offsetY}
+                  x1={geometry.leftX + offsetX}
+                  y1={geometry.leftY + offsetY}
+                  x2={geometry.rightX - offsetX}
+                  y2={geometry.rightY - offsetY}
                   class="topology__link"
                   class:topology__link--up={link.linkStatus === 'up'}
                   class:topology__link--down={link.linkStatus === 'down'}
                 />
                 <line
-                  x1={leftRouter.x + offsetX}
-                  y1={leftRouter.y + offsetY}
-                  x2={rightRouter.x - offsetX}
-                  y2={rightRouter.y - offsetY}
+                  x1={geometry.leftX + offsetX}
+                  y1={geometry.leftY + offsetY}
+                  x2={geometry.rightX - offsetX}
+                  y2={geometry.rightY - offsetY}
                   class="topology__link-hit"
                 />
 
-                {#if link.leftInterface || link.rightInterface}
-                  {@const ppsLabel = getLinkPpsLabel(link)}
-                  {@const labelWidth = getLinkLabelWidth(link.leftInterface, link.rightInterface, ppsLabel)}
-                  {@const label = getLinkLabelPosition(
-                    leftRouter.x,
-                    leftRouter.y,
-                    rightRouter.x,
-                    rightRouter.y
-                  )}
+                {#if geometry.label}
+                  {@const label = geometry.label}
                   <g class="topology__link-label-group" transform={`translate(${label.x}, ${label.y})`}>
                     <rect
                       class="topology__link-label-bg"
-                      x={-labelWidth / 2}
+                      x={-label.width / 2}
                       y={-linkLabelHeight / 2}
-                      width={labelWidth}
+                      width={label.width}
                       height={linkLabelHeight}
                       rx="12"
                     ></rect>
                     <text class="topology__link-label" text-anchor="middle">
-                      <tspan x="0" y={link.monitorTraffic ? -13 : -4}>{getLinkInterfaceLabel(link.leftInterface, link.rightInterface)}</tspan>
-                      {#if link.monitorTraffic}
-                        <tspan class="topology__link-pps" x="0" y="9">→ {formatPps(link.leftPps)} pps    ← {formatPps(link.rightPps)}</tspan>
+                      <tspan x="0" y={label.ppsLine ? -13 : -4}>{label.interfaceLine}</tspan>
+                      {#if label.ppsLine}
+                        <tspan class="topology__link-pps" x="0" y="9">{label.ppsLine}</tspan>
                       {/if}
                     </text>
                   </g>

@@ -40,6 +40,7 @@ export function createL3VpnSiteRoutingProtocolDraft(): L3VpnSiteRoutingProtocolD
     type: 'bgp',
     addressFamilies: ['ipv4'],
     bgpAutonomousSystem: null,
+    bgpAuthenticationKey: '',
     ospfAreaAddress: '',
     ospfMetric: 1,
     staticIpv4LanPrefixes: [],

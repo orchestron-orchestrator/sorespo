@@ -6,6 +6,7 @@
   import TopologyMap from '$lib/core/topology/TopologyMap.svelte';
   import { buildTopologyGraph } from '$lib/core/topology/model';
   import { restconfGetJson } from '$lib/core/restconf/client';
+  import { onGlobalRefresh } from '$lib/core/util/global-refresh';
 
   import type { L3VpnSitesPayload, NetinfraPayload, TopologyGraph } from '$lib/core/topology/model';
 
@@ -88,11 +89,10 @@
     loadDevices();
     loadTopology();
 
-    const handleRefresh = () => {
+    const offRefresh = onGlobalRefresh(() => {
       loadDevices();
       loadTopology();
-    };
-    window.addEventListener('global-refresh', handleRefresh);
+    });
 
     let refreshTimer: ReturnType<typeof setInterval> | null = null;
     const startTopologyRefresh = () => {
@@ -122,7 +122,7 @@
     document.addEventListener('visibilitychange', handleVisibility);
 
     return () => {
-      window.removeEventListener('global-refresh', handleRefresh);
+      offRefresh();
       document.removeEventListener('visibilitychange', handleVisibility);
       stopTopologyRefresh();
     };
@@ -188,7 +188,7 @@
             <tbody>
               {#each devices as device}
                 <tr>
-                  <td><a class="device-table__name" href={`/devices/${device.id}`}>{device.name}</a></td>
+                  <td><a class="device-table__name" href={`/devices/${encodeURIComponent(device.id)}`}>{device.name}</a></td>
                   <td>{device.type ?? '—'}</td>
                   <td class="monospace">{device.address ?? '—'}</td>
                   <td>{device.username ?? '—'}</td>

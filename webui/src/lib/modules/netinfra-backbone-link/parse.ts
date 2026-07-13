@@ -1,3 +1,4 @@
+import { parseLinkStatus, parsePps } from '$lib/core/topology/model';
 import { createNetinfraBackboneLinkDraft } from '$lib/modules/netinfra-backbone-link/defaults';
 import {
   formatNetinfraBackboneLinkEndpoints,
@@ -23,20 +24,6 @@ function getBackboneLinkEntry(input: any): any | null {
   return null;
 }
 
-function parsePpsLeaf(value: unknown): number | null {
-  if (value === undefined || value === null) {
-    return null;
-  }
-  const parsed = typeof value === 'number' ? value : Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
-}
-
-function parseLinkStatusLeaf(value: unknown): 'up' | 'down' | 'unknown' {
-  if (value === 'up') return 'up';
-  if (value === 'down') return 'down';
-  return 'unknown';
-}
-
 export function parseNetinfraBackboneLink(input: unknown): NetinfraBackboneLinkDraft {
   const defaults = createNetinfraBackboneLinkDraft();
   const backboneLink = getBackboneLinkEntry(input);
@@ -53,9 +40,9 @@ export function parseNetinfraBackboneLink(input: unknown): NetinfraBackboneLinkD
     rightRouter: String(backboneLink['right-router'] ?? ''),
     rightInterface: String(backboneLink['right-interface'] ?? ''),
     monitorTraffic: Boolean(backboneLink['monitor-traffic'] ?? false),
-    leftPps: parsePpsLeaf(state?.['left-pps']),
-    rightPps: parsePpsLeaf(state?.['right-pps']),
-    linkStatus: parseLinkStatusLeaf(state?.['link-status'])
+    leftPps: parsePps(state?.['left-pps']),
+    rightPps: parsePps(state?.['right-pps']),
+    linkStatus: parseLinkStatus(state?.['link-status'])
   };
 }
 

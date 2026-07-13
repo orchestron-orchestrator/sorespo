@@ -7,6 +7,8 @@
     type ConfigLogEntry,
     type DeviceInfo
   } from '$lib/core/orchestron/client';
+  import SegmentedControl from '$lib/core/ui/SegmentedControl.svelte';
+  import { onGlobalRefresh } from '$lib/core/util/global-refresh';
 
   let {
     data
@@ -33,17 +35,17 @@
   });
 
   onMount(() => {
-    const handleRefresh = () => loadLog();
-    window.addEventListener('global-refresh', handleRefresh);
+    const offRefresh = onGlobalRefresh(() => loadLog());
 
     pollHandle = setInterval(() => {
+      if (document.visibilityState === 'hidden') return;
       if (!loadingLog) {
         loadLog(true);
       }
     }, 1000);
 
     return () => {
-      window.removeEventListener('global-refresh', handleRefresh);
+      offRefresh();
       if (pollHandle) {
         clearInterval(pollHandle);
       }
@@ -128,13 +130,6 @@
 
 <div class="page-header">
   <div>
-    <div class="breadcrumb">
-      <a href="/devices">Devices</a>
-      <span>›</span>
-      <a href={`/devices/${deviceId}`}>{device?.name || deviceId}</a>
-      <span>›</span>
-      <span>Configuration Log</span>
-    </div>
     <h2>Configuration Log</h2>
     <p>Watch configuration delivery history with live polling every second.</p>
   </div>
@@ -169,11 +164,16 @@
           <h3>Entry Detail</h3>
           <p>Auto-refresh is active. XML remains the only reliable format in the current backend.</p>
         </div>
-        <div class="segmented">
-          <button type="button" disabled>JSON</button>
-          <button class:active={configFormat === 'xml'} type="button" onclick={() => changeFormat('xml')}>XML</button>
-          <button type="button" disabled>GData</button>
-        </div>
+        <SegmentedControl
+          ariaLabel="Diff format"
+          options={[
+            { value: 'json', label: 'JSON', disabled: true },
+            { value: 'xml', label: 'XML' },
+            { value: 'gdata', label: 'GData', disabled: true }
+          ]}
+          value={configFormat}
+          onchange={(format) => changeFormat(format)}
+        />
       </div>
 
       {#if selectedEntry}
@@ -194,20 +194,6 @@
 {/if}
 
 <style>
-  .breadcrumb {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    margin-bottom: 0.7rem;
-    color: var(--text-muted);
-    font-size: 0.95rem;
-  }
-
-  .breadcrumb a {
-    color: var(--brand);
-    text-decoration: none;
-  }
-
   .log-layout {
     display: grid;
     gap: 1rem;
@@ -278,28 +264,6 @@
     display: flex;
     gap: 0.6rem;
     flex-wrap: wrap;
-  }
-
-  .segmented {
-    display: flex;
-    gap: 0.3rem;
-    flex-wrap: wrap;
-    padding: 0.3rem;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: var(--surface-alt);
-  }
-
-  .segmented button {
-    padding: 0.55rem 0.9rem;
-    border: none;
-    border-radius: 999px;
-    background: transparent;
-  }
-
-  .segmented button.active {
-    background: var(--brand);
-    color: white;
   }
 
   .log-layout__detail pre {
