@@ -42,16 +42,10 @@ export function getNetinfraBackboneLinkPathKey(
   ];
 }
 
-function decodeRoutePart(value: string): string {
-  try {
-    return decodeURIComponent(value);
-  } catch {
-    return value;
-  }
-}
-
 export function parseNetinfraBackboneLinkRouteId(id: string): string[] {
-  const parts = id.split(',').map((part) => decodeRoutePart(part).trim());
+  // The id arrives already percent-decoded (route params and query params are
+  // decoded by the router), so the parts must not be decoded again.
+  const parts = id.split(',').map((part) => part.trim());
 
   while (parts.length < 4) {
     parts.push('');

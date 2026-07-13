@@ -1,3 +1,4 @@
+import { normalizeIdentity } from '$lib/core/restconf/identity';
 import {
   createL3VpnSiteAccessDraft,
   createL3VpnSiteDeviceDraft,
@@ -26,11 +27,6 @@ import type {
   L3VpnSiteRoutingProtocolDraft,
   L3VpnSiteRoutingProtocolType
 } from '$lib/modules/l3vpn-site/model';
-
-function normalizeIdentity(value: unknown): string {
-  const raw = String(value ?? '').trim();
-  return raw.includes(':') ? raw.split(':').pop() ?? '' : raw;
-}
 
 function normalizeManagementType(value: unknown): L3VpnSiteManagementType {
   const normalized = normalizeIdentity(value);
@@ -107,6 +103,12 @@ function parseRoutingProtocol(input: any): L3VpnSiteRoutingProtocolDraft {
       ...defaults,
       type,
       bgpAutonomousSystem: toNumber(input?.bgp?.['autonomous-system']),
+      // Augmented leaf — RESTCONF serves it module-prefixed.
+      bgpAuthenticationKey: String(
+        input?.bgp?.['sorespo-ietf-l3vpn-svc:authentication-key'] ??
+          input?.bgp?.['authentication-key'] ??
+          ''
+      ),
       addressFamilies: normalizeAddressFamilies(input?.bgp?.['address-family'])
     };
   }
@@ -233,7 +235,7 @@ function getSiteEntry(input: any): any | null {
   return null;
 }
 
-function getSites(input: any): any[] {
+export function getSites(input: any): any[] {
   const sites =
     input?.['ietf-l3vpn-svc:l3vpn-svc']?.sites?.site ??
     input?.['ietf-l3vpn-svc:sites']?.site ??

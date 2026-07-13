@@ -34,6 +34,7 @@ export interface L3VpnSiteRoutingProtocolDraft {
   type: L3VpnSiteRoutingProtocolType;
   addressFamilies: L3VpnSiteAddressFamily[];
   bgpAutonomousSystem: number | null;
+  bgpAuthenticationKey: string;
   ospfAreaAddress: string;
   ospfMetric: number | null;
   staticIpv4LanPrefixes: L3VpnSiteLanPrefixDraft[];
@@ -63,31 +64,6 @@ export interface L3VpnSiteDraft {
   devices: L3VpnSiteDeviceDraft[];
   accesses: L3VpnSiteAccessDraft[];
 }
-
-export const L3VPN_SITE_MANAGEMENT_OPTIONS = [
-  { value: 'customer-managed', label: 'Customer managed' },
-  { value: 'provider-managed', label: 'Provider managed' },
-  { value: 'co-managed', label: 'Co-managed' }
-];
-
-export const L3VPN_SITE_ACCESS_TYPE_OPTIONS = [
-  { value: 'point-to-point', label: 'Point to point' },
-  { value: 'multipoint', label: 'Multipoint' }
-];
-
-export const L3VPN_SITE_ROUTING_PROTOCOL_OPTIONS = [
-  { value: 'bgp', label: 'BGP' },
-  { value: 'ospf', label: 'OSPF' },
-  { value: 'static', label: 'Static' },
-  { value: 'rip', label: 'RIP' },
-  { value: 'vrrp', label: 'VRRP' },
-  { value: 'direct', label: 'Direct' }
-];
-
-export const L3VPN_SITE_ADDRESS_FAMILY_OPTIONS = [
-  { value: 'ipv4', label: 'IPv4' },
-  { value: 'ipv6', label: 'IPv6' }
-];
 
 export function formatL3VpnSiteManagementType(value: string): string {
   switch (value) {
@@ -128,3 +104,29 @@ export function formatL3VpnSiteRoutingProtocolType(value: string): string {
       return 'BGP';
   }
 }
+
+export function formatL3VpnSiteAddressFamily(value: string): string {
+  return value === 'ipv6' ? 'IPv6' : 'IPv4';
+}
+
+export const L3VPN_SITE_MANAGEMENT_OPTIONS = L3VPN_SITE_MANAGEMENT_TYPES.map((value) => ({
+  value,
+  label: formatL3VpnSiteManagementType(value)
+}));
+
+export const L3VPN_SITE_ACCESS_TYPE_OPTIONS = L3VPN_SITE_ACCESS_TYPES.map((value) => ({
+  value,
+  label: formatL3VpnSiteAccessType(value)
+}));
+
+export const L3VPN_SITE_ROUTING_PROTOCOL_OPTIONS = L3VPN_SITE_ROUTING_PROTOCOL_TYPES.map(
+  (value) => ({
+    value,
+    label: formatL3VpnSiteRoutingProtocolType(value)
+  })
+);
+
+export const L3VPN_SITE_ADDRESS_FAMILY_OPTIONS = L3VPN_SITE_ADDRESS_FAMILIES.map((value) => ({
+  value,
+  label: formatL3VpnSiteAddressFamily(value)
+}));

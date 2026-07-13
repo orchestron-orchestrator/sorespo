@@ -1,5 +1,6 @@
 <script lang="ts">
   import ConfirmDialog from '$lib/core/ui/ConfirmDialog.svelte';
+  import SegmentedControl from '$lib/core/ui/SegmentedControl.svelte';
   import { restconfRaw } from '$lib/core/restconf/client';
 
   type Format = 'json' | 'xml';
@@ -151,22 +152,15 @@
   {/if}
 
   <div class="toolbar">
-    <div class="segmented" role="group" aria-label="Body format">
-      <button
-        type="button"
-        class:active={format === 'json'}
-        onclick={() => setFormat('json')}
-      >
-        JSON
-      </button>
-      <button
-        type="button"
-        class:active={format === 'xml'}
-        onclick={() => setFormat('xml')}
-      >
-        XML
-      </button>
-    </div>
+    <SegmentedControl
+      ariaLabel="Body format"
+      options={[
+        { value: 'json' as Format, label: 'JSON' },
+        { value: 'xml' as Format, label: 'XML' }
+      ]}
+      value={format}
+      onchange={(next) => setFormat(next)}
+    />
     <span class="toolbar__meta">
       {format === 'xml'
         ? 'Content-Type: application/yang-data+xml'
@@ -277,32 +271,6 @@
 
   .toolbar__count {
     margin-left: auto;
-  }
-
-  .segmented {
-    display: inline-flex;
-    background: var(--sw-bg-elevated);
-    border: 1px solid var(--sw-border-subtle);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-
-  .segmented button {
-    background: transparent;
-    border: 0;
-    padding: 5px 14px;
-    color: var(--sw-text-secondary);
-    font-size: 12px;
-    cursor: pointer;
-  }
-
-  .segmented button.active {
-    background: var(--sw-accent-glow);
-    color: var(--sw-accent);
-  }
-
-  .segmented button:hover:not(.active) {
-    color: var(--sw-text-primary);
   }
 
   .dropzone {

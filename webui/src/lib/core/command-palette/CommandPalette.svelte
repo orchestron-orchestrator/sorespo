@@ -4,6 +4,7 @@
   import { get } from 'svelte/store';
 
   import { queuesPoll } from '$lib/core/orchestron/poll-store';
+  import { LatestRequest } from '$lib/core/util/latest-request';
 
   import { buildStaticEntries, fetchDynamicEntries, filterEntries } from './index-builder';
   import type { PaletteEntry } from './types';
@@ -30,6 +31,8 @@
   });
   let flat = $derived(groups.flatMap(([, items]) => items));
 
+  const entriesRequest = new LatestRequest();
+
   $effect(() => {
     if (!open) return;
 
@@ -39,8 +42,10 @@
     dynamicEntries = [];
     loading = true;
 
+    const token = entriesRequest.begin();
     const queues = get(queuesPoll).queues;
     void fetchDynamicEntries(queues).then((entries) => {
+      if (!entriesRequest.isCurrent(token)) return;
       dynamicEntries = entries;
       loading = false;
     });

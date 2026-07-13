@@ -9,9 +9,9 @@ function normalizePath(path: string): string {
 }
 
 function encodeListKeyPart(value: string): string {
-  // Double-encode forward slashes so the SvelteKit catch-all proxy route
-  // does not decode them into path separators before forwarding upstream.
-  return encodeURIComponent(value.trim()).replace(/%2F/gi, '%252F');
+  // The /api proxy forwards the raw request path, so list keys need exactly
+  // the single percent-encoding RFC 8040 prescribes.
+  return encodeURIComponent(value.trim());
 }
 
 async function readResponse<T>(response: Response, readBody = true): Promise<T> {
@@ -66,6 +66,24 @@ export function restconfGetJson<T>(path: string, fetchFn: Fetch = fetch): Promis
     method: 'GET',
     accept: 'application/yang-data+json'
   }, fetchFn);
+}
+
+export async function restconfExists(path: string, fetchFn: Fetch = fetch): Promise<boolean> {
+  const response = await fetchFn(`${RESTCONF_BASE}/${normalizePath(path)}`, {
+    method: 'GET',
+    headers: { accept: 'application/yang-data+json' }
+  });
+
+  if (response.status === 404) {
+    return false;
+  }
+
+  if (!response.ok) {
+    const message = (await response.text()) || response.statusText;
+    throw new Error(`RESTCONF ${response.status}: ${message}`);
+  }
+
+  return true;
 }
 
 export function restconfPutJson<T>(path: string, body: unknown): Promise<T> {

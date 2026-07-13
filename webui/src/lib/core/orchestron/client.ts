@@ -52,10 +52,19 @@ export interface QueueItemDetail {
 export interface QueueItemSummary {
   deviceId: string;
   queueId: string;
-  tid?: string;
   deviceTxid?: string;
-  configDiff?: string;
   approved?: boolean | null;
+}
+
+// The backend serializes `approved` with Python str(): "True", "False" or "null".
+function parseApproved(value: unknown): boolean | null {
+  if (value === true || value === 'True') return true;
+  if (value === false || value === 'False') return false;
+  return null;
+}
+
+export function isPendingQueueItem(item: Pick<QueueItemSummary, 'approved'>): boolean {
+  return item.approved !== true && item.approved !== false;
 }
 
 export interface ConfigLogEntry {
@@ -97,16 +106,15 @@ export async function fetchDevices(fetchFn: Fetch = fetch): Promise<DeviceSummar
 
   const summaries = await Promise.allSettled(
     deviceNames.map(async (name) => {
-      const upperId = name.toUpperCase();
-      const info = await apiRequest<any>(`/device/${upperId}/info`, {}, fetchFn);
+      const info = await apiRequest<any>(`/device/${encodeURIComponent(name)}/info`, {}, fetchFn);
       const firstAddr = Array.isArray(info.addresses) && info.addresses.length > 0 ? info.addresses[0] : null;
       const address = firstAddr
         ? `${firstAddr.address}${firstAddr.port ? `:${firstAddr.port}` : ''}`
         : undefined;
 
       return {
-        id: upperId,
-        name: info.name || upperId,
+        id: name,
+        name: info.name || name,
         type: info.type,
         address,
         username: info.username,
@@ -126,18 +134,17 @@ export async function fetchDevices(fetchFn: Fetch = fetch): Promise<DeviceSummar
 
     const name = deviceNames[index] ?? '';
     return {
-      id: name.toUpperCase(),
+      id: name,
       name
     } satisfies DeviceSummary;
   });
 }
 
 export async function fetchDevice(deviceId: string, fetchFn: Fetch = fetch): Promise<DeviceInfo> {
-  const upperId = deviceId.toUpperCase();
-  const info = await apiRequest<any>(`/device/${upperId}/info`, {}, fetchFn);
+  const info = await apiRequest<any>(`/device/${encodeURIComponent(deviceId)}/info`, {}, fetchFn);
   return {
-    id: upperId,
-    name: info.name || upperId,
+    id: deviceId,
+    name: info.name || deviceId,
     type: info.type,
     approvalRequired: Boolean(info.approval_required),
     addresses: info.addresses || [],
@@ -152,11 +159,13 @@ export async function fetchDevice(deviceId: string, fetchFn: Fetch = fetch): Pro
 }
 
 export async function resyncDevice(deviceId: string): Promise<unknown> {
-  return apiRequest(`/device/${deviceId.toUpperCase()}/resync`);
+  return apiRequest(`/device/${encodeURIComponent(deviceId)}/resync`);
 }
 
-export async function fetchDeviceConfigQueue(deviceId: string): Promise<Record<string, { approved?: boolean }>> {
-  return apiRequest(`/device/${deviceId.toUpperCase()}/q`);
+export async function fetchDeviceConfigQueue(
+  deviceId: string
+): Promise<Record<string, { tid?: string }>> {
+  return apiRequest(`/device/${encodeURIComponent(deviceId)}/q`);
 }
 
 export async function fetchConfigQueueItem(
@@ -164,7 +173,10 @@ export async function fetchConfigQueueItem(
   queueId: string,
   format = 'xml'
 ): Promise<QueueItemDetail> {
-  return apiRequest(`/device/${deviceId.toUpperCase()}/q/${queueId}?format=${format}`);
+  const detail = await apiRequest<any>(
+    `/device/${encodeURIComponent(deviceId)}/q/${encodeURIComponent(queueId)}?format=${format}`
+  );
+  return { ...(detail ?? {}), approved: parseApproved(detail?.approved) };
 }
 
 export async function approveConfigQueueItem(
@@ -173,13 +185,16 @@ export async function approveConfigQueueItem(
   deviceTxid: string | undefined,
   approved = true
 ): Promise<unknown> {
-  return apiRequest(`/device/${deviceId.toUpperCase()}/q/${queueId}/set_approval`, {
-    method: 'POST',
-    body: JSON.stringify({
-      device_txid: deviceTxid,
-      approved
-    })
-  });
+  return apiRequest(
+    `/device/${encodeURIComponent(deviceId)}/q/${encodeURIComponent(queueId)}/set_approval`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        device_txid: deviceTxid,
+        approved
+      })
+    }
+  );
 }
 
 export async function fetchAllDeviceQueues(): Promise<QueueItemSummary[]> {
@@ -191,10 +206,8 @@ export async function fetchAllDeviceQueues(): Promise<QueueItemSummary[]> {
       items.push({
         deviceId: device.device_id,
         queueId: String(item.queue_id),
-        tid: item.tid,
         deviceTxid: item.device_txid,
-        configDiff: item.config_diff,
-        approved: item.approved
+        approved: parseApproved(item.approved)
       });
     }
   }
@@ -203,7 +216,9 @@ export async function fetchAllDeviceQueues(): Promise<QueueItemSummary[]> {
 }
 
 export async function fetchDeviceRunningConfig(deviceId: string, format = 'json'): Promise<string> {
-  const response = await fetch(`${API_BASE}/device/${deviceId.toUpperCase()}/running?format=${format}`);
+  const response = await fetch(
+    `${API_BASE}/device/${encodeURIComponent(deviceId)}/running?format=${format}`
+  );
   if (!response.ok) {
     throw new Error('Failed to fetch running config');
   }
@@ -211,7 +226,9 @@ export async function fetchDeviceRunningConfig(deviceId: string, format = 'json'
 }
 
 export async function fetchDeviceTargetConfig(deviceId: string, format = 'json'): Promise<string> {
-  const response = await fetch(`${API_BASE}/device/${deviceId.toUpperCase()}/target?format=${format}`);
+  const response = await fetch(
+    `${API_BASE}/device/${encodeURIComponent(deviceId)}/target?format=${format}`
+  );
   if (!response.ok) {
     throw new Error('Failed to fetch target config');
   }
@@ -219,7 +236,9 @@ export async function fetchDeviceTargetConfig(deviceId: string, format = 'json')
 }
 
 export async function fetchDeviceConfigDiff(deviceId: string, format = 'json'): Promise<string> {
-  const response = await fetch(`${API_BASE}/device/${deviceId.toUpperCase()}/diff?format=${format}`);
+  const response = await fetch(
+    `${API_BASE}/device/${encodeURIComponent(deviceId)}/diff?format=${format}`
+  );
   if (!response.ok) {
     throw new Error('Failed to fetch config diff');
   }
@@ -230,7 +249,7 @@ export async function fetchDeviceConfigLog(
   deviceId: string,
   format = 'json'
 ): Promise<{ log?: ConfigLogEntry[] }> {
-  return apiRequest(`/device/${deviceId.toUpperCase()}/log?format=${format}`);
+  return apiRequest(`/device/${encodeURIComponent(deviceId)}/log?format=${format}`);
 }
 
 // The /layer/<index> endpoint selects its serialization via the Accept header

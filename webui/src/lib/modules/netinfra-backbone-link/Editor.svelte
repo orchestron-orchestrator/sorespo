@@ -6,6 +6,7 @@
   import FieldSelect from '$lib/core/ui/FieldSelect.svelte';
   import FieldText from '$lib/core/ui/FieldText.svelte';
   import Section from '$lib/core/ui/Section.svelte';
+  import { onGlobalRefresh } from '$lib/core/util/global-refresh';
   import { listNetinfraRouters } from '$lib/modules/netinfra-router/parse';
 
   import type { ServiceListItem } from '$lib/core/registry/types';
@@ -96,16 +97,7 @@
 
   onMount(() => {
     loadRouters();
-
-    const handleRefresh = () => {
-      loadRouters();
-    };
-
-    window.addEventListener('global-refresh', handleRefresh);
-
-    return () => {
-      window.removeEventListener('global-refresh', handleRefresh);
-    };
+    return onGlobalRefresh(() => loadRouters());
   });
 </script>
 

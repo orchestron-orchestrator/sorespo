@@ -2,6 +2,8 @@
   import { invalidate } from '$app/navigation';
   import { onMount } from 'svelte';
 
+  import { onGlobalRefresh } from '$lib/core/util/global-refresh';
+
   import type { DeviceSummary } from '$lib/core/orchestron/client';
 
   let { data }: { data: { devices: DeviceSummary[]; loadError: string } } = $props();
@@ -18,14 +20,7 @@
     return device.hasRunningConfig === false ? 'var(--sw-danger)' : 'var(--sw-success)';
   }
 
-  onMount(() => {
-    const handleRefresh = () => invalidate('data:devices');
-    window.addEventListener('global-refresh', handleRefresh);
-
-    return () => {
-      window.removeEventListener('global-refresh', handleRefresh);
-    };
-  });
+  onMount(() => onGlobalRefresh(() => invalidate('data:devices')));
 </script>
 
 <div class="page-header">
@@ -54,7 +49,7 @@
 {:else}
   <div class="device-grid">
     {#each filteredDevices as device}
-      <a class="device-card card" href={`/devices/${device.id}`}>
+      <a class="device-card card" href={`/devices/${encodeURIComponent(device.id)}`}>
         <div class="device-card__header">
           <h3>{device.name}</h3>
           <span class="pill">

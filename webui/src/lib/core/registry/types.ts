@@ -83,6 +83,14 @@ export function formatServiceRouteId<TDraft>(module: ServiceModule<TDraft>, id: 
   return module.formatRouteId ? module.formatRouteId(id) : id;
 }
 
+export function pathKeysEqual(a: string | string[], b: string | string[]): boolean {
+  const norm = (key: string | string[]) =>
+    (Array.isArray(key) ? key : [key]).map((part) => String(part).trim());
+  const left = norm(a);
+  const right = norm(b);
+  return left.length === right.length && left.every((part, i) => part === right[i]);
+}
+
 export type AnyServiceModule = ServiceModule<any>;
 
 function cloneValue<T>(value: T): T {

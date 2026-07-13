@@ -6,6 +6,8 @@
   import { formatServiceRouteId, getRoutePathKey } from '$lib/core/registry/types';
   import { getListEntryPath, restconfDelete } from '$lib/core/restconf/client';
   import ConfirmDialog from '$lib/core/ui/ConfirmDialog.svelte';
+  import { StatusFlash } from '$lib/core/ui/status-flash.svelte';
+  import { onGlobalRefresh } from '$lib/core/util/global-refresh';
 
   import type { ServiceListItem } from '$lib/core/registry/types';
 
@@ -22,18 +24,14 @@
   } = $props();
 
   let removingId = $state('');
-  let statusMessage: { type: 'success' | 'error'; text: string } | null = $state(null);
+  const status = new StatusFlash();
   let pendingRemoval: { id: string; label: string } | null = $state(null);
 
   let serviceModule = $derived(getServiceModule(data.moduleId));
   let items = $derived(data.items);
   let error = $derived(data.loadError);
 
-  onMount(() => {
-    const handleRefresh = () => invalidate(`data:services:${data.moduleId}`);
-    window.addEventListener('global-refresh', handleRefresh);
-    return () => window.removeEventListener('global-refresh', handleRefresh);
-  });
+  onMount(() => onGlobalRefresh(() => invalidate(`data:services:${data.moduleId}`)));
 
   function openRemoval(item: { id: string; label: string }): void {
     pendingRemoval = item;
@@ -50,21 +48,16 @@
 
     try {
       removingId = item.id;
-      statusMessage = null;
+      status.set(null);
       await restconfDelete(
         getListEntryPath(serviceModule.restconfRoot, getRoutePathKey(serviceModule, item.id))
       );
       await invalidate(`data:services:${data.moduleId}`);
-      const successMessage = { type: 'success' as const, text: `Removed ${displayId}.` };
-      statusMessage = successMessage;
-      setTimeout(() => {
-        if (statusMessage === successMessage) statusMessage = null;
-      }, 3000);
+      status.flash(`Removed ${displayId}.`);
     } catch (removeError) {
-      statusMessage = {
-        type: 'error',
-        text: removeError instanceof Error ? removeError.message : 'Failed to remove service.'
-      };
+      status.error(
+        removeError instanceof Error ? removeError.message : 'Failed to remove service.'
+      );
     } finally {
       removingId = '';
     }
@@ -82,9 +75,9 @@
     </div>
   </div>
 
-  {#if statusMessage}
-    <div class:service-status--error={statusMessage.type === 'error'} class:service-status--success={statusMessage.type === 'success'} class="service-status">
-      {statusMessage.text}
+  {#if status.message}
+    <div class:service-status--error={status.message.type === 'error'} class:service-status--success={status.message.type === 'success'} class="service-status">
+      {status.message.text}
     </div>
   {/if}
 

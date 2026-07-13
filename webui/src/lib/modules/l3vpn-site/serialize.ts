@@ -72,7 +72,10 @@ function serializeRoutingProtocol(protocol: L3VpnSiteRoutingProtocolDraft): Reco
   if (protocol.type === 'bgp') {
     payload.bgp = {
       ...(protocol.bgpAutonomousSystem !== null ? { 'autonomous-system': protocol.bgpAutonomousSystem } : {}),
-      ...(protocol.addressFamilies.length > 0 ? { 'address-family': protocol.addressFamilies } : {})
+      ...(protocol.addressFamilies.length > 0 ? { 'address-family': protocol.addressFamilies } : {}),
+      ...(protocol.bgpAuthenticationKey.trim()
+        ? { 'sorespo-ietf-l3vpn-svc:authentication-key': protocol.bgpAuthenticationKey.trim() }
+        : {})
     };
     return payload;
   }

@@ -2,8 +2,11 @@ import { proxyRequest } from '$lib/core/restconf/server';
 
 import type { RequestHandler } from './$types';
 
-const handler: RequestHandler = async ({ request, params, url }) => {
-  return proxyRequest(request, `/restconf/${params.path}`, url.search);
+// Forward the raw (still percent-encoded) pathname rather than the decoded
+// params.path, so encoded list-key characters (%2F, %2C, %25, %3F, ...)
+// reach the upstream RESTCONF server intact.
+const handler: RequestHandler = async ({ request, url }) => {
+  return proxyRequest(request, url.pathname.replace(/^\/api/, ''), url.search);
 };
 
 export const GET = handler;

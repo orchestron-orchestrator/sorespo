@@ -11,7 +11,8 @@
     type DeviceInfo,
     type QueueItemDetail
   } from '$lib/core/orchestron/client';
-  import { highlightXmlDiff } from '$lib/core/diff/xml-diff';
+  import XmlDiff from '$lib/core/diff/XmlDiff.svelte';
+  import { onGlobalRefresh } from '$lib/core/util/global-refresh';
 
   let {
     data
@@ -19,7 +20,7 @@
 
   let lastLoadedId = $state('');
 
-  let configQueue: Record<string, { approved?: boolean }> = $state({});
+  let configQueue: Record<string, { tid?: string }> = $state({});
   let selectedQueueItem: string | null = $state(null);
   let queueItemDetail: QueueItemDetail | null = $state(null);
   let resyncing = $state(false);
@@ -30,10 +31,6 @@
   let device = $derived(data.device);
   let deviceId = $derived(data.deviceId);
   let error = $derived(data.loadError);
-  let diffRuns = $derived.by(() => {
-    const diff = queueItemDetail?.config_diff;
-    return diff ? highlightXmlDiff(diff) : [];
-  });
 
   $effect(() => {
     if (browser && deviceId && deviceId !== lastLoadedId) {
@@ -42,17 +39,12 @@
     }
   });
 
-  onMount(() => {
-    const handleRefresh = () => {
+  onMount(() =>
+    onGlobalRefresh(() => {
       invalidate(`data:device:${data.deviceId}`);
       loadConfigQueue();
-    };
-    window.addEventListener('global-refresh', handleRefresh);
-
-    return () => {
-      window.removeEventListener('global-refresh', handleRefresh);
-    };
-  });
+    })
+  );
 
   async function loadConfigQueue(requestId = data.deviceId): Promise<void> {
     try {
@@ -260,28 +252,27 @@
         {:else}
           <div class="queue-layout">
             <div class="queue-layout__list">
-              {#each Object.entries(configQueue) as [queueId, item]}
+              {#each Object.entries(configQueue) as [queueId, item], index}
                 <div class:selected={selectedQueueItem === queueId} class="queue-card">
                   <div class="queue-card__header">
                     <strong>Queue #{queueId}</strong>
-                    <span class:success={item.approved === true} class:warning={item.approved !== true} class="pill">
-                      {item.approved === true ? 'Approved' : 'Pending'}
-                    </span>
+                    {#if item.tid}
+                      <span class="pill monospace" title="Transaction ID">{item.tid}</span>
+                    {/if}
                   </div>
                   <div class="queue-card__actions">
                     <button class="btn btn-secondary" type="button" onclick={() => viewQueueItem(queueId)}>
                       View details
                     </button>
-                    {#if item.approved !== true}
-                      <button
-                        class="btn btn-success"
-                        type="button"
-                        disabled={approvingItem === queueId}
-                        onclick={() => handleApproveItem(queueId)}
-                      >
-                        {approvingItem === queueId ? 'Approving...' : 'Approve'}
-                      </button>
-                    {/if}
+                    <button
+                      class="btn btn-success"
+                      type="button"
+                      disabled={index !== 0 || approvingItem === queueId}
+                      title={index !== 0 ? 'Only the first queued change per device can be approved.' : undefined}
+                      onclick={() => handleApproveItem(queueId)}
+                    >
+                      {approvingItem === queueId ? 'Approving...' : 'Approve'}
+                    </button>
                   </div>
                 </div>
               {/each}
@@ -291,10 +282,14 @@
               {#if selectedQueueItem && queueItemDetail}
                 <h5>Queue Item {selectedQueueItem}</h5>
                 <p class="device-detail__muted">
-                  Status: {queueItemDetail.approved === true ? 'Approved' : 'Pending Approval'}
+                  Status: {queueItemDetail.approved === true
+                    ? 'Approved'
+                    : queueItemDetail.approved === false
+                      ? 'Rejected'
+                      : 'Pending approval'}
                 </p>
                 {#if queueItemDetail.config_diff}
-                  <pre>{#each diffRuns as run}<span class:diff-add={run.kind === 'add'} class:diff-remove={run.kind === 'remove'}>{run.text}</span>{/each}</pre>
+                  <XmlDiff diff={queueItemDetail.config_diff} />
                 {:else}
                   <p class="device-detail__muted">No configuration diff available for this item.</p>
                 {/if}
@@ -453,28 +448,6 @@
 
   .queue-layout__detail {
     min-height: 18rem;
-  }
-
-  .queue-layout__detail pre {
-    margin: 0;
-    padding: 1rem;
-    overflow: auto;
-    border-radius: var(--sw-radius-md);
-    background: var(--sw-bg-deep);
-    border: 1px solid var(--sw-border-subtle);
-    color: var(--sw-text-secondary);
-  }
-
-  .diff-add {
-    color: var(--sw-success);
-  }
-
-  .diff-remove {
-    color: var(--sw-danger);
-    background: var(--sw-danger-dim);
-    border-radius: 4px;
-    box-decoration-break: clone;
-    -webkit-box-decoration-break: clone;
   }
 
   .module-table-wrap {
