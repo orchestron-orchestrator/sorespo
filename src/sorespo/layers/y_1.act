@@ -84,6 +84,7 @@ SRC_DNODE_CHILD_4: DContainer = DContainer(module='l3vpn-inter', namespace='http
             ], config=True, min_elements=0, ordered_by='system', children=[
             DLeaf(module='l3vpn-inter', namespace='http://example.com/l3vpn-inter', prefix='l3vpn-inter', name='device', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
             DLeaf(module='l3vpn-inter', namespace='http://example.com/l3vpn-inter', prefix='l3vpn-inter', name='interface', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
+            DLeaf(module='l3vpn-inter', namespace='http://example.com/l3vpn-inter', prefix='l3vpn-inter', name='endpoint-mtu', config=True, mandatory=False, type_=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(0, 65535)])), units='bytes'),
             DLeaf(module='l3vpn-inter', namespace='http://example.com/l3vpn-inter', prefix='l3vpn-inter', name='site', config=True, mandatory=True, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
             DLeaf(module='l3vpn-inter', namespace='http://example.com/l3vpn-inter', prefix='l3vpn-inter', name='site-network-access', config=True, mandatory=True, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
             DLeaf(module='l3vpn-inter', namespace='http://example.com/l3vpn-inter', prefix='l3vpn-inter', name='provider-ipv4-address', config=True, mandatory=True, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
@@ -138,6 +139,10 @@ SRC_YANG_0: str = r"""module l3vpn-inter {
         }
         leaf interface {
           type string;
+        }
+        leaf endpoint-mtu {
+          type uint16;
+          units bytes;
         }
         leaf site {
           type string;
@@ -1404,6 +1409,7 @@ _breaker16: None = None
 class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yadata.MNode):
     device: str
     interface: str
+    endpoint_mtu: ?u64
     site: str
     site_network_access: str
     provider_ipv4_address: str
@@ -1411,9 +1417,10 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yadata.MNode):
     ipv4_prefix_length: u64
     bgp: ?l3vpn_inter__l3vpns__l3vpn__endpoint__bgp
 
-    mut def __init__(self, device: str, interface: str, site: str, site_network_access: str, provider_ipv4_address: str, ipv4_prefix_length: u64, customer_ipv4_address: ?str, bgp: ?l3vpn_inter__l3vpns__l3vpn__endpoint__bgp=None) -> None:
+    mut def __init__(self, device: str, interface: str, site: str, site_network_access: str, provider_ipv4_address: str, ipv4_prefix_length: u64, endpoint_mtu: ?u64, customer_ipv4_address: ?str, bgp: ?l3vpn_inter__l3vpns__l3vpn__endpoint__bgp=None) -> None:
         self.device = device
         self.interface = interface
+        self.endpoint_mtu = endpoint_mtu
         self.site = site
         self.site_network_access = site_network_access
         self.provider_ipv4_address = provider_ipv4_address
@@ -1437,7 +1444,7 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yadata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> l3vpn_inter__l3vpns__l3vpn__endpoint_entry:
-        return l3vpn_inter__l3vpns__l3vpn__endpoint_entry(device=n.get_str(ygdata.Id(NS_l3vpn_inter, 'device')), interface=n.get_str(ygdata.Id(NS_l3vpn_inter, 'interface')), site=n.get_str(ygdata.Id(NS_l3vpn_inter, 'site')), site_network_access=n.get_str(ygdata.Id(NS_l3vpn_inter, 'site-network-access')), provider_ipv4_address=n.get_str(ygdata.Id(NS_l3vpn_inter, 'provider-ipv4-address')), customer_ipv4_address=n.get_opt_str(ygdata.Id(NS_l3vpn_inter, 'customer-ipv4-address')), ipv4_prefix_length=n.get_u64(ygdata.Id(NS_l3vpn_inter, 'ipv4-prefix-length')), bgp=l3vpn_inter__l3vpns__l3vpn__endpoint__bgp.from_gdata(n.get_opt_cnt(ygdata.Id(NS_l3vpn_inter, 'bgp'))))
+        return l3vpn_inter__l3vpns__l3vpn__endpoint_entry(device=n.get_str(ygdata.Id(NS_l3vpn_inter, 'device')), interface=n.get_str(ygdata.Id(NS_l3vpn_inter, 'interface')), endpoint_mtu=n.get_opt_u64(ygdata.Id(NS_l3vpn_inter, 'endpoint-mtu')), site=n.get_str(ygdata.Id(NS_l3vpn_inter, 'site')), site_network_access=n.get_str(ygdata.Id(NS_l3vpn_inter, 'site-network-access')), provider_ipv4_address=n.get_str(ygdata.Id(NS_l3vpn_inter, 'provider-ipv4-address')), customer_ipv4_address=n.get_opt_str(ygdata.Id(NS_l3vpn_inter, 'customer-ipv4-address')), ipv4_prefix_length=n.get_u64(ygdata.Id(NS_l3vpn_inter, 'ipv4-prefix-length')), bgp=l3vpn_inter__l3vpns__l3vpn__endpoint__bgp.from_gdata(n.get_opt_cnt(ygdata.Id(NS_l3vpn_inter, 'bgp'))))
 
     mut def copy(self) -> l3vpn_inter__l3vpns__l3vpn__endpoint_entry:
         """Create a deep copy of this adata object"""
@@ -1456,17 +1463,19 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint(yadata.MList[l3vpn_inter__l3vpns__l3v
                 continue
             return e
 
-    mut def create(self, device: str, interface: str, site: str, site_network_access: str, provider_ipv4_address: str, ipv4_prefix_length: u64, customer_ipv4_address: ?str=None) -> l3vpn_inter__l3vpns__l3vpn__endpoint_entry:
+    mut def create(self, device: str, interface: str, site: str, site_network_access: str, provider_ipv4_address: str, ipv4_prefix_length: u64, endpoint_mtu: ?u64=None, customer_ipv4_address: ?str=None) -> l3vpn_inter__l3vpns__l3vpn__endpoint_entry:
         e = self.get(device, interface)
         if e is not None:
             e.site = site
             e.site_network_access = site_network_access
             e.provider_ipv4_address = provider_ipv4_address
             e.ipv4_prefix_length = ipv4_prefix_length
+            if endpoint_mtu is not None:
+                e.endpoint_mtu = endpoint_mtu
             if customer_ipv4_address is not None:
                 e.customer_ipv4_address = customer_ipv4_address
             return e
-        res = l3vpn_inter__l3vpns__l3vpn__endpoint_entry(device=device, interface=interface, site=site, site_network_access=site_network_access, provider_ipv4_address=provider_ipv4_address, ipv4_prefix_length=ipv4_prefix_length, customer_ipv4_address=customer_ipv4_address)
+        res = l3vpn_inter__l3vpns__l3vpn__endpoint_entry(device=device, interface=interface, site=site, site_network_access=site_network_access, provider_ipv4_address=provider_ipv4_address, ipv4_prefix_length=ipv4_prefix_length, endpoint_mtu=endpoint_mtu, customer_ipv4_address=customer_ipv4_address)
         self.elements.append(res)
         return res
 

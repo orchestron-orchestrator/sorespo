@@ -910,6 +910,10 @@ DMust(condition="((. = 'enable') and starts-with(../../srl_nokia-if:name, 'syste
         ], reference='RFC 2863: The Interfaces Group MIB - ifAdminStatus', type_=DTypeEnum(name='srl_nokia-comm:admin-state', description='general admin-state option.', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'enable':1, 'disable':2}), exts=[
             DExt(module='srl_nokia-extensions', namespace='urn:nokia.com:srlinux:general:extensions', prefix='srl_nokia-ext', name='show-importance', arg='high', exts=[])
         ]),
+    DLeaf(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='ip-mtu', config=True, description='IP MTU of the subinterface in bytes.\n\nIncludes the IP header but excludes Ethernet encapsulation.\n\nIP MTU specifies the maximum sized IPv4 or IPv6 packet that can be transmitted on the subinterface. If an IPv4 or IPv6 packet exceeds this size it is dropped and this may result in the generation of an ICMP error message back to the source.\n\nThe default IP MTU for a subinterface is taken from /system/mtu/default-ip-mtu.  For the mgmt0 and mgmt0-standby subinterfaces the default is the associated interface MTU minus the Ethernet encapsulation overhead.\n\nThe IP MTU is not configurable for subinterfaces of loopback interfaces.\n\nThe 7220 IXR-D1, 7220 IXR-D2, 7220 IXR-D3, 7220 IXR-D4, 7220 IXR-D5, 7220 IXR-H2, 7220 IXR-H3, and 7220 IXR-H4 systems support a maximum IP MTU of 9398 bytes.\n\nThe 7730 SXR systems support a maximum IP MTU of 9394 bytes.\n\nEach 7250 IXR IMM supports a maximum of 4 different IP MTU values. 7220 IXR systems do not have any limit on the maximum number of different IP MTU values.', mandatory=False, must=[
+DMust(condition="not (starts-with(../../srl_nokia-if:name, 'system') or starts-with(../../srl_nokia-if:name, 'lo'))", description=None, error_app_tag=None, error_message='ip-mtu not supported on this interface', reference=None),
+DMust(condition="(../type != 'srl_nokia-if:bridged') and (../type != 'srl_nokia-if:local-mirror-dest')", description=None, error_app_tag=None, error_message='ip-mtu not allowed with type bridged or type local-mirror-dest', reference=None)
+        ], type_=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(1280, 9486)])), units='bytes'),
     DContainer(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='ipv4', config=True, description='IPv4 configuration and state for the subinterface', presence=False, children=[
         DLeaf(module='srl_nokia-interfaces', namespace='urn:nokia.com:srlinux:chassis:interfaces', prefix='srl_nokia-if', name='admin-state', config=True, description='Enable/disable IPv4 on the subinterface\n\nWhen set to enable, and even before an IPv4 address is configured, the subinterface starts to accept incoming packets with dest-ip 255.255.255.255, which is necessary to support dhcp-client functionality.', default='disable', mandatory=False, must=[
 DMust(condition="(. = 'disable' or (../../type != 'bridged' and ../../type != 'local-mirror-dest'))", description=None, error_app_tag=None, error_message='ipv4 configuration not allowed on bridged or local-mirror-dest subinterfaces', reference=None)
@@ -34242,14 +34246,16 @@ class srl_nokia_interfaces__interface__subinterface_entry(yadata.MNode):
     index: u64
     description: ?str
     admin_state: ?str
+    ip_mtu: ?u64
     ipv4: srl_nokia_interfaces__interface__subinterface__ipv4
     ipv6: srl_nokia_interfaces__interface__subinterface__ipv6
     vlan: srl_nokia_interfaces__interface__subinterface__vlan
 
-    mut def __init__(self, index: u64, description: ?str, admin_state: ?str, ipv4: ?srl_nokia_interfaces__interface__subinterface__ipv4=None, ipv6: ?srl_nokia_interfaces__interface__subinterface__ipv6=None, vlan: ?srl_nokia_interfaces__interface__subinterface__vlan=None) -> None:
+    mut def __init__(self, index: u64, description: ?str, admin_state: ?str, ip_mtu: ?u64, ipv4: ?srl_nokia_interfaces__interface__subinterface__ipv4=None, ipv6: ?srl_nokia_interfaces__interface__subinterface__ipv6=None, vlan: ?srl_nokia_interfaces__interface__subinterface__vlan=None) -> None:
         self.index = index
         self.description = description
         self.admin_state = admin_state
+        self.ip_mtu = ip_mtu
         self.ipv4 = ipv4 if ipv4 is not None else srl_nokia_interfaces__interface__subinterface__ipv4()
         self.ipv6 = ipv6 if ipv6 is not None else srl_nokia_interfaces__interface__subinterface__ipv6()
         self.vlan = vlan if vlan is not None else srl_nokia_interfaces__interface__subinterface__vlan()
@@ -34259,7 +34265,7 @@ class srl_nokia_interfaces__interface__subinterface_entry(yadata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> srl_nokia_interfaces__interface__subinterface_entry:
-        return srl_nokia_interfaces__interface__subinterface_entry(index=n.get_u64(ygdata.Id(NS_srl_nokia_interfaces, 'index')), description=n.get_opt_str(ygdata.Id(NS_srl_nokia_interfaces, 'description')), admin_state=n.get_opt_str(ygdata.Id(NS_srl_nokia_interfaces, 'admin-state')), ipv4=srl_nokia_interfaces__interface__subinterface__ipv4.from_gdata(n.get_opt_cnt(ygdata.Id(NS_srl_nokia_interfaces, 'ipv4'))), ipv6=srl_nokia_interfaces__interface__subinterface__ipv6.from_gdata(n.get_opt_cnt(ygdata.Id(NS_srl_nokia_interfaces, 'ipv6'))), vlan=srl_nokia_interfaces__interface__subinterface__vlan.from_gdata(n.get_opt_cnt(ygdata.Id(NS_srl_nokia_interfaces_vlans, 'vlan'))))
+        return srl_nokia_interfaces__interface__subinterface_entry(index=n.get_u64(ygdata.Id(NS_srl_nokia_interfaces, 'index')), description=n.get_opt_str(ygdata.Id(NS_srl_nokia_interfaces, 'description')), admin_state=n.get_opt_str(ygdata.Id(NS_srl_nokia_interfaces, 'admin-state')), ip_mtu=n.get_opt_u64(ygdata.Id(NS_srl_nokia_interfaces, 'ip-mtu')), ipv4=srl_nokia_interfaces__interface__subinterface__ipv4.from_gdata(n.get_opt_cnt(ygdata.Id(NS_srl_nokia_interfaces, 'ipv4'))), ipv6=srl_nokia_interfaces__interface__subinterface__ipv6.from_gdata(n.get_opt_cnt(ygdata.Id(NS_srl_nokia_interfaces, 'ipv6'))), vlan=srl_nokia_interfaces__interface__subinterface__vlan.from_gdata(n.get_opt_cnt(ygdata.Id(NS_srl_nokia_interfaces_vlans, 'vlan'))))
 
     mut def copy(self) -> srl_nokia_interfaces__interface__subinterface_entry:
         """Create a deep copy of this adata object"""
@@ -34276,15 +34282,17 @@ class srl_nokia_interfaces__interface__subinterface(yadata.MList[srl_nokia_inter
                 continue
             return e
 
-    mut def create(self, index: u64, description: ?str=None, admin_state: ?str=None) -> srl_nokia_interfaces__interface__subinterface_entry:
+    mut def create(self, index: u64, description: ?str=None, admin_state: ?str=None, ip_mtu: ?u64=None) -> srl_nokia_interfaces__interface__subinterface_entry:
         e = self.get(index)
         if e is not None:
             if description is not None:
                 e.description = description
             if admin_state is not None:
                 e.admin_state = admin_state
+            if ip_mtu is not None:
+                e.ip_mtu = ip_mtu
             return e
-        res = srl_nokia_interfaces__interface__subinterface_entry(index=index, description=description, admin_state=admin_state)
+        res = srl_nokia_interfaces__interface__subinterface_entry(index=index, description=description, admin_state=admin_state, ip_mtu=ip_mtu)
         self.elements.append(res)
         return res
 
@@ -35944,6 +35952,7 @@ class srl_nokia_interfaces__interface__subinterface_entry_subs(SubscriptionNode)
     index: SubscriptionNode
     description: SubscriptionNode
     admin_state: SubscriptionNode
+    ip_mtu: SubscriptionNode
     ipv4: srl_nokia_interfaces__interface__subinterface__ipv4_subs
     ipv6: srl_nokia_interfaces__interface__subinterface__ipv6_subs
     vlan: srl_nokia_interfaces__interface__subinterface__vlan_subs
@@ -35953,12 +35962,13 @@ class srl_nokia_interfaces__interface__subinterface_entry_subs(SubscriptionNode)
         self.index = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_srl_nokia_interfaces, 'index'), parent=path))
         self.description = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_srl_nokia_interfaces, 'description'), parent=path))
         self.admin_state = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_srl_nokia_interfaces, 'admin-state'), parent=path))
+        self.ip_mtu = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_srl_nokia_interfaces, 'ip-mtu'), parent=path))
         self.ipv4 = srl_nokia_interfaces__interface__subinterface__ipv4_subs(SubscriptionPath(ygdata.Id(NS_srl_nokia_interfaces, 'ipv4'), parent=path))
         self.ipv6 = srl_nokia_interfaces__interface__subinterface__ipv6_subs(SubscriptionPath(ygdata.Id(NS_srl_nokia_interfaces, 'ipv6'), parent=path))
         self.vlan = srl_nokia_interfaces__interface__subinterface__vlan_subs(SubscriptionPath(ygdata.Id(NS_srl_nokia_interfaces_vlans, 'vlan'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.index, self.description, self.admin_state, self.ipv4, self.ipv6, self.vlan]
+        direct: list[SubscriptionNode] = [self.index, self.description, self.admin_state, self.ip_mtu, self.ipv4, self.ipv6, self.vlan]
         return direct
 
 _breaker64: None = None
@@ -35966,6 +35976,7 @@ class srl_nokia_interfaces__interface__subinterface_subs(SubscriptionNode):
     index: SubscriptionNode
     description: SubscriptionNode
     admin_state: SubscriptionNode
+    ip_mtu: SubscriptionNode
     ipv4: srl_nokia_interfaces__interface__subinterface__ipv4_subs
     ipv6: srl_nokia_interfaces__interface__subinterface__ipv6_subs
     vlan: srl_nokia_interfaces__interface__subinterface__vlan_subs
@@ -35974,6 +35985,7 @@ class srl_nokia_interfaces__interface__subinterface_subs(SubscriptionNode):
         self.index = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_srl_nokia_interfaces, 'index'), parent=path))
         self.description = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_srl_nokia_interfaces, 'description'), parent=path))
         self.admin_state = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_srl_nokia_interfaces, 'admin-state'), parent=path))
+        self.ip_mtu = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_srl_nokia_interfaces, 'ip-mtu'), parent=path))
         self.ipv4 = srl_nokia_interfaces__interface__subinterface__ipv4_subs(SubscriptionPath(ygdata.Id(NS_srl_nokia_interfaces, 'ipv4'), parent=path))
         self.ipv6 = srl_nokia_interfaces__interface__subinterface__ipv6_subs(SubscriptionPath(ygdata.Id(NS_srl_nokia_interfaces, 'ipv6'), parent=path))
         self.vlan = srl_nokia_interfaces__interface__subinterface__vlan_subs(SubscriptionPath(ygdata.Id(NS_srl_nokia_interfaces_vlans, 'vlan'), parent=path))
@@ -35986,7 +35998,7 @@ class srl_nokia_interfaces__interface__subinterface_subs(SubscriptionNode):
         return srl_nokia_interfaces__interface__subinterface_entry_subs(SubscriptionPath(ygdata.Id(NS_srl_nokia_interfaces, 'subinterface'), predicates=predicates, parent=base_path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.index, self.description, self.admin_state, self.ipv4, self.ipv6, self.vlan]
+        direct: list[SubscriptionNode] = [self.index, self.description, self.admin_state, self.ip_mtu, self.ipv4, self.ipv6, self.vlan]
         return direct
 
 _breaker65: None = None

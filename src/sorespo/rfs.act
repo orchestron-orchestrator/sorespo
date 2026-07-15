@@ -508,9 +508,10 @@ class VrfInterface(base.VrfInterface):
 
             # Create the main interface
             intf = dev.interface.create(main_intf, admin_state="enable", vlan_tagging=True)
+            intf.description = "Alex added this in {i.name}"
 
             # Create the subinterface
-            subif = intf.subinterface.create(u64(vlan_id), description=i.description, admin_state="enable")
+            subif = intf.subinterface.create(u64(vlan_id), description=i.description, admin_state="enable", ip_mtu=i.mtu)
             subif.vlan.encap.create_single_tagged().vlan_id = int(vlan_id)
 
             # Configure IPv4 address if present

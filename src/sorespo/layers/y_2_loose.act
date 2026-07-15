@@ -134,7 +134,8 @@ SRC_DNODE_CHILD_17: DList = DList(module='sorespo-rfs', namespace='http://exampl
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='description', config=True, mandatory=False, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='vrf', config=True, description='VRF name', mandatory=True, type_=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ipv4-address', config=True, mandatory=False, type_=DTypeString(name='inet:ipv4-address', description='The ipv4-address type represents an IPv4 address in\ndotted-quad notation.  The IPv4 address may include a zone\nindex, separated by a % sign.\n\nThe zone index is used to disambiguate identical address\nvalues.  For link-local addresses, the zone index will\ntypically be the interface index number or the name of an\ninterface.  If the zone index is not present, the default\nzone of the device will be used.\n\nThe canonical format for the zone index is the numerical\nformat', reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(%[\\p{{N}}\\p{{L}}]+)?', pcre='^((([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(%[\\p{{N}}\\p{{L}}]+)?)$', invert=False)])),
-    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ipv4-prefix-length', config=True, default='30', mandatory=False, type_=DTypeIntegerUnsigned(name='uint8', description=None, reference=None, exts=[], builtin_type='uint8', default=None, ranges=Ranges([(1, 31)])))
+    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ipv4-prefix-length', config=True, default='30', mandatory=False, type_=DTypeIntegerUnsigned(name='uint8', description=None, reference=None, exts=[], builtin_type='uint8', default=None, ranges=Ranges([(1, 31)]))),
+    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='mtu', config=True, mandatory=False, type_=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(1, 9000)])))
 ])
 
 SRC_DNODE_CHILD_18: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ebgp-customer', key=[
@@ -333,6 +334,11 @@ SRC_YANG_0: str = r"""module sorespo-rfs {
                     range "1..31";
                 }
                 default "30";
+            }
+            leaf mtu {
+                type uint16 {
+                    range "1..9000";
+                }
             }
         }
 
@@ -1932,20 +1938,22 @@ class stratoweave_rfs__rfs__vrf_interface_entry(yadata.MNode):
     vrf: ?str
     ipv4_address: ?str
     ipv4_prefix_length: ?u64
+    mtu: ?u64
 
-    mut def __init__(self, name: str, description: ?str, vrf: ?str, ipv4_address: ?str, ipv4_prefix_length: ?u64) -> None:
+    mut def __init__(self, name: str, description: ?str, vrf: ?str, ipv4_address: ?str, ipv4_prefix_length: ?u64, mtu: ?u64) -> None:
         self.name = name
         self.description = description
         self.vrf = vrf
         self.ipv4_address = ipv4_address
         self.ipv4_prefix_length = ipv4_prefix_length
+        self.mtu = mtu
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:vrf-interface'])
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> stratoweave_rfs__rfs__vrf_interface_entry:
-        return stratoweave_rfs__rfs__vrf_interface_entry(name=n.get_str(ygdata.Id(NS_sorespo_rfs, 'name')), description=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'description')), vrf=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'vrf')), ipv4_address=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'ipv4-address')), ipv4_prefix_length=n.get_opt_u64(ygdata.Id(NS_sorespo_rfs, 'ipv4-prefix-length')))
+        return stratoweave_rfs__rfs__vrf_interface_entry(name=n.get_str(ygdata.Id(NS_sorespo_rfs, 'name')), description=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'description')), vrf=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'vrf')), ipv4_address=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'ipv4-address')), ipv4_prefix_length=n.get_opt_u64(ygdata.Id(NS_sorespo_rfs, 'ipv4-prefix-length')), mtu=n.get_opt_u64(ygdata.Id(NS_sorespo_rfs, 'mtu')))
 
     mut def copy(self) -> stratoweave_rfs__rfs__vrf_interface_entry:
         """Create a deep copy of this adata object"""
@@ -1962,7 +1970,7 @@ class stratoweave_rfs__rfs__vrf_interface(yadata.MList[stratoweave_rfs__rfs__vrf
                 continue
             return e
 
-    mut def create(self, name: str, description: ?str=None, vrf: ?str=None, ipv4_address: ?str=None, ipv4_prefix_length: ?u64=None) -> stratoweave_rfs__rfs__vrf_interface_entry:
+    mut def create(self, name: str, description: ?str=None, vrf: ?str=None, ipv4_address: ?str=None, ipv4_prefix_length: ?u64=None, mtu: ?u64=None) -> stratoweave_rfs__rfs__vrf_interface_entry:
         e = self.get(name)
         if e is not None:
             if description is not None:
@@ -1973,8 +1981,10 @@ class stratoweave_rfs__rfs__vrf_interface(yadata.MList[stratoweave_rfs__rfs__vrf
                 e.ipv4_address = ipv4_address
             if ipv4_prefix_length is not None:
                 e.ipv4_prefix_length = ipv4_prefix_length
+            if mtu is not None:
+                e.mtu = mtu
             return e
-        res = stratoweave_rfs__rfs__vrf_interface_entry(name=name, description=description, vrf=vrf, ipv4_address=ipv4_address, ipv4_prefix_length=ipv4_prefix_length)
+        res = stratoweave_rfs__rfs__vrf_interface_entry(name=name, description=description, vrf=vrf, ipv4_address=ipv4_address, ipv4_prefix_length=ipv4_prefix_length, mtu=mtu)
         self.elements.append(res)
         return res
 
