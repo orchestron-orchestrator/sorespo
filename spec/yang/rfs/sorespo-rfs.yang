@@ -107,6 +107,31 @@ module sorespo-rfs {
             }
         }
 
+        list peering-interface {
+          key name;
+          sw:rfs-transform sorespo.rfs.PeeringInterface;
+
+          leaf name {
+            type string;
+          }
+          leaf ipv4-address {
+            type inet:ipv4-address;
+            mandatory true;
+          }
+          leaf ipv4-prefix-length {
+            type uint8 {
+              range "1..32";
+            }
+            default "24";
+          }
+          leaf-list secondary-ipv4-address {
+            type inet:ipv4-address;
+          }
+          leaf description {
+            type string;
+          }
+        }
+
         list ibgp-neighbor {
           key address;
           sw:rfs-transform sorespo.rfs.IbgpNeighbor;
@@ -121,6 +146,42 @@ module sorespo-rfs {
           leaf description {
             type string;
             mandatory true;
+          }
+        }
+
+        list ebgp-peer {
+          key address;
+          sw:rfs-transform sorespo.rfs.EbgpPeer;
+          leaf address {
+            type inet:ipv4-address;
+          }
+          leaf local-address {
+            type inet:ipv4-address;
+          }
+          leaf local-asn {
+            type inet:as-number;
+            mandatory true;
+          }
+          leaf peer-asn {
+            type inet:as-number;
+            mandatory true;
+          }
+          leaf description {
+            type string;
+          }
+          container state {
+            config false;
+            leaf session-state {
+              type enumeration {
+                enum idle;
+                enum connect;
+                enum active;
+                enum open-sent;
+                enum open-confirm;
+                enum established;
+                enum unknown;
+              }
+            }
           }
         }
 

@@ -1,0 +1,69 @@
+module openconfig-network-instance {
+  yang-version 1;
+  namespace "http://openconfig.net/yang/network-instance";
+  prefix oc-netinst;
+
+  import openconfig-policy-types {
+    prefix oc-pol-types;
+  }
+
+  revision "2022-07-04" {
+    description
+      "Schema slice for the IOS XR 25.3.1 BGP operational state used by
+       SoReSpo. The module name, namespace, revision, keys, and enum values
+       match the OpenConfig model advertised by the device.";
+  }
+
+  container network-instances {
+    config false;
+
+    list network-instance {
+      key "name";
+
+      leaf name {
+        type string;
+      }
+
+      container protocols {
+        list protocol {
+          key "identifier name";
+
+          leaf identifier {
+            type identityref {
+              base oc-pol-types:INSTALL_PROTOCOL_TYPE;
+            }
+          }
+
+          leaf name {
+            type string;
+          }
+
+          container bgp {
+            container neighbors {
+              list neighbor {
+                key "neighbor-address";
+
+                leaf neighbor-address {
+                  type string;
+                }
+
+                container state {
+                  leaf session-state {
+                    type enumeration {
+                      enum IDLE;
+                      enum CONNECT;
+                      enum ACTIVE;
+                      enum OPENSENT;
+                      enum OPENCONFIRM;
+                      enum ESTABLISHED;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -59,6 +59,21 @@ class InterfaceStats(object):
         self.rx_packets = rx_packets
         self.oper_status = oper_status
 
+
+def bgp_session_state(raw: ?str) -> ?str:
+    if raw is None:
+        return None
+    states = {
+        "IDLE": "idle",
+        "CONNECT": "connect",
+        "ACTIVE": "active",
+        "OPENSENT": "open-sent",
+        "OPENCONFIRM": "open-confirm",
+        "ESTABLISHED": "established",
+    }
+    state = states.get(raw!)
+    return state! if state is not None else "unknown"
+
 def _bb_interface_description(remote_device: str, remote_interface: str) -> str:
     return "Link to {remote_device} [{remote_interface}]"
 
@@ -358,6 +373,160 @@ class BBInterface(base.BBInterface):
 
             return dev
 
+        raise UnsupportedDevice()
+
+
+class PeeringInterface(base.PeeringInterface):
+    def transform(self, i, di):
+        print("RFS /rfs{{{di.name}}}/peering-interface transform running [{i.name}]", err=True)
+        if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
+            dev = xr25.root()
+            intf = dev.interfaces.interface.create(i.name, description=i.description)
+            intf.ipv4.addresses.create_address(
+                i.ipv4_address,
+                prefix_length_to_netmask(int(i.ipv4_prefix_length)))
+            for address in i.secondary_ipv4_address:
+                intf.ipv4.addresses.secondaries.secondary.create(
+                    address,
+                    netmask=prefix_length_to_netmask(int(i.ipv4_prefix_length)))
+            return dev
+        raise UnsupportedDevice()
+
+
+actor EbgpPeerTransform(path: stratoweave.ttt.Path,
+                        update_oper: proc(?y_2_oper.stratoweave_rfs__rfs__ebgp_peer_entry)->None,
+                        dev: swdev.DeviceMgr):
+    _subs = gdata.SubscriptionManager(dev.tree_provider(), str(path))
+    _oper = base.EbgpPeer.new_state(path)
+    var update_sequence = 0
+    var on_change_valid = False
+    var on_change_sequence = 0
+    var on_change_state: ?str = None
+    var periodic_valid = False
+    var periodic_sequence = 0
+    var periodic_state: ?str = None
+    var current_peer: ?str = None
+
+    def reset_state():
+        on_change_valid = False
+        periodic_valid = False
+        _oper.state.session_state = None
+        update_oper(_oper)
+
+    def publish_latest_state():
+        if (on_change_valid
+                and (not periodic_valid
+                     or on_change_sequence >= periodic_sequence)):
+            _oper.state.session_state = on_change_state
+        elif periodic_valid:
+            _oper.state.session_state = periodic_state
+        else:
+            _oper.state.session_state = "unknown"
+        update_oper(_oper)
+
+    def on_xr_state(root: ?xr25_oper_root, err: ?Exception,
+                    peer_address: str, mode: str):
+        if err is not None:
+            print("EbgpPeerTransform {mode} subscription error: {err}",
+                  err=True)
+            if mode == "on-change":
+                on_change_valid = False
+            else:
+                periodic_valid = False
+            publish_latest_state()
+            return
+        # A Delivery calls its destination before its first snapshot arrives.
+        # With independent on-change and periodic deliveries, that empty
+        # callback must not erase a snapshot already supplied by the other.
+        if root is None:
+            return
+        snapshot: xr25_oper_root = root!
+        session_state: ?str = None
+        state_present = False
+        for instance in snapshot.network_instances.network_instance:
+            if instance.name == "DEFAULT":
+                for proto in instance.protocols.protocol_:
+                    if (proto.identifier == xr25_oper.openconfig_policy_types_BGP
+                            and proto.name == "default"):
+                        for neighbor in proto.bgp.neighbors.neighbor:
+                            if neighbor.neighbor_address == peer_address:
+                                raw_state = neighbor.state.session_state
+                                if raw_state is not None:
+                                    state_present = True
+                                    session_state = bgp_session_state(raw_state)
+        # XR on-change updates are partial and can briefly omit session-state
+        # for every selected neighbor. Preserve the previous state until XR
+        # publishes an explicit value. The periodic snapshot still turns a
+        # genuinely missing peer into unknown below.
+        if mode == "on-change" and not state_present:
+            return
+        # XR's OpenConfig backend reports every selected neighbor as UNKNOWN
+        # briefly while recalculating after one session changes. Do not fan
+        # that transient out as false alarms. A persistent unknown is still
+        # published by the independent periodic snapshot.
+        if mode == "on-change" and session_state == "unknown":
+            return
+        update_sequence += 1
+        state = "unknown" if session_state is None else session_state
+        if mode == "on-change":
+            on_change_state = state
+            on_change_sequence = update_sequence
+            on_change_valid = True
+        else:
+            periodic_state = state
+            periodic_sequence = update_sequence
+            periodic_valid = True
+        publish_latest_state()
+
+    def on_conf(conf: y_2.stratoweave_rfs__rfs__ebgp_peer_entry):
+        want: set[gdata.Delivery] = set()
+        modset = dev.get_modules().0
+        if "Cisco-IOS-XR-um-hostname-cfg" in modset:
+            address = conf.address
+            if current_peer is None or current_peer! != address:
+                current_peer = address
+                reset_state()
+            # XR 25.3.1's native BGP tree is cadence-capable but does not emit
+            # event-driven updates. Use the OpenConfig EDT gather point and key
+            # the filter all the way to this peer, so partial updates for another
+            # neighbor cannot affect this service instance.
+            selector = xr25_oper.subs.network_instances.network_instance.entry(
+                "DEFAULT").protocols.protocol_.entry(
+                    xr25_oper.openconfig_policy_types_BGP,
+                    "default").bgp.neighbors.neighbor.entry(
+                        address).state.session_state
+            filt = selector.filt()
+            # On-change provides the immediate transition; the periodic stream
+            # bounds staleness if UDP loss happens after the final transition.
+            # Keep these as independent deliveries: merging both latest trees
+            # would let a stale on-change baseline overlay a fresh periodic one.
+            on_change_dst = xr25_oper.dst(
+                lambda r, e: on_xr_state(r, e, address, "on-change"))
+            periodic_dst = xr25_oper.dst(
+                lambda r, e: on_xr_state(r, e, address, "periodic"))
+            want.add(on_change_dst.deliver({
+                gdata.SubscriptionSpec(filt, on_change=True)}))
+            want.add(periodic_dst.deliver({
+                gdata.SubscriptionSpec(filt, period=30.0)}))
+        else:
+            reset_state()
+        _subs.declare(want)
+
+
+class EbgpPeer(base.EbgpPeer):
+    def transform(self, i, di):
+        print("RFS /rfs{{{di.name}}}/ebgp-peer transform running {i.address}", err=True)
+        if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
+            dev = xr25.root()
+            bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(i.local_asn)
+            bgp_as.address_families.address_family.create("ipv4-unicast")
+            neighbor = bgp_as.neighbors.neighbor.create(
+                i.address, remote_as=i.peer_asn, description=i.description)
+            local_address = i.local_address
+            if local_address is not None:
+                neighbor.local.address.ip_address = local_address
+            neighbor.address_families.address_family.create("ipv4-unicast")
+            return dev
         raise UnsupportedDevice()
 
 

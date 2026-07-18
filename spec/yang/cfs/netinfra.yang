@@ -111,6 +111,83 @@ module netinfra {
       }
     }
 
+    list peering-interface {
+      key "router name";
+
+      sw:transform sorespo.cfs.PeeringInterface;
+      tmf:cfs-service "Peering Interface";
+
+      leaf router {
+        type string;
+        description "Managed router on which to configure the interface.";
+      }
+      leaf name {
+        type string;
+        description "Interface facing the external network.";
+      }
+      leaf ipv4-address {
+        type inet:ipv4-address;
+        mandatory true;
+      }
+      leaf ipv4-prefix-length {
+        type uint8 {
+          range "1..32";
+        }
+        default "24";
+      }
+      leaf-list secondary-ipv4-address {
+        type inet:ipv4-address;
+        description
+          "Additional local addresses in the same prefix, used when distinct
+           source addresses are required for multiple peer sessions.";
+      }
+      leaf description {
+        type string;
+      }
+    }
+
+    list ebgp-peer {
+      key "router peer-address";
+
+      sw:transform sorespo.cfs.EbgpPeer;
+      tmf:cfs-service "eBGP Peer";
+
+      leaf router {
+        type string;
+        description "Router on which to configure the session.";
+      }
+      leaf peer-address {
+        type inet:ipv4-address;
+      }
+      leaf local-address {
+        type inet:ipv4-address;
+        description
+          "Optional source address for this session. The address must be
+           configured on a peering interface.";
+      }
+      leaf peer-asn {
+        type inet:as-number;
+        mandatory true;
+      }
+      leaf description {
+        type string;
+      }
+      container state {
+        config false;
+        leaf session-state {
+          type enumeration {
+            enum idle;
+            enum connect;
+            enum active;
+            enum open-sent;
+            enum open-confirm;
+            enum established;
+            enum unknown;
+          }
+        }
+      }
+    }
+
     container global-settings {
       sw:transform sorespo.cfs.GlobalSettings;
       description

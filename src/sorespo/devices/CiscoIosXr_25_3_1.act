@@ -16,6 +16,11 @@ import sorespo.devices.CiscoIosXr_25_3_1_schema
 
 
 
+# Identityref constants
+openconfig_policy_types_INSTALL_PROTOCOL_TYPE: Identityref = Identityref('INSTALL_PROTOCOL_TYPE', ns='http://openconfig.net/yang/policy-types', mod='openconfig-policy-types', pfx='oc-pol-types')
+openconfig_policy_types_BGP: Identityref = Identityref('BGP', ns='http://openconfig.net/yang/policy-types', mod='openconfig-policy-types', pfx='oc-pol-types')
+
+
 SRC_DNODE: DRoot = sorespo.devices.CiscoIosXr_25_3_1_schema.SRC_DNODE
 
 pure def src_yang() -> list[str]:
@@ -244,6 +249,8 @@ NS_Cisco_IOS_XR_um_yang_push_cfg: str = 'http://cisco.com/ns/yang/Cisco-IOS-XR-u
 NS_Cisco_IOS_XR_um_yang_server_cfg: str = 'http://cisco.com/ns/yang/Cisco-IOS-XR-um-yang-server-cfg'
 NS_cisco_semver: str = 'http://cisco.com/ns/yang/cisco-semver'
 NS_Cisco_IOS_XR_types: str = 'http://cisco.com/ns/yang/cisco-xr-types'
+NS_openconfig_network_instance: str = 'http://openconfig.net/yang/network-instance'
+NS_openconfig_policy_types: str = 'http://openconfig.net/yang/policy-types'
 NS_tailf_common: str = 'http://tail-f.com/yang/common'
 NS_ietf_inet_types: str = 'urn:ietf:params:xml:ns:yang:ietf-inet-types'
 NS_ietf_yang_types: str = 'urn:ietf:params:xml:ns:yang:ietf-yang-types'
@@ -704,11 +711,113 @@ class Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__add
 
 
 _breaker18: None = None
+class Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary_entry(yadata.MNode):
+    address: str
+    netmask: ?str
+
+    mut def __init__(self, address: str, netmask: ?str) -> None:
+        self.address = address
+        self.netmask = netmask
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['Cisco-IOS-XR-um-interface-cfg:interfaces', 'interface', 'ipv4', 'Cisco-IOS-XR-um-if-ip-address-cfg:addresses', 'secondaries', 'secondary'])
+
+    @staticmethod
+    mut def from_gdata(n: ygdata.Node) -> Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary_entry:
+        return Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary_entry(address=n.get_str(ygdata.Id(NS_Cisco_IOS_XR_um_if_ip_address_cfg, 'address')), netmask=n.get_opt_str(ygdata.Id(NS_Cisco_IOS_XR_um_if_ip_address_cfg, 'netmask')))
+
+    mut def copy(self) -> Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary_entry:
+        """Create a deep copy of this adata object"""
+        return Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary_entry.from_gdata(self.to_gdata())
+
+_breaker19: None = None
+class Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary(yadata.MList[Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary_entry]):
+    mut def __init__(self, elements: list[Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary_entry]=[]) -> None:
+        self.elements = elements
+
+    pure def get(self, address: str) -> ?Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary_entry:
+        for e in self:
+            if e.address != address:
+                continue
+            return e
+
+    mut def create(self, address: str, netmask: ?str=None) -> Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary_entry:
+        e = self.get(address)
+        if e is not None:
+            if netmask is not None:
+                e.netmask = netmask
+            return e
+        res = Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary_entry(address=address, netmask=netmask)
+        self.elements.append(res)
+        return res
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.List) -> list[Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary_entry]:
+        if n is not None:
+            return [Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary_entry.from_gdata(e) for e in n.elements]
+        return []
+
+    mut def copy(self) -> Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary:
+        """Create a deep copy of this list object"""
+        # Copy each element in the list
+        copied_elements = []
+        for e in self:
+            ce = e.copy()
+            if ce is not None:
+                copied_elements.append(ce)
+        return Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary(elements=copied_elements)
+
+
+extension Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary(Indexed[str, Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary_entry]):
+    def __getitem__(self, k: str) -> Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.address == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.address == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
+
+_breaker20: None = None
+class Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries(yadata.MNode):
+    secondary: Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary
+
+    mut def __init__(self, secondary: list[Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary_entry]=[]) -> None:
+        self.secondary = Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary(elements=secondary)
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['Cisco-IOS-XR-um-interface-cfg:interfaces', 'interface', 'ipv4', 'Cisco-IOS-XR-um-if-ip-address-cfg:addresses', 'secondaries'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries:
+        if n is not None:
+            return Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries(secondary=Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries__secondary.from_gdata(n.get_opt_list(ygdata.Id(NS_Cisco_IOS_XR_um_if_ip_address_cfg, 'secondary'))))
+        return Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries()
+
+    mut def copy(self) -> Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries:
+        """Create a deep copy of this adata object"""
+        return Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries.from_gdata(self.to_gdata())
+
+
+_breaker21: None = None
 class Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses(yadata.MNode):
     address: ?Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__address
+    secondaries: Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries
 
-    mut def __init__(self, address: ?Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__address=None) -> None:
+    mut def __init__(self, address: ?Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__address=None, secondaries: ?Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries=None) -> None:
         self.address = address
+        self.secondaries = secondaries if secondaries is not None else Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries()
 
     mut def create_address(self, address: ?str=None, netmask: ?str=None) -> Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__address:
         existing = self.address
@@ -728,7 +837,7 @@ class Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses(yada
     @staticmethod
     mut def from_gdata(n: ?ygdata.Node) -> Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses:
         if n is not None:
-            return Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses(address=Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__address.from_gdata(n.get_opt_cnt(ygdata.Id(NS_Cisco_IOS_XR_um_if_ip_address_cfg, 'address'))))
+            return Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses(address=Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__address.from_gdata(n.get_opt_cnt(ygdata.Id(NS_Cisco_IOS_XR_um_if_ip_address_cfg, 'address'))), secondaries=Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses__secondaries.from_gdata(n.get_opt_cnt(ygdata.Id(NS_Cisco_IOS_XR_um_if_ip_address_cfg, 'secondaries'))))
         return Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses()
 
     mut def copy(self) -> Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses:
@@ -736,7 +845,7 @@ class Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses(yada
         return Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses.from_gdata(self.to_gdata())
 
 
-_breaker19: None = None
+_breaker22: None = None
 class Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4(yadata.MNode):
     addresses: Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4__addresses
 
@@ -757,7 +866,7 @@ class Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4(yadata.MNode):
         return Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4.from_gdata(self.to_gdata())
 
 
-_breaker20: None = None
+_breaker23: None = None
 class Cisco_IOS_XR_um_interface_cfg__interfaces__interface__shutdown(yadata.MNode):
 
     mut def __init__(self) -> None:
@@ -780,7 +889,7 @@ class Cisco_IOS_XR_um_interface_cfg__interfaces__interface__shutdown(yadata.MNod
         raise Exception('Unreachable in Cisco_IOS_XR_um_interface_cfg__interfaces__interface__shutdown.copy()')
 
 
-_breaker21: None = None
+_breaker24: None = None
 class Cisco_IOS_XR_um_interface_cfg__interfaces__interface__encapsulation__dot1q(yadata.MNode):
     vlan_id: ?u64
 
@@ -801,7 +910,7 @@ class Cisco_IOS_XR_um_interface_cfg__interfaces__interface__encapsulation__dot1q
         return Cisco_IOS_XR_um_interface_cfg__interfaces__interface__encapsulation__dot1q.from_gdata(self.to_gdata())
 
 
-_breaker22: None = None
+_breaker25: None = None
 class Cisco_IOS_XR_um_interface_cfg__interfaces__interface__encapsulation(yadata.MNode):
     dot1q: Cisco_IOS_XR_um_interface_cfg__interfaces__interface__encapsulation__dot1q
 
@@ -822,7 +931,7 @@ class Cisco_IOS_XR_um_interface_cfg__interfaces__interface__encapsulation(yadata
         return Cisco_IOS_XR_um_interface_cfg__interfaces__interface__encapsulation.from_gdata(self.to_gdata())
 
 
-_breaker23: None = None
+_breaker26: None = None
 class Cisco_IOS_XR_um_interface_cfg__interfaces__interface_entry(yadata.MNode):
     interface_name: str
     ipv4: Cisco_IOS_XR_um_interface_cfg__interfaces__interface__ipv4
@@ -858,7 +967,7 @@ class Cisco_IOS_XR_um_interface_cfg__interfaces__interface_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_interface_cfg__interfaces__interface_entry.from_gdata(self.to_gdata())
 
-_breaker24: None = None
+_breaker27: None = None
 class Cisco_IOS_XR_um_interface_cfg__interfaces__interface(yadata.MList[Cisco_IOS_XR_um_interface_cfg__interfaces__interface_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_interface_cfg__interfaces__interface_entry]=[]) -> None:
         self.elements = elements
@@ -919,7 +1028,7 @@ extension Cisco_IOS_XR_um_interface_cfg__interfaces__interface(Indexed[str, Cisc
                 return
         raise KeyError(k)
 
-_breaker25: None = None
+_breaker28: None = None
 class Cisco_IOS_XR_um_interface_cfg__interfaces(yadata.MNode):
     interface: Cisco_IOS_XR_um_interface_cfg__interfaces__interface
 
@@ -940,7 +1049,7 @@ class Cisco_IOS_XR_um_interface_cfg__interfaces(yadata.MNode):
         return Cisco_IOS_XR_um_interface_cfg__interfaces.from_gdata(self.to_gdata())
 
 
-_breaker26: None = None
+_breaker29: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net_entry(yadata.MNode):
     net_id: str
 
@@ -958,7 +1067,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net_entry.from_gdata(self.to_gdata())
 
-_breaker27: None = None
+_breaker30: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net(yadata.MList[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net_entry]=[]) -> None:
         self.elements = elements
@@ -1015,7 +1124,7 @@ extension Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__proc
                 return
         raise KeyError(k)
 
-_breaker28: None = None
+_breaker31: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets(yadata.MNode):
     net: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net
 
@@ -1036,7 +1145,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets.from_gdata(self.to_gdata())
 
 
-_breaker29: None = None
+_breaker32: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level_entry(yadata.MNode):
     level_number: u64
     default_metric: ?u64
@@ -1056,7 +1165,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level_entry.from_gdata(self.to_gdata())
 
-_breaker30: None = None
+_breaker33: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level(yadata.MList[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level_entry]=[]) -> None:
         self.elements = elements
@@ -1115,7 +1224,7 @@ extension Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__proc
                 return
         raise KeyError(k)
 
-_breaker31: None = None
+_breaker34: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels(yadata.MNode):
     metric_level: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level
 
@@ -1136,7 +1245,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels.from_gdata(self.to_gdata())
 
 
-_breaker32: None = None
+_breaker35: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family_entry(yadata.MNode):
     af_name: str
     saf_name: str
@@ -1158,7 +1267,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family_entry.from_gdata(self.to_gdata())
 
-_breaker33: None = None
+_breaker36: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family(yadata.MList[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family_entry]=[]) -> None:
         self.elements = elements
@@ -1196,7 +1305,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family(elements=copied_elements)
 
 
-_breaker34: None = None
+_breaker37: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families(yadata.MNode):
     address_family: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family
 
@@ -1217,7 +1326,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families.from_gdata(self.to_gdata())
 
 
-_breaker35: None = None
+_breaker38: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface_entry(yadata.MNode):
     interface_name: str
     state: ?str
@@ -1243,7 +1352,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface_entry.from_gdata(self.to_gdata())
 
-_breaker36: None = None
+_breaker39: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface(yadata.MList[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface_entry]=[]) -> None:
         self.elements = elements
@@ -1306,7 +1415,7 @@ extension Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__proc
                 return
         raise KeyError(k)
 
-_breaker37: None = None
+_breaker40: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces(yadata.MNode):
     interface: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface
 
@@ -1327,7 +1436,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces.from_gdata(self.to_gdata())
 
 
-_breaker38: None = None
+_breaker41: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family__metric_style__wide(yadata.MNode):
 
     mut def __init__(self) -> None:
@@ -1350,7 +1459,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         raise Exception('Unreachable in Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family__metric_style__wide.copy()')
 
 
-_breaker39: None = None
+_breaker42: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family__metric_style(yadata.MNode):
     wide: ?Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family__metric_style__wide
 
@@ -1379,7 +1488,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family__metric_style.from_gdata(self.to_gdata())
 
 
-_breaker40: None = None
+_breaker43: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family_entry(yadata.MNode):
     af_name: str
     saf_name: str
@@ -1401,7 +1510,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family_entry.from_gdata(self.to_gdata())
 
-_breaker41: None = None
+_breaker44: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family(yadata.MList[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family_entry]=[]) -> None:
         self.elements = elements
@@ -1439,7 +1548,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family(elements=copied_elements)
 
 
-_breaker42: None = None
+_breaker45: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families(yadata.MNode):
     address_family: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family
 
@@ -1460,7 +1569,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families.from_gdata(self.to_gdata())
 
 
-_breaker43: None = None
+_breaker46: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process_entry(yadata.MNode):
     process_id: str
     is_type: ?str
@@ -1486,7 +1595,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process_entry.from_gdata(self.to_gdata())
 
-_breaker44: None = None
+_breaker47: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process(yadata.MList[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process_entry]=[]) -> None:
         self.elements = elements
@@ -1545,7 +1654,7 @@ extension Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__proc
                 return
         raise KeyError(k)
 
-_breaker45: None = None
+_breaker48: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes(yadata.MNode):
     process: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process
 
@@ -1566,7 +1675,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes.from_gdata(self.to_gdata())
 
 
-_breaker46: None = None
+_breaker49: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis(yadata.MNode):
     processes: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes
 
@@ -1587,7 +1696,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis(yadata.MN
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis.from_gdata(self.to_gdata())
 
 
-_breaker47: None = None
+_breaker50: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router(yadata.MNode):
     isis: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis
 
@@ -1608,7 +1717,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router(yadata.MNode):
         return Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router.from_gdata(self.to_gdata())
 
 
-_breaker48: None = None
+_breaker51: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__use(yadata.MNode):
     neighbor_group: ?str
 
@@ -1629,29 +1738,173 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__use.from_gdata(self.to_gdata())
 
 
-_breaker49: None = None
+_breaker52: None = None
+class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local__address(yadata.MNode):
+    ip_address: ?str
+
+    mut def __init__(self, ip_address: ?str) -> None:
+        self.ip_address = ip_address
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['Cisco-IOS-XR-um-router-bgp-cfg:router', 'bgp', 'as', 'neighbors', 'neighbor', 'local', 'address'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local__address:
+        if n is not None:
+            return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local__address(ip_address=n.get_opt_str(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'ip-address')))
+        return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local__address()
+
+    mut def copy(self) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local__address:
+        """Create a deep copy of this adata object"""
+        return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local__address.from_gdata(self.to_gdata())
+
+
+_breaker53: None = None
+class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local(yadata.MNode):
+    address: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local__address
+
+    mut def __init__(self, address: ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local__address=None) -> None:
+        self.address = address if address is not None else Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local__address()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['Cisco-IOS-XR-um-router-bgp-cfg:router', 'bgp', 'as', 'neighbors', 'neighbor', 'local'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local:
+        if n is not None:
+            return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local(address=Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local__address.from_gdata(n.get_opt_cnt(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'address'))))
+        return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local()
+
+    mut def copy(self) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local:
+        """Create a deep copy of this adata object"""
+        return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local.from_gdata(self.to_gdata())
+
+
+_breaker54: None = None
+class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family_entry(yadata.MNode):
+    af_name: str
+
+    mut def __init__(self, af_name: str) -> None:
+        self.af_name = af_name
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['Cisco-IOS-XR-um-router-bgp-cfg:router', 'bgp', 'as', 'neighbors', 'neighbor', 'address-families', 'address-family'])
+
+    @staticmethod
+    mut def from_gdata(n: ygdata.Node) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family_entry:
+        return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family_entry(af_name=n.get_str(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'af-name')))
+
+    mut def copy(self) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family_entry:
+        """Create a deep copy of this adata object"""
+        return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family_entry.from_gdata(self.to_gdata())
+
+_breaker55: None = None
+class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family(yadata.MList[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family_entry]):
+    mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family_entry]=[]) -> None:
+        self.elements = elements
+
+    pure def get(self, af_name: str) -> ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family_entry:
+        for e in self:
+            if e.af_name != af_name:
+                continue
+            return e
+
+    mut def create(self, af_name: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family_entry:
+        e = self.get(af_name)
+        if e is not None:
+            return e
+        res = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family_entry(af_name=af_name)
+        self.elements.append(res)
+        return res
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.List) -> list[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family_entry]:
+        if n is not None:
+            return [Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family_entry.from_gdata(e) for e in n.elements]
+        return []
+
+    mut def copy(self) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family:
+        """Create a deep copy of this list object"""
+        # Copy each element in the list
+        copied_elements = []
+        for e in self:
+            ce = e.copy()
+            if ce is not None:
+                copied_elements.append(ce)
+        return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family(elements=copied_elements)
+
+
+extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family(Indexed[str, Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family_entry]):
+    def __getitem__(self, k: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family_entry:
+        e = self.get(k)
+        if e is not None:
+            return e
+        raise KeyError(k)
+
+    mut def __setitem__(self, k: str, n: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family_entry) -> None:
+        for i, e in enumerate(self.elements):
+            if e.af_name == k:
+                self.elements[i] = n
+                return
+        self.elements.append(n)
+
+    mut def __delitem__(self, k: str) -> None:
+        for i, e in enumerate(self.elements):
+            if e.af_name == k:
+                del self.elements[i]
+                return
+        raise KeyError(k)
+
+_breaker56: None = None
+class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families(yadata.MNode):
+    address_family: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family
+
+    mut def __init__(self, address_family: list[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family_entry]=[]) -> None:
+        self.address_family = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family(elements=address_family)
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['Cisco-IOS-XR-um-router-bgp-cfg:router', 'bgp', 'as', 'neighbors', 'neighbor', 'address-families'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families:
+        if n is not None:
+            return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families(address_family=Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families__address_family.from_gdata(n.get_opt_list(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'address-family'))))
+        return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families()
+
+    mut def copy(self) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families:
+        """Create a deep copy of this adata object"""
+        return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families.from_gdata(self.to_gdata())
+
+
+_breaker57: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry(yadata.MNode):
     address: str
+    remote_as: ?value
     use: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__use
     description: ?str
+    local: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local
+    address_families: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families
 
-    mut def __init__(self, address: str, use: ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__use=None, description: ?str) -> None:
+    mut def __init__(self, address: str, remote_as: ?value, use: ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__use=None, description: ?str, local: ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local=None, address_families: ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families=None) -> None:
         self.address = address
+        self.remote_as = remote_as
         self.use = use if use is not None else Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__use()
         self.description = description
+        self.local = local if local is not None else Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local()
+        self.address_families = address_families if address_families is not None else Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families()
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['Cisco-IOS-XR-um-router-bgp-cfg:router', 'bgp', 'as', 'neighbors', 'neighbor'])
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry:
-        return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry(address=n.get_str(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'address')), use=Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__use.from_gdata(n.get_opt_cnt(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'use'))), description=n.get_opt_str(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'description')))
+        return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry(address=n.get_str(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'address')), remote_as=n.get_opt_value(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'remote-as')), use=Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__use.from_gdata(n.get_opt_cnt(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'use'))), description=n.get_opt_str(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'description')), local=Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__local.from_gdata(n.get_opt_cnt(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'local'))), address_families=Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__address_families.from_gdata(n.get_opt_cnt(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'address-families'))))
 
     mut def copy(self) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry:
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry.from_gdata(self.to_gdata())
 
-_breaker50: None = None
+_breaker58: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor(yadata.MList[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry]=[]) -> None:
         self.elements = elements
@@ -1667,13 +1920,15 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
                 continue
             return e
 
-    mut def create(self, address: str, description: ?str=None) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry:
+    mut def create(self, address: str, remote_as: ?value=None, description: ?str=None) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry:
         e = self.get(address)
         if e is not None:
+            if remote_as is not None:
+                e.remote_as = remote_as
             if description is not None:
                 e.description = description
             return e
-        res = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry(address=address, description=description)
+        res = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry(address=address, remote_as=remote_as, description=description)
         self.elements.append(res)
         return res
 
@@ -1694,7 +1949,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor(elements=copied_elements)
 
 
-_breaker51: None = None
+_breaker59: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors(yadata.MNode):
     neighbor: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor
 
@@ -1715,7 +1970,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors.from_gdata(self.to_gdata())
 
 
-_breaker52: None = None
+_breaker60: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__password(yadata.MNode):
     encrypted: ?str
 
@@ -1736,7 +1991,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__password.from_gdata(self.to_gdata())
 
 
-_breaker53: None = None
+_breaker61: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family_entry(yadata.MNode):
     af_name: str
 
@@ -1754,7 +2009,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family_entry.from_gdata(self.to_gdata())
 
-_breaker54: None = None
+_breaker62: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family(yadata.MList[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family_entry]=[]) -> None:
         self.elements = elements
@@ -1811,7 +2066,7 @@ extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__nei
                 return
         raise KeyError(k)
 
-_breaker55: None = None
+_breaker63: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families(yadata.MNode):
     address_family: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family
 
@@ -1832,7 +2087,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families.from_gdata(self.to_gdata())
 
 
-_breaker56: None = None
+_breaker64: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group_entry(yadata.MNode):
     neighbor_group_name: str
     remote_as: ?value
@@ -1858,7 +2113,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group_entry.from_gdata(self.to_gdata())
 
-_breaker57: None = None
+_breaker65: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group(yadata.MList[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group_entry]=[]) -> None:
         self.elements = elements
@@ -1919,7 +2174,7 @@ extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__nei
                 return
         raise KeyError(k)
 
-_breaker58: None = None
+_breaker66: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups(yadata.MNode):
     neighbor_group: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group
 
@@ -1940,7 +2195,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups.from_gdata(self.to_gdata())
 
 
-_breaker59: None = None
+_breaker67: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family_entry(yadata.MNode):
     af_name: str
 
@@ -1958,7 +2213,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family_entry.from_gdata(self.to_gdata())
 
-_breaker60: None = None
+_breaker68: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family(yadata.MList[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family_entry]=[]) -> None:
         self.elements = elements
@@ -2015,7 +2270,7 @@ extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__add
                 return
         raise KeyError(k)
 
-_breaker61: None = None
+_breaker69: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families(yadata.MNode):
     address_family: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family
 
@@ -2036,7 +2291,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families.from_gdata(self.to_gdata())
 
 
-_breaker62: None = None
+_breaker70: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__bgp(yadata.MNode):
     router_id: ?str
 
@@ -2057,7 +2312,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__bgp(yad
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__bgp.from_gdata(self.to_gdata())
 
 
-_breaker63: None = None
+_breaker71: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__rd__two_byte_as(yadata.MNode):
     two_byte_as_number: ?value
     asn2_index: ?u64
@@ -2083,7 +2338,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         raise Exception('Unreachable in Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__rd__two_byte_as.copy()')
 
 
-_breaker64: None = None
+_breaker72: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__rd(yadata.MNode):
     two_byte_as: ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__rd__two_byte_as
 
@@ -2116,7 +2371,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__rd.from_gdata(self.to_gdata())
 
 
-_breaker65: None = None
+_breaker73: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family_entry(yadata.MNode):
     af_name: str
 
@@ -2134,7 +2389,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family_entry.from_gdata(self.to_gdata())
 
-_breaker66: None = None
+_breaker74: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family(yadata.MList[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family_entry]=[]) -> None:
         self.elements = elements
@@ -2191,7 +2446,7 @@ extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrf
                 return
         raise KeyError(k)
 
-_breaker67: None = None
+_breaker75: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families(yadata.MNode):
     address_family: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family
 
@@ -2212,7 +2467,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families.from_gdata(self.to_gdata())
 
 
-_breaker68: None = None
+_breaker76: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__password(yadata.MNode):
     encrypted: ?str
 
@@ -2233,7 +2488,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__password.from_gdata(self.to_gdata())
 
 
-_breaker69: None = None
+_breaker77: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family__route_policy(yadata.MNode):
     out: ?str
     in_: ?str
@@ -2256,7 +2511,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family__route_policy.from_gdata(self.to_gdata())
 
 
-_breaker70: None = None
+_breaker78: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family__as_override(yadata.MNode):
 
     mut def __init__(self) -> None:
@@ -2279,7 +2534,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         raise Exception('Unreachable in Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family__as_override.copy()')
 
 
-_breaker71: None = None
+_breaker79: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry(yadata.MNode):
     af_name: str
     route_policy: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family__route_policy
@@ -2309,7 +2564,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry.from_gdata(self.to_gdata())
 
-_breaker72: None = None
+_breaker80: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family(yadata.MList[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry]=[]) -> None:
         self.elements = elements
@@ -2366,7 +2621,7 @@ extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrf
                 return
         raise KeyError(k)
 
-_breaker73: None = None
+_breaker81: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families(yadata.MNode):
     address_family: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family
 
@@ -2387,7 +2642,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families.from_gdata(self.to_gdata())
 
 
-_breaker74: None = None
+_breaker82: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry(yadata.MNode):
     address: str
     remote_as: ?value
@@ -2413,7 +2668,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry.from_gdata(self.to_gdata())
 
-_breaker75: None = None
+_breaker83: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor(yadata.MList[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry]=[]) -> None:
         self.elements = elements
@@ -2458,7 +2713,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor(elements=copied_elements)
 
 
-_breaker76: None = None
+_breaker84: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors(yadata.MNode):
     neighbor: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor
 
@@ -2479,7 +2734,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors.from_gdata(self.to_gdata())
 
 
-_breaker77: None = None
+_breaker85: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry(yadata.MNode):
     vrf_name: str
     rd: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__rd
@@ -2503,7 +2758,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry.from_gdata(self.to_gdata())
 
-_breaker78: None = None
+_breaker86: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf(yadata.MList[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry]=[]) -> None:
         self.elements = elements
@@ -2560,7 +2815,7 @@ extension Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrf
                 return
         raise KeyError(k)
 
-_breaker79: None = None
+_breaker87: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs(yadata.MNode):
     vrf: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf
 
@@ -2581,7 +2836,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs(ya
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs.from_gdata(self.to_gdata())
 
 
-_breaker80: None = None
+_breaker88: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_entry(yadata.MNode):
     as_number: value
     neighbors: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors
@@ -2609,7 +2864,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_entry(ya
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_entry.from_gdata(self.to_gdata())
 
-_breaker81: None = None
+_breaker89: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as(yadata.MList[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_entry]=[]) -> None:
         self.elements = elements
@@ -2653,7 +2908,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as(yadata.M
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as(elements=copied_elements)
 
 
-_breaker82: None = None
+_breaker90: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp(yadata.MNode):
     as_: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as
 
@@ -2674,7 +2929,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp(yadata.MNode
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp.from_gdata(self.to_gdata())
 
 
-_breaker83: None = None
+_breaker91: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router(yadata.MNode):
     bgp: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp
 
@@ -2695,7 +2950,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router(yadata.MNode):
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router.from_gdata(self.to_gdata())
 
 
-_breaker84: None = None
+_breaker92: None = None
 class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry(yadata.MNode):
     route_policy_name: str
     rpl_route_policy: ?str
@@ -2715,7 +2970,7 @@ class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_po
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry.from_gdata(self.to_gdata())
 
-_breaker85: None = None
+_breaker93: None = None
 class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy(yadata.MList[Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry]=[]) -> None:
         self.elements = elements
@@ -2774,7 +3029,7 @@ extension Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__rout
                 return
         raise KeyError(k)
 
-_breaker86: None = None
+_breaker94: None = None
 class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies(yadata.MNode):
     route_policy: Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy
 
@@ -2795,7 +3050,7 @@ class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies(yadata.MN
         return Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies.from_gdata(self.to_gdata())
 
 
-_breaker87: None = None
+_breaker95: None = None
 class Cisco_IOS_XR_um_route_policy_cfg__routing_policy(yadata.MNode):
     route_policies: Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies
 
@@ -2816,7 +3071,7 @@ class Cisco_IOS_XR_um_route_policy_cfg__routing_policy(yadata.MNode):
         return Cisco_IOS_XR_um_route_policy_cfg__routing_policy.from_gdata(self.to_gdata())
 
 
-_breaker88: None = None
+_breaker96: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry(yadata.MNode):
     af_name: str
 
@@ -2834,7 +3089,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry.from_gdata(self.to_gdata())
 
-_breaker89: None = None
+_breaker97: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family(yadata.MList[Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry]=[]) -> None:
         self.elements = elements
@@ -2891,7 +3146,7 @@ extension Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_fam
                 return
         raise KeyError(k)
 
-_breaker90: None = None
+_breaker98: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families(yadata.MNode):
     address_family: Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family
 
@@ -2912,7 +3167,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families(yadata.MNode):
         return Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families.from_gdata(self.to_gdata())
 
 
-_breaker91: None = None
+_breaker99: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry(yadata.MNode):
     interface_name: str
 
@@ -2930,7 +3185,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry(yadat
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry.from_gdata(self.to_gdata())
 
-_breaker92: None = None
+_breaker100: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface(yadata.MList[Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry]=[]) -> None:
         self.elements = elements
@@ -2987,7 +3242,7 @@ extension Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface(Indexed
                 return
         raise KeyError(k)
 
-_breaker93: None = None
+_breaker101: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces(yadata.MNode):
     interface: Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface
 
@@ -3008,7 +3263,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces(yadata.MNode):
         return Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces.from_gdata(self.to_gdata())
 
 
-_breaker94: None = None
+_breaker102: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp(yadata.MNode):
     address_families: Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families
     interfaces: Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces
@@ -3034,7 +3289,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp(yadata.MNode):
         raise Exception('Unreachable in Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp.copy()')
 
 
-_breaker95: None = None
+_breaker103: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls(yadata.MNode):
     ldp: ?Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp
 
@@ -3063,7 +3318,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls(yadata.MNode):
         return Cisco_IOS_XR_um_mpls_ldp_cfg__mpls.from_gdata(self.to_gdata())
 
 
-_breaker96: None = None
+_breaker104: None = None
 class Cisco_IOS_XR_um_hostname_cfg__hostname(yadata.MNode):
     system_network_name: ?str
 
@@ -3084,7 +3339,7 @@ class Cisco_IOS_XR_um_hostname_cfg__hostname(yadata.MNode):
         return Cisco_IOS_XR_um_hostname_cfg__hostname.from_gdata(self.to_gdata())
 
 
-_breaker97: None = None
+_breaker105: None = None
 class root(yadata.MNode):
     vrfs: Cisco_IOS_XR_um_vrf_cfg__vrfs
     interfaces: Cisco_IOS_XR_um_interface_cfg__interfaces

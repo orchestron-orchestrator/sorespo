@@ -43,3 +43,49 @@ proc def _test_rfs_bbinterface2(t: testing.SyncT):
     transform = rfs.BBInterface(t.log_handler)
     out, _ = transform.transform_xml(xml.decode(xmlin), mock_di)
     return out.to_xmlstr()
+
+
+proc def _test_rfs_peering_interface(t: testing.SyncT):
+    modeled_input = rfs.PeeringInterface.input_type()(
+        name="GigabitEthernet0/0/0/0",
+        ipv4_address="192.0.2.1",
+        ipv4_prefix_length=24,
+        secondary_ipv4_address=["192.0.2.3", "192.0.2.5"],
+        description="External eBGP link"
+    )
+    mock_di = stratoweave.ttt.DeviceInfo("xrd-a", {
+        "Cisco-IOS-XR-um-hostname-cfg": stratoweave.adapters.adapter.ModCap(
+            "Cisco-IOS-XR-um-hostname-cfg",
+            "http://cisco.com/ns/yang/Cisco-IOS-XR-um-hostname-cfg")
+    })
+    transform = rfs.PeeringInterface(t.log_handler)
+    return transform.transform(modeled_input, mock_di).to_gdata().to_xmlstr(
+        pretty=True, deterministic=True)
+
+
+def _test_bgp_session_state():
+    testing.assertEqual(rfs.bgp_session_state("IDLE"), "idle")
+    testing.assertEqual(rfs.bgp_session_state("CONNECT"), "connect")
+    testing.assertEqual(rfs.bgp_session_state("OPENSENT"), "open-sent")
+    testing.assertEqual(rfs.bgp_session_state("OPENCONFIRM"), "open-confirm")
+    testing.assertEqual(rfs.bgp_session_state("ESTABLISHED"), "established")
+    testing.assertEqual(rfs.bgp_session_state("future-state"), "unknown")
+    testing.assertEqual(rfs.bgp_session_state(None), None)
+
+
+proc def _test_rfs_ebgp_peer(t: testing.SyncT):
+    modeled_input = rfs.EbgpPeer.input_type()(
+        address="192.0.2.2",
+        local_address="192.0.2.1",
+        local_asn=65001,
+        peer_asn=65002,
+        description="Hackathon peer"
+    )
+    mock_di = stratoweave.ttt.DeviceInfo("xrd-a", {
+        "Cisco-IOS-XR-um-hostname-cfg": stratoweave.adapters.adapter.ModCap(
+            "Cisco-IOS-XR-um-hostname-cfg",
+            "http://cisco.com/ns/yang/Cisco-IOS-XR-um-hostname-cfg")
+    })
+    transform = rfs.EbgpPeer(t.log_handler)
+    return transform.transform(modeled_input, mock_di).to_gdata().to_xmlstr(
+        pretty=True, deterministic=True)

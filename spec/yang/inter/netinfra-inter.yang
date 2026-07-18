@@ -83,6 +83,44 @@ module netinfra-inter {
           type inet:ip-address;
         }
       }
+      list peering-interface {
+        key "name";
+        leaf name {
+          type string;
+        }
+        leaf ipv4-address {
+          type inet:ipv4-address;
+          mandatory true;
+        }
+        leaf ipv4-prefix-length {
+          type uint8 {
+            range "1..32";
+          }
+          default "24";
+        }
+        leaf-list secondary-ipv4-address {
+          type inet:ipv4-address;
+        }
+        leaf description {
+          type string;
+        }
+      }
+      list ebgp-peer {
+        key "peer-address";
+        leaf peer-address {
+          type inet:ipv4-address;
+        }
+        leaf local-address {
+          type inet:ipv4-address;
+        }
+        leaf peer-asn {
+          type inet:as-number;
+          mandatory true;
+        }
+        leaf description {
+          type string;
+        }
+      }
     }
 
     list backbone-link {
@@ -154,6 +192,33 @@ module netinfra-inter {
         leaf ipv4-address {
           type inet:ipv4-address;
           mandatory true;
+        }
+      }
+    }
+
+    list ebgp-peer {
+      key "router peer-address";
+
+      sw:transform sorespo.inter.EbgpPeer;
+
+      leaf router {
+        type string;
+      }
+      leaf peer-address {
+        type inet:ipv4-address;
+      }
+      container state {
+        config false;
+        leaf session-state {
+          type enumeration {
+            enum idle;
+            enum connect;
+            enum active;
+            enum open-sent;
+            enum open-confirm;
+            enum established;
+            enum unknown;
+          }
         }
       }
     }

@@ -95,6 +95,60 @@ class BBLink(base.BBLink):
         return o
 
 
+class PeeringInterface(base.PeeringInterface):
+    def transform(self, i):
+        o = base.o_root()
+        interface = o.netinfra.router.create(i.router).peering_interface.create(
+            i.name,
+            ipv4_address=i.ipv4_address,
+            ipv4_prefix_length=i.ipv4_prefix_length,
+            description=i.description)
+        for address in i.secondary_ipv4_address:
+            interface.secondary_ipv4_address.append(address)
+        return o
+
+
+actor EbgpPeerTransform(path: ttt.Path,
+                        update_oper: proc(?y_0_oper.netinfra__netinfra__ebgp_peer_entry)->None,
+                        lower_tree_provider: ?gdata.TreeProvider):
+    _oper = base.EbgpPeer.new_state(path)
+    _subs = gdata.SubscriptionManager(ttt.expect(lower_tree_provider, "Missing lower tree provider for CFS eBGP telemetry"), str(path))
+
+    def push_state(session_state: ?str):
+        _oper.state.session_state = session_state
+        update_oper(_oper)
+
+    def on_inter_state(root: ?y_1_oper.root, err: ?Exception,
+                       router: str, peer_address: str):
+        if err is not None:
+            print("cfs.EbgpPeerTransform inter subscription error: {err}", err=True)
+            push_state("unknown")
+            return
+        session_state: ?str = None
+        if root is not None:
+            for peer in root.netinfra.ebgp_peer:
+                if peer.router == router and peer.peer_address == peer_address:
+                    session_state = peer.state.session_state
+        push_state(session_state)
+
+    def on_conf(conf: y_0.netinfra__netinfra__ebgp_peer_entry):
+        router = conf.router
+        peer_address = conf.peer_address
+        dst = y_1_oper.dst(lambda r, e: on_inter_state(r, e, router, peer_address))
+        entry = y_1_oper.subs.netinfra.ebgp_peer.entry(router, peer_address)
+        _subs.declare({dst.deliver({entry.state.session_state.subscribe(period=0.1)})})
+
+
+class EbgpPeer(base.EbgpPeer):
+    def transform(self, i):
+        o = base.o_root()
+        o.netinfra.router.create(i.router).ebgp_peer.create(
+            i.peer_address, local_address=i.local_address,
+            peer_asn=i.peer_asn, description=i.description)
+        o.netinfra.ebgp_peer.create(i.router, i.peer_address)
+        return o
+
+
 class L3VpnVpnService(base.L3VpnVpnService):
     def transform(self, i):
         print("CFS L3VPN VPN Service transform running %s" % (i.vpn_id))

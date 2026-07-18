@@ -46,6 +46,21 @@ class Router(base.Router):
             for ebgp_customer_address in vrf.ebgp_customer_address:
                 rfs.ebgp_customer.create(vrf.vpn_id, ebgp_customer_address, local_asn=i.base_config.asn)
 
+        for peering_interface in i.peering_interface:
+            interface = rfs.peering_interface.create(
+                peering_interface.name,
+                ipv4_address=peering_interface.ipv4_address,
+                ipv4_prefix_length=peering_interface.ipv4_prefix_length,
+                description=peering_interface.description)
+            for address in peering_interface.secondary_ipv4_address:
+                interface.secondary_ipv4_address.append(address)
+
+        for peer in i.ebgp_peer:
+            rfs.ebgp_peer.create(peer.peer_address, local_asn=i.base_config.asn,
+                                 local_address=peer.local_address,
+                                 peer_asn=peer.peer_asn,
+                                 description=peer.description)
+
         return o
 
 
@@ -129,6 +144,44 @@ class BBLink(base.BBLink):
         ri.remote.interface = i.left_interface
 
         return o
+
+
+actor EbgpPeerTransform(path: ttt.Path,
+                        update_oper: proc(?y_1_oper.netinfra_inter__netinfra__ebgp_peer_entry)->None,
+                        lower_tree_provider: ?gdata.TreeProvider):
+    _oper = base.EbgpPeer.new_state(path)
+    _subs = gdata.SubscriptionManager(ttt.expect(lower_tree_provider, "Missing lower tree provider for intermediate eBGP telemetry"), str(path))
+
+    def push_state(session_state: ?str):
+        _oper.state.session_state = session_state
+        update_oper(_oper)
+
+    def on_rfs_state(root: ?y_2_oper.root, err: ?Exception,
+                     router: str, peer_address: str):
+        if err is not None:
+            print("inter.EbgpPeerTransform RFS subscription error: {err}", err=True)
+            push_state("unknown")
+            return
+        session_state: ?str = None
+        if root is not None:
+            for rfs in root.rfs:
+                if rfs.name == router:
+                    for peer in rfs.ebgp_peer:
+                        if peer.address == peer_address:
+                            session_state = peer.state.session_state
+        push_state(session_state)
+
+    def on_conf(conf: y_1.netinfra_inter__netinfra__ebgp_peer_entry):
+        router = conf.router
+        peer_address = conf.peer_address
+        dst = y_2_oper.dst(lambda r, e: on_rfs_state(r, e, router, peer_address))
+        entry = y_2_oper.subs.rfs.entry(router).ebgp_peer.entry(peer_address)
+        _subs.declare({dst.deliver({entry.state.session_state.subscribe(period=0.1)})})
+
+
+class EbgpPeer(base.EbgpPeer):
+    def transform(self, i):
+        return base.o_root()
 
 
 class IbgpFullmesh(base.IbgpFullmesh):

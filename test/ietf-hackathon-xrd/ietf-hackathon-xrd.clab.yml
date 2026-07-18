@@ -1,0 +1,30 @@
+name: sorespo-ietf-hackathon-xrd
+prefix: __lab-name
+
+mgmt:
+  network: sorespo-ietf-hackathon-xrd
+  ipv4-subnet: 172.100.60.0/24
+
+topology:
+  kinds:
+    xrd:
+      image: ghcr.io/stratoweave/ios-xr/xrd-control-plane:25.3.1
+  nodes:
+    xrd-a:
+      kind: xrd
+      mgmt-ipv4: 172.100.60.11
+      startup-config: xrd-a-startup.conf
+    xrd-b:
+      kind: xrd
+      mgmt-ipv4: 172.100.60.12
+      startup-config: xrd-b-startup.conf
+    sweave:
+      kind: linux
+      image: debian:12
+      mgmt-ipv4: 172.100.60.10
+      cmd: sleep infinity
+      ports:
+        - 127.0.0.1:18080:80/tcp
+
+  links:
+    - endpoints: ["xrd-a:Gi0-0-0-0", "xrd-b:Gi0-0-0-0"]

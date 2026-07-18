@@ -11,11 +11,14 @@ import yang.xml as yxml
 
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__base_config
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface_entry
+from sorespo.layers.y_2 import stratoweave_rfs__rfs__peering_interface_entry
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__ibgp_neighbor_entry
+from sorespo.layers.y_2 import stratoweave_rfs__rfs__ebgp_peer_entry
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__vrf_entry
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__vrf_interface_entry
 from sorespo.layers.y_2 import stratoweave_rfs__rfs__ebgp_customer_entry
 from sorespo.layers.y_2_oper import stratoweave_rfs__rfs__backbone_interface_entry as stratoweave_rfs__rfs__backbone_interface_entry__oper
+from sorespo.layers.y_2_oper import stratoweave_rfs__rfs__ebgp_peer_entry as stratoweave_rfs__rfs__ebgp_peer_entry__oper
 from sorespo.layers.y_2 import SRC_DNODE
 from sorespo.layers.y_3_loose import root as output_root
 
@@ -83,6 +86,31 @@ class BBInterface(ttt.RFSFunction):
 
         return self.transform(modeled_input, device_info).to_gdata(), None
 
+class PeeringInterface(ttt.RFSFunction):
+    transform: mut(stratoweave_rfs__rfs__peering_interface_entry, ttt.DeviceInfo) -> yadata.MNode
+
+    @staticmethod
+    def input_type():
+        """Return the modeled input type for this transform"""
+        return stratoweave_rfs__rfs__peering_interface_entry
+
+    mut def transform_wrapper(self, i: ygdata.Node, device_info: ttt.DeviceInfo, memory: ?ygdata.Node, dynstate: ?ygdata.Node) -> (ygdata.Node, ?ygdata.Node):
+        """Wrap the user provided transform method to convert from gdata to
+        modeled input and back to gdata
+        """
+        modeled_input = stratoweave_rfs__rfs__peering_interface_entry.from_gdata(i)
+
+        return self.transform(modeled_input, device_info).to_gdata(), None
+
+    mut def transform_xml(self, i: xml.Node, device_info: ttt.DeviceInfo, memory: ?ygdata.Node, dynstate: ?ygdata.Node) -> (ygdata.Node, ?ygdata.Node):
+        """Wrap the user provided transform method to convert from XML to
+        modeled input and return gdata
+        """
+        gdata_input = yxml.from_xml(SRC_DNODE, i, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:peering-interface'])
+        modeled_input = stratoweave_rfs__rfs__peering_interface_entry.from_gdata(gdata_input)
+
+        return self.transform(modeled_input, device_info).to_gdata(), None
+
 class IbgpNeighbor(ttt.RFSFunction):
     transform: mut(stratoweave_rfs__rfs__ibgp_neighbor_entry, ttt.DeviceInfo) -> yadata.MNode
 
@@ -105,6 +133,41 @@ class IbgpNeighbor(ttt.RFSFunction):
         """
         gdata_input = yxml.from_xml(SRC_DNODE, i, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:ibgp-neighbor'])
         modeled_input = stratoweave_rfs__rfs__ibgp_neighbor_entry.from_gdata(gdata_input)
+
+        return self.transform(modeled_input, device_info).to_gdata(), None
+
+class EbgpPeer(ttt.RFSFunction):
+    transform: mut(stratoweave_rfs__rfs__ebgp_peer_entry, ttt.DeviceInfo) -> yadata.MNode
+
+    @staticmethod
+    def input_type():
+        """Return the modeled input type for this transform"""
+        return stratoweave_rfs__rfs__ebgp_peer_entry
+
+    @staticmethod
+    def state_type():
+        """Return the modeled operational state type for this transform"""
+        return stratoweave_rfs__rfs__ebgp_peer_entry__oper
+
+    @staticmethod
+    def new_state(path: ttt.Path):
+        """Create modeled operational state for this transform path"""
+        return stratoweave_rfs__rfs__ebgp_peer_entry__oper.from_gdata(ttt.path_key_data(path))
+
+    mut def transform_wrapper(self, i: ygdata.Node, device_info: ttt.DeviceInfo, memory: ?ygdata.Node, dynstate: ?ygdata.Node) -> (ygdata.Node, ?ygdata.Node):
+        """Wrap the user provided transform method to convert from gdata to
+        modeled input and back to gdata
+        """
+        modeled_input = stratoweave_rfs__rfs__ebgp_peer_entry.from_gdata(i)
+
+        return self.transform(modeled_input, device_info).to_gdata(), None
+
+    mut def transform_xml(self, i: xml.Node, device_info: ttt.DeviceInfo, memory: ?ygdata.Node, dynstate: ?ygdata.Node) -> (ygdata.Node, ?ygdata.Node):
+        """Wrap the user provided transform method to convert from XML to
+        modeled input and return gdata
+        """
+        gdata_input = yxml.from_xml(SRC_DNODE, i, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:ebgp-peer'])
+        modeled_input = stratoweave_rfs__rfs__ebgp_peer_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input, device_info).to_gdata(), None
 
