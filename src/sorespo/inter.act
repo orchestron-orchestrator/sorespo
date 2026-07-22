@@ -44,7 +44,7 @@ class Router(base.Router):
         for vrf in i.l3vpn_vrf:
             rfs.vrf.create(vrf.vpn_id, router_id=sid, asn=i.base_config.asn)
             for ebgp_customer_address in vrf.ebgp_customer_address:
-                rfs.ebgp_customer.create(vrf.vpn_id, ebgp_customer_address, local_asn=i.base_config.asn)
+                rfs.ebgp_customer.create((vrf.vpn_id, ebgp_customer_address), local_asn=i.base_config.asn)
 
         return o
 
@@ -167,7 +167,7 @@ class L3Vpn(base.L3Vpn):
             bgp = ep.bgp
             if customer_ipv4_address is not None and bgp is not None:
                 # local_asn is set in the inter.Router transform
-                rfs.ebgp_customer.create(i.name, customer_ipv4_address,
+                rfs.ebgp_customer.create((i.name, customer_ipv4_address),
                     peer_asn=bgp.as_number,
                     authentication_key=bgp.authentication_key,
                     description="Customer eBGP %s [%s] in VPN %s to %s" % (ep.site, ep.site_network_access, i.name, customer_ipv4_address))
