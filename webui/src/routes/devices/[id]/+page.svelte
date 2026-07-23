@@ -13,6 +13,7 @@
   } from '$lib/core/orchestron/client';
   import XmlDiff from '$lib/core/diff/XmlDiff.svelte';
   import { onGlobalRefresh } from '$lib/core/util/global-refresh';
+  import { appHref } from '$lib/core/util/nav';
 
   let {
     data
@@ -129,7 +130,7 @@
 <div class="device-detail">
   <div class="page-header">
     <div>
-      <a class="back-link" href="/devices">← Back to Devices</a>
+      <a class="back-link" href={appHref('/devices')}>← Back to Devices</a>
       <h2>Device Detail</h2>
       <p>Inspect device metadata, queue state, and supported YANG modules.</p>
     </div>
@@ -153,12 +154,12 @@
         <div class="flash {message.type}">{message.text}</div>
       {/if}
 
-      <div class="device-detail__actions">
+      <div class="device-detail__actions" data-tour="device-actions">
         <button class="btn btn-primary" type="button" disabled={resyncing} onclick={handleResync}>
           {resyncing ? 'Resyncing...' : 'Resync'}
         </button>
-        <a class="btn btn-secondary" href={`/devices/${deviceId}/config`}>View Configuration</a>
-        <a class="btn btn-secondary" href={`/devices/${deviceId}/log`}>Configuration Log</a>
+        <a class="btn btn-secondary" href={appHref(`/devices/${deviceId}/config`)}>View Configuration</a>
+        <a class="btn btn-secondary" href={appHref(`/devices/${deviceId}/log`)}>Configuration Log</a>
       </div>
 
       <div class="device-detail__grid">
@@ -239,7 +240,7 @@
         </section>
       </div>
 
-      <section class="panel">
+      <section class="panel" data-tour="device-queue">
         <div class="device-detail__section-header">
           <h4>Configuration Queue</h4>
           <span class="pill">{Object.keys(configQueue).length} item{Object.keys(configQueue).length === 1 ? '' : 's'}</span>
@@ -301,7 +302,7 @@
         {/if}
       </section>
 
-      <section class="panel">
+      <section class="panel" data-tour="device-modules">
         <div class="device-detail__section-header">
           <h4>YANG Modules</h4>
           <span class="pill">{device.modules?.length ?? 0} module{device.modules?.length === 1 ? '' : 's'}</span>

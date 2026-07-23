@@ -1,5 +1,7 @@
 import type { RestconfRequestOptions } from '$lib/core/restconf/proxy-types';
 
+import { demoFetch } from '$lib/demo/gate';
+
 const RESTCONF_BASE = '/api/restconf';
 
 type Fetch = typeof fetch;
@@ -53,7 +55,7 @@ export async function restconfRequest<T>(
     headers.set('content-type', init.contentType);
   }
 
-  const response = await fetchFn(`${RESTCONF_BASE}/${normalizePath(path)}`, {
+  const response = await (demoFetch ?? fetchFn)(`${RESTCONF_BASE}/${normalizePath(path)}`, {
     ...init,
     headers
   });
@@ -69,7 +71,7 @@ export function restconfGetJson<T>(path: string, fetchFn: Fetch = fetch): Promis
 }
 
 export async function restconfExists(path: string, fetchFn: Fetch = fetch): Promise<boolean> {
-  const response = await fetchFn(`${RESTCONF_BASE}/${normalizePath(path)}`, {
+  const response = await (demoFetch ?? fetchFn)(`${RESTCONF_BASE}/${normalizePath(path)}`, {
     method: 'GET',
     headers: { accept: 'application/yang-data+json' }
   });

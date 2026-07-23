@@ -82,7 +82,8 @@
 {#if error}
   <div class="error-state">{error}</div>
 {:else if device}
-  <ConfigViewerCard title={device.name || device.id} loading={loadingConfig} content={configData}>
+  <div data-tour="config-viewer">
+    <ConfigViewerCard title={device.name || device.id} loading={loadingConfig} content={configData}>
     {#snippet controls()}
       <SegmentedControl
         label="View"
@@ -97,5 +98,6 @@
         onchange={(format) => changeFormat(format)}
       />
     {/snippet}
-  </ConfigViewerCard>
+    </ConfigViewerCard>
+  </div>
 {/if}

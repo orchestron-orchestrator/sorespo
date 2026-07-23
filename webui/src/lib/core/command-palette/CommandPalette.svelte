@@ -5,6 +5,7 @@
 
   import { queuesPoll } from '$lib/core/orchestron/poll-store';
   import { LatestRequest } from '$lib/core/util/latest-request';
+  import { appHref } from '$lib/core/util/nav';
 
   import { buildStaticEntries, fetchDynamicEntries, filterEntries } from './index-builder';
   import type { PaletteEntry } from './types';
@@ -85,7 +86,7 @@
 
   function select(entry: PaletteEntry): void {
     open = false;
-    void goto(entry.href);
+    void goto(appHref(entry.href));
   }
 </script>
 

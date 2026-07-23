@@ -17,6 +17,7 @@
     wrapListEntryBody
   } from '$lib/core/restconf/client';
   import { StatusFlash } from '$lib/core/ui/status-flash.svelte';
+  import { appHref } from '$lib/core/util/nav';
   import ServiceWorkspace from '$lib/core/workspace/ServiceWorkspace.svelte';
 
   let {
@@ -115,7 +116,7 @@
     }
 
     try {
-      await goto(`/services/${serviceModule.id}/${encodeURIComponent(key)}`);
+      await goto(appHref(`/services/${serviceModule.id}/${encodeURIComponent(key)}`));
     } catch (navError) {
       status.error(
         `Saved ${key}, but navigation failed: ${navError instanceof Error ? navError.message : 'unknown'}`

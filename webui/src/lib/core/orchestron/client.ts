@@ -1,3 +1,5 @@
+import { demoFetch } from '$lib/demo/gate';
+
 const API_BASE = '/api';
 
 export interface DeviceSummary {
@@ -93,7 +95,7 @@ async function apiRequest<T>(path: string, init: RequestInit = {}, fetchFn: Fetc
   }
 
   return readJson<T>(
-    await fetchFn(`${API_BASE}${path}`, {
+    await (demoFetch ?? fetchFn)(`${API_BASE}${path}`, {
       ...init,
       headers
     })
@@ -216,7 +218,7 @@ export async function fetchAllDeviceQueues(): Promise<QueueItemSummary[]> {
 }
 
 export async function fetchDeviceRunningConfig(deviceId: string, format = 'json'): Promise<string> {
-  const response = await fetch(
+  const response = await (demoFetch ?? fetch)(
     `${API_BASE}/device/${encodeURIComponent(deviceId)}/running?format=${format}`
   );
   if (!response.ok) {
@@ -226,7 +228,7 @@ export async function fetchDeviceRunningConfig(deviceId: string, format = 'json'
 }
 
 export async function fetchDeviceTargetConfig(deviceId: string, format = 'json'): Promise<string> {
-  const response = await fetch(
+  const response = await (demoFetch ?? fetch)(
     `${API_BASE}/device/${encodeURIComponent(deviceId)}/target?format=${format}`
   );
   if (!response.ok) {
@@ -236,7 +238,7 @@ export async function fetchDeviceTargetConfig(deviceId: string, format = 'json')
 }
 
 export async function fetchDeviceConfigDiff(deviceId: string, format = 'json'): Promise<string> {
-  const response = await fetch(
+  const response = await (demoFetch ?? fetch)(
     `${API_BASE}/device/${encodeURIComponent(deviceId)}/diff?format=${format}`
   );
   if (!response.ok) {
@@ -263,7 +265,9 @@ const LAYER_ACCEPT: Record<string, string> = {
 export async function fetchLayerConfig(index: number, format = 'xml'): Promise<string> {
   const accept = LAYER_ACCEPT[format] ?? LAYER_ACCEPT.xml;
   const suffix = format === 'adata' ? '?loose=true' : '';
-  const response = await fetch(`${API_BASE}/layer/${index}${suffix}`, { headers: { accept } });
+  const response = await (demoFetch ?? fetch)(`${API_BASE}/layer/${index}${suffix}`, {
+    headers: { accept }
+  });
   if (!response.ok) {
     throw new Error(`Failed to fetch layer ${index} config (HTTP ${response.status})`);
   }

@@ -3,6 +3,7 @@
   import { onMount } from 'svelte';
 
   import { onGlobalRefresh } from '$lib/core/util/global-refresh';
+  import { appHref } from '$lib/core/util/nav';
 
   import type { DeviceSummary } from '$lib/core/orchestron/client';
 
@@ -47,9 +48,9 @@
 {:else if filteredDevices.length === 0}
   <div class="empty-state">No devices match "{searchQuery}".</div>
 {:else}
-  <div class="device-grid">
+  <div class="device-grid" data-tour="device-grid">
     {#each filteredDevices as device}
-      <a class="device-card card" href={`/devices/${encodeURIComponent(device.id)}`}>
+      <a class="device-card card" href={appHref(`/devices/${encodeURIComponent(device.id)}`)}>
         <div class="device-card__header">
           <h3>{device.name}</h3>
           <span class="pill">

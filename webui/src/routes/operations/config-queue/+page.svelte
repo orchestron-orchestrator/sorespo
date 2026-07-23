@@ -184,7 +184,7 @@
 </div>
 
 <div class="queue-layout">
-  <section class="card queue-layout__sidebar">
+  <section class="card queue-layout__sidebar" data-tour="queue-list">
     {#if loading && allQueues.length === 0}
       <div class="loading-state">Loading queue...</div>
     {:else if error && allQueues.length === 0}
@@ -220,7 +220,7 @@
     {/if}
   </section>
 
-  <section class="card queue-layout__detail">
+  <section class="card queue-layout__detail" data-tour="queue-detail">
     {#if error && allQueues.length > 0}
       <div class="flash error">{error}</div>
     {/if}
@@ -266,7 +266,7 @@
             Next
           </button>
         </div>
-        <div class="queue-layout__actions">
+        <div class="queue-layout__actions" data-tour="queue-actions">
           <button
             class="btn btn-danger"
             type="button"

@@ -5,6 +5,7 @@
     TOPOLOGY_SITE_CARD_HEIGHT,
     TOPOLOGY_SITE_CARD_WIDTH
   } from '$lib/core/topology/model';
+  import { appHref } from '$lib/core/util/nav';
 
   import type { TopologyGraph } from '$lib/core/topology/model';
 
@@ -61,7 +62,7 @@
               {@const offsetX = (deltaX / length) * (routerRadius + 4)}
               {@const offsetY = (deltaY / length) * (routerRadius + 4)}
               {@const routeId = `${link.leftRouter},${link.leftInterface},${link.rightRouter},${link.rightInterface}`}
-              {@const href = `/services/netinfra-backbone-link/${encodeURIComponent(routeId)}`}
+              {@const href = appHref(`/services/netinfra-backbone-link/${encodeURIComponent(routeId)}`)}
 
               <a {href} class="topology__link-link" aria-label={`Open backbone-link ${link.leftRouter} ${link.leftInterface} ↔ ${link.rightRouter} ${link.rightInterface}, status ${link.linkStatus}`}>
                 <line
@@ -130,7 +131,7 @@
 
         <g class="topology__routers">
           {#each graph.routers as router}
-            <a href={`/devices/${encodeURIComponent(router.name)}`}>
+            <a href={appHref(`/devices/${encodeURIComponent(router.name)}`)}>
               <g
                 class="topology__router"
                 class:topology__router--approval={router.approvalRequired}
@@ -157,7 +158,7 @@
         <g class="topology__sites">
           {#each graph.routers as router}
             {#each router.attachments as attachment}
-              <a href={`/services/l3vpn-site/${encodeURIComponent(attachment.siteId)}`}>
+              <a href={appHref(`/services/l3vpn-site/${encodeURIComponent(attachment.siteId)}`)}>
                 <g
                   class="topology__site"
                   transform={`translate(${attachment.x}, ${attachment.y})`}
@@ -201,7 +202,7 @@
       </div>
       <div class="card-body topology__orphan-list">
         {#each graph.orphanSiteAttachments as attachment}
-          <a class="topology__orphan-item" href={`/services/l3vpn-site/${encodeURIComponent(attachment.siteId)}`}>
+          <a class="topology__orphan-item" href={appHref(`/services/l3vpn-site/${encodeURIComponent(attachment.siteId)}`)}>
             <strong>{attachment.siteId}</strong>
             <span>{attachment.vpnIds[0] || 'No vpn-id'}</span>
             <span>{attachment.routerHint || 'No router hint from bearer-reference'}</span>

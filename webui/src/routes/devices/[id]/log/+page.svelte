@@ -139,7 +139,7 @@
   <div class="error-state">{error}</div>
 {:else if device}
   <div class="log-layout">
-    <section class="card log-layout__sidebar">
+    <section class="card log-layout__sidebar" data-tour="log-history">
       <div class="log-layout__sidebar-header">
         <h3>History</h3>
         <span class="pill">{configLog.length} entr{configLog.length === 1 ? 'y' : 'ies'}</span>
