@@ -141,7 +141,7 @@
       <button class="btn btn-secondary" type="button" disabled={!body || applying} onclick={reset}>
         Reset
       </button>
-      <button class="btn btn-primary" type="button" disabled={!canApply} onclick={requestApply}>
+      <button class="btn btn-primary" type="button" disabled={!canApply} onclick={requestApply} data-tour="configure-apply">
         {applying ? 'Applying…' : 'Apply'}
       </button>
     </div>
@@ -172,6 +172,7 @@
   <div
     class="dropzone"
     class:dragging
+    data-tour="configure-editor"
     role="textbox"
     tabindex="-1"
     ondragover={handleDragOver}

@@ -28,7 +28,7 @@
   }: Props = $props();
 </script>
 
-<div class="save-bar card">
+<div class="save-bar card" data-tour="workspace-save">
   <div class="card-body save-bar__inner">
     <div class="save-bar__status">
       <strong class:dirty>{dirty ? 'Unsaved changes' : 'Draft is up to date'}</strong>

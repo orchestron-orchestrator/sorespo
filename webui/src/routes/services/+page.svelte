@@ -1,5 +1,6 @@
 <script lang="ts">
   import { listServiceModuleMeta } from '$lib/core/registry/service-modules';
+  import { appHref } from '$lib/core/util/nav';
 
   const modules = listServiceModuleMeta();
 </script>
@@ -23,8 +24,8 @@
         <p class="service-card__desc">{module.description}</p>
 
         <div class="service-card__actions">
-          <a class="btn btn-primary" href={`/services/${module.id}/new`}>+ Create new</a>
-          <a class="btn btn-secondary" href={`/services/${module.id}`}>Browse existing</a>
+          <a class="btn btn-primary" href={appHref(`/services/${module.id}/new`)}>+ Create new</a>
+          <a class="btn btn-secondary" href={appHref(`/services/${module.id}`)}>Browse existing</a>
         </div>
       </div>
     </article>

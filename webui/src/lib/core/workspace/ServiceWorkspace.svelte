@@ -98,7 +98,7 @@
     <div class="loading-state">Loading service data...</div>
   {:else}
     <div class="workspace__grid">
-      <section class="workspace__editor card">
+      <section class="workspace__editor card" data-tour="workspace-editor">
         <div class="card-header">
           <h3>Editor</h3>
           <span class="card-badge">{module.id}</span>
@@ -120,7 +120,7 @@
         </div>
       </section>
 
-      <div class="workspace__sidebar">
+      <div class="workspace__sidebar" data-tour="workspace-sidebar">
         <ValidationPanel {validation} active={validationActive} />
         <PreviewPanel {draft} {payload} {originalPayload} Preview={module.Preview} />
       </div>

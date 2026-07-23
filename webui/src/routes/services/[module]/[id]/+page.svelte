@@ -22,6 +22,7 @@
   import ConfirmDialog from '$lib/core/ui/ConfirmDialog.svelte';
   import { StatusFlash } from '$lib/core/ui/status-flash.svelte';
   import { onGlobalRefresh } from '$lib/core/util/global-refresh';
+  import { appHref } from '$lib/core/util/nav';
   import ServiceWorkspace from '$lib/core/workspace/ServiceWorkspace.svelte';
 
   let {
@@ -45,7 +46,7 @@
 
   let routeKey = $derived(`${data.moduleId}:${data.serviceId}`);
   let cloneHref = $derived(
-    `/services/${serviceModule.id}/new?clone=${encodeURIComponent(data.serviceId)}`
+    appHref(`/services/${serviceModule.id}/new?clone=${encodeURIComponent(data.serviceId)}`)
   );
   let displayServiceId = $derived(formatServiceRouteId(serviceModule, data.serviceId));
 
@@ -140,7 +141,7 @@
       await restconfDelete(
         getListEntryPath(serviceModule.restconfRoot, getRoutePathKey(serviceModule, data.serviceId))
       );
-      await goto(`/services/${serviceModule.id}`, {
+      await goto(appHref(`/services/${serviceModule.id}`), {
         invalidateAll: true
       });
     } catch (deleteError) {

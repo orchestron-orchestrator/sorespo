@@ -7,6 +7,7 @@
   import { buildTopologyGraph } from '$lib/core/topology/model';
   import { restconfGetJson } from '$lib/core/restconf/client';
   import { onGlobalRefresh } from '$lib/core/util/global-refresh';
+  import { appHref } from '$lib/core/util/nav';
 
   import type { L3VpnSitesPayload, NetinfraPayload, TopologyGraph } from '$lib/core/topology/model';
 
@@ -136,7 +137,7 @@
     </div>
   </div>
 
-  <section class="overview__section">
+  <section class="overview__section" data-tour="topology">
     <div class="section-head">
       <div>
         <h3>Network Topology</h3>
@@ -154,13 +155,13 @@
     {/if}
   </section>
 
-  <section class="overview__section">
+  <section class="overview__section" data-tour="devices-table">
     <div class="section-head">
       <div>
         <h3>Devices</h3>
         <p>Current managed devices</p>
       </div>
-      <a class="btn btn-secondary btn-sm" href="/devices">View all devices</a>
+      <a class="btn btn-secondary btn-sm" href={appHref('/devices')}>View all devices</a>
     </div>
 
     {#if loadingDevices}
@@ -188,7 +189,7 @@
             <tbody>
               {#each devices as device}
                 <tr>
-                  <td><a class="device-table__name" href={`/devices/${encodeURIComponent(device.id)}`}>{device.name}</a></td>
+                  <td><a class="device-table__name" href={appHref(`/devices/${encodeURIComponent(device.id)}`)}>{device.name}</a></td>
                   <td>{device.type ?? '—'}</td>
                   <td class="monospace">{device.address ?? '—'}</td>
                   <td>{device.username ?? '—'}</td>
@@ -216,13 +217,13 @@
     {/if}
   </section>
 
-  <section class="overview__section">
+  <section class="overview__section" data-tour="service-cards">
     <div class="section-head">
       <div>
         <h3>Services</h3>
         <p>Direct entry points for service configuration modules.</p>
       </div>
-      <a class="btn btn-secondary btn-sm" href="/services">View all services</a>
+      <a class="btn btn-secondary btn-sm" href={appHref('/services')}>View all services</a>
     </div>
 
     <div class="service-grid">
@@ -237,8 +238,8 @@
             <p class="service-card__desc">{module.description}</p>
 
             <div class="service-card__actions">
-              <a class="btn btn-primary" href={`/services/${module.id}/new`}>Create new</a>
-              <a class="btn btn-secondary" href={`/services/${module.id}`}>Browse existing</a>
+              <a class="btn btn-primary" href={appHref(`/services/${module.id}/new`)}>Create new</a>
+              <a class="btn btn-secondary" href={appHref(`/services/${module.id}`)}>Browse existing</a>
             </div>
           </div>
         </article>

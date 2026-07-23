@@ -63,19 +63,21 @@
   </div>
 </div>
 
-<ConfigViewerCard loading={loading} content={configData}>
-  {#snippet controls()}
-    <SegmentedControl
-      label="Layer"
-      options={LAYER_OPTIONS}
-      value={selectedLayer}
-      onchange={(index) => loadLayer(index)}
-    />
-    <SegmentedControl
-      label="Format"
-      options={FORMAT_OPTIONS}
-      value={configFormat}
-      onchange={(format) => changeFormat(format)}
-    />
-  {/snippet}
-</ConfigViewerCard>
+<div data-tour="layer-viewer">
+  <ConfigViewerCard loading={loading} content={configData}>
+    {#snippet controls()}
+      <SegmentedControl
+        label="Layer"
+        options={LAYER_OPTIONS}
+        value={selectedLayer}
+        onchange={(index) => loadLayer(index)}
+      />
+      <SegmentedControl
+        label="Format"
+        options={FORMAT_OPTIONS}
+        value={configFormat}
+        onchange={(format) => changeFormat(format)}
+      />
+    {/snippet}
+  </ConfigViewerCard>
+</div>

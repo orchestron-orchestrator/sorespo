@@ -1,15 +1,18 @@
 <script lang="ts">
   import '../app.css';
 
+  import { PUBLIC_DEMO } from '$env/static/public';
   import { invalidateAll } from '$app/navigation';
+  import { asset } from '$app/paths';
   import { page } from '$app/state';
-  import { onMount, type Snippet } from 'svelte';
+  import { onMount, type Component, type Snippet } from 'svelte';
 
   import CommandPalette from '$lib/core/command-palette/CommandPalette.svelte';
   import { isPendingQueueItem } from '$lib/core/orchestron/client';
   import { queuesPoll, refreshQueues } from '$lib/core/orchestron/poll-store';
   import { getServiceModule, listServiceModuleMeta } from '$lib/core/registry/service-modules';
   import { formatServiceRouteId } from '$lib/core/registry/types';
+  import { appHref, appPathname } from '$lib/core/util/nav';
 
   let { children }: { children?: Snippet } = $props();
 
@@ -17,6 +20,16 @@
 
   let totalPendingCount = $derived($queuesPoll.queues.filter(isPendingQueueItem).length);
   let paletteOpen = $state(false);
+  let DemoShell = $state<Component | null>(null);
+
+  onMount(() => {
+    // Statically false outside demo builds, so the chunk is never emitted.
+    if (PUBLIC_DEMO === '1') {
+      void import('$lib/demo/DemoShell.svelte').then((mod) => {
+        DemoShell = mod.default;
+      });
+    }
+  });
 
   async function handleRefresh(): Promise<void> {
     window.dispatchEvent(new CustomEvent('global-refresh'));
@@ -92,7 +105,7 @@
     return crumbs;
   }
 
-  let currentPathname = $derived(page.url.pathname);
+  let currentPathname = $derived(appPathname(page.url));
   let breadcrumbs = $derived(getBreadcrumbs(currentPathname));
   let pageTitle = $derived(
     breadcrumbs
@@ -112,10 +125,10 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <a class="logo-link" href="/" aria-label="StratoWeave — go to dashboard">
+      <a class="logo-link" href={appHref('/')} aria-label="StratoWeave — go to dashboard">
         <img
           class="logo-img"
-          src="/stratoweave-logo.png"
+          src={asset('/stratoweave-logo.png')}
           alt="StratoWeave — Orchestration Platform"
           width="286"
           height="53"
@@ -128,7 +141,8 @@
         <a
           class="nav-item"
           class:active={currentPathname === '/'}
-          href="/"
+          href={appHref('/')}
+          data-tour="nav-dashboard"
         >
           <span class="nav-icon">◉</span>
           Dashboard
@@ -140,7 +154,8 @@
         <a
           class="nav-item"
           class:active={currentPathname.startsWith('/devices')}
-          href="/devices"
+          href={appHref('/devices')}
+          data-tour="nav-devices"
         >
           <span class="nav-icon">⬡</span>
           Devices
@@ -152,7 +167,8 @@
         <a
           class="nav-item"
           class:active={currentPathname.startsWith('/operations/config-queue')}
-          href="/operations/config-queue"
+          href={appHref('/operations/config-queue')}
+          data-tour="nav-queue"
         >
           <span class="nav-icon">◇</span>
           Config Queue
@@ -163,7 +179,8 @@
         <a
           class="nav-item"
           class:active={currentPathname.startsWith('/configure')}
-          href="/configure"
+          href={appHref('/configure')}
+          data-tour="nav-configure"
         >
           <span class="nav-icon">⤴</span>
           Apply Config
@@ -175,7 +192,8 @@
         <a
           class="nav-item"
           class:active={currentPathname.startsWith('/layers')}
-          href="/layers"
+          href={appHref('/layers')}
+          data-tour="nav-layers"
         >
           <span class="nav-icon">▤</span>
           Config
@@ -187,7 +205,8 @@
         <a
           class="nav-item"
           class:active={currentPathname.startsWith('/services')}
-          href="/services"
+          href={appHref('/services')}
+          data-tour="nav-services"
         >
           <span class="nav-icon">◈</span>
           Service Modules
@@ -198,7 +217,7 @@
             <a
               class="nav-item nav-item--sub"
               class:active={currentPathname.startsWith(`/services/${serviceModule.id}`)}
-              href={`/services/${serviceModule.id}`}
+              href={appHref(`/services/${serviceModule.id}`)}
             >
               <span class="nav-icon">·</span>
               {serviceModule.title}
@@ -208,7 +227,8 @@
           <a
             class="nav-item nav-item--sub"
             class:active={currentPathname.startsWith('/global-settings')}
-            href="/global-settings"
+            href={appHref('/global-settings')}
+            data-tour="nav-global-settings"
           >
             <span class="nav-icon nav-icon--gear">⚙</span>
             Global Settings
@@ -229,7 +249,7 @@
           {#if crumb.current}
             <span class="segment current" aria-current="page">{crumb.label}</span>
           {:else}
-            <a class="segment" href={crumb.href}>{crumb.label}</a>
+            <a class="segment" href={appHref(crumb.href)}>{crumb.label}</a>
           {/if}
         {/each}
       </nav>
@@ -238,7 +258,7 @@
         <button class="btn btn-ghost btn-sm cmdk-trigger" type="button" onclick={() => (paletteOpen = true)} aria-label="Open command palette">
           Search <kbd>⌘K</kbd>
         </button>
-        <button class="btn btn-ghost btn-sm" type="button" onclick={handleRefresh}>
+        <button class="btn btn-ghost btn-sm" type="button" onclick={handleRefresh} data-tour="refresh">
           ⟳ Refresh
         </button>
       </div>
@@ -251,6 +271,10 @@
 </div>
 
 <CommandPalette bind:open={paletteOpen} />
+
+{#if DemoShell}
+  <DemoShell />
+{/if}
 
 <style>
   .nav-subsection {

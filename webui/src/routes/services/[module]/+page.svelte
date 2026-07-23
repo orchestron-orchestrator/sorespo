@@ -8,6 +8,7 @@
   import ConfirmDialog from '$lib/core/ui/ConfirmDialog.svelte';
   import { StatusFlash } from '$lib/core/ui/status-flash.svelte';
   import { onGlobalRefresh } from '$lib/core/util/global-refresh';
+  import { appHref } from '$lib/core/util/nav';
 
   import type { ServiceListItem } from '$lib/core/registry/types';
 
@@ -71,7 +72,7 @@
       <p>{serviceModule.description}</p>
     </div>
     <div>
-      <a class="btn btn-primary" href={`/services/${serviceModule.id}/new`}>Create new</a>
+      <a class="btn btn-primary" href={appHref(`/services/${serviceModule.id}/new`)} data-tour="service-create">Create new</a>
     </div>
   </div>
 
@@ -88,10 +89,10 @@
   {:else if items.length === 0}
     <div class="empty-state">No existing {serviceModule.collectionLabel.toLowerCase()} were returned by RESTCONF.</div>
   {:else}
-    <div class="service-list">
+    <div class="service-list" data-tour="service-list">
       {#each items as item}
         <article class="card service-list__item">
-          <a class="service-list__link" href={`/services/${serviceModule.id}/${encodeURIComponent(item.id)}`}>
+          <a class="service-list__link" href={appHref(`/services/${serviceModule.id}/${encodeURIComponent(item.id)}`)}>
             <div class="service-list__copy">
               <h3>{item.label}</h3>
               {#if item.description}
@@ -117,7 +118,7 @@
           <div class="service-list__actions">
             <a
               class="btn btn-secondary btn-sm"
-              href={`/services/${serviceModule.id}/new?clone=${encodeURIComponent(item.id)}`}
+              href={appHref(`/services/${serviceModule.id}/new?clone=${encodeURIComponent(item.id)}`)}
             >
               Clone
             </a>
