@@ -1,63 +1,88 @@
-# StratoWeave Web UI
+# SORESPO Web UI
 
-This frontend is a SvelteKit application with an adapter-node build target.
+The SORESPO Web UI is a SvelteKit application. Each SORESPO test environment
+runs it as a Containerlab node alongside the `sweave` application container.
 
-## Running
+## Test Environments
 
-Install dependencies once (uses [bun](https://bun.sh/)):
-
-```bash
-cd webui && bun install
-```
-
-The webui only makes sense alongside a running StratoWeave backend, so its
-lifecycle is owned by the lab Makefiles in `test/quicklab-*/`. Pick a lab and
-start it together with the webui:
+Choose an environment under `test/` and run its Make targets from the repository
+root. For example:
 
 ```bash
-make -C test/quicklab-srl start WEBUI=true
+TESTENV=test/quicklab-srl
+make -C "$TESTENV" start
 ```
 
-`make start` prints the dynamic URL of the sweave backend; the webui dev
-server itself listens on `http://localhost:3000` and proxies `/api/*` to that
-backend.
+The Web UI is available at <http://localhost:3000> even when
+SORESPO is not yet running inside `sweave`.
 
-Useful targets (run from inside any `test/quicklab-*/` directory):
+```bash
+make -C "$TESTENV" stop
+```
 
-- `make api-url`   — print the discovered backend URL
-- `make start-webui` — start the webui dev server (lab must be running)
-- `make stop-webui`  — stop the webui dev server
+Set `WEBUI_PORT` to change the host port or `WEBUI_IMAGE` to use another image.
 
-## Demo build
+## Local Development
 
-`bun run build:demo` produces a fully static, self-contained demo of the UI
-(no backend, no Node at runtime): every `/api/*` call is answered by an
-in-memory mock with sample data modeled on the quicklab-srl lab, and a guided
-tour introduces each page. The build uses `@sveltejs/adapter-static` with
-SvelteKit's hash router, so the output in `build/` can be served from any
-static host and any subdirectory — this is what powers the interactive demo
-on [stratoweave.org](https://www.stratoweave.org/tutorials/exploring-the-webui/).
+Install [Bun](https://bun.sh/) and the frontend dependencies:
 
-`PUBLIC_DEMO=1 bun run dev` runs the same demo mode on the dev server, which
-is the fastest way to iterate on the mock data (`src/lib/demo/`) or the tour
-(`src/lib/demo/tour/steps.ts`). Normal builds contain none of the demo code
-(the entry points are stubbed out in `vite.config.ts`).
+```bash
+cd webui
+bun install --frozen-lockfile
+cd ..
+```
 
-## Route Areas
+With the selected test environment running, replace its Web UI node with Vite:
 
-- `/devices`
-- `/operations/config-queue`
-- `/services`
+```bash
+make -C "$TESTENV" dev-webui
+```
 
-## API Integration
+Vite serves <http://localhost:3000>, proxies API requests to the running
+`sweave` container, and reloads changes under `webui/src`.
 
-The browser only talks to same-origin paths under `/api/*`, which the server
-side (the `handle` hook in `src/hooks.server.ts`) proxies upstream.
+```bash
+make -C "$TESTENV" stop-dev-webui
+make -C "$TESTENV" restore-webui
+```
 
-- `/api/*` proxies to the StratoWeave backend
-- `/api/restconf/*` proxies to the backend RESTCONF interface
+`stop-dev-webui` stops Vite. `restore-webui` stops Vite and restarts the
+Containerlab Web UI node.
 
-The upstream origin is read from `STRATOWEAVE_API_ORIGIN`. The lab Makefile
-discovers the sweave container's host port via `docker port` and sets this
-automatically. If the variable is unset (e.g. lab not running), requests fail
-with a 502 explaining what's missing.
+Run checks and builds from `webui/`:
+
+```bash
+bun run check
+bun run build
+```
+
+## Build a Local Image
+
+Build and use the adapter-node image without publishing it:
+
+```bash
+docker build -t sorespo-webui:local webui
+make -C "$TESTENV" start WEBUI_IMAGE=sorespo-webui:local
+```
+
+The default image is `ghcr.io/stratoweave/sorespo-webui:tip`. Images listen on
+port 3000 and read the SORESPO backend URL from `STRATOWEAVE_API_ORIGIN`.
+
+## Demo
+
+The static demo uses in-memory sample data and does not require SORESPO:
+
+```bash
+cd webui
+bun run build:demo
+PUBLIC_DEMO=1 bun run dev
+```
+
+`build:demo` writes the deployable static site to `build/`. Demo mode powers
+the [interactive tour](https://www.stratoweave.org/tutorials/exploring-the-webui/).
+
+## API Proxy
+
+The browser sends same-origin requests to `/api/*`. In normal builds,
+`src/hooks.server.ts` forwards them to `STRATOWEAVE_API_ORIGIN`. The test
+environment sets this variable for both the Web UI node and Vite server.

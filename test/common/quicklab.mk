@@ -33,12 +33,9 @@ licenses/%:
 start: build-sweave-image
 	$(CLAB_BIN) deploy --topo $(TESTENV:sorespo-%=%).clab.yml --log-level debug --reconfigure
 	@$(MAKE) --no-print-directory api-url
-	@if [ "$(WEBUI)" = "true" ]; then \
-		$(MAKE) start-webui; \
-	fi
+	@echo "SORESPO Web UI: http://localhost:$(WEBUI_PORT)"
 
 WEBUI_HOST ?= 127.0.0.1
-WEBUI_PORT ?= 3000
 WEBUI_PIDFILE ?= logs/webui-dev.pid
 WEBUI_LOG ?= logs/webui-dev.log
 WEBUI_PATH := $(abspath ../../webui)
@@ -47,8 +44,9 @@ WEBUI_PATH := $(abspath ../../webui)
 api-url:
 	@echo "$(STRATOWEAVE_API_ORIGIN)"
 
-.PHONY: start-webui
-start-webui:
+.PHONY: dev-webui
+dev-webui:
+	@docker stop $(TESTENV)-webui >/dev/null 2>&1 || true
 	@mkdir -p logs
 	@listener_pid=$$(lsof -iTCP:$(WEBUI_PORT) -sTCP:LISTEN -n -P -t 2>/dev/null | head -n 1); \
 	if [ -n "$$listener_pid" ]; then \
@@ -65,14 +63,14 @@ start-webui:
 	@other_webui_pids=$$(pgrep -f "$(WEBUI_PATH)/[n]ode_modules/.bin/vite dev" 2>/dev/null); \
 	if [ -n "$$other_webui_pids" ]; then \
 		echo "Found existing WebUI dev process(es): $$other_webui_pids"; \
-		echo "Run 'make stop-webui' first"; \
+		echo "Run 'make stop-dev-webui' first"; \
 		exit 1; \
 	fi
 	@if [ -f "$(WEBUI_PIDFILE)" ]; then \
 		pid=$$(cat "$(WEBUI_PIDFILE)"); \
 		if kill -0 "$$pid" 2>/dev/null; then \
 			echo "Tracked WebUI process $$pid is still running but not listening on port $(WEBUI_PORT)"; \
-			echo "Run 'make stop-webui' first"; \
+			echo "Run 'make stop-dev-webui' first"; \
 			exit 1; \
 		fi; \
 		rm -f "$(WEBUI_PIDFILE)"; \
@@ -93,8 +91,8 @@ start-webui:
 		exit 1; \
 	fi
 
-.PHONY: stop-webui
-stop-webui:
+.PHONY: stop-dev-webui
+stop-dev-webui:
 	@stopped=0; \
 	for pid in $$(pgrep -f "$(WEBUI_PATH)/[n]ode_modules/.bin/vite dev" 2>/dev/null); do \
 		if [ "$$pid" != "$$$$" ]; then \
@@ -125,6 +123,11 @@ stop-webui:
 	else \
 		echo "WebUI dev server is not running"; \
 	fi
+
+.PHONY: restore-webui
+restore-webui: stop-dev-webui
+	@docker start $(TESTENV)-webui >/dev/null
+	@echo "Containerlab Web UI restored on http://localhost:$(WEBUI_PORT)"
 
 .PHONY: stop
 stop:

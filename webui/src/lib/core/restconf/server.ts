@@ -21,7 +21,7 @@ export async function proxyRequest(request: Request, targetPath: string, search 
     return Response.json(
       {
         message:
-          'STRATOWEAVE_API_ORIGIN is not set. Start the webui via `make -C test/quicklab-* start-webui` (auto-discovers the lab) or export STRATOWEAVE_API_ORIGIN explicitly.'
+          'STRATOWEAVE_API_ORIGIN is not set. Start a quicklab environment or export STRATOWEAVE_API_ORIGIN explicitly.'
       },
       { status: 502 }
     );

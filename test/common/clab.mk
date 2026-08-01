@@ -1,6 +1,8 @@
 PROJECT_DIR:=$(realpath $(dir $(lastword $(MAKEFILE_LIST)))/../../)
 # Set this env var to empty string if you have local cRPD, XRd container images
 export IMAGE_PATH?=ghcr.io/stratoweave/
+export WEBUI_IMAGE?=ghcr.io/stratoweave/sorespo-webui:tip
+export WEBUI_PORT?=3000
 
 ifeq (true,$(REMOTE_CONTAINERS))
 CLAB_BIN:=containerlab
@@ -20,6 +22,8 @@ CLAB_BIN:=docker run --rm $(INTERACTIVE) --privileged \
     --pid="host" \
     -v $(PROJECT_DIR):$(PROJECT_DIR) \
     -e IMAGE_PATH=$(IMAGE_PATH) \
+    -e WEBUI_IMAGE=$(WEBUI_IMAGE) \
+    -e WEBUI_PORT=$(WEBUI_PORT) \
     -w $(CURDIR) \
     $(CLAB_CONTAINER_IMAGE) containerlab
 endif
