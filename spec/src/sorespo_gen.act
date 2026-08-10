@@ -2,26 +2,23 @@ import file
 import process
 
 import stratoweave.build
+import stratoweave.device_schema as swds
 import stratoweave.swyang as swyang
 import tmf.tmf_yang as tmf_yang
-from yang.transform_list_order import remove_list_user_order
-from yang.transform_filter_schema import filter_schema
 
 actor main(env):
     fc = file.FileCap(env.cap)
     pc = process.ProcessCap(env.cap)
 
-    def transform_list_order(dt):
-        paths = [
+    # JUNOS marks lists "ordered-by user" in many places where the order has no
+    # effect on the applied configuration.
+    crpd_order_paths = [
             "/jc:configuration/protocols/bgp/group/neighbor",
             "/jc:configuration/protocols/mpls/interface",
-        ]
-        remove_list_user_order(dt.root, paths)
-        return dt
+    ]
 
-    def transform_filter_xr(dt):
-        # Keep only the XR nodes that sorespo actively uses.
-        paths = [
+    # Keep only the XR nodes that sorespo actively uses.
+    xr_paths = [
     "/um-hostname-cfg:hostname",
     "/um-hostname-cfg:hostname/system-network-name",
     "/um-interface-cfg:interfaces",
@@ -160,13 +157,10 @@ actor main(env):
     "/pfi-im-cmd-oper:interfaces/interface-xr/interface/interface-statistics/full-interface-stats",
     "/pfi-im-cmd-oper:interfaces/interface-xr/interface/interface-statistics/full-interface-stats/packets-received",
 ]
-        filter_schema(dt.root, paths)
-        return dt
 
-    def transform_filter_crpd(dt):
-        # Keep only the cRPD configuration nodes that sorespo's RFS transforms
-        # actively write to.
-        paths = [
+    # Keep only the cRPD configuration nodes that sorespo's RFS transforms
+    # actively write to.
+    crpd_paths = [
     "/jc:configuration/interfaces/interface/description",
     "/jc:configuration/interfaces/interface/mac",
     "/jc:configuration/interfaces/interface/mtu",
@@ -270,13 +264,10 @@ actor main(env):
     "/jc:configuration/system/services/netconf/yang-compliant",
     "/jc:configuration/version",
 ]
-        filter_schema(dt.root, paths)
-        return dt
 
-    def transform_filter_srl(dt):
-        # Keep only the SRL configuration nodes that sorespo's RFS transforms
-        # actively write to.
-        paths = [
+    # Keep only the SRL configuration nodes that sorespo's RFS transforms
+    # actively write to.
+    srl_paths = [
     "/srl_nokia-system:system/name/host-name",
     "/srl_nokia-if:interface/name",
     "/srl_nokia-if:interface/description",
@@ -336,8 +327,6 @@ actor main(env):
     "/srl_nokia-tunnel-if:tunnel-interface/vxlan-interface/type",
     "/srl_nokia-tunnel-if:tunnel-interface/vxlan-interface/ingress/vni",
 ]
-        filter_schema(dt.root, paths)
-        return dt
 
     # The paths referenced by these leafrefs are invalid - missing module
     # imports. We explicitly allow resolving the target leaf type to fallback to
@@ -357,13 +346,6 @@ actor main(env):
     ]
 
     try:
-        stratoweave.build.apply_schema_transforms_to_dir(fc, "yang/CiscoIosXr_25_3_1", [
-            stratoweave.build.SchemaTransformChain(".*yang.orig", [stratoweave.build.SchemaTransformNoComments()])
-        ])
-        stratoweave.build.apply_schema_transforms_to_dir(fc, "yang/NokiaSRLinux_25_3_2", [
-            stratoweave.build.SchemaTransformChain(".*yang.orig", [stratoweave.build.SchemaTransformNoComments()])
-        ])
-
         cfs_layer = stratoweave.build.Layer.from_dir(fc, "yang/cfs")
         cfs_layer.models.extend([
             swyang.stratoweave,
@@ -382,14 +364,21 @@ actor main(env):
             inter_layer,
             rfs_layer,
         ], [
-            stratoweave.build.DeviceType.from_dir(fc, "CiscoIosXr_25_3_1", "yang/CiscoIosXr_25_3_1"),
-            stratoweave.build.DeviceType.from_dir(fc, "JuniperCRPD_24_4R1_9", "yang/JuniperCRPD_24_4R1_9"),
-            stratoweave.build.DeviceType.from_dir(fc, "NokiaSRLinux_25_3_2", "yang/NokiaSRLinux_25_3_2"),
+            stratoweave.build.DeviceType.from_dir(fc, "CiscoIosXr_25_3_1", "yang/CiscoIosXr_25_3_1",
+                transforms=[
+                    swds.filter_schema(xr_paths),
+                ]),
+            stratoweave.build.DeviceType.from_dir(fc, "JuniperCRPD_24_4R1_9", "yang/JuniperCRPD_24_4R1_9",
+                transforms=[
+                    swds.filter_schema(crpd_paths),
+                    swds.remove_list_user_order(crpd_order_paths),
+                ]),
+            stratoweave.build.DeviceType.from_dir(fc, "NokiaSRLinux_25_3_2", "yang/NokiaSRLinux_25_3_2",
+                transforms=[
+                    swds.filter_schema(srl_paths),
+                ]),
         ])
         compiled_spec = spec.compile(broken_leafrefs)
-        transform_list_order(transform_filter_crpd(compiled_spec.dev_types["JuniperCRPD_24_4R1_9"]))
-        transform_filter_srl(compiled_spec.dev_types["NokiaSRLinux_25_3_2"])
-        transform_filter_xr(compiled_spec.dev_types["CiscoIosXr_25_3_1"])
         compiled_spec.gen_app(fc, "../src/")
     except Exception as exc:
         print(exc, err=True)
