@@ -10,7 +10,7 @@ else ifeq (true,$(CODESPACES))
 CLAB_BIN:=containerlab
 else
 
-CLAB_VERSION?=0.76.1
+CLAB_VERSION?=0.78.0
 CLAB_CONTAINER_IMAGE?=ghcr.io/srl-labs/clab:$(CLAB_VERSION)
 # ${HOME}/.docker is mounted (read-only) for registry credentials. On macOS
 # (colima) it may also pick up the colima context from config.json, so we
