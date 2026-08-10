@@ -180,6 +180,11 @@ jobs:
         if: ${{ startsWith(env.IMAGE_PATH, 'ghcr.io') && (matrix.TESTENV == 'quicklab' || matrix.TESTENV == 'quicklab-crpd') }}
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      # Build the Web UI image locally so the lab tests this branch's webui
+      # code instead of pulling the published :tip image (the clab node uses
+      # image-pull-policy: if-not-present).
+      - name: "Build Web UI image"
+        run: docker build -t ghcr.io/stratoweave/sorespo-webui:tip webui
       - name: "Start quicklab"
         run: |
           make -C test/${{ matrix.TESTENV }} start
