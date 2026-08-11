@@ -82,12 +82,12 @@ class BaseConfig(base.BaseConfig):
             ip = dev.um_router_isis_cfg_router.isis.processes.process.create("1")
             ip.is_type = "level-2-only"
             ip.nets.net.create(net_clns_address)
-            af = ip.address_families.address_family.create("ipv4", "unicast")
+            af = ip.address_families.address_family.create(("ipv4", "unicast"))
             af.metric_style.create_wide()
 
             # Loopback0 IS-IS interface config
             lo0 = ip.interfaces.interface.create("Loopback0", state="passive")
-            lo0.address_families.address_family.create("ipv4", "unicast")
+            lo0.address_families.address_family.create(("ipv4", "unicast"))
 
             # BGP global config
             bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(i.asn)
@@ -289,7 +289,7 @@ class BBInterface(base.BBInterface):
             # IS-IS config for this interface
             ip = dev.um_router_isis_cfg_router.isis.processes.process.create("1")
             ci = ip.interfaces.interface.create(i.name, circuit_type="level-2-only", point_to_point=True)
-            af = ci.address_families.address_family.create("ipv4", "unicast")
+            af = ci.address_families.address_family.create(("ipv4", "unicast"))
             af.metric_levels.metric_level.create(2, default_metric=5000)
 
             # MPLS and LDP config for this interface
@@ -403,8 +403,8 @@ class Vrf(base.Vrf):
             # Create global VRF
             vrf = dev.vrfs.vrf.create(i.name)
             ipv4_unicast = vrf.address_family.ipv4.create_unicast()
-            ipv4_unicast.import_.route_target.two_byte_as_route_targets.two_byte_as_route_target.create(i.asn, i.id, "disable")
-            ipv4_unicast.export.route_target.two_byte_as_route_targets.two_byte_as_route_target.create(i.asn, i.id, "disable")
+            ipv4_unicast.import_.route_target.two_byte_as_route_targets.two_byte_as_route_target.create((i.asn, i.id, "disable"))
+            ipv4_unicast.export.route_target.two_byte_as_route_targets.two_byte_as_route_target.create((i.asn, i.id, "disable"))
 
             # Create RD in BGP VRF
             bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(i.asn)
