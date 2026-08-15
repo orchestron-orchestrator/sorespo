@@ -3,9 +3,9 @@
 # WARNING WARNING WARNING WARNING WARNING
 
 import logging
-import lmdb
 
 import stratoweave.app as swapp
+import stratoweave.db as swdb
 import stratoweave.device as swdev
 import stratoweave.adapters.netconf as swna
 import stratoweave.ttt as ttt
@@ -27,7 +27,7 @@ import sorespo.devices.JuniperCRPD_24_4R1_9_oper as dev_JuniperCRPD_24_4R1_9_ope
 import sorespo.devices.NokiaSRLinux_25_3_2 as dev_NokiaSRLinux_25_3_2
 import sorespo.devices.NokiaSRLinux_25_3_2_oper as dev_NokiaSRLinux_25_3_2_oper
 
-def get_layers(dev_registry: swdev.DeviceRegistry, log_handler: ?logging.Handler=None, db: ?lmdb.Db=None):
+def get_layers(dev_registry: swdev.DeviceRegistry, log_handler: ?logging.Handler=None, db: ?swdb.Store=None):
     layer3 = ttt.Layer('3', t_3.get_ttt(None, dev_registry, log_handler), None, db)
     layer2 = ttt.Layer('2', t_2.get_ttt(layer3, dev_registry, log_handler), layer3, db)
     layer1 = ttt.Layer('1', t_1.get_ttt(layer2, dev_registry, log_handler), layer2, db)
