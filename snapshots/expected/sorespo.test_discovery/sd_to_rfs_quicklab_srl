@@ -1,0 +1,250 @@
+# === Layer 2 adata ===
+# Top node: /
+l2 = root()
+
+# List /device element: AMS-CORE-1
+device_element = l2.device.create('AMS-CORE-1', type='NokiaSRLinux_25_3_2')
+
+# List /device[name='AMS-CORE-1']/address element: oob
+address_element = device_element.address.create('oob', address='AMS-CORE-1')
+
+# Container: /device[name='AMS-CORE-1']/credentials
+device_element.credentials.username = 'clab'
+device_element.credentials.password = 'clab@123'
+
+# Container: /device[name='AMS-CORE-1']/mock
+device_element.mock.enabled = True
+
+# List /device element: FRA-CORE-1
+device_element = l2.device.create('FRA-CORE-1', type='NokiaSRLinux_25_3_2')
+
+# List /device[name='FRA-CORE-1']/address element: oob
+address_element = device_element.address.create('oob', address='FRA-CORE-1')
+
+# Container: /device[name='FRA-CORE-1']/credentials
+device_element.credentials.username = 'clab'
+device_element.credentials.password = 'clab@123'
+
+# Container: /device[name='FRA-CORE-1']/mock
+device_element.mock.enabled = True
+
+# List /device element: LJU-CORE-1
+device_element = l2.device.create('LJU-CORE-1', type='NokiaSRLinux_25_3_2')
+
+# List /device[name='LJU-CORE-1']/address element: oob
+address_element = device_element.address.create('oob', address='LJU-CORE-1')
+
+# Container: /device[name='LJU-CORE-1']/credentials
+device_element.credentials.username = 'clab'
+device_element.credentials.password = 'clab@123'
+
+# Container: /device[name='LJU-CORE-1']/mock
+device_element.mock.enabled = True
+
+# List /device element: STO-CORE-1
+device_element = l2.device.create('STO-CORE-1', type='NokiaSRLinux_25_3_2')
+
+# List /device[name='STO-CORE-1']/address element: oob
+address_element = device_element.address.create('oob', address='STO-CORE-1')
+
+# Container: /device[name='STO-CORE-1']/credentials
+device_element.credentials.username = 'clab'
+device_element.credentials.password = 'clab@123'
+
+# Container: /device[name='STO-CORE-1']/mock
+device_element.mock.enabled = True
+
+# List /rfs element: AMS-CORE-1
+rfs_element = l2.rfs.create('AMS-CORE-1')
+
+# Container: /rfs[name='AMS-CORE-1']/base-config
+rfs_element.base_config.role = 'edge'
+rfs_element.base_config.ipv4_address = '10.0.0.1'
+rfs_element.base_config.ipv6_address = '2001:db8:0:0::1'
+rfs_element.base_config.asn = u64(65001)
+rfs_element.base_config.ibgp_authentication_key = 'ibgp-authentication-key'
+
+# List /rfs[name='AMS-CORE-1']/backbone-interface element: ethernet-1/1
+backbone_interface_element = rfs_element.backbone_interface.create('ethernet-1/1', ipv4_address='10.0.7.1', ipv4_prefix_length=u64(30), monitor_traffic=False)
+
+# Container: /rfs[name='AMS-CORE-1']/backbone-interface[name='ethernet-1/1']/remote
+backbone_interface_element.remote.device = 'FRA-CORE-1'
+backbone_interface_element.remote.interface = 'ethernet-1/1'
+
+# List /rfs[name='AMS-CORE-1']/backbone-interface element: ethernet-1/2
+backbone_interface_element = rfs_element.backbone_interface.create('ethernet-1/2', ipv4_address='10.0.20.1', ipv4_prefix_length=u64(30), monitor_traffic=False)
+
+# Container: /rfs[name='AMS-CORE-1']/backbone-interface[name='ethernet-1/2']/remote
+backbone_interface_element.remote.device = 'STO-CORE-1'
+backbone_interface_element.remote.interface = 'ethernet-1/1'
+
+# List /rfs[name='AMS-CORE-1']/ibgp-neighbor element: 10.0.0.2
+ibgp_neighbor_element = rfs_element.ibgp_neighbor.create('10.0.0.2', asn=u64(65001), description='FRA-CORE-1')
+
+# List /rfs[name='AMS-CORE-1']/ibgp-neighbor element: 10.0.0.3
+ibgp_neighbor_element = rfs_element.ibgp_neighbor.create('10.0.0.3', asn=u64(65001), description='STO-CORE-1')
+
+# List /rfs[name='AMS-CORE-1']/ibgp-neighbor element: 10.0.0.4
+ibgp_neighbor_element = rfs_element.ibgp_neighbor.create('10.0.0.4', asn=u64(65001), description='LJU-CORE-1')
+
+# List /rfs[name='AMS-CORE-1']/vrf element: acme-65501
+vrf_element = rfs_element.vrf.create('acme-65501', id=u64(65501), router_id=u64(1), asn=u64(65001))
+
+# List /rfs[name='AMS-CORE-1']/vrf-interface element: ethernet-1/3.100
+vrf_interface_element = rfs_element.vrf_interface.create('ethernet-1/3.100', description='Customer VPN access SITE-1 [SNA-1-1] in VPN acme-65501', vrf='acme-65501', ipv4_address='10.201.1.1', ipv4_prefix_length=u64(30))
+
+# List /rfs[name='AMS-CORE-1']/ebgp-customer element: acme-65501,10.201.1.2
+ebgp_customer_element = rfs_element.ebgp_customer.create((vrf='acme-65501', address='10.201.1.2'), local_asn=u64(65001), peer_asn=u64(65501), description='Customer VPN access SITE-1 [SNA-1-1] in VPN acme-65501', authentication_key='$aes1$ATe9/PELXosG+m8=$gm5vY3VoiiuzkiYoH+959A==')
+
+# List /rfs element: FRA-CORE-1
+rfs_element = l2.rfs.create('FRA-CORE-1')
+
+# Container: /rfs[name='FRA-CORE-1']/base-config
+rfs_element.base_config.role = 'edge'
+rfs_element.base_config.ipv4_address = '10.0.0.2'
+rfs_element.base_config.ipv6_address = '2001:db8:0:0::2'
+rfs_element.base_config.asn = u64(65001)
+rfs_element.base_config.ibgp_authentication_key = 'ibgp-authentication-key'
+
+# List /rfs[name='FRA-CORE-1']/backbone-interface element: ethernet-1/1
+backbone_interface_element = rfs_element.backbone_interface.create('ethernet-1/1', ipv4_address='10.0.7.2', ipv4_prefix_length=u64(30), monitor_traffic=False)
+
+# Container: /rfs[name='FRA-CORE-1']/backbone-interface[name='ethernet-1/1']/remote
+backbone_interface_element.remote.device = 'AMS-CORE-1'
+backbone_interface_element.remote.interface = 'ethernet-1/1'
+
+# List /rfs[name='FRA-CORE-1']/backbone-interface element: ethernet-1/2
+backbone_interface_element = rfs_element.backbone_interface.create('ethernet-1/2', ipv4_address='10.0.25.1', ipv4_prefix_length=u64(30), monitor_traffic=False)
+
+# Container: /rfs[name='FRA-CORE-1']/backbone-interface[name='ethernet-1/2']/remote
+backbone_interface_element.remote.device = 'STO-CORE-1'
+backbone_interface_element.remote.interface = 'ethernet-1/2'
+
+# List /rfs[name='FRA-CORE-1']/backbone-interface element: ethernet-1/3
+backbone_interface_element = rfs_element.backbone_interface.create('ethernet-1/3', ipv4_address='10.0.18.1', ipv4_prefix_length=u64(30), monitor_traffic=False)
+
+# Container: /rfs[name='FRA-CORE-1']/backbone-interface[name='ethernet-1/3']/remote
+backbone_interface_element.remote.device = 'LJU-CORE-1'
+backbone_interface_element.remote.interface = 'ethernet-1/1'
+
+# List /rfs[name='FRA-CORE-1']/ibgp-neighbor element: 10.0.0.1
+ibgp_neighbor_element = rfs_element.ibgp_neighbor.create('10.0.0.1', asn=u64(65001), description='AMS-CORE-1')
+
+# List /rfs[name='FRA-CORE-1']/ibgp-neighbor element: 10.0.0.3
+ibgp_neighbor_element = rfs_element.ibgp_neighbor.create('10.0.0.3', asn=u64(65001), description='STO-CORE-1')
+
+# List /rfs[name='FRA-CORE-1']/ibgp-neighbor element: 10.0.0.4
+ibgp_neighbor_element = rfs_element.ibgp_neighbor.create('10.0.0.4', asn=u64(65001), description='LJU-CORE-1')
+
+# List /rfs[name='FRA-CORE-1']/vrf element: acme-65501
+vrf_element = rfs_element.vrf.create('acme-65501', id=u64(65501), router_id=u64(2), asn=u64(65001))
+
+# List /rfs[name='FRA-CORE-1']/vrf-interface element: ethernet-1/4.100
+vrf_interface_element = rfs_element.vrf_interface.create('ethernet-1/4.100', description='Customer VPN access SITE-2 [SNA-2-1] in VPN acme-65501', vrf='acme-65501', ipv4_address='10.202.1.1', ipv4_prefix_length=u64(30))
+
+# List /rfs[name='FRA-CORE-1']/ebgp-customer element: acme-65501,10.202.1.2
+ebgp_customer_element = rfs_element.ebgp_customer.create((vrf='acme-65501', address='10.202.1.2'), local_asn=u64(65001), peer_asn=u64(65501), description='Customer VPN access SITE-2 [SNA-2-1] in VPN acme-65501', authentication_key='$aes1$ATfVeJp0Ro4EYm8=$U/2B49m7S7sWV9uKausk5Q==')
+
+# List /rfs element: LJU-CORE-1
+rfs_element = l2.rfs.create('LJU-CORE-1')
+
+# Container: /rfs[name='LJU-CORE-1']/base-config
+rfs_element.base_config.role = 'edge'
+rfs_element.base_config.ipv4_address = '10.0.0.4'
+rfs_element.base_config.ipv6_address = '2001:db8:0:0::4'
+rfs_element.base_config.asn = u64(65001)
+rfs_element.base_config.ibgp_authentication_key = 'ibgp-authentication-key'
+
+# List /rfs[name='LJU-CORE-1']/backbone-interface element: ethernet-1/1
+backbone_interface_element = rfs_element.backbone_interface.create('ethernet-1/1', ipv4_address='10.0.18.2', ipv4_prefix_length=u64(30), monitor_traffic=False)
+
+# Container: /rfs[name='LJU-CORE-1']/backbone-interface[name='ethernet-1/1']/remote
+backbone_interface_element.remote.device = 'FRA-CORE-1'
+backbone_interface_element.remote.interface = 'ethernet-1/3'
+
+# List /rfs[name='LJU-CORE-1']/backbone-interface element: ethernet-1/2
+backbone_interface_element = rfs_element.backbone_interface.create('ethernet-1/2', ipv4_address='10.0.31.2', ipv4_prefix_length=u64(30), monitor_traffic=False)
+
+# Container: /rfs[name='LJU-CORE-1']/backbone-interface[name='ethernet-1/2']/remote
+backbone_interface_element.remote.device = 'STO-CORE-1'
+backbone_interface_element.remote.interface = 'ethernet-1/3'
+
+# List /rfs[name='LJU-CORE-1']/ibgp-neighbor element: 10.0.0.1
+ibgp_neighbor_element = rfs_element.ibgp_neighbor.create('10.0.0.1', asn=u64(65001), description='AMS-CORE-1')
+
+# List /rfs[name='LJU-CORE-1']/ibgp-neighbor element: 10.0.0.2
+ibgp_neighbor_element = rfs_element.ibgp_neighbor.create('10.0.0.2', asn=u64(65001), description='FRA-CORE-1')
+
+# List /rfs[name='LJU-CORE-1']/ibgp-neighbor element: 10.0.0.3
+ibgp_neighbor_element = rfs_element.ibgp_neighbor.create('10.0.0.3', asn=u64(65001), description='STO-CORE-1')
+
+# List /rfs[name='LJU-CORE-1']/vrf element: acme-65501
+vrf_element = rfs_element.vrf.create('acme-65501', id=u64(65501), router_id=u64(4), asn=u64(65001))
+
+# List /rfs[name='LJU-CORE-1']/vrf-interface element: ethernet-1/3.100
+vrf_interface_element = rfs_element.vrf_interface.create('ethernet-1/3.100', description='Customer VPN access SITE-4 [SNA-4-1] in VPN acme-65501', vrf='acme-65501', ipv4_address='10.204.1.1', ipv4_prefix_length=u64(30))
+
+# List /rfs[name='LJU-CORE-1']/ebgp-customer element: acme-65501,10.204.1.2
+ebgp_customer_element = rfs_element.ebgp_customer.create((vrf='acme-65501', address='10.204.1.2'), local_asn=u64(65001), peer_asn=u64(65501), description='Customer VPN access SITE-4 [SNA-4-1] in VPN acme-65501', authentication_key='$aes1$ATd1WtVHSenEoW8=$vcB8Bo1ewGRol5FjG+bWGA==')
+
+# List /rfs element: STO-CORE-1
+rfs_element = l2.rfs.create('STO-CORE-1')
+
+# Container: /rfs[name='STO-CORE-1']/base-config
+rfs_element.base_config.role = 'edge'
+rfs_element.base_config.ipv4_address = '10.0.0.3'
+rfs_element.base_config.ipv6_address = '2001:db8:0:0::3'
+rfs_element.base_config.asn = u64(65001)
+rfs_element.base_config.ibgp_authentication_key = 'ibgp-authentication-key'
+
+# List /rfs[name='STO-CORE-1']/backbone-interface element: ethernet-1/1
+backbone_interface_element = rfs_element.backbone_interface.create('ethernet-1/1', ipv4_address='10.0.20.2', ipv4_prefix_length=u64(30), monitor_traffic=False)
+
+# Container: /rfs[name='STO-CORE-1']/backbone-interface[name='ethernet-1/1']/remote
+backbone_interface_element.remote.device = 'AMS-CORE-1'
+backbone_interface_element.remote.interface = 'ethernet-1/2'
+
+# List /rfs[name='STO-CORE-1']/backbone-interface element: ethernet-1/2
+backbone_interface_element = rfs_element.backbone_interface.create('ethernet-1/2', ipv4_address='10.0.25.2', ipv4_prefix_length=u64(30), monitor_traffic=False)
+
+# Container: /rfs[name='STO-CORE-1']/backbone-interface[name='ethernet-1/2']/remote
+backbone_interface_element.remote.device = 'FRA-CORE-1'
+backbone_interface_element.remote.interface = 'ethernet-1/2'
+
+# List /rfs[name='STO-CORE-1']/backbone-interface element: ethernet-1/3
+backbone_interface_element = rfs_element.backbone_interface.create('ethernet-1/3', ipv4_address='10.0.31.1', ipv4_prefix_length=u64(30), monitor_traffic=False)
+
+# Container: /rfs[name='STO-CORE-1']/backbone-interface[name='ethernet-1/3']/remote
+backbone_interface_element.remote.device = 'LJU-CORE-1'
+backbone_interface_element.remote.interface = 'ethernet-1/2'
+
+# List /rfs[name='STO-CORE-1']/ibgp-neighbor element: 10.0.0.1
+ibgp_neighbor_element = rfs_element.ibgp_neighbor.create('10.0.0.1', asn=u64(65001), description='AMS-CORE-1')
+
+# List /rfs[name='STO-CORE-1']/ibgp-neighbor element: 10.0.0.2
+ibgp_neighbor_element = rfs_element.ibgp_neighbor.create('10.0.0.2', asn=u64(65001), description='FRA-CORE-1')
+
+# List /rfs[name='STO-CORE-1']/ibgp-neighbor element: 10.0.0.4
+ibgp_neighbor_element = rfs_element.ibgp_neighbor.create('10.0.0.4', asn=u64(65001), description='LJU-CORE-1')
+
+# List /rfs[name='STO-CORE-1']/vrf element: acme-65501
+vrf_element = rfs_element.vrf.create('acme-65501', id=u64(65501), router_id=u64(3), asn=u64(65001))
+
+# List /rfs[name='STO-CORE-1']/vrf-interface element: ethernet-1/4.100
+vrf_interface_element = rfs_element.vrf_interface.create('ethernet-1/4.100', description='Customer VPN access SITE-3 [SNA-3-1] in VPN acme-65501', vrf='acme-65501', ipv4_address='10.203.1.1', ipv4_prefix_length=u64(30))
+
+# List /rfs[name='STO-CORE-1']/ebgp-customer element: acme-65501,10.203.1.2
+ebgp_customer_element = rfs_element.ebgp_customer.create((vrf='acme-65501', address='10.203.1.2'), local_asn=u64(65001), peer_asn=u64(65501), description='Customer VPN access SITE-3 [SNA-3-1] in VPN acme-65501', authentication_key='$aes1$ATdYAVdNTHoaSm8=$fu2H4+wHTwRHFllmIHhUGg==')
+
+# === Round-trip diff (per device) ===
+# device AMS-CORE-1
+no diff
+
+# device FRA-CORE-1
+no diff
+
+# device LJU-CORE-1
+no diff
+
+# device STO-CORE-1
+no diff

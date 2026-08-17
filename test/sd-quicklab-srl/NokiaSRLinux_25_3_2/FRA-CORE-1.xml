@@ -1,0 +1,279 @@
+<data>
+  <system xmlns="urn:nokia.com:srlinux:general:system">
+    <name xmlns="urn:nokia.com:srlinux:chassis:system-name">
+      <host-name>FRA-CORE-1</host-name>
+    </name>
+  </system>
+  <interface xmlns="urn:nokia.com:srlinux:chassis:interfaces">
+    <name>ethernet-1/1</name>
+    <description>Link to AMS-CORE-1 [ethernet-1/1]</description>
+    <admin-state>enable</admin-state>
+    <subinterface>
+      <index>0</index>
+      <description>Link to AMS-CORE-1 [ethernet-1/1]</description>
+      <admin-state>enable</admin-state>
+      <ipv4>
+        <admin-state>enable</admin-state>
+        <address>
+          <ip-prefix>10.0.7.2/30</ip-prefix>
+        </address>
+      </ipv4>
+    </subinterface>
+  </interface>
+  <interface xmlns="urn:nokia.com:srlinux:chassis:interfaces">
+    <name>ethernet-1/2</name>
+    <description>Link to STO-CORE-1 [ethernet-1/2]</description>
+    <admin-state>enable</admin-state>
+    <subinterface>
+      <index>0</index>
+      <description>Link to STO-CORE-1 [ethernet-1/2]</description>
+      <admin-state>enable</admin-state>
+      <ipv4>
+        <admin-state>enable</admin-state>
+        <address>
+          <ip-prefix>10.0.25.1/30</ip-prefix>
+        </address>
+      </ipv4>
+    </subinterface>
+  </interface>
+  <interface xmlns="urn:nokia.com:srlinux:chassis:interfaces">
+    <name>ethernet-1/3</name>
+    <description>Link to LJU-CORE-1 [ethernet-1/1]</description>
+    <admin-state>enable</admin-state>
+    <subinterface>
+      <index>0</index>
+      <description>Link to LJU-CORE-1 [ethernet-1/1]</description>
+      <admin-state>enable</admin-state>
+      <ipv4>
+        <admin-state>enable</admin-state>
+        <address>
+          <ip-prefix>10.0.18.1/30</ip-prefix>
+        </address>
+      </ipv4>
+    </subinterface>
+  </interface>
+  <interface xmlns="urn:nokia.com:srlinux:chassis:interfaces">
+    <name>ethernet-1/4</name>
+    <admin-state>enable</admin-state>
+    <subinterface>
+      <index>100</index>
+      <description>Customer VPN access SITE-2 [SNA-2-1] in VPN acme-65501</description>
+      <admin-state>enable</admin-state>
+      <ipv4>
+        <admin-state>enable</admin-state>
+        <address>
+          <ip-prefix>10.202.1.1/30</ip-prefix>
+        </address>
+      </ipv4>
+      <vlan xmlns="urn:nokia.com:srlinux:chassis:interfaces-vlans">
+        <encap>
+          <single-tagged>
+            <vlan-id>100</vlan-id>
+          </single-tagged>
+        </encap>
+      </vlan>
+    </subinterface>
+    <vlan-tagging xmlns="urn:nokia.com:srlinux:chassis:interfaces-vlans">true</vlan-tagging>
+  </interface>
+  <interface xmlns="urn:nokia.com:srlinux:chassis:interfaces">
+    <name>mgmt0</name>
+    <admin-state>enable</admin-state>
+    <subinterface>
+      <index>0</index>
+      <admin-state>enable</admin-state>
+      <ipv4>
+        <admin-state>enable</admin-state>
+      </ipv4>
+      <ipv6>
+        <admin-state>enable</admin-state>
+      </ipv6>
+    </subinterface>
+  </interface>
+  <interface xmlns="urn:nokia.com:srlinux:chassis:interfaces">
+    <name>system0</name>
+    <subinterface>
+      <index>0</index>
+      <ipv4>
+        <admin-state>enable</admin-state>
+        <address>
+          <ip-prefix>10.0.0.2/32</ip-prefix>
+        </address>
+      </ipv4>
+    </subinterface>
+  </interface>
+  <network-instance xmlns="urn:nokia.com:srlinux:net-inst:network-instance">
+    <name>acme-65501</name>
+    <type xmlns:srl_nokia-network-instance="urn:nokia.com:srlinux:net-inst:network-instance">
+      srl_nokia-network-instance:ip-vrf</type>
+    <admin-state>enable</admin-state>
+    <interface>
+      <name>ethernet-1/4.100</name>
+    </interface>
+    <vxlan-interface>
+      <name>vxlan1.65501</name>
+    </vxlan-interface>
+    <protocols>
+      <bgp-evpn>
+        <bgp-instance xmlns="urn:nokia.com:srlinux:net-inst:bgp-evpn">
+          <id>1</id>
+          <admin-state>enable</admin-state>
+          <vxlan-interface>vxlan1.65501</vxlan-interface>
+          <evi>65501</evi>
+        </bgp-instance>
+      </bgp-evpn>
+      <bgp xmlns="urn:nokia.com:srlinux:bgp:bgp">
+        <autonomous-system>65001</autonomous-system>
+        <router-id>10.0.0.2</router-id>
+        <ebgp-default-policy>
+          <import-reject-all>false</import-reject-all>
+          <export-reject-all>false</export-reject-all>
+        </ebgp-default-policy>
+        <afi-safi>
+          <afi-safi-name xmlns:srl_nokia-common="urn:nokia.com:srlinux:general:common">
+            srl_nokia-common:ipv4-unicast</afi-safi-name>
+          <admin-state>enable</admin-state>
+        </afi-safi>
+        <group>
+          <group-name>customer</group-name>
+          <send-default-route>
+            <ipv4-unicast>true</ipv4-unicast>
+          </send-default-route>
+        </group>
+        <neighbor>
+          <peer-address>10.202.1.2</peer-address>
+          <peer-as>65501</peer-as>
+          <peer-group>customer</peer-group>
+          <authentication>
+            <password>$aes1$ATfVeJp0Ro4EYm8=$U/2B49m7S7sWV9uKausk5Q==</password>
+          </authentication>
+        </neighbor>
+      </bgp>
+      <bgp-vpn xmlns="urn:nokia.com:srlinux:bgp:bgp-vpn">
+        <bgp-instance>
+          <id>1</id>
+          <route-target>
+            <export-rt>target:65001:65501</export-rt>
+            <import-rt>target:65001:65501</import-rt>
+          </route-target>
+        </bgp-instance>
+      </bgp-vpn>
+    </protocols>
+  </network-instance>
+  <network-instance xmlns="urn:nokia.com:srlinux:net-inst:network-instance">
+    <name>default</name>
+    <interface>
+      <name>ethernet-1/1.0</name>
+    </interface>
+    <interface>
+      <name>ethernet-1/2.0</name>
+    </interface>
+    <interface>
+      <name>ethernet-1/3.0</name>
+    </interface>
+    <interface>
+      <name>system0.0</name>
+    </interface>
+    <protocols>
+      <isis xmlns="urn:nokia.com:srlinux:isis:isis">
+        <instance>
+          <name>quicklab</name>
+          <admin-state>enable</admin-state>
+          <net>49.0001.0100.0000.0002.00</net>
+          <level-capability>L2</level-capability>
+          <ipv4-unicast>
+            <admin-state>enable</admin-state>
+          </ipv4-unicast>
+          <interface>
+            <interface-name>ethernet-1/1.0</interface-name>
+            <admin-state>enable</admin-state>
+            <circuit-type>point-to-point</circuit-type>
+            <level>
+              <level-number>2</level-number>
+              <metric>5000</metric>
+            </level>
+          </interface>
+          <interface>
+            <interface-name>ethernet-1/2.0</interface-name>
+            <admin-state>enable</admin-state>
+            <circuit-type>point-to-point</circuit-type>
+            <level>
+              <level-number>2</level-number>
+              <metric>5000</metric>
+            </level>
+          </interface>
+          <interface>
+            <interface-name>ethernet-1/3.0</interface-name>
+            <admin-state>enable</admin-state>
+            <circuit-type>point-to-point</circuit-type>
+            <level>
+              <level-number>2</level-number>
+              <metric>5000</metric>
+            </level>
+          </interface>
+          <interface>
+            <interface-name>system0.0</interface-name>
+            <admin-state>enable</admin-state>
+            <passive>true</passive>
+          </interface>
+        </instance>
+      </isis>
+      <bgp xmlns="urn:nokia.com:srlinux:bgp:bgp">
+        <autonomous-system>65001</autonomous-system>
+        <router-id>10.0.0.2</router-id>
+        <afi-safi>
+          <afi-safi-name xmlns:srl_nokia-common="urn:nokia.com:srlinux:general:common">
+            srl_nokia-common:evpn</afi-safi-name>
+          <admin-state>enable</admin-state>
+        </afi-safi>
+        <afi-safi>
+          <afi-safi-name xmlns:srl_nokia-common="urn:nokia.com:srlinux:general:common">
+            srl_nokia-common:ipv4-unicast</afi-safi-name>
+          <admin-state>enable</admin-state>
+        </afi-safi>
+        <group>
+          <group-name>IPV4-IBGP</group-name>
+          <peer-as>65001</peer-as>
+        </group>
+        <neighbor>
+          <peer-address>10.0.0.1</peer-address>
+          <admin-state>enable</admin-state>
+          <description>AMS-CORE-1</description>
+          <peer-group>IPV4-IBGP</peer-group>
+        </neighbor>
+        <neighbor>
+          <peer-address>10.0.0.3</peer-address>
+          <admin-state>enable</admin-state>
+          <description>STO-CORE-1</description>
+          <peer-group>IPV4-IBGP</peer-group>
+        </neighbor>
+        <neighbor>
+          <peer-address>10.0.0.4</peer-address>
+          <admin-state>enable</admin-state>
+          <description>LJU-CORE-1</description>
+          <peer-group>IPV4-IBGP</peer-group>
+        </neighbor>
+      </bgp>
+    </protocols>
+  </network-instance>
+  <network-instance xmlns="urn:nokia.com:srlinux:net-inst:network-instance">
+    <name>mgmt</name>
+    <type xmlns:srl_nokia-network-instance="urn:nokia.com:srlinux:net-inst:network-instance">
+      srl_nokia-network-instance:ip-vrf</type>
+    <admin-state>enable</admin-state>
+    <description>Management network instance</description>
+    <interface>
+      <name>mgmt0.0</name>
+    </interface>
+  </network-instance>
+  <tunnel-interface xmlns="urn:nokia.com:srlinux:vxlan:tunnel-interfaces">
+    <name>vxlan1</name>
+    <vxlan-interface>
+      <index>65501</index>
+      <type xmlns:srl_nokia-interfaces="urn:nokia.com:srlinux:chassis:interfaces">
+        srl_nokia-interfaces:routed</type>
+      <ingress>
+        <vni>65501</vni>
+      </ingress>
+    </vxlan-interface>
+  </tunnel-interface>
+</data>
