@@ -177,15 +177,18 @@ def discover_base_config(dev: gdata.Node, device_type: str, authentication_key_h
         if system0 is None:
             return None
 
-        ipv4_address: ?str = None
-
         subiface = system0!.subinterface.get(0)
-        if subiface is not None:
-            addrs = subiface.ipv4?.address
-            if addrs is not None:
-                for addr in addrs:
-                    ipv4_address = addr.ip_prefix.split("/")[0]
-                    break
+        if subiface is None:
+            return None
+        addrs = subiface!.ipv4?.address
+
+        ipv4_address: ?str = None
+        if addrs is not None:
+            for addr in addrs:
+                ipv4_address = addr.ip_prefix.split("/")[0]
+                break
+        else:
+            return None
 
         asn: ?u64 = None
         net_insts = srl_dev.network_instance
