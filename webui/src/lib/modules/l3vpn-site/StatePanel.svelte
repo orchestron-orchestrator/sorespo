@@ -10,7 +10,7 @@
 </script>
 
 {#each escalated as access}
-  <section class="bgp-state">
+  <section class="bgp-state" data-tour="site-monitoring">
     <header class="bgp-state__header">
       <span class="bgp-state__title">eBGP session · {access.siteNetworkAccessId}</span>
       <span class="bgp-state__badge">⚠ debug escalated</span>

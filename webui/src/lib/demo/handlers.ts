@@ -225,6 +225,22 @@ function upsertListEntry(list: Record<string, any>[], keyLeaf: string, entry: Re
   }
 }
 
+const SITE_BGP_SESSIONS_KEY = 'sorespo-ietf-l3vpn-svc:bgp-sessions';
+
+/** Apply site configuration without treating config-false BGP telemetry as writable. */
+function upsertSite(list: Record<string, any>[], entry: Record<string, any>): void {
+  const siteId = String(entry['site-id'] ?? '');
+  const existing = list.find((site) => String(site['site-id'] ?? '') === siteId);
+  const next = { ...entry };
+
+  delete next[SITE_BGP_SESSIONS_KEY];
+  if (existing?.[SITE_BGP_SESSIONS_KEY] !== undefined) {
+    next[SITE_BGP_SESSIONS_KEY] = existing[SITE_BGP_SESSIONS_KEY];
+  }
+
+  upsertListEntry(list, 'site-id', next);
+}
+
 // ── the RESTCONF branch (/api/restconf/...) ──
 
 async function handleRestconf(
@@ -330,7 +346,7 @@ async function handleRestconf(
         if (method === 'PUT') {
           const body = unwrapEntry(parseBody(init), 'ietf-l3vpn-svc:site');
           if (body) {
-            upsertListEntry(state.sites, 'site-id', { ...body, 'site-id': body['site-id'] ?? siteId });
+            upsertSite(state.sites, { ...body, 'site-id': body['site-id'] ?? siteId });
             enqueueSiteAdd(body);
           }
           return empty();
@@ -391,7 +407,7 @@ function applyCfsPayload(init: RequestInit | undefined): void {
       upsertListEntry(state.vpnServices, 'vpn-id', vpn);
     }
     for (const site of l3vpn?.sites?.site ?? []) {
-      upsertListEntry(state.sites, 'site-id', site);
+      upsertSite(state.sites, site);
       const facts = siteFacts(site);
       if (facts && state.devices[facts.router]) {
         enqueueSiteAdd(site);
