@@ -29,6 +29,46 @@ module sorespo-ietf-l3vpn-svc {
   augment "/l3vpn-svc:l3vpn-svc/l3vpn-svc:sites/l3vpn-svc:site" {
     sw:transform sorespo.cfs.L3VpnSite;
     tmf:cfs-service "L3VPN Site";
+
+    container bgp-sessions {
+      config false;
+      description
+        "Operational eBGP customer session telemetry, lifted from the RFS
+         ebgp-customer state via the inter l3vpn endpoint. One entry per
+         site-network-access with BGP configured. debug-active reflects the
+         per-neighbor on-demand telemetry escalation (session down or flapping).";
+      list bgp-session {
+        key site-network-access;
+        leaf site-network-access {
+          type string;
+        }
+        leaf session-state {
+          type enumeration {
+            enum idle;
+            enum connect;
+            enum active;
+            enum opensent;
+            enum openconfirm;
+            enum established;
+          }
+        }
+        leaf last-event {
+          type string;
+        }
+        leaf established-transitions {
+          type uint64;
+        }
+        leaf debug-active {
+          type boolean;
+        }
+        leaf negotiated-hold-time {
+          type uint64;
+        }
+        leaf last-notification {
+          type string;
+        }
+      }
+    }
   }
 
   augment "/l3vpn-svc:l3vpn-svc/l3vpn-svc:sites/l3vpn-svc:site"

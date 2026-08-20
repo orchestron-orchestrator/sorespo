@@ -52,11 +52,7 @@ SRC_DNODE_CHILD_2: DList = DList(module='netinfra-inter', namespace='http://exam
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='left-router', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='left-interface', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='right-router', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
-    DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='right-interface', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
-    DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='monitor-traffic', config=True, default='false', mandatory=False, type=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
-    DContainer(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='dynstate', config=True, presence=False, exts=[
-            DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='dynstate', arg=None, exts=[])
-        ])
+    DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='right-interface', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
 ])
 
 SRC_DNODE_CHILD_3: DList = DList(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='ibgp-fullmesh', key=['asn'], config=True, min_elements=0, ordered_by='system', exts=[
@@ -170,6 +166,27 @@ SRC_YANG_0: str = r"""module l3vpn-inter {
             type string;
           }
         }
+        container state {
+          config false;
+          description
+            "eBGP customer session telemetry, lifted from the RFS ebgp-customer
+             entry. debug-active reflects the per-neighbor escalation.";
+          leaf session-state {
+            type enumeration {
+              enum idle;
+              enum connect;
+              enum active;
+              enum opensent;
+              enum openconfirm;
+              enum established;
+            }
+          }
+          leaf last-event { type string; }
+          leaf established-transitions { type uint64; }
+          leaf debug-active { type boolean; }
+          leaf negotiated-hold-time { type uint64; }
+          leaf last-notification { type string; }
+        }
       }
     }
   }
@@ -280,28 +297,13 @@ SRC_YANG_1: str = r"""module netinfra-inter {
       leaf right-interface {
         type string;
       }
-      leaf monitor-traffic {
-        type boolean;
-        default false;
-      }
-      container dynstate {
-        sw:dynstate;
-      }
+
       container state {
         config false;
         description
-          "Operational state lifted from the RFS backbone-interface entries.
-           left-pps is the receive PPS measured on the left interface;
-           right-pps is the receive PPS measured on the right interface.
-           link-status is the combined oper-state of the two endpoints
-           (up only when both endpoints are up; down if either is down;
-           unknown when either endpoint's oper-state is unavailable).";
-        leaf left-pps {
-          type uint64;
-        }
-        leaf right-pps {
-          type uint64;
-        }
+          "Combined oper-state of the two endpoints, lifted from the RFS
+           backbone-interface entries: up only when both endpoints are up,
+           down if either is down, unknown when either is unavailable.";
         leaf link-status {
           type enumeration {
             enum up;
@@ -1050,64 +1052,40 @@ class netinfra_inter__netinfra__router(yadata.MKeyedList[str, netinfra_inter__ne
 
 
 _breaker7: None = None
-class netinfra_inter__netinfra__backbone_link__dynstate(yadata.MNode):
-
-    mut def __init__(self) -> None:
-        pass
-
-    mut def to_gdata(self) -> ygdata.Node:
-        return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['netinfra-inter:netinfra', 'backbone-link', 'dynstate'])
-
-    @staticmethod
-    mut def from_gdata(n: ?ygdata.Node) -> netinfra_inter__netinfra__backbone_link__dynstate:
-        if n is not None:
-            return netinfra_inter__netinfra__backbone_link__dynstate()
-        return netinfra_inter__netinfra__backbone_link__dynstate()
-
-    mut def copy(self) -> netinfra_inter__netinfra__backbone_link__dynstate:
-        """Create a deep copy of this adata object"""
-        return netinfra_inter__netinfra__backbone_link__dynstate.from_gdata(self.to_gdata())
-
-
-_breaker8: None = None
 class netinfra_inter__netinfra__backbone_link_entry(yadata.MNode):
     left_router: str
     left_interface: str
     right_router: str
     right_interface: str
-    monitor_traffic: bool
 
-    mut def __init__(self, left_router: str, left_interface: str, right_router: str, right_interface: str, monitor_traffic: ?bool=None) -> None:
+    mut def __init__(self, left_router: str, left_interface: str, right_router: str, right_interface: str) -> None:
         self.left_router = left_router
         self.left_interface = left_interface
         self.right_router = right_router
         self.right_interface = right_interface
-        self.monitor_traffic = monitor_traffic if monitor_traffic is not None else False
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['netinfra-inter:netinfra', 'backbone-link'])
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> netinfra_inter__netinfra__backbone_link_entry:
-        return netinfra_inter__netinfra__backbone_link_entry(left_router=n.get_str(ygdata.Id(NS_netinfra_inter, 'left-router')), left_interface=n.get_str(ygdata.Id(NS_netinfra_inter, 'left-interface')), right_router=n.get_str(ygdata.Id(NS_netinfra_inter, 'right-router')), right_interface=n.get_str(ygdata.Id(NS_netinfra_inter, 'right-interface')), monitor_traffic=n.get_opt_bool(ygdata.Id(NS_netinfra_inter, 'monitor-traffic')))
+        return netinfra_inter__netinfra__backbone_link_entry(left_router=n.get_str(ygdata.Id(NS_netinfra_inter, 'left-router')), left_interface=n.get_str(ygdata.Id(NS_netinfra_inter, 'left-interface')), right_router=n.get_str(ygdata.Id(NS_netinfra_inter, 'right-router')), right_interface=n.get_str(ygdata.Id(NS_netinfra_inter, 'right-interface')))
 
     mut def copy(self) -> netinfra_inter__netinfra__backbone_link_entry:
         """Create a deep copy of this adata object"""
         return netinfra_inter__netinfra__backbone_link_entry.from_gdata(self.to_gdata())
 
-_breaker9: None = None
+_breaker8: None = None
 class netinfra_inter__netinfra__backbone_link(yadata.MKeyedList[(left_router: str, left_interface: str, right_router: str, right_interface: str), netinfra_inter__netinfra__backbone_link_entry]):
     mut def __init__(self, elements: list[netinfra_inter__netinfra__backbone_link_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.left_router == k.left_router and e.left_interface == k.left_interface and e.right_router == k.right_router and e.right_interface == k.right_interface, elements)
 
-    mut def create(self, key: (left_router: str, left_interface: str, right_router: str, right_interface: str), monitor_traffic: ?bool=None) -> netinfra_inter__netinfra__backbone_link_entry:
+    mut def create(self, key: (left_router: str, left_interface: str, right_router: str, right_interface: str)) -> netinfra_inter__netinfra__backbone_link_entry:
         e = self.get(key)
         if e is not None:
-            if monitor_traffic is not None:
-                e.monitor_traffic = monitor_traffic
             return e
         (left_router=left_router, left_interface=left_interface, right_router=right_router, right_interface=right_interface) = key
-        res = netinfra_inter__netinfra__backbone_link_entry(left_router=left_router, left_interface=left_interface, right_router=right_router, right_interface=right_interface, monitor_traffic=monitor_traffic)
+        res = netinfra_inter__netinfra__backbone_link_entry(left_router=left_router, left_interface=left_interface, right_router=right_router, right_interface=right_interface)
         self.elements.append(res)
         return res
 
@@ -1128,7 +1106,7 @@ class netinfra_inter__netinfra__backbone_link(yadata.MKeyedList[(left_router: st
         return netinfra_inter__netinfra__backbone_link(elements=copied_elements)
 
 
-_breaker10: None = None
+_breaker9: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh__router_entry(yadata.MNode):
     name: str
     ipv4_address: str
@@ -1148,7 +1126,7 @@ class netinfra_inter__netinfra__ibgp_fullmesh__router_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return netinfra_inter__netinfra__ibgp_fullmesh__router_entry.from_gdata(self.to_gdata())
 
-_breaker11: None = None
+_breaker10: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh__router(yadata.MKeyedList[str, netinfra_inter__netinfra__ibgp_fullmesh__router_entry]):
     mut def __init__(self, elements: list[netinfra_inter__netinfra__ibgp_fullmesh__router_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
@@ -1180,7 +1158,7 @@ class netinfra_inter__netinfra__ibgp_fullmesh__router(yadata.MKeyedList[str, net
         return netinfra_inter__netinfra__ibgp_fullmesh__router(elements=copied_elements)
 
 
-_breaker12: None = None
+_breaker11: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh_entry(yadata.MNode):
     asn: u64
     authentication_key: str
@@ -1202,7 +1180,7 @@ class netinfra_inter__netinfra__ibgp_fullmesh_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return netinfra_inter__netinfra__ibgp_fullmesh_entry.from_gdata(self.to_gdata())
 
-_breaker13: None = None
+_breaker12: None = None
 class netinfra_inter__netinfra__ibgp_fullmesh(yadata.MKeyedList[u64, netinfra_inter__netinfra__ibgp_fullmesh_entry]):
     mut def __init__(self, elements: list[netinfra_inter__netinfra__ibgp_fullmesh_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.asn == k, elements)
@@ -1234,7 +1212,7 @@ class netinfra_inter__netinfra__ibgp_fullmesh(yadata.MKeyedList[u64, netinfra_in
         return netinfra_inter__netinfra__ibgp_fullmesh(elements=copied_elements)
 
 
-_breaker14: None = None
+_breaker13: None = None
 class netinfra_inter__netinfra(yadata.MNode):
     router: netinfra_inter__netinfra__router
     backbone_link: netinfra_inter__netinfra__backbone_link
@@ -1259,7 +1237,7 @@ class netinfra_inter__netinfra(yadata.MNode):
         return netinfra_inter__netinfra.from_gdata(self.to_gdata())
 
 
-_breaker15: None = None
+_breaker14: None = None
 class l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(yadata.MNode):
     as_number: u64
     authentication_key: ?str
@@ -1285,7 +1263,7 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint__bgp(yadata.MNode):
         raise Exception('Unreachable in l3vpn_inter__l3vpns__l3vpn__endpoint__bgp.copy()')
 
 
-_breaker16: None = None
+_breaker15: None = None
 class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yadata.MNode):
     device: str
     interface: str
@@ -1328,7 +1306,7 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return l3vpn_inter__l3vpns__l3vpn__endpoint_entry.from_gdata(self.to_gdata())
 
-_breaker17: None = None
+_breaker16: None = None
 class l3vpn_inter__l3vpns__l3vpn__endpoint(yadata.MKeyedList[(device: str, interface: str), l3vpn_inter__l3vpns__l3vpn__endpoint_entry]):
     mut def __init__(self, elements: list[l3vpn_inter__l3vpns__l3vpn__endpoint_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.device == k.device and e.interface == k.interface, elements)
@@ -1365,7 +1343,7 @@ class l3vpn_inter__l3vpns__l3vpn__endpoint(yadata.MKeyedList[(device: str, inter
         return l3vpn_inter__l3vpns__l3vpn__endpoint(elements=copied_elements)
 
 
-_breaker18: None = None
+_breaker17: None = None
 class l3vpn_inter__l3vpns__l3vpn_entry(yadata.MNode):
     name: str
     description: ?str
@@ -1387,7 +1365,7 @@ class l3vpn_inter__l3vpns__l3vpn_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return l3vpn_inter__l3vpns__l3vpn_entry.from_gdata(self.to_gdata())
 
-_breaker19: None = None
+_breaker18: None = None
 class l3vpn_inter__l3vpns__l3vpn(yadata.MKeyedList[str, l3vpn_inter__l3vpns__l3vpn_entry]):
     mut def __init__(self, elements: list[l3vpn_inter__l3vpns__l3vpn_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
@@ -1420,7 +1398,7 @@ class l3vpn_inter__l3vpns__l3vpn(yadata.MKeyedList[str, l3vpn_inter__l3vpns__l3v
         return l3vpn_inter__l3vpns__l3vpn(elements=copied_elements)
 
 
-_breaker20: None = None
+_breaker19: None = None
 class l3vpn_inter__l3vpns(yadata.MNode):
     l3vpn: l3vpn_inter__l3vpns__l3vpn
 
@@ -1441,7 +1419,7 @@ class l3vpn_inter__l3vpns(yadata.MNode):
         return l3vpn_inter__l3vpns.from_gdata(self.to_gdata())
 
 
-_breaker21: None = None
+_breaker20: None = None
 class root(yadata.MNode):
     netinfra: netinfra_inter__netinfra
     l3vpns: l3vpn_inter__l3vpns

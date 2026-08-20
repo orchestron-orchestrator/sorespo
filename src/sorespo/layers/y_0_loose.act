@@ -1112,8 +1112,7 @@ SRC_DNODE_CHILD_126: DContainer = DContainer(module='netinfra', namespace='http:
         DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='left-router', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
         DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='left-interface', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
         DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='right-router', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
-        DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='right-interface', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
-        DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='monitor-traffic', config=True, default='false', mandatory=False, type=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
+        DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='right-interface', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
     ]),
     DContainer(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='global-settings', config=True, description='Network-wide settings shared across all routers.', presence=False, exts=[
             DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='transform', arg='sorespo.cfs.GlobalSettings', exts=[])
@@ -4784,25 +4783,13 @@ SRC_YANG_2: str = r"""module netinfra {
       leaf right-interface {
         type string;
       }
-      leaf monitor-traffic {
-        type boolean;
-        default false;
-      }
+
       container state {
         config false;
         description
-          "Operational state lifted from the underlying RFS backbone-interface entries.
-           left-pps is the receive PPS measured on the left interface (traffic flowing right -> left);
-           right-pps is the receive PPS measured on the right interface (traffic flowing left -> right).
-           link-status is the combined oper-state of the two endpoints
-           (up only when both endpoints are up; down if either is down;
-           unknown when either endpoint's oper-state is unavailable).";
-        leaf left-pps {
-          type uint64;
-        }
-        leaf right-pps {
-          type uint64;
-        }
+          "Combined oper-state of the link, lifted from the underlying RFS
+           backbone-interface entries: up only when both endpoints are up,
+           down if either is down, unknown when either is unavailable.";
         leaf link-status {
           type enumeration {
             enum up;
@@ -4860,6 +4847,46 @@ SRC_YANG_3: str = r"""module sorespo-ietf-l3vpn-svc {
   augment "/l3vpn-svc:l3vpn-svc/l3vpn-svc:sites/l3vpn-svc:site" {
     sw:transform sorespo.cfs.L3VpnSite;
     tmf:cfs-service "L3VPN Site";
+
+    container bgp-sessions {
+      config false;
+      description
+        "Operational eBGP customer session telemetry, lifted from the RFS
+         ebgp-customer state via the inter l3vpn endpoint. One entry per
+         site-network-access with BGP configured. debug-active reflects the
+         per-neighbor on-demand telemetry escalation (session down or flapping).";
+      list bgp-session {
+        key site-network-access;
+        leaf site-network-access {
+          type string;
+        }
+        leaf session-state {
+          type enumeration {
+            enum idle;
+            enum connect;
+            enum active;
+            enum opensent;
+            enum openconfirm;
+            enum established;
+          }
+        }
+        leaf last-event {
+          type string;
+        }
+        leaf established-transitions {
+          type uint64;
+        }
+        leaf debug-active {
+          type boolean;
+        }
+        leaf negotiated-hold-time {
+          type uint64;
+        }
+        leaf last-notification {
+          type string;
+        }
+      }
+    }
   }
 
   augment "/l3vpn-svc:l3vpn-svc/l3vpn-svc:sites/l3vpn-svc:site"
@@ -13301,21 +13328,19 @@ class netinfra__netinfra__backbone_link_entry(yadata.MNode):
     left_interface: str
     right_router: str
     right_interface: str
-    monitor_traffic: ?bool
 
-    mut def __init__(self, left_router: str, left_interface: str, right_router: str, right_interface: str, monitor_traffic: ?bool) -> None:
+    mut def __init__(self, left_router: str, left_interface: str, right_router: str, right_interface: str) -> None:
         self.left_router = left_router
         self.left_interface = left_interface
         self.right_router = right_router
         self.right_interface = right_interface
-        self.monitor_traffic = monitor_traffic
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['netinfra:netinfra', 'backbone-link'])
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> netinfra__netinfra__backbone_link_entry:
-        return netinfra__netinfra__backbone_link_entry(left_router=n.get_str(ygdata.Id(NS_netinfra, 'left-router')), left_interface=n.get_str(ygdata.Id(NS_netinfra, 'left-interface')), right_router=n.get_str(ygdata.Id(NS_netinfra, 'right-router')), right_interface=n.get_str(ygdata.Id(NS_netinfra, 'right-interface')), monitor_traffic=n.get_opt_bool(ygdata.Id(NS_netinfra, 'monitor-traffic')))
+        return netinfra__netinfra__backbone_link_entry(left_router=n.get_str(ygdata.Id(NS_netinfra, 'left-router')), left_interface=n.get_str(ygdata.Id(NS_netinfra, 'left-interface')), right_router=n.get_str(ygdata.Id(NS_netinfra, 'right-router')), right_interface=n.get_str(ygdata.Id(NS_netinfra, 'right-interface')))
 
     mut def copy(self) -> netinfra__netinfra__backbone_link_entry:
         """Create a deep copy of this adata object"""
@@ -13326,14 +13351,12 @@ class netinfra__netinfra__backbone_link(yadata.MKeyedList[(left_router: str, lef
     mut def __init__(self, elements: list[netinfra__netinfra__backbone_link_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.left_router == k.left_router and e.left_interface == k.left_interface and e.right_router == k.right_router and e.right_interface == k.right_interface, elements)
 
-    mut def create(self, key: (left_router: str, left_interface: str, right_router: str, right_interface: str), monitor_traffic: ?bool=None) -> netinfra__netinfra__backbone_link_entry:
+    mut def create(self, key: (left_router: str, left_interface: str, right_router: str, right_interface: str)) -> netinfra__netinfra__backbone_link_entry:
         e = self.get(key)
         if e is not None:
-            if monitor_traffic is not None:
-                e.monitor_traffic = monitor_traffic
             return e
         (left_router=left_router, left_interface=left_interface, right_router=right_router, right_interface=right_interface) = key
-        res = netinfra__netinfra__backbone_link_entry(left_router=left_router, left_interface=left_interface, right_router=right_router, right_interface=right_interface, monitor_traffic=monitor_traffic)
+        res = netinfra__netinfra__backbone_link_entry(left_router=left_router, left_interface=left_interface, right_router=right_router, right_interface=right_interface)
         self.elements.append(res)
         return res
 

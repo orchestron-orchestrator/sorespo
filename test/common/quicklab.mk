@@ -167,13 +167,6 @@ configure-tmf640:
 	$(MAKE) send-config-tmf640-stream FILE="netinfra.json" FILTER="../common/netinfra-to-tmf640.jq"
 	$(MAKE) send-config-tmf640-stream FILE="l3vpn-svc.json" FILTER="../common/l3vpn-svc-to-tmf640.jq"
 
-.PHONY: monitor-traffic-enable
-monitor-traffic-enable:
-	$(MAKE) send-config-wait FILE="monitor-traffic-enable.xml"
-
-.PHONY: monitor-traffic-disable
-monitor-traffic-disable:
-	$(MAKE) send-config-wait FILE="monitor-traffic-disable.xml"
 
 .PHONY: tutorial
 tutorial:
@@ -334,9 +327,6 @@ test:
 
 .PHONY: test-ping
 test-ping::
-
-.PHONY: generate-traffic
-generate-traffic::
 
 .PHONY: test-get-config
 test-get-config:

@@ -84,19 +84,11 @@ module sorespo-rfs {
                 }
             }
 
-            leaf monitor-traffic {
-                type boolean;
-                default "false";
-            }
-
             container state {
                 config false;
-                leaf rx-packets {
-                    type uint64;
-                }
-                leaf pps {
-                    type uint64;
-                }
+                description
+                    "Operational state of the backbone interface, polled from
+                     the device. oper-status is the interface oper-state.";
                 leaf oper-status {
                     type enumeration {
                         enum up;
@@ -105,6 +97,7 @@ module sorespo-rfs {
                     }
                 }
             }
+
         }
 
         list ibgp-neighbor {
@@ -199,6 +192,29 @@ module sorespo-rfs {
         description
           "Optional eBGP session authentication key (MD5/TCP-AO). Absent when
            the customer session has no authentication configured.";
+      }
+
+      container state {
+        config false;
+        description
+          "eBGP customer neighbor session telemetry. The base set is always
+           collected; the escalated detail is collected only while debug-active
+           (session down or flapping).";
+        leaf session-state {
+          type enumeration {
+            enum idle;
+            enum connect;
+            enum active;
+            enum opensent;
+            enum openconfirm;
+            enum established;
+          }
+        }
+        leaf last-event { type string; }
+        leaf established-transitions { type uint64; }
+        leaf debug-active { type boolean; }
+        leaf negotiated-hold-time { type uint64; }
+        leaf last-notification { type string; }
       }
     }
   }

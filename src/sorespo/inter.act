@@ -7,7 +7,6 @@ import sorespo.layers.y_1 as y_1
 import sorespo.layers.y_1_oper as y_1_oper
 import sorespo.layers.y_2_oper as y_2_oper
 
-from sorespo.layers.y_1 import netinfra_inter__netinfra__backbone_link__dynstate as BackboneLinkDynstate
 
 
 def letter_position(letter):
@@ -16,8 +15,6 @@ def letter_position(letter):
     """
     if len(letter) != 1 or not letter.isalpha():
         raise ValueError("Input must be a single alphabetic character.")
-    
-    # Convert to lowercase to handle case-insensitivity
     letter = letter.lower()
     return ord(letter) - ord('a') + 1
 
@@ -59,25 +56,38 @@ def combine_link_status(left: ?str, right: ?str) -> ?str:
     return "unknown"
 
 
+class BBLink(base.BBLink):
+    def transform(self, i):
+        print("Intermediate backbonelink transform running %s [%s] <-> %s [%s]" % (i.left_router, i.left_interface, i.right_router, i.right_interface))
+        o = base.o_root()
+        link_id = letter_position(i.left_router[0]) + letter_position(i.right_router[0])
+        left_rfs = o.rfs.create(i.left_router)
+        li = left_rfs.backbone_interface.create(i.left_interface, ipv4_address="10.0.{link_id}.1")
+        li.remote.device = i.right_router
+        li.remote.interface = i.right_interface
+
+        right_rfs = o.rfs.create(i.right_router)
+        ri = right_rfs.backbone_interface.create(i.right_interface, ipv4_address="10.0.{link_id}.2")
+        ri.remote.device = i.left_router
+        ri.remote.interface = i.left_interface
+
+        return o
+
+
+# --- Backbone link oper-status lift -------------------------------------------
+# Combine the two endpoints' RFS backbone-interface oper-status into the
+# backbone-link link-status (up only when both ends are up; see
+# combine_link_status).
 actor BBLinkTransform(path: ttt.Path,
-                       update_dynstate: proc(?BackboneLinkDynstate)->None,
-                       update_oper: proc(?y_1_oper.netinfra_inter__netinfra__backbone_link_entry)->None,
-                       lower_tree_provider: ?gdata.TreeProvider):
+                      update_oper: proc(?y_1_oper.netinfra_inter__netinfra__backbone_link_entry)->None,
+                      lower_tree_provider: ?gdata.TreeProvider):
     _oper = base.BBLink.new_state(path)
     _subs = gdata.SubscriptionManager(lower_tree_provider!, str(path))
-
-    def push_state(left_pps: ?u64, right_pps: ?u64, link_status: ?str):
-        _oper.state.left_pps = left_pps
-        _oper.state.right_pps = right_pps
-        _oper.state.link_status = link_status
-        update_oper(_oper)
 
     def on_rfs_state(root: ?y_2_oper.root, err: ?Exception, left_router: str, left_interface: str, right_router: str, right_interface: str):
         if err is not None:
             print("inter.BBLinkTransform RFS subscription error: {err}", err=True)
             return
-        left_pps: ?u64 = None
-        right_pps: ?u64 = None
         left_status: ?str = None
         right_status: ?str = None
         if root is not None:
@@ -85,50 +95,26 @@ actor BBLinkTransform(path: ttt.Path,
                 if r.name == left_router:
                     for bi in r.backbone_interface:
                         if bi.name == left_interface:
-                            left_pps = bi.state.pps
                             left_status = bi.state.oper_status
                 if r.name == right_router:
                     for bi in r.backbone_interface:
                         if bi.name == right_interface:
-                            right_pps = bi.state.pps
                             right_status = bi.state.oper_status
-        push_state(left_pps, right_pps, combine_link_status(left_status, right_status))
+        _oper.state.link_status = combine_link_status(left_status, right_status)
+        update_oper(_oper)
 
     def on_conf(conf: y_1.netinfra_inter__netinfra__backbone_link_entry):
+        lr = conf.left_router
+        li = conf.left_interface
+        rr = conf.right_router
+        ri = conf.right_interface
+        dst = y_2_oper.dst(lambda r, e: on_rfs_state(r, e, lr, li, rr, ri))
         want: set[gdata.Delivery] = set()
-        if conf.monitor_traffic:
-            lr = conf.left_router
-            li = conf.left_interface
-            rr = conf.right_router
-            ri = conf.right_interface
-            dst = y_2_oper.dst(lambda r, e: on_rfs_state(r, e, lr, li, rr, ri))
-            want.add(dst.deliver({
-                y_2_oper.subs.rfs.entry(lr).backbone_interface.entry(li).state.pps.subscribe(period=5.0),
-                y_2_oper.subs.rfs.entry(lr).backbone_interface.entry(li).state.oper_status.subscribe(period=5.0),
-                y_2_oper.subs.rfs.entry(rr).backbone_interface.entry(ri).state.pps.subscribe(period=5.0),
-                y_2_oper.subs.rfs.entry(rr).backbone_interface.entry(ri).state.oper_status.subscribe(period=5.0),
-            }))
-        else:
-            push_state(None, None, None)
+        want.add(dst.deliver({
+            y_2_oper.subs.rfs.entry(lr).backbone_interface.entry(li).state.subscribe(period=5.0),
+            y_2_oper.subs.rfs.entry(rr).backbone_interface.entry(ri).state.subscribe(period=5.0)
+        }))
         _subs.declare(want)
-
-
-class BBLink(base.BBLink):
-    def transform(self, i, dynstate):
-        print("Intermediate backbonelink transform running %s [%s] <-> %s [%s]" % (i.left_router, i.left_interface, i.right_router, i.right_interface))
-        o = base.o_root()
-        link_id = letter_position(i.left_router[0]) + letter_position(i.right_router[0])
-        left_rfs = o.rfs.create(i.left_router)
-        li = left_rfs.backbone_interface.create(i.left_interface, ipv4_address="10.0.{link_id}.1", monitor_traffic=i.monitor_traffic)
-        li.remote.device = i.right_router
-        li.remote.interface = i.right_interface
-
-        right_rfs = o.rfs.create(i.right_router)
-        ri = right_rfs.backbone_interface.create(i.right_interface, ipv4_address="10.0.{link_id}.2", monitor_traffic=i.monitor_traffic)
-        ri.remote.device = i.left_router
-        ri.remote.interface = i.left_interface
-
-        return o
 
 
 class IbgpFullmesh(base.IbgpFullmesh):
@@ -144,6 +130,78 @@ class IbgpFullmesh(base.IbgpFullmesh):
                 rfs.ibgp_neighbor.create(rb.ipv4_address, asn=i.asn, description=rb.name)
 
         return o
+
+
+actor L3VpnTransform(path: ttt.Path,
+                      update_oper: proc(?y_1_oper.l3vpn_inter__l3vpns__l3vpn_entry)->None,
+                      lower_tree_provider: ?gdata.TreeProvider):
+    # Lift RFS eBGP customer session telemetry to inter endpoint state.
+    var _oper = base.L3Vpn.new_state(path)
+    _subs = gdata.SubscriptionManager(lower_tree_provider!, str(path))
+
+    def on_rfs_state(root: ?y_2_oper.root, err: ?Exception, conf: y_1.l3vpn_inter__l3vpns__l3vpn_entry):
+        if err is not None:
+            print("inter.L3VpnTransform RFS subscription error: {err}", err=True)
+            return
+        # Rebuild each delivery so removed/BGP-disabled endpoints clear from oper.
+        # Mirrors cfs.L3VpnSiteTransform.on_inter_state: the canonical lift shape.
+        _oper = base.L3Vpn.new_state(path)
+        vpn = conf.name
+        for ep in conf.endpoint:
+            addr = ep.customer_ipv4_address
+            if ep.bgp is None or addr is None:
+                continue
+            found = False
+            session_state: ?str = None
+            last_event: ?str = None
+            transitions: ?u64 = None
+            debug_active: ?bool = None
+            hold: ?u64 = None
+            notification: ?str = None
+            if root is not None:
+                for r in root.rfs:
+                    if r.name == ep.device:
+                        for ec in r.ebgp_customer:
+                            if ec.vrf == vpn and ec.address == addr:
+                                found = True
+                                ecs = ec.state
+                                da = ecs.debug_active
+                                session_state = ecs.session_state
+                                debug_active = da
+                                # Detail metrics are exposed only while debug is active.
+                                if da is not None and da:
+                                    last_event = ecs.last_event
+                                    transitions = ecs.established_transitions
+                                    hold = ecs.negotiated_hold_time
+                                    notification = ecs.last_notification
+            if not found:
+                # RFS has not reported this neighbor yet: avoid a key-only entry.
+                continue
+            st = _oper.endpoint.create((ep.device, ep.interface)).state
+            st.session_state = session_state
+            st.debug_active = debug_active
+            st.last_event = last_event
+            st.established_transitions = transitions
+            st.negotiated_hold_time = hold
+            st.last_notification = notification
+        update_oper(_oper)
+
+    def on_conf(conf: y_1.l3vpn_inter__l3vpns__l3vpn_entry):
+        want: set[gdata.Delivery] = set()
+        vpn = conf.name
+        dst = y_2_oper.dst(lambda r, e: on_rfs_state(r, e, conf))
+        specs: set[gdata.SubscriptionSpec] = set()
+        for ep in conf.endpoint:
+            addr = ep.customer_ipv4_address
+            if ep.bgp is not None and addr is not None:
+                ec = y_2_oper.subs.rfs.entry(ep.device).ebgp_customer.entry(vpn, addr)
+                specs.add(ec.state.subscribe(period=2.0))
+        if len(specs) > 0:
+            want.add(dst.deliver(specs))
+        _subs.declare(want)
+        if len(specs) == 0:
+            _oper = base.L3Vpn.new_state(path)
+            update_oper(_oper)
 
 
 class L3Vpn(base.L3Vpn):

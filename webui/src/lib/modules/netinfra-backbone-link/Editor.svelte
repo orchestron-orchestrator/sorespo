@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
 
   import { restconfGetJson } from '$lib/core/restconf/client';
-  import FieldCheckbox from '$lib/core/ui/FieldCheckbox.svelte';
   import FieldSelect from '$lib/core/ui/FieldSelect.svelte';
   import FieldText from '$lib/core/ui/FieldText.svelte';
   import Section from '$lib/core/ui/Section.svelte';
@@ -161,20 +160,6 @@
     </div>
   </Section>
 
-  <Section
-    title="Behavior"
-    description="Optional operational flags exposed by the `netinfra:backbone-link` model."
-    yangPath="netinfra:backbone-link/*"
-  >
-    <div class="editor__toggles">
-      <FieldCheckbox
-        label="Monitor traffic"
-        checked={draft.monitorTraffic}
-        help="Enables the monitor-traffic leaf on this backbone-link entry."
-        onchange={(monitorTraffic) => patch({ monitorTraffic })}
-      />
-    </div>
-  </Section>
 </div>
 
 <style>
@@ -190,15 +175,6 @@
 
   .editor__grid--2col {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .editor__toggles {
-    display: grid;
-    gap: 12px;
-    padding: 16px;
-    border-radius: var(--sw-radius-md);
-    background: var(--sw-bg-elevated);
-    border: 1px solid var(--sw-border-subtle);
   }
 
   @media (max-width: 720px) {

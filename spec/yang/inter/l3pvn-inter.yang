@@ -64,6 +64,27 @@ module l3vpn-inter {
             type string;
           }
         }
+        container state {
+          config false;
+          description
+            "eBGP customer session telemetry, lifted from the RFS ebgp-customer
+             entry. debug-active reflects the per-neighbor escalation.";
+          leaf session-state {
+            type enumeration {
+              enum idle;
+              enum connect;
+              enum active;
+              enum opensent;
+              enum openconfirm;
+              enum established;
+            }
+          }
+          leaf last-event { type string; }
+          leaf established-transitions { type uint64; }
+          leaf debug-active { type boolean; }
+          leaf negotiated-hold-time { type uint64; }
+          leaf last-notification { type string; }
+        }
       }
     }
   }

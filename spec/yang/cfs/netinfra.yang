@@ -82,25 +82,13 @@ module netinfra {
       leaf right-interface {
         type string;
       }
-      leaf monitor-traffic {
-        type boolean;
-        default false;
-      }
+
       container state {
         config false;
         description
-          "Operational state lifted from the underlying RFS backbone-interface entries.
-           left-pps is the receive PPS measured on the left interface (traffic flowing right -> left);
-           right-pps is the receive PPS measured on the right interface (traffic flowing left -> right).
-           link-status is the combined oper-state of the two endpoints
-           (up only when both endpoints are up; down if either is down;
-           unknown when either endpoint's oper-state is unavailable).";
-        leaf left-pps {
-          type uint64;
-        }
-        leaf right-pps {
-          type uint64;
-        }
+          "Combined oper-state of the link, lifted from the underlying RFS
+           backbone-interface entries: up only when both endpoints are up,
+           down if either is down, unknown when either is unavailable.";
         leaf link-status {
           type enumeration {
             enum up;

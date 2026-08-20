@@ -5,12 +5,8 @@ export interface NetinfraBackboneLinkDraft {
   leftInterface: string;
   rightRouter: string;
   rightInterface: string;
-  monitorTraffic: boolean;
-  /** Read-only operational state lifted from the lower layers. Not serialized. */
-  leftPps: number | null;
-  /** Read-only operational state lifted from the lower layers. Not serialized. */
-  rightPps: number | null;
-  /** Combined link status (AND of both endpoints' oper-state). Not serialized. */
+  /** Read-only operational link status lifted from the CFS backbone-link state
+   * (up only when both endpoints are oper-up). Not serialized. */
   linkStatus: NetinfraBackboneLinkStatus;
 }
 

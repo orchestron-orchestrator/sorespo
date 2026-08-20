@@ -62,6 +62,7 @@
 
   const Editor = $derived(module.Editor);
   const Summary = $derived(module.Summary);
+  const StatePanel = $derived(module.StatePanel);
   let payload = $derived(module.serialize(draft));
   let originalPayload = $derived(original === undefined ? undefined : module.serialize(original));
 </script>
@@ -98,7 +99,11 @@
     <div class="loading-state">Loading service data...</div>
   {:else}
     <div class="workspace__grid">
-      <section class="workspace__editor card" data-tour="workspace-editor">
+      <div class="workspace__editor-col">
+        {#if StatePanel}
+          <StatePanel {draft} />
+        {/if}
+        <section class="workspace__editor card" data-tour="workspace-editor">
         <div class="card-header">
           <h3>Editor</h3>
           <span class="card-badge">{module.id}</span>
@@ -118,7 +123,8 @@
             ontouch={() => ontouch?.()}
           />
         </div>
-      </section>
+        </section>
+      </div>
 
       <div class="workspace__sidebar" data-tour="workspace-sidebar">
         <ValidationPanel {validation} active={validationActive} />
@@ -159,6 +165,13 @@
     display: grid;
     gap: 20px;
     grid-template-columns: minmax(0, 1.7fr) minmax(300px, 0.9fr);
+  }
+
+  .workspace__editor-col {
+    display: grid;
+    gap: 20px;
+    align-content: start;
+    min-width: 0;
   }
 
   .workspace__editor,

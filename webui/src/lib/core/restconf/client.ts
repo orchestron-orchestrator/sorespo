@@ -3,6 +3,9 @@ import type { RestconfRequestOptions } from '$lib/core/restconf/proxy-types';
 import { demoFetch } from '$lib/demo/gate';
 
 const RESTCONF_BASE = '/api/restconf';
+// Synchronous RESTCONF writes wait for device application, which cannot finish
+// while an approval-required change is pending in the configuration queue.
+const ASYNC_WRITE_HEADERS = { async: 'true' } as const;
 
 type Fetch = typeof fetch;
 
@@ -92,6 +95,7 @@ export function restconfPutJson<T>(path: string, body: unknown): Promise<T> {
   return restconfRequest<T>(path, {
     method: 'PUT',
     body: JSON.stringify(body),
+    headers: ASYNC_WRITE_HEADERS,
     accept: 'application/yang-data+json',
     contentType: 'application/yang-data+json',
     readBody: false
@@ -102,6 +106,7 @@ export function restconfPatchJson<T>(path: string, body: unknown): Promise<T> {
   return restconfRequest<T>(path, {
     method: 'PATCH',
     body: JSON.stringify(body),
+    headers: ASYNC_WRITE_HEADERS,
     accept: 'application/yang-data+json',
     contentType: 'application/yang-data+json',
     readBody: false

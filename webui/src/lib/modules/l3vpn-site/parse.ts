@@ -83,6 +83,45 @@ function toNumber(value: unknown): number | null {
   return Number.isNaN(numeric) ? null : numeric;
 }
 
+function normalizeBool(value: unknown): boolean | null {
+  if (typeof value === 'boolean') return value;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return null;
+}
+
+interface BgpSessionInfo {
+  state: string | null;
+  debug: boolean | null;
+  transitions: number | null;
+  lastEvent: string | null;
+  negotiatedHoldTime: number | null;
+  lastNotification: string | null;
+}
+
+/** Read the eBGP session telemetry the CFS layer augments onto the site
+ * (sorespo-ietf-l3vpn-svc:bgp-sessions), keyed by site-network-access. */
+function parseBgpSessions(site: any): Record<string, BgpSessionInfo> {
+  const container = site?.['sorespo-ietf-l3vpn-svc:bgp-sessions'] ?? site?.['bgp-sessions'];
+  const list = container?.['bgp-session'];
+  const out: Record<string, BgpSessionInfo> = {};
+  if (Array.isArray(list)) {
+    for (const entry of list) {
+      const id = String(entry?.['site-network-access'] ?? '');
+      if (!id) continue;
+      out[id] = {
+        state: entry?.['session-state'] != null ? normalizeIdentity(entry['session-state']) : null,
+        debug: normalizeBool(entry?.['debug-active']),
+        transitions: toNumber(entry?.['established-transitions']),
+        lastEvent: entry?.['last-event'] != null ? String(entry['last-event']) : null,
+        negotiatedHoldTime: toNumber(entry?.['negotiated-hold-time']),
+        lastNotification: entry?.['last-notification'] != null ? String(entry['last-notification']) : null
+      };
+    }
+  }
+  return out;
+}
+
 function parseLanPrefix(input: any): L3VpnSiteLanPrefixDraft {
   const defaults = createL3VpnSiteLanPrefixDraft();
 
@@ -254,14 +293,28 @@ export function parseL3VpnSite(input: unknown): L3VpnSiteDraft {
     return defaults;
   }
 
+  const accesses: L3VpnSiteAccessDraft[] = Array.isArray(site?.['site-network-accesses']?.['site-network-access'])
+    ? site['site-network-accesses']['site-network-access'].map(parseAccess)
+    : [];
+  const sessions = parseBgpSessions(site);
+  for (const access of accesses) {
+    const session = sessions[access.siteNetworkAccessId];
+    if (session) {
+      access.bgpSessionState = session.state;
+      access.bgpDebugActive = session.debug;
+      access.bgpEstablishedTransitions = session.transitions;
+      access.bgpLastEvent = session.lastEvent;
+      access.bgpNegotiatedHoldTime = session.negotiatedHoldTime;
+      access.bgpLastNotification = session.lastNotification;
+    }
+  }
+
   return {
     siteId: String(site['site-id'] ?? ''),
     managementType: normalizeManagementType(site?.management?.type),
     locations: Array.isArray(site?.locations?.location) ? site.locations.location.map(parseLocation) : [],
     devices: Array.isArray(site?.devices?.device) ? site.devices.device.map(parseDevice) : [],
-    accesses: Array.isArray(site?.['site-network-accesses']?.['site-network-access'])
-      ? site['site-network-accesses']['site-network-access'].map(parseAccess)
-      : []
+    accesses
   };
 }
 

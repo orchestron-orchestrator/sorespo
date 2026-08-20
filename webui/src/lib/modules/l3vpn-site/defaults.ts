@@ -62,7 +62,13 @@ export function createL3VpnSiteAccessDraft(): L3VpnSiteAccessDraft {
     customerAddress: '',
     prefixLength: null,
     bearerReference: '',
-    routingProtocols: [createL3VpnSiteRoutingProtocolDraft()]
+    routingProtocols: [createL3VpnSiteRoutingProtocolDraft()],
+    bgpSessionState: null,
+    bgpDebugActive: null,
+    bgpEstablishedTransitions: null,
+    bgpLastEvent: null,
+    bgpNegotiatedHoldTime: null,
+    bgpLastNotification: null
   };
 }
 

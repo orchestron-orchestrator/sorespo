@@ -41,58 +41,45 @@ class Router(base.Router):
         return o
 
 
+class BBLink(base.BBLink):
+    def transform(self, i):
+        print("CFS backbonelink transform running %s [%s] <-> %s [%s]" % (i.left_router, i.left_interface, i.right_router, i.right_interface))
+        o = base.o_root()
+        o.netinfra.backbone_link.create((i.left_router, i.left_interface, i.right_router, i.right_interface))
+        return o
+
+
+# --- Backbone link oper-status lift -------------------------------------------
+# Lift the inter backbone-link link-status onto the CFS backbone-link so it is
+# served at data/netinfra:netinfra/backbone-link
 actor BBLinkTransform(path: ttt.Path,
-                       update_oper: proc(?y_0_oper.netinfra__netinfra__backbone_link_entry)->None,
-                       lower_tree_provider: ?gdata.TreeProvider):
+                      update_oper: proc(?y_0_oper.netinfra__netinfra__backbone_link_entry)->None,
+                      lower_tree_provider: ?gdata.TreeProvider):
     _oper = base.BBLink.new_state(path)
     _subs = gdata.SubscriptionManager(lower_tree_provider!, str(path))
-
-    def push_state(left_pps: ?u64, right_pps: ?u64, link_status: ?str):
-        _oper.state.left_pps = left_pps
-        _oper.state.right_pps = right_pps
-        _oper.state.link_status = link_status
-        update_oper(_oper)
 
     def on_inter_state(root: ?y_1_oper.root, err: ?Exception, left_router: str, left_interface: str, right_router: str, right_interface: str):
         if err is not None:
             print("cfs.BBLinkTransform inter subscription error: {err}", err=True)
             return
-        left_pps: ?u64 = None
-        right_pps: ?u64 = None
         link_status: ?str = None
         if root is not None:
             for bl in root.netinfra.backbone_link:
                 if bl.left_router == left_router and bl.left_interface == left_interface and bl.right_router == right_router and bl.right_interface == right_interface:
-                    left_pps = bl.state.left_pps
-                    right_pps = bl.state.right_pps
                     link_status = bl.state.link_status
-        push_state(left_pps, right_pps, link_status)
+        _oper.state.link_status = link_status
+        update_oper(_oper)
 
     def on_conf(conf: y_0.netinfra__netinfra__backbone_link_entry):
+        lr = conf.left_router
+        li = conf.left_interface
+        rr = conf.right_router
+        ri = conf.right_interface
+        dst = y_1_oper.dst(lambda r, e: on_inter_state(r, e, lr, li, rr, ri))
+        entry = y_1_oper.subs.netinfra.backbone_link.entry(lr, li, rr, ri)
         want: set[gdata.Delivery] = set()
-        if conf.monitor_traffic:
-            lr = conf.left_router
-            li = conf.left_interface
-            rr = conf.right_router
-            ri = conf.right_interface
-            dst = y_1_oper.dst(lambda r, e: on_inter_state(r, e, lr, li, rr, ri))
-            entry = y_1_oper.subs.netinfra.backbone_link.entry(lr, li, rr, ri)
-            want.add(dst.deliver({
-                entry.state.left_pps.subscribe(period=5.0),
-                entry.state.right_pps.subscribe(period=5.0),
-                entry.state.link_status.subscribe(period=5.0),
-            }))
-        else:
-            push_state(None, None, None)
+        want.add(dst.deliver({ entry.state.subscribe(period=5.0) }))
         _subs.declare(want)
-
-
-class BBLink(base.BBLink):
-    def transform(self, i):
-        print("CFS backbonelink transform running %s [%s] <-> %s [%s]" % (i.left_router, i.left_interface, i.right_router, i.right_interface))
-        o = base.o_root()
-        o.netinfra.backbone_link.create((i.left_router, i.left_interface, i.right_router, i.right_interface), monitor_traffic=i.monitor_traffic)
-        return o
 
 
 class L3VpnVpnService(base.L3VpnVpnService):
@@ -105,8 +92,78 @@ class L3VpnVpnService(base.L3VpnVpnService):
 
 
 actor L3VpnSiteTransform(path: ttt.Path, update_oper: proc(y_0_oper.ietf_l3vpn_svc__l3vpn_svc__sites__site_entry) -> None, lower_tree_provider: ?gdata.TreeProvider):
+    # Lift inter endpoint telemetry into per-SNA site BGP session state.
+    var _oper = base.L3VpnSite.new_state(path)
+    _subs = gdata.SubscriptionManager(lower_tree_provider!, str(path))
+
+    def _endpoint(bearer_ref: ?str) -> (?str, ?str):
+        if bearer_ref is not None:
+            parts = bearer_ref.split(",")
+            if len(parts) == 2:
+                return (parts[0], parts[1])
+        return (None, None)
+
+    def on_inter_state(root: ?y_1_oper.root, err: ?Exception, conf: y_0.ietf_l3vpn_svc__l3vpn_svc__sites__site_entry):
+        if err is not None:
+            print("cfs.L3VpnSiteTransform inter subscription error: {err}", err=True)
+            return
+        # Rebuild each delivery so removed/non-BGP SNAs clear from oper.
+        _oper = base.L3VpnSite.new_state(path)
+        for sna in conf.site_network_accesses.site_network_access:
+            vpn_id = sna.vpn_attachment.vpn_id
+            device, interface = _endpoint(sna.bearer.bearer_reference)
+            if vpn_id is None or device is None or interface is None:
+                continue
+            found = False
+            session_state: ?str = None
+            last_event: ?str = None
+            transitions: ?u64 = None
+            debug_active: ?bool = None
+            hold: ?u64 = None
+            notification: ?str = None
+            if root is not None:
+                for vpn in root.l3vpns.l3vpn:
+                    if vpn.name == vpn_id:
+                        for ep in vpn.endpoint:
+                            if ep.device == device and ep.interface == interface:
+                                found = True
+                                eps = ep.state
+                                da = eps.debug_active
+                                session_state = eps.session_state
+                                debug_active = da
+                                if da is not None and da:
+                                    last_event = eps.last_event
+                                    transitions = eps.established_transitions
+                                    hold = eps.negotiated_hold_time
+                                    notification = eps.last_notification
+            if not found:
+                # Non-BGP or not yet reported: avoid a key-only session entry.
+                continue
+            bs = _oper.bgp_sessions.bgp_session.create(sna.site_network_access_id)
+            bs.session_state = session_state
+            bs.debug_active = debug_active
+            bs.last_event = last_event
+            bs.established_transitions = transitions
+            bs.negotiated_hold_time = hold
+            bs.last_notification = notification
+        update_oper(_oper)
+
     def on_conf(conf: y_0.ietf_l3vpn_svc__l3vpn_svc__sites__site_entry):
-        pass
+        want: set[gdata.Delivery] = set()
+        dst = y_1_oper.dst(lambda r, e: on_inter_state(r, e, conf))
+        specs: set[gdata.SubscriptionSpec] = set()
+        for sna in conf.site_network_accesses.site_network_access:
+            vpn_id = sna.vpn_attachment.vpn_id
+            device, interface = _endpoint(sna.bearer.bearer_reference)
+            if vpn_id is not None and device is not None and interface is not None:
+                ep = y_1_oper.subs.l3vpns.l3vpn.entry(vpn_id).endpoint.entry(device, interface)
+                specs.add(ep.state.subscribe(period=2.0))
+        if len(specs) > 0:
+            want.add(dst.deliver(specs))
+        _subs.declare(want)
+        if len(specs) == 0:
+            _oper = base.L3VpnSite.new_state(path)
+            update_oper(_oper)
 
 class L3VpnSite(base.L3VpnSite):
     def transform(self, i):

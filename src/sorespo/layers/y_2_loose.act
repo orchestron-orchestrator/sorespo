@@ -105,8 +105,7 @@ SRC_DNODE_CHILD_14: DList = DList(module='sorespo-rfs', namespace='http://exampl
     DContainer(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='remote', config=True, presence=False, children=[
         DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='device', config=True, mandatory=True, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
         DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='interface', config=True, mandatory=True, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
-    ]),
-    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='monitor-traffic', config=True, default='false', mandatory=False, type=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
+    ])
 ])
 
 SRC_DNODE_CHILD_15: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ibgp-neighbor', key=['address'], config=True, min_elements=0, ordered_by='system', exts=[
@@ -246,19 +245,11 @@ SRC_YANG_0: str = r"""module sorespo-rfs {
                 }
             }
 
-            leaf monitor-traffic {
-                type boolean;
-                default "false";
-            }
-
             container state {
                 config false;
-                leaf rx-packets {
-                    type uint64;
-                }
-                leaf pps {
-                    type uint64;
-                }
+                description
+                    "Operational state of the backbone interface, polled from
+                     the device. oper-status is the interface oper-state.";
                 leaf oper-status {
                     type enumeration {
                         enum up;
@@ -267,6 +258,7 @@ SRC_YANG_0: str = r"""module sorespo-rfs {
                     }
                 }
             }
+
         }
 
         list ibgp-neighbor {
@@ -361,6 +353,29 @@ SRC_YANG_0: str = r"""module sorespo-rfs {
         description
           "Optional eBGP session authentication key (MD5/TCP-AO). Absent when
            the customer session has no authentication configured.";
+      }
+
+      container state {
+        config false;
+        description
+          "eBGP customer neighbor session telemetry. The base set is always
+           collected; the escalated detail is collected only while debug-active
+           (session down or flapping).";
+        leaf session-state {
+          type enumeration {
+            enum idle;
+            enum connect;
+            enum active;
+            enum opensent;
+            enum openconfirm;
+            enum established;
+          }
+        }
+        leaf last-event { type string; }
+        leaf established-transitions { type uint64; }
+        leaf debug-active { type boolean; }
+        leaf negotiated-hold-time { type uint64; }
+        leaf last-notification { type string; }
       }
     }
   }
@@ -1556,23 +1571,21 @@ class stratoweave_rfs__rfs__backbone_interface_entry(yadata.MNode):
     ipv6_address: ?str
     ipv6_prefix_length: ?u64
     remote: stratoweave_rfs__rfs__backbone_interface__remote
-    monitor_traffic: ?bool
 
-    mut def __init__(self, name: str, ipv4_address: ?str, ipv4_prefix_length: ?u64, ipv6_address: ?str, ipv6_prefix_length: ?u64, remote: ?stratoweave_rfs__rfs__backbone_interface__remote=None, monitor_traffic: ?bool) -> None:
+    mut def __init__(self, name: str, ipv4_address: ?str, ipv4_prefix_length: ?u64, ipv6_address: ?str, ipv6_prefix_length: ?u64, remote: ?stratoweave_rfs__rfs__backbone_interface__remote=None) -> None:
         self.name = name
         self.ipv4_address = ipv4_address
         self.ipv4_prefix_length = ipv4_prefix_length
         self.ipv6_address = ipv6_address
         self.ipv6_prefix_length = ipv6_prefix_length
         self.remote = remote if remote is not None else stratoweave_rfs__rfs__backbone_interface__remote()
-        self.monitor_traffic = monitor_traffic
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:backbone-interface'])
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> stratoweave_rfs__rfs__backbone_interface_entry:
-        return stratoweave_rfs__rfs__backbone_interface_entry(name=n.get_str(ygdata.Id(NS_sorespo_rfs, 'name')), ipv4_address=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'ipv4-address')), ipv4_prefix_length=n.get_opt_u64(ygdata.Id(NS_sorespo_rfs, 'ipv4-prefix-length')), ipv6_address=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'ipv6-address')), ipv6_prefix_length=n.get_opt_u64(ygdata.Id(NS_sorespo_rfs, 'ipv6-prefix-length')), remote=stratoweave_rfs__rfs__backbone_interface__remote.from_gdata(n.get_opt_cnt(ygdata.Id(NS_sorespo_rfs, 'remote'))), monitor_traffic=n.get_opt_bool(ygdata.Id(NS_sorespo_rfs, 'monitor-traffic')))
+        return stratoweave_rfs__rfs__backbone_interface_entry(name=n.get_str(ygdata.Id(NS_sorespo_rfs, 'name')), ipv4_address=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'ipv4-address')), ipv4_prefix_length=n.get_opt_u64(ygdata.Id(NS_sorespo_rfs, 'ipv4-prefix-length')), ipv6_address=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'ipv6-address')), ipv6_prefix_length=n.get_opt_u64(ygdata.Id(NS_sorespo_rfs, 'ipv6-prefix-length')), remote=stratoweave_rfs__rfs__backbone_interface__remote.from_gdata(n.get_opt_cnt(ygdata.Id(NS_sorespo_rfs, 'remote'))))
 
     mut def copy(self) -> stratoweave_rfs__rfs__backbone_interface_entry:
         """Create a deep copy of this adata object"""
@@ -1583,7 +1596,7 @@ class stratoweave_rfs__rfs__backbone_interface(yadata.MKeyedList[str, stratoweav
     mut def __init__(self, elements: list[stratoweave_rfs__rfs__backbone_interface_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
 
-    mut def create(self, key: str, ipv4_address: ?str=None, ipv4_prefix_length: ?u64=None, ipv6_address: ?str=None, ipv6_prefix_length: ?u64=None, monitor_traffic: ?bool=None) -> stratoweave_rfs__rfs__backbone_interface_entry:
+    mut def create(self, key: str, ipv4_address: ?str=None, ipv4_prefix_length: ?u64=None, ipv6_address: ?str=None, ipv6_prefix_length: ?u64=None) -> stratoweave_rfs__rfs__backbone_interface_entry:
         e = self.get(key)
         if e is not None:
             if ipv4_address is not None:
@@ -1594,11 +1607,9 @@ class stratoweave_rfs__rfs__backbone_interface(yadata.MKeyedList[str, stratoweav
                 e.ipv6_address = ipv6_address
             if ipv6_prefix_length is not None:
                 e.ipv6_prefix_length = ipv6_prefix_length
-            if monitor_traffic is not None:
-                e.monitor_traffic = monitor_traffic
             return e
         name = key
-        res = stratoweave_rfs__rfs__backbone_interface_entry(name=name, ipv4_address=ipv4_address, ipv4_prefix_length=ipv4_prefix_length, ipv6_address=ipv6_address, ipv6_prefix_length=ipv6_prefix_length, monitor_traffic=monitor_traffic)
+        res = stratoweave_rfs__rfs__backbone_interface_entry(name=name, ipv4_address=ipv4_address, ipv4_prefix_length=ipv4_prefix_length, ipv6_address=ipv6_address, ipv6_prefix_length=ipv6_prefix_length)
         self.elements.append(res)
         return res
 

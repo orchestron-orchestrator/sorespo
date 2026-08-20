@@ -55,6 +55,15 @@ export interface L3VpnSiteAccessDraft {
   prefixLength: number | null;
   bearerReference: string;
   routingProtocols: L3VpnSiteRoutingProtocolDraft[];
+  /** Read-only eBGP session telemetry, lifted from the RFS ebgp-customer state. Not serialized. */
+  bgpSessionState: string | null;
+  /** True while the per-neighbor telemetry has escalated (session down or flapping). Not serialized. */
+  bgpDebugActive: boolean | null;
+  bgpEstablishedTransitions: number | null;
+  bgpLastEvent: string | null;
+  /** Escalated detail, only populated while debug-active. Not serialized. */
+  bgpNegotiatedHoldTime: number | null;
+  bgpLastNotification: string | null;
 }
 
 export interface L3VpnSiteDraft {

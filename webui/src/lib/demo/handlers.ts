@@ -68,32 +68,11 @@ function notFound(message: string): Response {
 
 // ── shared payload shapes ──
 
-function netinfraTree(state: DemoState, jitterPps: boolean): Record<string, unknown> {
-  const links = jitterPps
-    ? state.backboneLinks.map((link) => jitterLink(link))
-    : state.backboneLinks;
+function netinfraTree(state: DemoState): Record<string, unknown> {
   return {
     'global-settings': state.globalSettings,
     router: state.routers,
-    'backbone-link': links
-  };
-}
-
-function jitterLink(link: NetinfraBackboneLinkApi): NetinfraBackboneLinkApi {
-  if (!link['monitor-traffic'] || !link.state || link.state['link-status'] !== 'up') {
-    return link;
-  }
-  const wiggle = (pps: number | string | undefined) => {
-    const base = Number(pps ?? 0);
-    return Math.max(0, Math.round(base * (0.9 + Math.random() * 0.2)));
-  };
-  return {
-    ...link,
-    state: {
-      ...link.state,
-      'left-pps': wiggle(link.state['left-pps']),
-      'right-pps': wiggle(link.state['right-pps'])
-    }
+    'backbone-link': state.backboneLinks
   };
 }
 
@@ -246,6 +225,22 @@ function upsertListEntry(list: Record<string, any>[], keyLeaf: string, entry: Re
   }
 }
 
+const SITE_BGP_SESSIONS_KEY = 'sorespo-ietf-l3vpn-svc:bgp-sessions';
+
+/** Apply site configuration without treating config-false BGP telemetry as writable. */
+function upsertSite(list: Record<string, any>[], entry: Record<string, any>): void {
+  const siteId = String(entry['site-id'] ?? '');
+  const existing = list.find((site) => String(site['site-id'] ?? '') === siteId);
+  const next = { ...entry };
+
+  delete next[SITE_BGP_SESSIONS_KEY];
+  if (existing?.[SITE_BGP_SESSIONS_KEY] !== undefined) {
+    next[SITE_BGP_SESSIONS_KEY] = existing[SITE_BGP_SESSIONS_KEY];
+  }
+
+  upsertListEntry(list, 'site-id', next);
+}
+
 // ── the RESTCONF branch (/api/restconf/...) ──
 
 async function handleRestconf(
@@ -269,7 +264,7 @@ async function handleRestconf(
 
   if (top === 'netinfra:netinfra') {
     if (rest.length === 0) {
-      if (method === 'GET') return json({ 'netinfra:netinfra': netinfraTree(state, true) });
+      if (method === 'GET') return json({ 'netinfra:netinfra': netinfraTree(state) });
       return restconfNotFound(`unsupported ${method} on netinfra:netinfra`);
     }
 
@@ -351,7 +346,7 @@ async function handleRestconf(
         if (method === 'PUT') {
           const body = unwrapEntry(parseBody(init), 'ietf-l3vpn-svc:site');
           if (body) {
-            upsertListEntry(state.sites, 'site-id', { ...body, 'site-id': body['site-id'] ?? siteId });
+            upsertSite(state.sites, { ...body, 'site-id': body['site-id'] ?? siteId });
             enqueueSiteAdd(body);
           }
           return empty();
@@ -412,7 +407,7 @@ function applyCfsPayload(init: RequestInit | undefined): void {
       upsertListEntry(state.vpnServices, 'vpn-id', vpn);
     }
     for (const site of l3vpn?.sites?.site ?? []) {
-      upsertListEntry(state.sites, 'site-id', site);
+      upsertSite(state.sites, site);
       const facts = siteFacts(site);
       if (facts && state.devices[facts.router]) {
         enqueueSiteAdd(site);
@@ -532,7 +527,7 @@ async function handleOrchestron(
         ? 'json'
         : 'xml';
     const body = layerConfigText(layer, format, {
-      netinfra: { 'netinfra:netinfra': netinfraTree(state, false) },
+      netinfra: { 'netinfra:netinfra': netinfraTree(state) },
       l3vpn: { 'ietf-l3vpn-svc:l3vpn-svc': l3vpnTree(state) },
       routers: managedRouters(state)
     });

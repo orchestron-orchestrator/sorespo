@@ -49,3 +49,24 @@ bb-up-all:
 	        "set / interface $$iface admin-state enable" \
 	        || true; \
 	done
+
+# --- BGP session failure injection --------------------------------------------
+# Drop 100% of packets on a PE's customer-facing port with netem. The link stays
+# operationally UP, but BGP keepalives are lost, so the eBGP PE<->CE session drops
+# after the negotiated hold time. This drives the reactive BGP-neighbor telemetry
+# to escalate (debug-active=true) on the affected neighbor. (Interface error/
+# discard counters do NOT move over containerlab veth, but BGP session state does.)
+# Default: ams-core-1's customer access port e1-3 (ethernet-1/3.100 -> cust-1,
+# eBGP neighbor 10.201.1.2 in network-instance acme-65501).
+BGP_IMPAIR_ROUTER ?= ams-core-1
+BGP_IMPAIR_IF     ?= e1-3
+
+.PHONY: bgp-impair
+bgp-impair:
+	@echo "Dropping 100% of packets on $(BGP_IMPAIR_ROUTER) $(BGP_IMPAIR_IF) (link stays up; eBGP session drops after hold)"
+	docker exec $(TESTENV)-$(BGP_IMPAIR_ROUTER) tc qdisc add dev $(BGP_IMPAIR_IF) root netem loss 100%
+
+.PHONY: bgp-restore
+bgp-restore:
+	@echo "Removing netem on $(BGP_IMPAIR_ROUTER) $(BGP_IMPAIR_IF)"
+	docker exec $(TESTENV)-$(BGP_IMPAIR_ROUTER) tc qdisc del dev $(BGP_IMPAIR_IF) root || true
