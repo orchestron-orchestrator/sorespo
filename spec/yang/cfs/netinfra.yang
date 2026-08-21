@@ -64,6 +64,22 @@ module netinfra {
       }
     }
 
+    list roadm {
+      key name;
+
+      sw:transform sorespo.cfs.ROADM;
+      tmf:cfs-service "ROADM";
+
+      leaf name {
+        type string;
+      }
+      leaf id {
+        type uint32;
+        description "roadm id";
+        mandatory true;
+      }
+    }
+
     list backbone-link {
       key "left-router left-interface right-router right-interface";
 
@@ -83,6 +99,33 @@ module netinfra {
         type string;
       }
 
+      container optical {
+        description "OTN link parameters";
+        leaf left-roadm {
+          type leafref {
+            path "/netinfra:netinfra/netinfra:roadm/netinfra:name";
+          }
+        }
+        leaf right-roadm {
+          type leafref {
+            path "/netinfra:netinfra/netinfra:roadm/netinfra:name";
+          }
+        }
+        leaf left-port {
+          type string;
+        }
+        leaf right-port {
+          type string;
+        }
+        leaf-list otn-path {
+          type leafref {
+            path "/netinfra:netinfra/netinfra:roadm/netinfra:name";
+          }
+          ordered-by user;
+          description "OTN path through intermediate ROADMs";
+        }
+      }
+
       container state {
         config false;
         description
@@ -96,6 +139,26 @@ module netinfra {
             enum unknown;
           }
         }
+      }
+    }
+
+    list optical-link {
+      key "left-roadm left-port right-roadm right-port";
+
+      sw:transform sorespo.cfs.OpticalLink;
+      tmf:cfs-service "Optical Link";
+
+      leaf left-roadm {
+        type string;
+      }
+      leaf left-port {
+        type string;
+      }
+      leaf right-roadm {
+        type string;
+      }
+      leaf right-port {
+        type string;
       }
     }
 
