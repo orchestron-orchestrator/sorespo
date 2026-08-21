@@ -8,6 +8,8 @@ from rtrsecrets.junos import *
 from rtrsecrets.cisco import cisco_type7_encrypt
 from rtrsecrets.nokia import nokia_srl_aes1_encrypt
 
+import timeseries
+
 import sorespo.layers.base_2 as base
 import sorespo.layers.y_2 as y_2
 import sorespo.layers.y_2_oper as y_2_oper
@@ -448,7 +450,9 @@ class IbgpNeighbor(base.IbgpNeighbor):
             dev = srl25.root()
             bgp = dev.network_instance.create("default").protocols.create_bgp()
             bgp.group.create("IPV4-IBGP")
-            bgp.neighbor.create(i.address, peer_group="IPV4-IBGP", admin_state="enable", description=i.description)
+            n = bgp.neighbor.create(i.address, peer_group="IPV4-IBGP", admin_state="enable", description=i.description)
+            if i.ibgp_authentication_key is not None:
+                n.authentication.password = nokia_srl_aes1_encrypt(i.ibgp_authentication_key!, _SRL_AES1_SALT)
             return dev
 
         raise UnsupportedDevice()
