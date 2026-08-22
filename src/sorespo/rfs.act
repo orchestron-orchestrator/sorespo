@@ -21,10 +21,12 @@ import sorespo.devices.JuniperCRPD_24_4R1_9 as crpd24
 import sorespo.devices.NokiaSRLinux_25_3_2 as srl25
 import sorespo.devices.NokiaSRLinux_25_3_2_oper as srl25_oper
 from sorespo.devices.NokiaSRLinux_25_3_2_oper import root as srl25_oper_root
+import sorespo.devices.ArcOS_8_2_1 as arcos8
 
 CRPD = True
 
 _SRL_AES1_SALT = b"\x01\x00sorespo!\x6f"
+_ARCOS_LAB_PASSWORD = "$6$OxKlHRd5r/wCpeBE$izoSbxJWOJFrky3R5v/Ool3cG9pBC7pjfp3.o1NG8.ZlPuX28j0lpw0V/zfWGa1PhRfuG2vIxrkS/5n/tr8EF."
 
 def prefix_length_to_netmask(prefix_length):
     binary_netmask = ("1" * prefix_length).ljust(32, "0")
@@ -270,6 +272,93 @@ end-policy
 
             return dev
 
+        elif "arcos-system" in di.modules:
+            print("RFS /rfs{{{di.name}}}/base-config transform for ArcOS", err=True)
+            dev = arcos8.root()
+
+            dev.features.feature.create(arcos8.arcos_features_ARCOS_RIOT, supported=False)
+            dev.features.feature.create(arcos8.arcos_features_ARCOS_ICMP_SRC_REWRITE, supported=False)
+            dev.features.feature.create(arcos8.arcos_features_ARCOS_SUBIF, supported=True)
+            dev.features.feature.create(arcos8.arcos_features_ARCOS_QoS, supported=False)
+            dev.features.feature.create(arcos8.arcos_features_ARCOS_MPLS, supported=True)
+            dev.features.feature.create(arcos8.arcos_features_ARCOS_SFLOW, supported=True)
+
+            dev.system.config.hostname = di.name
+            dev.system.config.login_banner = "ArcOS (c) Arrcus, Inc."
+            dev.system.ssh_server.config.enable = True
+            dev.system.ssh_server.config.permit_root_login = True
+            dev.system.ssh_server.sftp.config.enable = True
+            dev.system.cli.config.commit_message = True
+            dev.system.netconf_server.config.enable = True
+            dev.system.netconf_server.transport.ssh.config.enable = True
+            dev.system.netconf_server.transport.ssh.config.port = 830
+
+            authentication = dev.system.aaa.authentication
+            authentication.admin_user.config.admin_password = _ARCOS_LAB_PASSWORD
+            clab = authentication.users.user.create("clab")
+            clab.config.username = "clab"
+            clab.config.password = _ARCOS_LAB_PASSWORD
+            clab.config.role = arcos8.openconfig_aaa_types_SYSTEM_ROLE_ADMIN
+
+            ipv6_rib = dev.system.rib.create(arcos8.openconfig_types_IPV6)
+            ipv6_rib.config.address_family = arcos8.openconfig_types_IPV6
+            ipv4_rib = dev.system.rib.create(arcos8.openconfig_types_IPV4)
+            ipv4_rib.config.address_family = arcos8.openconfig_types_IPV4
+
+            eth0 = dev.interfaces.interface.create("eth0")
+            eth0.config.name = "eth0"
+            eth0.config.type = arcos8.iana_if_type_ethernetCsmacd
+            eth0.config.mtu = 1500
+            eth0.config.enabled = True
+            eth0_subif = eth0.subinterfaces.subinterface.create(0)
+            eth0_subif.config.index = 0
+
+            default_ni = dev.network_instances.network_instance.create("default")
+            default_ni.config.name = "default"
+            management_ni = dev.network_instances.network_instance.create("management")
+            management_ni.config.name = "management"
+
+            lldp_eth0 = dev.lldp.interfaces.interface.create("eth0")
+            lldp_eth0.config.name = "eth0"
+
+            ipv4_martians = dev.routing_policy.defined_sets.prefix_sets.prefix_set.create("__IPV4_MARTIAN_PREFIX_SET__")
+            ipv4_martians.config.prefix_set_name = "__IPV4_MARTIAN_PREFIX_SET__"
+            prefix = ipv4_martians.prefixes.prefix.create(("0.0.0.0/8", "8..32"))
+            prefix.config.ip_prefix = "0.0.0.0/8"
+            prefix.config.masklength_range = "8..32"
+            prefix = ipv4_martians.prefixes.prefix.create(("127.0.0.0/8", "8..32"))
+            prefix.config.ip_prefix = "127.0.0.0/8"
+            prefix.config.masklength_range = "8..32"
+            prefix = ipv4_martians.prefixes.prefix.create(("192.0.0.0/24", "24..32"))
+            prefix.config.ip_prefix = "192.0.0.0/24"
+            prefix.config.masklength_range = "24..32"
+            prefix = ipv4_martians.prefixes.prefix.create(("224.0.0.0/4", "exact"))
+            prefix.config.ip_prefix = "224.0.0.0/4"
+            prefix.config.masklength_range = "exact"
+            prefix = ipv4_martians.prefixes.prefix.create(("224.0.0.0/24", "exact"))
+            prefix.config.ip_prefix = "224.0.0.0/24"
+            prefix.config.masklength_range = "exact"
+            prefix = ipv4_martians.prefixes.prefix.create(("240.0.0.0/4", "4..32"))
+            prefix.config.ip_prefix = "240.0.0.0/4"
+            prefix.config.masklength_range = "4..32"
+
+            ipv6_martians = dev.routing_policy.defined_sets.prefix_sets.prefix_set.create("__IPV6_MARTIAN_PREFIX_SET__")
+            ipv6_martians.config.prefix_set_name = "__IPV6_MARTIAN_PREFIX_SET__"
+            prefix = ipv6_martians.prefixes.prefix.create(("::/128", "exact"))
+            prefix.config.ip_prefix = "::/128"
+            prefix.config.masklength_range = "exact"
+            prefix = ipv6_martians.prefixes.prefix.create(("::1/128", "exact"))
+            prefix.config.ip_prefix = "::1/128"
+            prefix.config.masklength_range = "exact"
+            prefix = ipv6_martians.prefixes.prefix.create(("ff00::/8", "exact"))
+            prefix.config.ip_prefix = "ff00::/8"
+            prefix.config.masklength_range = "exact"
+            prefix = ipv6_martians.prefixes.prefix.create(("ff02::/16", "exact"))
+            prefix.config.ip_prefix = "ff02::/16"
+            prefix.config.masklength_range = "exact"
+
+            return dev
+
         raise UnsupportedDevice()
 
 class BBInterface(base.BBInterface):
@@ -357,6 +446,11 @@ class BBInterface(base.BBInterface):
             il2 = isis_intf.level.create(2)
             il2.metric = 5000
 
+            return dev
+
+        elif "arcos-system" in di.modules:
+            print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}] for ArcOS", err=True)
+            dev = arcos8.root()
             return dev
 
         raise UnsupportedDevice()
@@ -451,6 +545,11 @@ class IbgpNeighbor(base.IbgpNeighbor):
             bgp.neighbor.create(i.address, peer_group="IPV4-IBGP", admin_state="enable")
             return dev
 
+        elif "arcos-system" in di.modules:
+            print("RFS /rfs{{{di.name}}}/ibgp-neighbor transform running {i.address} for ArcOS", err=True)
+            dev = arcos8.root()
+            return dev
+
         raise UnsupportedDevice()
 
 
@@ -525,6 +624,11 @@ class Vrf(base.Vrf):
 
             return dev
 
+        elif "arcos-system" in di.modules:
+            print("RFS /rfs{{{di.name}}}/vrf transform running {i.name} for ArcOS", err=True)
+            dev = arcos8.root()
+            return dev
+
         raise UnsupportedDevice()
 
 
@@ -590,6 +694,11 @@ class VrfInterface(base.VrfInterface):
 
             return dev
 
+        elif "arcos-system" in di.modules:
+            print("RFS /rfs{{{di.name}}}/vrf-interface transform running {i.name} for ArcOS", err=True)
+            dev = arcos8.root()
+            return dev
+
         raise UnsupportedDevice()
 
 class EbgpCustomer(base.EbgpCustomer):
@@ -642,6 +751,11 @@ class EbgpCustomer(base.EbgpCustomer):
             neighbor.timers.hold_time = 3
             neighbor.timers.keepalive_interval = 1
 
+            return dev
+
+        elif "arcos-system" in di.modules:
+            print("RFS /rfs{{{di.name}}}/ebgp-customer transform running {i.address} for ArcOS", err=True)
+            dev = arcos8.root()
             return dev
 
         raise UnsupportedDevice()

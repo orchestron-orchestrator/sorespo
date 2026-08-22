@@ -2690,11 +2690,207 @@ NS_INET_ADDRESS_MIB: str = 'urn:ietf:params:xml:ns:yang:smiv2:INET-ADDRESS-MIB'
 
 
 _breaker1: None = None
+class openconfig_interfaces__interfaces__interface__config(yadata.MNode):
+    type: ?Identityref
+    mtu: ?u64
+    name: ?str
+    enabled: ?bool
+
+    mut def __init__(self, type: ?Identityref, mtu: ?u64, name: ?str, enabled: ?bool) -> None:
+        self.type = type
+        self.mtu = mtu
+        self.name = name
+        self.enabled = enabled
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-interfaces:interfaces', 'interface', 'config'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_interfaces__interfaces__interface__config:
+        if n is not None:
+            return openconfig_interfaces__interfaces__interface__config(type=n.get_opt_Identityref(ygdata.Id(NS_openconfig_interfaces, 'type')), mtu=n.get_opt_u64(ygdata.Id(NS_openconfig_interfaces, 'mtu')), name=n.get_opt_str(ygdata.Id(NS_openconfig_interfaces, 'name')), enabled=n.get_opt_bool(ygdata.Id(NS_openconfig_interfaces, 'enabled')))
+        return openconfig_interfaces__interfaces__interface__config()
+
+    mut def copy(self) -> openconfig_interfaces__interfaces__interface__config:
+        """Create a deep copy of this adata object"""
+        return openconfig_interfaces__interfaces__interface__config.from_gdata(self.to_gdata())
+
+
+_breaker2: None = None
+class openconfig_interfaces__interfaces__interface__subinterfaces__subinterface__config(yadata.MNode):
+    index: ?u64
+
+    mut def __init__(self, index: ?u64) -> None:
+        self.index = index
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-interfaces:interfaces', 'interface', 'subinterfaces', 'subinterface', 'config'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_interfaces__interfaces__interface__subinterfaces__subinterface__config:
+        if n is not None:
+            return openconfig_interfaces__interfaces__interface__subinterfaces__subinterface__config(index=n.get_opt_u64(ygdata.Id(NS_openconfig_interfaces, 'index')))
+        return openconfig_interfaces__interfaces__interface__subinterfaces__subinterface__config()
+
+    mut def copy(self) -> openconfig_interfaces__interfaces__interface__subinterfaces__subinterface__config:
+        """Create a deep copy of this adata object"""
+        return openconfig_interfaces__interfaces__interface__subinterfaces__subinterface__config.from_gdata(self.to_gdata())
+
+
+_breaker3: None = None
+class openconfig_interfaces__interfaces__interface__subinterfaces__subinterface_entry(yadata.MNode):
+    index: u64
+    config: openconfig_interfaces__interfaces__interface__subinterfaces__subinterface__config
+
+    mut def __init__(self, index: u64, config: ?openconfig_interfaces__interfaces__interface__subinterfaces__subinterface__config=None) -> None:
+        self.index = index
+        self.config = config if config is not None else openconfig_interfaces__interfaces__interface__subinterfaces__subinterface__config()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-interfaces:interfaces', 'interface', 'subinterfaces', 'subinterface'])
+
+    @staticmethod
+    mut def from_gdata(n: ygdata.Node) -> openconfig_interfaces__interfaces__interface__subinterfaces__subinterface_entry:
+        return openconfig_interfaces__interfaces__interface__subinterfaces__subinterface_entry(index=n.get_u64(ygdata.Id(NS_openconfig_interfaces, 'index')), config=openconfig_interfaces__interfaces__interface__subinterfaces__subinterface__config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_interfaces, 'config'))))
+
+    mut def copy(self) -> openconfig_interfaces__interfaces__interface__subinterfaces__subinterface_entry:
+        """Create a deep copy of this adata object"""
+        return openconfig_interfaces__interfaces__interface__subinterfaces__subinterface_entry.from_gdata(self.to_gdata())
+
+_breaker4: None = None
+class openconfig_interfaces__interfaces__interface__subinterfaces__subinterface(yadata.MKeyedList[u64, openconfig_interfaces__interfaces__interface__subinterfaces__subinterface_entry]):
+    mut def __init__(self, elements: list[openconfig_interfaces__interfaces__interface__subinterfaces__subinterface_entry]=[]) -> None:
+        yadata.MKeyedList.__init__(self, lambda e, k: e.index == k, elements)
+
+    mut def create(self, key: u64) -> openconfig_interfaces__interfaces__interface__subinterfaces__subinterface_entry:
+        e = self.get(key)
+        if e is not None:
+            return e
+        index = key
+        res = openconfig_interfaces__interfaces__interface__subinterfaces__subinterface_entry(index=index)
+        self.elements.append(res)
+        return res
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.List) -> list[openconfig_interfaces__interfaces__interface__subinterfaces__subinterface_entry]:
+        if n is not None:
+            return [openconfig_interfaces__interfaces__interface__subinterfaces__subinterface_entry.from_gdata(e) for e in n.elements]
+        return []
+
+    mut def copy(self) -> openconfig_interfaces__interfaces__interface__subinterfaces__subinterface:
+        """Create a deep copy of this list object"""
+        # Copy each element in the list
+        copied_elements = []
+        for e in self:
+            ce = e.copy()
+            if ce is not None:
+                copied_elements.append(ce)
+        return openconfig_interfaces__interfaces__interface__subinterfaces__subinterface(elements=copied_elements)
+
+
+_breaker5: None = None
+class openconfig_interfaces__interfaces__interface__subinterfaces(yadata.MNode):
+    subinterface: openconfig_interfaces__interfaces__interface__subinterfaces__subinterface
+
+    mut def __init__(self, subinterface: list[openconfig_interfaces__interfaces__interface__subinterfaces__subinterface_entry]=[]) -> None:
+        self.subinterface = openconfig_interfaces__interfaces__interface__subinterfaces__subinterface(elements=subinterface)
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-interfaces:interfaces', 'interface', 'subinterfaces'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_interfaces__interfaces__interface__subinterfaces:
+        if n is not None:
+            return openconfig_interfaces__interfaces__interface__subinterfaces(subinterface=openconfig_interfaces__interfaces__interface__subinterfaces__subinterface.from_gdata(n.get_opt_list(ygdata.Id(NS_openconfig_interfaces, 'subinterface'))))
+        return openconfig_interfaces__interfaces__interface__subinterfaces()
+
+    mut def copy(self) -> openconfig_interfaces__interfaces__interface__subinterfaces:
+        """Create a deep copy of this adata object"""
+        return openconfig_interfaces__interfaces__interface__subinterfaces.from_gdata(self.to_gdata())
+
+
+_breaker6: None = None
+class openconfig_interfaces__interfaces__interface_entry(yadata.MNode):
+    name: str
+    config: openconfig_interfaces__interfaces__interface__config
+    subinterfaces: openconfig_interfaces__interfaces__interface__subinterfaces
+
+    mut def __init__(self, name: str, config: ?openconfig_interfaces__interfaces__interface__config=None, subinterfaces: ?openconfig_interfaces__interfaces__interface__subinterfaces=None) -> None:
+        self.name = name
+        self.config = config if config is not None else openconfig_interfaces__interfaces__interface__config()
+        self.subinterfaces = subinterfaces if subinterfaces is not None else openconfig_interfaces__interfaces__interface__subinterfaces()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-interfaces:interfaces', 'interface'])
+
+    @staticmethod
+    mut def from_gdata(n: ygdata.Node) -> openconfig_interfaces__interfaces__interface_entry:
+        return openconfig_interfaces__interfaces__interface_entry(name=n.get_str(ygdata.Id(NS_openconfig_interfaces, 'name')), config=openconfig_interfaces__interfaces__interface__config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_interfaces, 'config'))), subinterfaces=openconfig_interfaces__interfaces__interface__subinterfaces.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_interfaces, 'subinterfaces'))))
+
+    mut def copy(self) -> openconfig_interfaces__interfaces__interface_entry:
+        """Create a deep copy of this adata object"""
+        return openconfig_interfaces__interfaces__interface_entry.from_gdata(self.to_gdata())
+
+_breaker7: None = None
+class openconfig_interfaces__interfaces__interface(yadata.MKeyedList[str, openconfig_interfaces__interfaces__interface_entry]):
+    mut def __init__(self, elements: list[openconfig_interfaces__interfaces__interface_entry]=[]) -> None:
+        yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
+
+    mut def create(self, key: str) -> openconfig_interfaces__interfaces__interface_entry:
+        e = self.get(key)
+        if e is not None:
+            return e
+        name = key
+        res = openconfig_interfaces__interfaces__interface_entry(name=name)
+        self.elements.append(res)
+        return res
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.List) -> list[openconfig_interfaces__interfaces__interface_entry]:
+        if n is not None:
+            return [openconfig_interfaces__interfaces__interface_entry.from_gdata(e) for e in n.elements]
+        return []
+
+    mut def copy(self) -> openconfig_interfaces__interfaces__interface:
+        """Create a deep copy of this list object"""
+        # Copy each element in the list
+        copied_elements = []
+        for e in self:
+            ce = e.copy()
+            if ce is not None:
+                copied_elements.append(ce)
+        return openconfig_interfaces__interfaces__interface(elements=copied_elements)
+
+
+_breaker8: None = None
+class openconfig_interfaces__interfaces(yadata.MNode):
+    interface: openconfig_interfaces__interfaces__interface
+
+    mut def __init__(self, interface: list[openconfig_interfaces__interfaces__interface_entry]=[]) -> None:
+        self.interface = openconfig_interfaces__interfaces__interface(elements=interface)
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-interfaces:interfaces'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_interfaces__interfaces:
+        if n is not None:
+            return openconfig_interfaces__interfaces(interface=openconfig_interfaces__interfaces__interface.from_gdata(n.get_opt_list(ygdata.Id(NS_openconfig_interfaces, 'interface'))))
+        return openconfig_interfaces__interfaces()
+
+    mut def copy(self) -> openconfig_interfaces__interfaces:
+        """Create a deep copy of this adata object"""
+        return openconfig_interfaces__interfaces.from_gdata(self.to_gdata())
+
+
+_breaker9: None = None
 class openconfig_system__system__config(yadata.MNode):
     hostname: ?str
+    login_banner: ?str
 
-    mut def __init__(self, hostname: ?str) -> None:
+    mut def __init__(self, hostname: ?str, login_banner: ?str) -> None:
         self.hostname = hostname
+        self.login_banner = login_banner
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'config'])
@@ -2702,7 +2898,7 @@ class openconfig_system__system__config(yadata.MNode):
     @staticmethod
     mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__config:
         if n is not None:
-            return openconfig_system__system__config(hostname=n.get_opt_str(ygdata.Id(NS_openconfig_system, 'hostname')))
+            return openconfig_system__system__config(hostname=n.get_opt_str(ygdata.Id(NS_openconfig_system, 'hostname')), login_banner=n.get_opt_str(ygdata.Id(NS_openconfig_system, 'login-banner')))
         return openconfig_system__system__config()
 
     mut def copy(self) -> openconfig_system__system__config:
@@ -2710,12 +2906,516 @@ class openconfig_system__system__config(yadata.MNode):
         return openconfig_system__system__config.from_gdata(self.to_gdata())
 
 
-_breaker2: None = None
+_breaker10: None = None
+class openconfig_system__system__ssh_server__config(yadata.MNode):
+    enable: ?bool
+    permit_root_login: ?bool
+
+    mut def __init__(self, enable: ?bool, permit_root_login: ?bool) -> None:
+        self.enable = enable
+        self.permit_root_login = permit_root_login
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'ssh-server', 'config'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__ssh_server__config:
+        if n is not None:
+            return openconfig_system__system__ssh_server__config(enable=n.get_opt_bool(ygdata.Id(NS_openconfig_system, 'enable')), permit_root_login=n.get_opt_bool(ygdata.Id(NS_arcos_openconfig_system_augments, 'permit-root-login')))
+        return openconfig_system__system__ssh_server__config()
+
+    mut def copy(self) -> openconfig_system__system__ssh_server__config:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__ssh_server__config.from_gdata(self.to_gdata())
+
+
+_breaker11: None = None
+class openconfig_system__system__ssh_server__sftp__config(yadata.MNode):
+    enable: ?bool
+
+    mut def __init__(self, enable: ?bool) -> None:
+        self.enable = enable
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'ssh-server', 'arcos-openconfig-system-augments:sftp', 'config'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__ssh_server__sftp__config:
+        if n is not None:
+            return openconfig_system__system__ssh_server__sftp__config(enable=n.get_opt_bool(ygdata.Id(NS_arcos_openconfig_system_augments, 'enable')))
+        return openconfig_system__system__ssh_server__sftp__config()
+
+    mut def copy(self) -> openconfig_system__system__ssh_server__sftp__config:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__ssh_server__sftp__config.from_gdata(self.to_gdata())
+
+
+_breaker12: None = None
+class openconfig_system__system__ssh_server__sftp(yadata.MNode):
+    config: openconfig_system__system__ssh_server__sftp__config
+
+    mut def __init__(self, config: ?openconfig_system__system__ssh_server__sftp__config=None) -> None:
+        self.config = config if config is not None else openconfig_system__system__ssh_server__sftp__config()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'ssh-server', 'arcos-openconfig-system-augments:sftp'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__ssh_server__sftp:
+        if n is not None:
+            return openconfig_system__system__ssh_server__sftp(config=openconfig_system__system__ssh_server__sftp__config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_arcos_openconfig_system_augments, 'config'))))
+        return openconfig_system__system__ssh_server__sftp()
+
+    mut def copy(self) -> openconfig_system__system__ssh_server__sftp:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__ssh_server__sftp.from_gdata(self.to_gdata())
+
+
+_breaker13: None = None
+class openconfig_system__system__ssh_server(yadata.MNode):
+    config: openconfig_system__system__ssh_server__config
+    sftp: openconfig_system__system__ssh_server__sftp
+
+    mut def __init__(self, config: ?openconfig_system__system__ssh_server__config=None, sftp: ?openconfig_system__system__ssh_server__sftp=None) -> None:
+        self.config = config if config is not None else openconfig_system__system__ssh_server__config()
+        self.sftp = sftp if sftp is not None else openconfig_system__system__ssh_server__sftp()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'ssh-server'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__ssh_server:
+        if n is not None:
+            return openconfig_system__system__ssh_server(config=openconfig_system__system__ssh_server__config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_system, 'config'))), sftp=openconfig_system__system__ssh_server__sftp.from_gdata(n.get_opt_cnt(ygdata.Id(NS_arcos_openconfig_system_augments, 'sftp'))))
+        return openconfig_system__system__ssh_server()
+
+    mut def copy(self) -> openconfig_system__system__ssh_server:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__ssh_server.from_gdata(self.to_gdata())
+
+
+_breaker14: None = None
+class openconfig_system__system__aaa__authentication__admin_user__config(yadata.MNode):
+    admin_password: ?str
+
+    mut def __init__(self, admin_password: ?str) -> None:
+        self.admin_password = admin_password
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'aaa', 'authentication', 'admin-user', 'config'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__aaa__authentication__admin_user__config:
+        if n is not None:
+            return openconfig_system__system__aaa__authentication__admin_user__config(admin_password=n.get_opt_str(ygdata.Id(NS_openconfig_system, 'admin-password')))
+        return openconfig_system__system__aaa__authentication__admin_user__config()
+
+    mut def copy(self) -> openconfig_system__system__aaa__authentication__admin_user__config:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__aaa__authentication__admin_user__config.from_gdata(self.to_gdata())
+
+
+_breaker15: None = None
+class openconfig_system__system__aaa__authentication__admin_user(yadata.MNode):
+    config: openconfig_system__system__aaa__authentication__admin_user__config
+
+    mut def __init__(self, config: ?openconfig_system__system__aaa__authentication__admin_user__config=None) -> None:
+        self.config = config if config is not None else openconfig_system__system__aaa__authentication__admin_user__config()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'aaa', 'authentication', 'admin-user'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__aaa__authentication__admin_user:
+        if n is not None:
+            return openconfig_system__system__aaa__authentication__admin_user(config=openconfig_system__system__aaa__authentication__admin_user__config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_system, 'config'))))
+        return openconfig_system__system__aaa__authentication__admin_user()
+
+    mut def copy(self) -> openconfig_system__system__aaa__authentication__admin_user:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__aaa__authentication__admin_user.from_gdata(self.to_gdata())
+
+
+_breaker16: None = None
+class openconfig_system__system__aaa__authentication__users__user__config(yadata.MNode):
+    username: ?str
+    password: ?str
+    role: ?value
+
+    mut def __init__(self, username: ?str, password: ?str, role: ?value) -> None:
+        self.username = username
+        self.password = password
+        self.role = role
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'aaa', 'authentication', 'users', 'user', 'config'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__aaa__authentication__users__user__config:
+        if n is not None:
+            return openconfig_system__system__aaa__authentication__users__user__config(username=n.get_opt_str(ygdata.Id(NS_openconfig_system, 'username')), password=n.get_opt_str(ygdata.Id(NS_openconfig_system, 'password')), role=n.get_opt_value(ygdata.Id(NS_openconfig_system, 'role')))
+        return openconfig_system__system__aaa__authentication__users__user__config()
+
+    mut def copy(self) -> openconfig_system__system__aaa__authentication__users__user__config:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__aaa__authentication__users__user__config.from_gdata(self.to_gdata())
+
+
+_breaker17: None = None
+class openconfig_system__system__aaa__authentication__users__user_entry(yadata.MNode):
+    username: str
+    config: openconfig_system__system__aaa__authentication__users__user__config
+
+    mut def __init__(self, username: str, config: ?openconfig_system__system__aaa__authentication__users__user__config=None) -> None:
+        self.username = username
+        self.config = config if config is not None else openconfig_system__system__aaa__authentication__users__user__config()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'aaa', 'authentication', 'users', 'user'])
+
+    @staticmethod
+    mut def from_gdata(n: ygdata.Node) -> openconfig_system__system__aaa__authentication__users__user_entry:
+        return openconfig_system__system__aaa__authentication__users__user_entry(username=n.get_str(ygdata.Id(NS_openconfig_system, 'username')), config=openconfig_system__system__aaa__authentication__users__user__config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_system, 'config'))))
+
+    mut def copy(self) -> openconfig_system__system__aaa__authentication__users__user_entry:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__aaa__authentication__users__user_entry.from_gdata(self.to_gdata())
+
+_breaker18: None = None
+class openconfig_system__system__aaa__authentication__users__user(yadata.MKeyedList[str, openconfig_system__system__aaa__authentication__users__user_entry]):
+    mut def __init__(self, elements: list[openconfig_system__system__aaa__authentication__users__user_entry]=[]) -> None:
+        yadata.MKeyedList.__init__(self, lambda e, k: e.username == k, elements)
+
+    mut def create(self, key: str) -> openconfig_system__system__aaa__authentication__users__user_entry:
+        e = self.get(key)
+        if e is not None:
+            return e
+        username = key
+        res = openconfig_system__system__aaa__authentication__users__user_entry(username=username)
+        self.elements.append(res)
+        return res
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.List) -> list[openconfig_system__system__aaa__authentication__users__user_entry]:
+        if n is not None:
+            return [openconfig_system__system__aaa__authentication__users__user_entry.from_gdata(e) for e in n.elements]
+        return []
+
+    mut def copy(self) -> openconfig_system__system__aaa__authentication__users__user:
+        """Create a deep copy of this list object"""
+        # Copy each element in the list
+        copied_elements = []
+        for e in self:
+            ce = e.copy()
+            if ce is not None:
+                copied_elements.append(ce)
+        return openconfig_system__system__aaa__authentication__users__user(elements=copied_elements)
+
+
+_breaker19: None = None
+class openconfig_system__system__aaa__authentication__users(yadata.MNode):
+    user: openconfig_system__system__aaa__authentication__users__user
+
+    mut def __init__(self, user: list[openconfig_system__system__aaa__authentication__users__user_entry]=[]) -> None:
+        self.user = openconfig_system__system__aaa__authentication__users__user(elements=user)
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'aaa', 'authentication', 'users'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__aaa__authentication__users:
+        if n is not None:
+            return openconfig_system__system__aaa__authentication__users(user=openconfig_system__system__aaa__authentication__users__user.from_gdata(n.get_opt_list(ygdata.Id(NS_openconfig_system, 'user'))))
+        return openconfig_system__system__aaa__authentication__users()
+
+    mut def copy(self) -> openconfig_system__system__aaa__authentication__users:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__aaa__authentication__users.from_gdata(self.to_gdata())
+
+
+_breaker20: None = None
+class openconfig_system__system__aaa__authentication(yadata.MNode):
+    admin_user: openconfig_system__system__aaa__authentication__admin_user
+    users: openconfig_system__system__aaa__authentication__users
+
+    mut def __init__(self, admin_user: ?openconfig_system__system__aaa__authentication__admin_user=None, users: ?openconfig_system__system__aaa__authentication__users=None) -> None:
+        self.admin_user = admin_user if admin_user is not None else openconfig_system__system__aaa__authentication__admin_user()
+        self.users = users if users is not None else openconfig_system__system__aaa__authentication__users()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'aaa', 'authentication'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__aaa__authentication:
+        if n is not None:
+            return openconfig_system__system__aaa__authentication(admin_user=openconfig_system__system__aaa__authentication__admin_user.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_system, 'admin-user'))), users=openconfig_system__system__aaa__authentication__users.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_system, 'users'))))
+        return openconfig_system__system__aaa__authentication()
+
+    mut def copy(self) -> openconfig_system__system__aaa__authentication:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__aaa__authentication.from_gdata(self.to_gdata())
+
+
+_breaker21: None = None
+class openconfig_system__system__aaa(yadata.MNode):
+    authentication: openconfig_system__system__aaa__authentication
+
+    mut def __init__(self, authentication: ?openconfig_system__system__aaa__authentication=None) -> None:
+        self.authentication = authentication if authentication is not None else openconfig_system__system__aaa__authentication()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'aaa'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__aaa:
+        if n is not None:
+            return openconfig_system__system__aaa(authentication=openconfig_system__system__aaa__authentication.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_system, 'authentication'))))
+        return openconfig_system__system__aaa()
+
+    mut def copy(self) -> openconfig_system__system__aaa:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__aaa.from_gdata(self.to_gdata())
+
+
+_breaker22: None = None
+class openconfig_system__system__cli__config(yadata.MNode):
+    commit_message: ?bool
+
+    mut def __init__(self, commit_message: ?bool) -> None:
+        self.commit_message = commit_message
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'arcos-openconfig-system-augments:cli', 'config'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__cli__config:
+        if n is not None:
+            return openconfig_system__system__cli__config(commit_message=n.get_opt_bool(ygdata.Id(NS_arcos_openconfig_system_augments, 'commit-message')))
+        return openconfig_system__system__cli__config()
+
+    mut def copy(self) -> openconfig_system__system__cli__config:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__cli__config.from_gdata(self.to_gdata())
+
+
+_breaker23: None = None
+class openconfig_system__system__cli(yadata.MNode):
+    config: openconfig_system__system__cli__config
+
+    mut def __init__(self, config: ?openconfig_system__system__cli__config=None) -> None:
+        self.config = config if config is not None else openconfig_system__system__cli__config()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'arcos-openconfig-system-augments:cli'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__cli:
+        if n is not None:
+            return openconfig_system__system__cli(config=openconfig_system__system__cli__config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_arcos_openconfig_system_augments, 'config'))))
+        return openconfig_system__system__cli()
+
+    mut def copy(self) -> openconfig_system__system__cli:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__cli.from_gdata(self.to_gdata())
+
+
+_breaker24: None = None
+class openconfig_system__system__rib__config(yadata.MNode):
+    address_family: ?Identityref
+
+    mut def __init__(self, address_family: ?Identityref) -> None:
+        self.address_family = address_family
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'arcos-openconfig-system-augments:rib', 'config'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__rib__config:
+        if n is not None:
+            return openconfig_system__system__rib__config(address_family=n.get_opt_Identityref(ygdata.Id(NS_arcos_openconfig_system_augments, 'address-family')))
+        return openconfig_system__system__rib__config()
+
+    mut def copy(self) -> openconfig_system__system__rib__config:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__rib__config.from_gdata(self.to_gdata())
+
+
+_breaker25: None = None
+class openconfig_system__system__rib_entry(yadata.MNode):
+    address_family: Identityref
+    config: openconfig_system__system__rib__config
+
+    mut def __init__(self, address_family: Identityref, config: ?openconfig_system__system__rib__config=None) -> None:
+        self.address_family = address_family
+        self.config = config if config is not None else openconfig_system__system__rib__config()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'arcos-openconfig-system-augments:rib'])
+
+    @staticmethod
+    mut def from_gdata(n: ygdata.Node) -> openconfig_system__system__rib_entry:
+        return openconfig_system__system__rib_entry(address_family=n.get_Identityref(ygdata.Id(NS_arcos_openconfig_system_augments, 'address-family')), config=openconfig_system__system__rib__config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_arcos_openconfig_system_augments, 'config'))))
+
+    mut def copy(self) -> openconfig_system__system__rib_entry:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__rib_entry.from_gdata(self.to_gdata())
+
+_breaker26: None = None
+class openconfig_system__system__rib(yadata.MKeyedList[Identityref, openconfig_system__system__rib_entry]):
+    mut def __init__(self, elements: list[openconfig_system__system__rib_entry]=[]) -> None:
+        yadata.MKeyedList.__init__(self, lambda e, k: e.address_family == k, elements)
+
+    mut def create(self, key: Identityref) -> openconfig_system__system__rib_entry:
+        e = self.get(key)
+        if e is not None:
+            return e
+        address_family = key
+        res = openconfig_system__system__rib_entry(address_family=address_family)
+        self.elements.append(res)
+        return res
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.List) -> list[openconfig_system__system__rib_entry]:
+        if n is not None:
+            return [openconfig_system__system__rib_entry.from_gdata(e) for e in n.elements]
+        return []
+
+    mut def copy(self) -> openconfig_system__system__rib:
+        """Create a deep copy of this list object"""
+        # Copy each element in the list
+        copied_elements = []
+        for e in self:
+            ce = e.copy()
+            if ce is not None:
+                copied_elements.append(ce)
+        return openconfig_system__system__rib(elements=copied_elements)
+
+
+_breaker27: None = None
+class openconfig_system__system__netconf_server__config(yadata.MNode):
+    enable: ?bool
+
+    mut def __init__(self, enable: ?bool) -> None:
+        self.enable = enable
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'arcos-openconfig-system-augments:netconf-server', 'config'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__netconf_server__config:
+        if n is not None:
+            return openconfig_system__system__netconf_server__config(enable=n.get_opt_bool(ygdata.Id(NS_arcos_openconfig_system_augments, 'enable')))
+        return openconfig_system__system__netconf_server__config()
+
+    mut def copy(self) -> openconfig_system__system__netconf_server__config:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__netconf_server__config.from_gdata(self.to_gdata())
+
+
+_breaker28: None = None
+class openconfig_system__system__netconf_server__transport__ssh__config(yadata.MNode):
+    enable: ?bool
+    port: ?u64
+
+    mut def __init__(self, enable: ?bool, port: ?u64) -> None:
+        self.enable = enable
+        self.port = port
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'arcos-openconfig-system-augments:netconf-server', 'transport', 'ssh', 'config'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__netconf_server__transport__ssh__config:
+        if n is not None:
+            return openconfig_system__system__netconf_server__transport__ssh__config(enable=n.get_opt_bool(ygdata.Id(NS_arcos_openconfig_system_augments, 'enable')), port=n.get_opt_u64(ygdata.Id(NS_arcos_openconfig_system_augments, 'port')))
+        return openconfig_system__system__netconf_server__transport__ssh__config()
+
+    mut def copy(self) -> openconfig_system__system__netconf_server__transport__ssh__config:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__netconf_server__transport__ssh__config.from_gdata(self.to_gdata())
+
+
+_breaker29: None = None
+class openconfig_system__system__netconf_server__transport__ssh(yadata.MNode):
+    config: openconfig_system__system__netconf_server__transport__ssh__config
+
+    mut def __init__(self, config: ?openconfig_system__system__netconf_server__transport__ssh__config=None) -> None:
+        self.config = config if config is not None else openconfig_system__system__netconf_server__transport__ssh__config()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'arcos-openconfig-system-augments:netconf-server', 'transport', 'ssh'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__netconf_server__transport__ssh:
+        if n is not None:
+            return openconfig_system__system__netconf_server__transport__ssh(config=openconfig_system__system__netconf_server__transport__ssh__config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_arcos_openconfig_system_augments, 'config'))))
+        return openconfig_system__system__netconf_server__transport__ssh()
+
+    mut def copy(self) -> openconfig_system__system__netconf_server__transport__ssh:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__netconf_server__transport__ssh.from_gdata(self.to_gdata())
+
+
+_breaker30: None = None
+class openconfig_system__system__netconf_server__transport(yadata.MNode):
+    ssh: openconfig_system__system__netconf_server__transport__ssh
+
+    mut def __init__(self, ssh: ?openconfig_system__system__netconf_server__transport__ssh=None) -> None:
+        self.ssh = ssh if ssh is not None else openconfig_system__system__netconf_server__transport__ssh()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'arcos-openconfig-system-augments:netconf-server', 'transport'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__netconf_server__transport:
+        if n is not None:
+            return openconfig_system__system__netconf_server__transport(ssh=openconfig_system__system__netconf_server__transport__ssh.from_gdata(n.get_opt_cnt(ygdata.Id(NS_arcos_openconfig_system_augments, 'ssh'))))
+        return openconfig_system__system__netconf_server__transport()
+
+    mut def copy(self) -> openconfig_system__system__netconf_server__transport:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__netconf_server__transport.from_gdata(self.to_gdata())
+
+
+_breaker31: None = None
+class openconfig_system__system__netconf_server(yadata.MNode):
+    config: openconfig_system__system__netconf_server__config
+    transport: openconfig_system__system__netconf_server__transport
+
+    mut def __init__(self, config: ?openconfig_system__system__netconf_server__config=None, transport: ?openconfig_system__system__netconf_server__transport=None) -> None:
+        self.config = config if config is not None else openconfig_system__system__netconf_server__config()
+        self.transport = transport if transport is not None else openconfig_system__system__netconf_server__transport()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system', 'arcos-openconfig-system-augments:netconf-server'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system__netconf_server:
+        if n is not None:
+            return openconfig_system__system__netconf_server(config=openconfig_system__system__netconf_server__config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_arcos_openconfig_system_augments, 'config'))), transport=openconfig_system__system__netconf_server__transport.from_gdata(n.get_opt_cnt(ygdata.Id(NS_arcos_openconfig_system_augments, 'transport'))))
+        return openconfig_system__system__netconf_server()
+
+    mut def copy(self) -> openconfig_system__system__netconf_server:
+        """Create a deep copy of this adata object"""
+        return openconfig_system__system__netconf_server.from_gdata(self.to_gdata())
+
+
+_breaker32: None = None
 class openconfig_system__system(yadata.MNode):
     config: openconfig_system__system__config
+    ssh_server: openconfig_system__system__ssh_server
+    aaa: openconfig_system__system__aaa
+    cli: openconfig_system__system__cli
+    rib: openconfig_system__system__rib
+    netconf_server: openconfig_system__system__netconf_server
 
-    mut def __init__(self, config: ?openconfig_system__system__config=None) -> None:
+    mut def __init__(self, config: ?openconfig_system__system__config=None, ssh_server: ?openconfig_system__system__ssh_server=None, aaa: ?openconfig_system__system__aaa=None, cli: ?openconfig_system__system__cli=None, rib: list[openconfig_system__system__rib_entry]=[], netconf_server: ?openconfig_system__system__netconf_server=None) -> None:
         self.config = config if config is not None else openconfig_system__system__config()
+        self.ssh_server = ssh_server if ssh_server is not None else openconfig_system__system__ssh_server()
+        self.aaa = aaa if aaa is not None else openconfig_system__system__aaa()
+        self.cli = cli if cli is not None else openconfig_system__system__cli()
+        self.rib = openconfig_system__system__rib(elements=rib)
+        self.netconf_server = netconf_server if netconf_server is not None else openconfig_system__system__netconf_server()
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-system:system'])
@@ -2723,7 +3423,7 @@ class openconfig_system__system(yadata.MNode):
     @staticmethod
     mut def from_gdata(n: ?ygdata.Node) -> openconfig_system__system:
         if n is not None:
-            return openconfig_system__system(config=openconfig_system__system__config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_system, 'config'))))
+            return openconfig_system__system(config=openconfig_system__system__config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_system, 'config'))), ssh_server=openconfig_system__system__ssh_server.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_system, 'ssh-server'))), aaa=openconfig_system__system__aaa.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_system, 'aaa'))), cli=openconfig_system__system__cli.from_gdata(n.get_opt_cnt(ygdata.Id(NS_arcos_openconfig_system_augments, 'cli'))), rib=openconfig_system__system__rib.from_gdata(n.get_opt_list(ygdata.Id(NS_arcos_openconfig_system_augments, 'rib'))), netconf_server=openconfig_system__system__netconf_server.from_gdata(n.get_opt_cnt(ygdata.Id(NS_arcos_openconfig_system_augments, 'netconf-server'))))
         return openconfig_system__system()
 
     mut def copy(self) -> openconfig_system__system:
@@ -2731,12 +3431,537 @@ class openconfig_system__system(yadata.MNode):
         return openconfig_system__system.from_gdata(self.to_gdata())
 
 
-_breaker3: None = None
-class root(yadata.MNode):
-    system: openconfig_system__system
+_breaker33: None = None
+class openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__config(yadata.MNode):
+    prefix_set_name: ?str
 
-    mut def __init__(self, system: ?openconfig_system__system=None) -> None:
+    mut def __init__(self, prefix_set_name: ?str) -> None:
+        self.prefix_set_name = prefix_set_name
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-routing-policy:routing-policy', 'defined-sets', 'prefix-sets', 'prefix-set', 'config'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__config:
+        if n is not None:
+            return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__config(prefix_set_name=n.get_opt_str(ygdata.Id(NS_openconfig_routing_policy, 'prefix-set-name')))
+        return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__config()
+
+    mut def copy(self) -> openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__config:
+        """Create a deep copy of this adata object"""
+        return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__config.from_gdata(self.to_gdata())
+
+
+_breaker34: None = None
+class openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix__config(yadata.MNode):
+    ip_prefix: ?str
+    masklength_range: ?str
+
+    mut def __init__(self, ip_prefix: ?str, masklength_range: ?str) -> None:
+        self.ip_prefix = ip_prefix
+        self.masklength_range = masklength_range
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-routing-policy:routing-policy', 'defined-sets', 'prefix-sets', 'prefix-set', 'prefixes', 'prefix', 'config'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix__config:
+        if n is not None:
+            return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix__config(ip_prefix=n.get_opt_str(ygdata.Id(NS_openconfig_routing_policy, 'ip-prefix')), masklength_range=n.get_opt_str(ygdata.Id(NS_openconfig_routing_policy, 'masklength-range')))
+        return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix__config()
+
+    mut def copy(self) -> openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix__config:
+        """Create a deep copy of this adata object"""
+        return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix__config.from_gdata(self.to_gdata())
+
+
+_breaker35: None = None
+class openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix_entry(yadata.MNode):
+    ip_prefix: str
+    masklength_range: str
+    config: openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix__config
+
+    mut def __init__(self, ip_prefix: str, masklength_range: str, config: ?openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix__config=None) -> None:
+        self.ip_prefix = ip_prefix
+        self.masklength_range = masklength_range
+        self.config = config if config is not None else openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix__config()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-routing-policy:routing-policy', 'defined-sets', 'prefix-sets', 'prefix-set', 'prefixes', 'prefix'])
+
+    @staticmethod
+    mut def from_gdata(n: ygdata.Node) -> openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix_entry:
+        return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix_entry(ip_prefix=n.get_str(ygdata.Id(NS_openconfig_routing_policy, 'ip-prefix')), masklength_range=n.get_str(ygdata.Id(NS_openconfig_routing_policy, 'masklength-range')), config=openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix__config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_routing_policy, 'config'))))
+
+    mut def copy(self) -> openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix_entry:
+        """Create a deep copy of this adata object"""
+        return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix_entry.from_gdata(self.to_gdata())
+
+_breaker36: None = None
+class openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix(yadata.MKeyedList[(ip_prefix: str, masklength_range: str), openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix_entry]):
+    mut def __init__(self, elements: list[openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix_entry]=[]) -> None:
+        yadata.MKeyedList.__init__(self, lambda e, k: e.ip_prefix == k.ip_prefix and e.masklength_range == k.masklength_range, elements)
+
+    mut def create(self, key: (ip_prefix: str, masklength_range: str)) -> openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix_entry:
+        e = self.get(key)
+        if e is not None:
+            return e
+        (ip_prefix=ip_prefix, masklength_range=masklength_range) = key
+        res = openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix_entry(ip_prefix=ip_prefix, masklength_range=masklength_range)
+        self.elements.append(res)
+        return res
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.List) -> list[openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix_entry]:
+        if n is not None:
+            return [openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix_entry.from_gdata(e) for e in n.elements]
+        return []
+
+    mut def copy(self) -> openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix:
+        """Create a deep copy of this list object"""
+        # Copy each element in the list
+        copied_elements = []
+        for e in self:
+            ce = e.copy()
+            if ce is not None:
+                copied_elements.append(ce)
+        return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix(elements=copied_elements)
+
+
+_breaker37: None = None
+class openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes(yadata.MNode):
+    prefix: openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix
+
+    mut def __init__(self, prefix: list[openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix_entry]=[]) -> None:
+        self.prefix = openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix(elements=prefix)
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-routing-policy:routing-policy', 'defined-sets', 'prefix-sets', 'prefix-set', 'prefixes'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes:
+        if n is not None:
+            return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes(prefix=openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes__prefix.from_gdata(n.get_opt_list(ygdata.Id(NS_openconfig_routing_policy, 'prefix'))))
+        return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes()
+
+    mut def copy(self) -> openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes:
+        """Create a deep copy of this adata object"""
+        return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes.from_gdata(self.to_gdata())
+
+
+_breaker38: None = None
+class openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set_entry(yadata.MNode):
+    prefix_set_name: str
+    config: openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__config
+    prefixes: openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes
+
+    mut def __init__(self, prefix_set_name: str, config: ?openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__config=None, prefixes: ?openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes=None) -> None:
+        self.prefix_set_name = prefix_set_name
+        self.config = config if config is not None else openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__config()
+        self.prefixes = prefixes if prefixes is not None else openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-routing-policy:routing-policy', 'defined-sets', 'prefix-sets', 'prefix-set'])
+
+    @staticmethod
+    mut def from_gdata(n: ygdata.Node) -> openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set_entry:
+        return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set_entry(prefix_set_name=n.get_str(ygdata.Id(NS_openconfig_routing_policy, 'prefix-set-name')), config=openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_routing_policy, 'config'))), prefixes=openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set__prefixes.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_routing_policy, 'prefixes'))))
+
+    mut def copy(self) -> openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set_entry:
+        """Create a deep copy of this adata object"""
+        return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set_entry.from_gdata(self.to_gdata())
+
+_breaker39: None = None
+class openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set(yadata.MKeyedList[str, openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set_entry]):
+    mut def __init__(self, elements: list[openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set_entry]=[]) -> None:
+        yadata.MKeyedList.__init__(self, lambda e, k: e.prefix_set_name == k, elements)
+
+    mut def create(self, key: str) -> openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set_entry:
+        e = self.get(key)
+        if e is not None:
+            return e
+        prefix_set_name = key
+        res = openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set_entry(prefix_set_name=prefix_set_name)
+        self.elements.append(res)
+        return res
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.List) -> list[openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set_entry]:
+        if n is not None:
+            return [openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set_entry.from_gdata(e) for e in n.elements]
+        return []
+
+    mut def copy(self) -> openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set:
+        """Create a deep copy of this list object"""
+        # Copy each element in the list
+        copied_elements = []
+        for e in self:
+            ce = e.copy()
+            if ce is not None:
+                copied_elements.append(ce)
+        return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set(elements=copied_elements)
+
+
+_breaker40: None = None
+class openconfig_routing_policy__routing_policy__defined_sets__prefix_sets(yadata.MNode):
+    prefix_set: openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set
+
+    mut def __init__(self, prefix_set: list[openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set_entry]=[]) -> None:
+        self.prefix_set = openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set(elements=prefix_set)
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-routing-policy:routing-policy', 'defined-sets', 'prefix-sets'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_routing_policy__routing_policy__defined_sets__prefix_sets:
+        if n is not None:
+            return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets(prefix_set=openconfig_routing_policy__routing_policy__defined_sets__prefix_sets__prefix_set.from_gdata(n.get_opt_list(ygdata.Id(NS_openconfig_routing_policy, 'prefix-set'))))
+        return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets()
+
+    mut def copy(self) -> openconfig_routing_policy__routing_policy__defined_sets__prefix_sets:
+        """Create a deep copy of this adata object"""
+        return openconfig_routing_policy__routing_policy__defined_sets__prefix_sets.from_gdata(self.to_gdata())
+
+
+_breaker41: None = None
+class openconfig_routing_policy__routing_policy__defined_sets(yadata.MNode):
+    prefix_sets: openconfig_routing_policy__routing_policy__defined_sets__prefix_sets
+
+    mut def __init__(self, prefix_sets: ?openconfig_routing_policy__routing_policy__defined_sets__prefix_sets=None) -> None:
+        self.prefix_sets = prefix_sets if prefix_sets is not None else openconfig_routing_policy__routing_policy__defined_sets__prefix_sets()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-routing-policy:routing-policy', 'defined-sets'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_routing_policy__routing_policy__defined_sets:
+        if n is not None:
+            return openconfig_routing_policy__routing_policy__defined_sets(prefix_sets=openconfig_routing_policy__routing_policy__defined_sets__prefix_sets.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_routing_policy, 'prefix-sets'))))
+        return openconfig_routing_policy__routing_policy__defined_sets()
+
+    mut def copy(self) -> openconfig_routing_policy__routing_policy__defined_sets:
+        """Create a deep copy of this adata object"""
+        return openconfig_routing_policy__routing_policy__defined_sets.from_gdata(self.to_gdata())
+
+
+_breaker42: None = None
+class openconfig_routing_policy__routing_policy(yadata.MNode):
+    defined_sets: openconfig_routing_policy__routing_policy__defined_sets
+
+    mut def __init__(self, defined_sets: ?openconfig_routing_policy__routing_policy__defined_sets=None) -> None:
+        self.defined_sets = defined_sets if defined_sets is not None else openconfig_routing_policy__routing_policy__defined_sets()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-routing-policy:routing-policy'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_routing_policy__routing_policy:
+        if n is not None:
+            return openconfig_routing_policy__routing_policy(defined_sets=openconfig_routing_policy__routing_policy__defined_sets.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_routing_policy, 'defined-sets'))))
+        return openconfig_routing_policy__routing_policy()
+
+    mut def copy(self) -> openconfig_routing_policy__routing_policy:
+        """Create a deep copy of this adata object"""
+        return openconfig_routing_policy__routing_policy.from_gdata(self.to_gdata())
+
+
+_breaker43: None = None
+class openconfig_network_instance__network_instances__network_instance__config(yadata.MNode):
+    name: ?str
+
+    mut def __init__(self, name: ?str) -> None:
+        self.name = name
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-network-instance:network-instances', 'network-instance', 'config'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_network_instance__network_instances__network_instance__config:
+        if n is not None:
+            return openconfig_network_instance__network_instances__network_instance__config(name=n.get_opt_str(ygdata.Id(NS_openconfig_network_instance, 'name')))
+        return openconfig_network_instance__network_instances__network_instance__config()
+
+    mut def copy(self) -> openconfig_network_instance__network_instances__network_instance__config:
+        """Create a deep copy of this adata object"""
+        return openconfig_network_instance__network_instances__network_instance__config.from_gdata(self.to_gdata())
+
+
+_breaker44: None = None
+class openconfig_network_instance__network_instances__network_instance_entry(yadata.MNode):
+    name: str
+    config: openconfig_network_instance__network_instances__network_instance__config
+
+    mut def __init__(self, name: str, config: ?openconfig_network_instance__network_instances__network_instance__config=None) -> None:
+        self.name = name
+        self.config = config if config is not None else openconfig_network_instance__network_instances__network_instance__config()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-network-instance:network-instances', 'network-instance'])
+
+    @staticmethod
+    mut def from_gdata(n: ygdata.Node) -> openconfig_network_instance__network_instances__network_instance_entry:
+        return openconfig_network_instance__network_instances__network_instance_entry(name=n.get_str(ygdata.Id(NS_openconfig_network_instance, 'name')), config=openconfig_network_instance__network_instances__network_instance__config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_network_instance, 'config'))))
+
+    mut def copy(self) -> openconfig_network_instance__network_instances__network_instance_entry:
+        """Create a deep copy of this adata object"""
+        return openconfig_network_instance__network_instances__network_instance_entry.from_gdata(self.to_gdata())
+
+_breaker45: None = None
+class openconfig_network_instance__network_instances__network_instance(yadata.MKeyedList[str, openconfig_network_instance__network_instances__network_instance_entry]):
+    mut def __init__(self, elements: list[openconfig_network_instance__network_instances__network_instance_entry]=[]) -> None:
+        yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
+
+    mut def create(self, key: str) -> openconfig_network_instance__network_instances__network_instance_entry:
+        e = self.get(key)
+        if e is not None:
+            return e
+        name = key
+        res = openconfig_network_instance__network_instances__network_instance_entry(name=name)
+        self.elements.append(res)
+        return res
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.List) -> list[openconfig_network_instance__network_instances__network_instance_entry]:
+        if n is not None:
+            return [openconfig_network_instance__network_instances__network_instance_entry.from_gdata(e) for e in n.elements]
+        return []
+
+    mut def copy(self) -> openconfig_network_instance__network_instances__network_instance:
+        """Create a deep copy of this list object"""
+        # Copy each element in the list
+        copied_elements = []
+        for e in self:
+            ce = e.copy()
+            if ce is not None:
+                copied_elements.append(ce)
+        return openconfig_network_instance__network_instances__network_instance(elements=copied_elements)
+
+
+_breaker46: None = None
+class openconfig_network_instance__network_instances(yadata.MNode):
+    network_instance: openconfig_network_instance__network_instances__network_instance
+
+    mut def __init__(self, network_instance: list[openconfig_network_instance__network_instances__network_instance_entry]=[]) -> None:
+        self.network_instance = openconfig_network_instance__network_instances__network_instance(elements=network_instance)
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-network-instance:network-instances'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_network_instance__network_instances:
+        if n is not None:
+            return openconfig_network_instance__network_instances(network_instance=openconfig_network_instance__network_instances__network_instance.from_gdata(n.get_opt_list(ygdata.Id(NS_openconfig_network_instance, 'network-instance'))))
+        return openconfig_network_instance__network_instances()
+
+    mut def copy(self) -> openconfig_network_instance__network_instances:
+        """Create a deep copy of this adata object"""
+        return openconfig_network_instance__network_instances.from_gdata(self.to_gdata())
+
+
+_breaker47: None = None
+class openconfig_lldp__lldp__interfaces__interface__config(yadata.MNode):
+    name: ?str
+
+    mut def __init__(self, name: ?str) -> None:
+        self.name = name
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-lldp:lldp', 'interfaces', 'interface', 'config'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_lldp__lldp__interfaces__interface__config:
+        if n is not None:
+            return openconfig_lldp__lldp__interfaces__interface__config(name=n.get_opt_str(ygdata.Id(NS_openconfig_lldp, 'name')))
+        return openconfig_lldp__lldp__interfaces__interface__config()
+
+    mut def copy(self) -> openconfig_lldp__lldp__interfaces__interface__config:
+        """Create a deep copy of this adata object"""
+        return openconfig_lldp__lldp__interfaces__interface__config.from_gdata(self.to_gdata())
+
+
+_breaker48: None = None
+class openconfig_lldp__lldp__interfaces__interface_entry(yadata.MNode):
+    name: str
+    config: openconfig_lldp__lldp__interfaces__interface__config
+
+    mut def __init__(self, name: str, config: ?openconfig_lldp__lldp__interfaces__interface__config=None) -> None:
+        self.name = name
+        self.config = config if config is not None else openconfig_lldp__lldp__interfaces__interface__config()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-lldp:lldp', 'interfaces', 'interface'])
+
+    @staticmethod
+    mut def from_gdata(n: ygdata.Node) -> openconfig_lldp__lldp__interfaces__interface_entry:
+        return openconfig_lldp__lldp__interfaces__interface_entry(name=n.get_str(ygdata.Id(NS_openconfig_lldp, 'name')), config=openconfig_lldp__lldp__interfaces__interface__config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_lldp, 'config'))))
+
+    mut def copy(self) -> openconfig_lldp__lldp__interfaces__interface_entry:
+        """Create a deep copy of this adata object"""
+        return openconfig_lldp__lldp__interfaces__interface_entry.from_gdata(self.to_gdata())
+
+_breaker49: None = None
+class openconfig_lldp__lldp__interfaces__interface(yadata.MKeyedList[str, openconfig_lldp__lldp__interfaces__interface_entry]):
+    mut def __init__(self, elements: list[openconfig_lldp__lldp__interfaces__interface_entry]=[]) -> None:
+        yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
+
+    mut def create(self, key: str) -> openconfig_lldp__lldp__interfaces__interface_entry:
+        e = self.get(key)
+        if e is not None:
+            return e
+        name = key
+        res = openconfig_lldp__lldp__interfaces__interface_entry(name=name)
+        self.elements.append(res)
+        return res
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.List) -> list[openconfig_lldp__lldp__interfaces__interface_entry]:
+        if n is not None:
+            return [openconfig_lldp__lldp__interfaces__interface_entry.from_gdata(e) for e in n.elements]
+        return []
+
+    mut def copy(self) -> openconfig_lldp__lldp__interfaces__interface:
+        """Create a deep copy of this list object"""
+        # Copy each element in the list
+        copied_elements = []
+        for e in self:
+            ce = e.copy()
+            if ce is not None:
+                copied_elements.append(ce)
+        return openconfig_lldp__lldp__interfaces__interface(elements=copied_elements)
+
+
+_breaker50: None = None
+class openconfig_lldp__lldp__interfaces(yadata.MNode):
+    interface: openconfig_lldp__lldp__interfaces__interface
+
+    mut def __init__(self, interface: list[openconfig_lldp__lldp__interfaces__interface_entry]=[]) -> None:
+        self.interface = openconfig_lldp__lldp__interfaces__interface(elements=interface)
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-lldp:lldp', 'interfaces'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_lldp__lldp__interfaces:
+        if n is not None:
+            return openconfig_lldp__lldp__interfaces(interface=openconfig_lldp__lldp__interfaces__interface.from_gdata(n.get_opt_list(ygdata.Id(NS_openconfig_lldp, 'interface'))))
+        return openconfig_lldp__lldp__interfaces()
+
+    mut def copy(self) -> openconfig_lldp__lldp__interfaces:
+        """Create a deep copy of this adata object"""
+        return openconfig_lldp__lldp__interfaces.from_gdata(self.to_gdata())
+
+
+_breaker51: None = None
+class openconfig_lldp__lldp(yadata.MNode):
+    interfaces: openconfig_lldp__lldp__interfaces
+
+    mut def __init__(self, interfaces: ?openconfig_lldp__lldp__interfaces=None) -> None:
+        self.interfaces = interfaces if interfaces is not None else openconfig_lldp__lldp__interfaces()
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['openconfig-lldp:lldp'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> openconfig_lldp__lldp:
+        if n is not None:
+            return openconfig_lldp__lldp(interfaces=openconfig_lldp__lldp__interfaces.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_lldp, 'interfaces'))))
+        return openconfig_lldp__lldp()
+
+    mut def copy(self) -> openconfig_lldp__lldp:
+        """Create a deep copy of this adata object"""
+        return openconfig_lldp__lldp.from_gdata(self.to_gdata())
+
+
+_breaker52: None = None
+class arcos_features__features__feature_entry(yadata.MNode):
+    name: Identityref
+    supported: ?bool
+
+    mut def __init__(self, name: Identityref, supported: ?bool) -> None:
+        self.name = name
+        self.supported = supported
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['arcos-features:features', 'feature'])
+
+    @staticmethod
+    mut def from_gdata(n: ygdata.Node) -> arcos_features__features__feature_entry:
+        return arcos_features__features__feature_entry(name=n.get_Identityref(ygdata.Id(NS_arcos_features, 'name')), supported=n.get_opt_bool(ygdata.Id(NS_arcos_features, 'supported')))
+
+    mut def copy(self) -> arcos_features__features__feature_entry:
+        """Create a deep copy of this adata object"""
+        return arcos_features__features__feature_entry.from_gdata(self.to_gdata())
+
+_breaker53: None = None
+class arcos_features__features__feature(yadata.MKeyedList[Identityref, arcos_features__features__feature_entry]):
+    mut def __init__(self, elements: list[arcos_features__features__feature_entry]=[]) -> None:
+        yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
+
+    mut def create(self, key: Identityref, supported: ?bool=None) -> arcos_features__features__feature_entry:
+        e = self.get(key)
+        if e is not None:
+            if supported is not None:
+                e.supported = supported
+            return e
+        name = key
+        res = arcos_features__features__feature_entry(name=name, supported=supported)
+        self.elements.append(res)
+        return res
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.List) -> list[arcos_features__features__feature_entry]:
+        if n is not None:
+            return [arcos_features__features__feature_entry.from_gdata(e) for e in n.elements]
+        return []
+
+    mut def copy(self) -> arcos_features__features__feature:
+        """Create a deep copy of this list object"""
+        # Copy each element in the list
+        copied_elements = []
+        for e in self:
+            ce = e.copy()
+            if ce is not None:
+                copied_elements.append(ce)
+        return arcos_features__features__feature(elements=copied_elements)
+
+
+_breaker54: None = None
+class arcos_features__features(yadata.MNode):
+    feature: arcos_features__features__feature
+
+    mut def __init__(self, feature: list[arcos_features__features__feature_entry]=[]) -> None:
+        self.feature = arcos_features__features__feature(elements=feature)
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['arcos-features:features'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> arcos_features__features:
+        if n is not None:
+            return arcos_features__features(feature=arcos_features__features__feature.from_gdata(n.get_opt_list(ygdata.Id(NS_arcos_features, 'feature'))))
+        return arcos_features__features()
+
+    mut def copy(self) -> arcos_features__features:
+        """Create a deep copy of this adata object"""
+        return arcos_features__features.from_gdata(self.to_gdata())
+
+
+_breaker55: None = None
+class root(yadata.MNode):
+    interfaces: openconfig_interfaces__interfaces
+    system: openconfig_system__system
+    routing_policy: openconfig_routing_policy__routing_policy
+    network_instances: openconfig_network_instance__network_instances
+    lldp: openconfig_lldp__lldp
+    features: arcos_features__features
+
+    mut def __init__(self, interfaces: ?openconfig_interfaces__interfaces=None, system: ?openconfig_system__system=None, routing_policy: ?openconfig_routing_policy__routing_policy=None, network_instances: ?openconfig_network_instance__network_instances=None, lldp: ?openconfig_lldp__lldp=None, features: ?arcos_features__features=None) -> None:
+        self.interfaces = interfaces if interfaces is not None else openconfig_interfaces__interfaces()
         self.system = system if system is not None else openconfig_system__system()
+        self.routing_policy = routing_policy if routing_policy is not None else openconfig_routing_policy__routing_policy()
+        self.network_instances = network_instances if network_instances is not None else openconfig_network_instance__network_instances()
+        self.lldp = lldp if lldp is not None else openconfig_lldp__lldp()
+        self.features = features if features is not None else arcos_features__features()
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=True)
@@ -2744,7 +3969,7 @@ class root(yadata.MNode):
     @staticmethod
     mut def from_gdata(n: ?ygdata.Node) -> root:
         if n is not None:
-            return root(system=openconfig_system__system.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_system, 'system'))))
+            return root(interfaces=openconfig_interfaces__interfaces.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_interfaces, 'interfaces'))), system=openconfig_system__system.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_system, 'system'))), routing_policy=openconfig_routing_policy__routing_policy.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_routing_policy, 'routing-policy'))), network_instances=openconfig_network_instance__network_instances.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_network_instance, 'network-instances'))), lldp=openconfig_lldp__lldp.from_gdata(n.get_opt_cnt(ygdata.Id(NS_openconfig_lldp, 'lldp'))), features=arcos_features__features.from_gdata(n.get_opt_cnt(ygdata.Id(NS_arcos_features, 'features'))))
         return root()
 
     mut def copy(self) -> root:
