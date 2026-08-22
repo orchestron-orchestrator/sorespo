@@ -15,7 +15,7 @@ $(addprefix platform-wait-,$(ROUTERS_SRL)):
 	timeout --foreground $(WAIT) bash -c "until docker logs $(TESTENV)-$(@:platform-wait-%=%) 2>&1 | grep -q 'Application license_mgr is running'; do sleep 1; done"
 	docker run $(INTERACTIVE) --rm --network container:$(TESTENV)-sweave ghcr.io/stratoweave/ncurl --host $(@:platform-wait-%=%) --port 830 --username clab --password clab@123 hello
 
-.PHONY: cli $(addprefix platform-cli-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL) $(ROUTERS_FRR))
+.PHONY: cli $(addprefix platform-cli-,$(ROUTERS_XR) $(ROUTERS_CRPD) $(ROUTERS_SRL) $(ROUTERS_ARCOS) $(ROUTERS_FRR))
 
 $(addprefix platform-cli-,$(ROUTERS_XR)):
 	docker exec -it $(TESTENV)-$(subst platform-cli-,,$@) /pkg/bin/xr_cli.sh
@@ -25,6 +25,9 @@ $(addprefix platform-cli-,$(ROUTERS_CRPD)):
 
 $(addprefix platform-cli-,$(ROUTERS_SRL)):
 	docker exec -it $(TESTENV)-$(subst platform-cli-,,$@) sr_cli
+
+$(addprefix platform-cli-,$(ROUTERS_ARCOS)):
+	docker exec -it $(TESTENV)-$(subst platform-cli-,,$@) /usr/bin/cli
 
 $(addprefix platform-cli-,$(ROUTERS_FRR)):
 	docker exec -it $(TESTENV)-$(subst platform-cli-,,$@) vtysh
