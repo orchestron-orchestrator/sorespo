@@ -26,6 +26,8 @@ import sorespo.devices.JuniperCRPD_24_4R1_9 as dev_JuniperCRPD_24_4R1_9
 import sorespo.devices.JuniperCRPD_24_4R1_9_oper as dev_JuniperCRPD_24_4R1_9_oper
 import sorespo.devices.NokiaSRLinux_25_3_2 as dev_NokiaSRLinux_25_3_2
 import sorespo.devices.NokiaSRLinux_25_3_2_oper as dev_NokiaSRLinux_25_3_2_oper
+import sorespo.devices.ArcOS_8_2_1 as dev_ArcOS_8_2_1
+import sorespo.devices.ArcOS_8_2_1_oper as dev_ArcOS_8_2_1_oper
 
 def get_layers(dev_registry: swdev.DeviceRegistry, log_handler: ?logging.Handler=None, db: ?swdb.Store=None):
     layer3 = ttt.Layer('3', t_3.get_ttt(None, dev_registry, log_handler), None, db)
@@ -397,6 +399,16 @@ generated_device_types: dict[str, swdev.DeviceType] = {
                     '/srl_nokia-tunnel-if:tunnel-interface/vxlan-interface/index',
                     '/srl_nokia-tunnel-if:tunnel-interface/vxlan-interface/type',
                     '/srl_nokia-tunnel-if:tunnel-interface/vxlan-interface/ingress/vni',
+                ]),
+            ],
+        ),
+    "ArcOS_8_2_1": swdev.DeviceType(name="ArcOS_8_2_1",
+            adapter_type=swna.NetconfAdapter,
+            src_dnode=dev_ArcOS_8_2_1.SRC_DNODE,
+            oper_src_dnode=dev_ArcOS_8_2_1_oper.SRC_DNODE,
+            schema_transforms=[
+                swds.filter_schema([
+                    '/oc-sys:system/config/hostname',
                 ]),
             ],
         ),

@@ -351,6 +351,7 @@ actor main(env):
     # Keep only the ArcOS configuration nodes that sorespo's RFS transforms
     # actively write to.
     arcos_paths = [
+    "/oc-sys:system/config/hostname",
 ]
 
     # The paths referenced by these leafrefs are invalid - missing module
@@ -408,6 +409,8 @@ actor main(env):
                 ]),
         ])
         compiled_spec = spec.compile(broken_leafrefs)
+        # Not sure why this is necessary?
+        compiled_spec.dev_types["ArcOS_8_2_1"].root.rpcs = []
         compiled_spec.gen_app(fc, "../src/")
     except Exception as exc:
         print(exc, err=True)
