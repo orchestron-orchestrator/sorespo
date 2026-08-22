@@ -315,8 +315,60 @@ end-policy
 
             default_ni = dev.network_instances.network_instance.create("default")
             default_ni.config.name = "default"
+            default_ni.config.type = arcos8.openconfig_network_instance_types_L3VRF
             management_ni = dev.network_instances.network_instance.create("management")
             management_ni.config.name = "management"
+
+            loopback = dev.interfaces.interface.create("loopback0")
+            loopback.config.name = "loopback0"
+            loopback.config.type = arcos8.iana_if_type_softwareLoopback
+            loopback.config.enabled = True
+            loopback_subif = loopback.subinterfaces.subinterface.create(0)
+            loopback_subif.config.index = 0
+            loopback_subif.ipv4.config.enabled = True
+            loopback_address = loopback_subif.ipv4.addresses.address.create(i.ipv4_address)
+            loopback_address.config.ip = i.ipv4_address
+            loopback_address.config.prefix_length = 32
+
+            isis_protocol = default_ni.protocols.protocol.create((arcos8.openconfig_policy_types_ISIS, "1"))
+            isis_protocol.config.identifier = arcos8.openconfig_policy_types_ISIS
+            isis_protocol.config.name = "1"
+            isis_protocol.isis.global.config.level_capability = "LEVEL_2"
+            isis_protocol.isis.global.config.net = [net_clns_address]
+            isis_level = isis_protocol.isis.levels.level.create(2)
+            isis_level.config.level_number = 2
+            isis_level.config.enabled = True
+            isis_loopback = isis_protocol.isis.interfaces.interface.create("loopback0")
+            isis_loopback.config.interface_id = "loopback0"
+            isis_loopback.config.passive = True
+
+            bgp_protocol = default_ni.protocols.protocol.create((arcos8.openconfig_policy_types_BGP, "default"))
+            bgp_protocol.config.identifier = arcos8.openconfig_policy_types_BGP
+            bgp_protocol.config.name = "default"
+            bgp_protocol.bgp.global.config.as_ = i.asn
+            bgp_protocol.bgp.global.config.router_id = i.ipv4_address
+            vpnv4 = bgp_protocol.bgp.global.afi_safis.afi_safi.create(arcos8.openconfig_bgp_types_L3VPN_IPV4_UNICAST)
+            vpnv4.config.afi_safi_name = arcos8.openconfig_bgp_types_L3VPN_IPV4_UNICAST
+            vpnv6 = bgp_protocol.bgp.global.afi_safis.afi_safi.create(arcos8.openconfig_bgp_types_L3VPN_IPV6_UNICAST)
+            vpnv6.config.afi_safi_name = arcos8.openconfig_bgp_types_L3VPN_IPV6_UNICAST
+            ibgp_group = bgp_protocol.bgp.peer_groups.peer_group.create("IPV4-IBGP")
+            ibgp_group.config.peer_group_name = "IPV4-IBGP"
+            ibgp_group.config.peer_as = i.asn
+            ibgp_group.config.auth_password = i.ibgp_authentication_key
+            ibgp_group.transport.config.local_address = i.ipv4_address
+            group_vpnv4 = ibgp_group.afi_safis.afi_safi.create(arcos8.openconfig_bgp_types_L3VPN_IPV4_UNICAST)
+            group_vpnv4.config.afi_safi_name = arcos8.openconfig_bgp_types_L3VPN_IPV4_UNICAST
+            group_vpnv6 = ibgp_group.afi_safis.afi_safi.create(arcos8.openconfig_bgp_types_L3VPN_IPV6_UNICAST)
+            group_vpnv6.config.afi_safi_name = arcos8.openconfig_bgp_types_L3VPN_IPV6_UNICAST
+
+            default_ni.mpls.global.config.ttl_propagation = True
+            default_ni.mpls.signaling_protocols.ldp.global.config.lsr_id = i.ipv4_address
+
+            accept = dev.routing_policy.policy_definitions.policy_definition.create("ACCEPT")
+            accept.config.name = "ACCEPT"
+            accept_statement = accept.statements.statement.create("10")
+            accept_statement.config.name = "10"
+            accept_statement.actions.config.accept_route = True
 
             lldp_eth0 = dev.lldp.interfaces.interface.create("eth0")
             lldp_eth0.config.name = "eth0"
@@ -451,6 +503,37 @@ class BBInterface(base.BBInterface):
         elif "arcos-system" in di.modules:
             print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}] for ArcOS", err=True)
             dev = arcos8.root()
+
+            intf = dev.interfaces.interface.create(i.name)
+            intf.config.name = i.name
+            intf.config.type = arcos8.iana_if_type_ethernetCsmacd
+            intf.config.description = if_description
+            intf.config.enabled = True
+            subif = intf.subinterfaces.subinterface.create(0)
+            subif.config.index = 0
+            subif.config.description = if_description
+            subif.ipv4.config.enabled = True
+            ipv4_address = i.ipv4_address
+            if ipv4_address is not None:
+                address = subif.ipv4.addresses.address.create(ipv4_address)
+                address.config.ip = ipv4_address
+                address.config.prefix_length = i.ipv4_prefix_length
+
+            default_ni = dev.network_instances.network_instance.create("default")
+            isis_protocol = default_ni.protocols.protocol.create((arcos8.openconfig_policy_types_ISIS, "1"))
+            isis_protocol.config.identifier = arcos8.openconfig_policy_types_ISIS
+            isis_protocol.config.name = "1"
+            isis_intf = isis_protocol.isis.interfaces.interface.create(i.name)
+            isis_intf.config.interface_id = i.name
+            isis_intf.config.enabled = True
+            isis_intf.config.passive = False
+            isis_level = isis_intf.levels.level.create(2)
+            isis_level.config.enabled = True
+            isis_level.config.level_number = 2
+            isis_level.config.metric = 5000
+
+            ldp_intf = default_ni.mpls.signaling_protocols.ldp.interface_attributes.interfaces.interface.create(i.name)
+            ldp_intf.config.interface_id = i.name
             return dev
 
         raise UnsupportedDevice()
@@ -548,6 +631,19 @@ class IbgpNeighbor(base.IbgpNeighbor):
         elif "arcos-system" in di.modules:
             print("RFS /rfs{{{di.name}}}/ibgp-neighbor transform running {i.address} for ArcOS", err=True)
             dev = arcos8.root()
+
+            default_ni = dev.network_instances.network_instance.create("default")
+            bgp_protocol = default_ni.protocols.protocol.create((arcos8.openconfig_policy_types_BGP, "default"))
+            bgp_protocol.config.identifier = arcos8.openconfig_policy_types_BGP
+            bgp_protocol.config.name = "default"
+            neighbor = bgp_protocol.bgp.neighbors.neighbor.create(i.address)
+            neighbor.config.neighbor_address = i.address
+            neighbor.config.peer_group = "IPV4-IBGP"
+            neighbor.config.description = i.description
+            vpnv4 = neighbor.afi_safis.afi_safi.create(arcos8.openconfig_bgp_types_L3VPN_IPV4_UNICAST)
+            vpnv4.config.afi_safi_name = arcos8.openconfig_bgp_types_L3VPN_IPV4_UNICAST
+            vpnv6 = neighbor.afi_safis.afi_safi.create(arcos8.openconfig_bgp_types_L3VPN_IPV6_UNICAST)
+            vpnv6.config.afi_safi_name = arcos8.openconfig_bgp_types_L3VPN_IPV6_UNICAST
             return dev
 
         raise UnsupportedDevice()
@@ -627,6 +723,26 @@ class Vrf(base.Vrf):
         elif "arcos-system" in di.modules:
             print("RFS /rfs{{{di.name}}}/vrf transform running {i.name} for ArcOS", err=True)
             dev = arcos8.root()
+
+            ni = dev.network_instances.network_instance.create(i.name)
+            ni.config.name = i.name
+            ni.config.type = arcos8.openconfig_network_instance_types_L3VRF
+
+            bgp_protocol = ni.protocols.protocol.create((arcos8.openconfig_policy_types_BGP, "default"))
+            bgp_protocol.config.identifier = arcos8.openconfig_policy_types_BGP
+            bgp_protocol.config.name = "default"
+            bgp_protocol.bgp.global.config.router_id = "10.0.0.{i.router_id}"
+            ipv4 = bgp_protocol.bgp.global.afi_safis.afi_safi.create(arcos8.openconfig_bgp_types_IPV4_UNICAST)
+            ipv4.config.afi_safi_name = arcos8.openconfig_bgp_types_IPV4_UNICAST
+            rt_afi = ipv4.rt_afi_safis.rt_afi_safi.create(arcos8.openconfig_bgp_types_L3VPN_IPV4_UNICAST)
+            rt_afi.config.rt_afi_safi_name = arcos8.openconfig_bgp_types_L3VPN_IPV4_UNICAST
+            route_target = "{i.asn}:{i.id}"
+            both_rt = rt_afi.route_targets.route_target.create((route_target, "both"))
+            both_rt.config.route_target = route_target
+            both_rt.config.route_target_type = "both"
+
+            customer = bgp_protocol.bgp.peer_groups.peer_group.create("customer")
+            customer.config.peer_group_name = "customer"
             return dev
 
         raise UnsupportedDevice()
@@ -697,6 +813,30 @@ class VrfInterface(base.VrfInterface):
         elif "arcos-system" in di.modules:
             print("RFS /rfs{{{di.name}}}/vrf-interface transform running {i.name} for ArcOS", err=True)
             dev = arcos8.root()
+
+            intf = dev.interfaces.interface.create(main_intf)
+            intf.config.name = main_intf
+            intf.config.type = arcos8.iana_if_type_ethernetCsmacd
+            intf.config.description = i.description
+            intf.config.enabled = True
+            subif_index = 4095 + u64(vlan_id)
+            subif = intf.subinterfaces.subinterface.create(subif_index)
+            subif.config.index = subif_index
+            subif.config.description = i.description
+            subif.vlan.match.single_tagged.config.vlan_id = u64(vlan_id)
+            ipv4_address = i.ipv4_address
+            if ipv4_address is not None:
+                subif.ipv4.config.enabled = True
+                address = subif.ipv4.addresses.address.create(ipv4_address)
+                address.config.ip = ipv4_address
+                address.config.prefix_length = i.ipv4_prefix_length
+
+            ni = dev.network_instances.network_instance.create(i.vrf)
+            ni_interface_id = "{main_intf}.{subif_index}"
+            ni_ref = ni.interfaces.interface.create(ni_interface_id)
+            ni_ref.config.id = ni_interface_id
+            ni_ref.config.interface = main_intf
+            ni_ref.config.subinterface = subif_index
             return dev
 
         raise UnsupportedDevice()
@@ -756,6 +896,23 @@ class EbgpCustomer(base.EbgpCustomer):
         elif "arcos-system" in di.modules:
             print("RFS /rfs{{{di.name}}}/ebgp-customer transform running {i.address} for ArcOS", err=True)
             dev = arcos8.root()
+
+            ni = dev.network_instances.network_instance.create(i.vrf)
+            bgp_protocol = ni.protocols.protocol.create((arcos8.openconfig_policy_types_BGP, "default"))
+            bgp_protocol.config.identifier = arcos8.openconfig_policy_types_BGP
+            bgp_protocol.config.name = "default"
+            neighbor = bgp_protocol.bgp.neighbors.neighbor.create(i.address)
+            neighbor.config.neighbor_address = i.address
+            neighbor.config.peer_group = "customer"
+            neighbor.config.peer_as = i.peer_asn
+            neighbor.config.description = i.description
+            if i.authentication_key is not None:
+                neighbor.config.auth_password = i.authentication_key!
+            neighbor.as_path_options.config.replace_peer_as = True
+            ipv4 = neighbor.afi_safis.afi_safi.create(arcos8.openconfig_bgp_types_IPV4_UNICAST)
+            ipv4.config.afi_safi_name = arcos8.openconfig_bgp_types_IPV4_UNICAST
+            ipv4.apply_policy.config.import_policy = ["ACCEPT"]
+            ipv4.apply_policy.config.export_policy = ["ACCEPT"]
             return dev
 
         raise UnsupportedDevice()
