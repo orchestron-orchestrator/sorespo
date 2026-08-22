@@ -1,0 +1,37 @@
+module ietf-yang-push-deviation {
+  namespace "http://tail-f.com/ns/ietf-yang-push-deviation";
+  prefix yp-devs;
+
+  import ietf-subscribed-notifications {
+    prefix sn;
+  }
+  import ietf-yang-push {
+    prefix yp;
+  }
+
+  organization "Tail-f Systems";
+
+  description
+    "Deviation module for ietf-yang-push.
+
+     Disables storage of datastore subtree filters. They are of type anydata
+     which we can't store properly in CDB.
+
+     Copyright 2019 Cisco Systems, Inc.
+     All rights reserved.
+     Permission is hereby granted to redistribute this file without
+     modification";
+
+  /* DATA NODES */
+
+  deviation "/sn:filters/yp:selection-filter/yp:filter-spec" +
+            "/yp:datastore-subtree-filter" {
+    deviate not-supported;
+  }
+
+  deviation "/sn:subscriptions/sn:subscription/sn:target/yp:datastore" +
+            "/yp:selection-filter/yp:within-subscription/yp:filter-spec" +
+            "/yp:datastore-subtree-filter" {
+    deviate not-supported;
+  }
+}

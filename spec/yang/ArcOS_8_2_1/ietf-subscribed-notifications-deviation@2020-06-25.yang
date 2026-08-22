@@ -1,0 +1,51 @@
+module ietf-subscribed-notifications-deviation {
+  namespace "http://tail-f.com/ns/ietf-subscribed-notifications-deviation";
+  prefix sn-devs;
+
+  import ietf-subscribed-notifications {
+    prefix sn;
+  }
+
+  organization "Tail-f Systems";
+
+  description
+    "Deviation module for ietf-subscribed-notifications.
+
+     Disables storage of stream subtree filters. They are of type anydata
+     which we can't store properly in CDB.
+
+     Copyright 2019-2020 Cisco Systems, Inc.
+     All rights reserved.
+     Permission is hereby granted to redistribute this file without
+     modification";
+
+  revision 2020-06-25 {
+    description
+      "Released as part of ConfD-7.4 / NCS-5.4.
+
+       Non-backwards-compatible changes have been introduced.
+
+       Changed namespace from 'urn:deviation' to
+       'http://tail-f.com/ns/ietf-subscribed-notifications-deviation'.
+
+       Changed prefix from 'deviation' to 'sn-devs'.";
+  }
+
+  revision 2019-11-28 {
+    description
+      "Initial revision, released as part of ConfD-7.3 / NCS-5.3.";
+  }
+
+  /* DATA NODES */
+
+  deviation "/sn:filters/sn:stream-filter/sn:filter-spec" +
+            "/sn:stream-subtree-filter" {
+    deviate not-supported;
+  }
+
+  deviation "/sn:subscriptions/sn:subscription/sn:target/sn:stream" +
+            "/sn:stream-filter/sn:within-subscription/sn:filter-spec" +
+            "/sn:stream-subtree-filter" {
+    deviate not-supported;
+  }
+}

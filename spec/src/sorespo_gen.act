@@ -348,6 +348,11 @@ actor main(env):
     "/srl_nokia-tunnel-if:tunnel-interface/vxlan-interface/ingress/vni",
 ]
 
+    # Keep only the ArcOS configuration nodes that sorespo's RFS transforms
+    # actively write to.
+    arcos_paths = [
+]
+
     # The paths referenced by these leafrefs are invalid - missing module
     # imports. We explicitly allow resolving the target leaf type to fallback to
     # a string so that we can avoid adding more models here ...
@@ -396,6 +401,10 @@ actor main(env):
             stratoweave.build.DeviceType.from_dir(fc, "NokiaSRLinux_25_3_2", "yang/NokiaSRLinux_25_3_2",
                 transforms=[
                     swds.filter_schema(srl_paths),
+                ]),
+            stratoweave.build.DeviceType.from_dir(fc, "ArcOS_8_2_1", "yang/ArcOS_8_2_1",
+                transforms=[
+                    swds.filter_schema(arcos_paths),
                 ]),
         ])
         compiled_spec = spec.compile(broken_leafrefs)
