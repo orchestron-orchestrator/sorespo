@@ -335,12 +335,24 @@ end-policy
             isis_protocol.config.name = "1"
             isis_protocol.isis.global.config.level_capability = "LEVEL_2"
             isis_protocol.isis.global.config.net = [net_clns_address]
+            isis_ipv4 = isis_protocol.isis.global.afi_safi.af.create((arcos8.openconfig_isis_types_IPV4, arcos8.openconfig_isis_types_UNICAST))
+            isis_ipv4.config.afi_name = arcos8.openconfig_isis_types_IPV4
+            isis_ipv4.config.safi_name = arcos8.openconfig_isis_types_UNICAST
+            isis_ipv4.config.enabled = True
             isis_level = isis_protocol.isis.levels.level.create(2)
             isis_level.config.level_number = 2
             isis_level.config.enabled = True
             isis_loopback = isis_protocol.isis.interfaces.interface.create("loopback0")
             isis_loopback.config.interface_id = "loopback0"
+            isis_loopback.config.enabled = True
             isis_loopback.config.passive = True
+            isis_loopback_ipv4 = isis_loopback.afi_safi.af.create((arcos8.openconfig_isis_types_IPV4, arcos8.openconfig_isis_types_UNICAST))
+            isis_loopback_ipv4.config.afi_name = arcos8.openconfig_isis_types_IPV4
+            isis_loopback_ipv4.config.safi_name = arcos8.openconfig_isis_types_UNICAST
+            isis_loopback_ipv4.config.enabled = True
+            isis_loopback_level = isis_loopback.levels.level.create(2)
+            isis_loopback_level.config.level_number = 2
+            isis_loopback_level.config.enabled = True
 
             bgp_protocol = default_ni.protocols.protocol.create((arcos8.openconfig_policy_types_BGP, "default"))
             bgp_protocol.config.identifier = arcos8.openconfig_policy_types_BGP
@@ -527,6 +539,11 @@ class BBInterface(base.BBInterface):
             isis_intf.config.interface_id = i.name
             isis_intf.config.enabled = True
             isis_intf.config.passive = False
+            isis_intf.config.network_type = "POINT_TO_POINT"
+            isis_ipv4 = isis_intf.afi_safi.af.create((arcos8.openconfig_isis_types_IPV4, arcos8.openconfig_isis_types_UNICAST))
+            isis_ipv4.config.afi_name = arcos8.openconfig_isis_types_IPV4
+            isis_ipv4.config.safi_name = arcos8.openconfig_isis_types_UNICAST
+            isis_ipv4.config.enabled = True
             isis_level = isis_intf.levels.level.create(2)
             isis_level.config.enabled = True
             isis_level.config.level_number = 2
