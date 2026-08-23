@@ -22,6 +22,8 @@ import sorespo.devices.NokiaSRLinux_25_3_2 as srl25
 import sorespo.devices.NokiaSRLinux_25_3_2_oper as srl25_oper
 from sorespo.devices.NokiaSRLinux_25_3_2_oper import root as srl25_oper_root
 import sorespo.devices.ArcOS_8_2_1 as arcos8
+import sorespo.devices.ArcOS_8_2_1_oper as arcos8_oper
+from sorespo.devices.ArcOS_8_2_1_oper import root as arcos8_oper_root
 
 CRPD = True
 
@@ -152,6 +154,22 @@ def _read_xr_bgp(root: xr25_oper_root, vrf: str, addr: str) -> BgpNeighborStats:
                         s.negotiated_hold_time = nb.hold_time
                         s.last_event = _xr_reset_reason(nb.reset_reason)
                         s.last_notification = _fmt_xr_notification(nb.last_notify_error_code, nb.last_notify_error_subcode)
+    return s
+
+def _read_arcos_bgp(root: arcos8_oper_root, vrf: str, addr: str) -> BgpNeighborStats:
+    s = BgpNeighborStats()
+    for ni in root.network_instances.network_instance:
+        if ni.name == vrf:
+            for protocol in ni.protocols.protocol:
+                if protocol.identifier == arcos8_oper.openconfig_policy_types_BGP and protocol.name == "default":
+                    for nb in protocol.bgp.neighbors.neighbor:
+                        if nb.neighbor_address == addr:
+                            state = nb.state.session_state
+                            s.session_state = state.lower() if state is not None else None
+                            s.established_transitions = nb.state.established_transitions
+                            sent = nb.state.messages.sent.last_notification_error_code
+                            received = nb.state.messages.received.last_notification_error_code
+                            s.last_notification = _fmt_notification("{sent}" if sent is not None else None, "{received}" if received is not None else None)
     return s
 
 class BaseConfig(base.BaseConfig):
@@ -623,6 +641,21 @@ actor BBInterfaceTransform(path, update_oper: proc(?y_2_oper.stratoweave_rfs__rf
                     status = "unknown"
         publish(status)
 
+    def on_arcos_state(root: ?arcos8_oper_root, err: ?Exception):
+        status: ?str = None
+        if err is not None:
+            print("BBInterfaceTransform subscription error: {err}", err=True)
+        elif root is not None:
+            for interface in root.interfaces.interface:
+                raw = interface.state.oper_status
+                if raw == "UP":
+                    status = "up"
+                elif raw == "DOWN":
+                    status = "down"
+                elif raw is not None:
+                    status = "unknown"
+        publish(status)
+
     def on_conf(conf: y_2.stratoweave_rfs__rfs__backbone_interface_entry):
         want: set[gdata.Delivery] = set()
         modset = dev.get_modules().0
@@ -635,6 +668,11 @@ actor BBInterfaceTransform(path, update_oper: proc(?y_2_oper.stratoweave_rfs__rf
             srl_dst = srl25_oper.dst(on_srl_state)
             want.add(srl_dst.deliver({
                 srl25_oper.subs.interface.entry(conf.name).oper_state.subscribe(period=5.0)
+            }))
+        elif "arcos-system" in modset:
+            arcos_dst = arcos8_oper.dst(on_arcos_state)
+            want.add(arcos_dst.deliver({
+                arcos8_oper.subs.interfaces.interface.entry(conf.name).state.oper_status.subscribe(period=5.0)
             }))
         _subs.declare(want)
 
@@ -994,6 +1032,19 @@ actor EbgpCustomerTransform(path, update_oper: proc(?y_2_oper.stratoweave_rfs__r
                 specs.add(nb.last_notify_error_code.subscribe(period=1.0))
                 specs.add(nb.last_notify_error_subcode.subscribe(period=1.0))
             want.add(dst.deliver(specs))
+        elif addr is not None and vrf is not None and "arcos-system" in modset:
+            dst = arcos8_oper.dst(on_arcos_state)
+            protocol = arcos8_oper.subs.network_instances.network_instance.entry(vrf).protocols.protocol.entry(
+                arcos8_oper.openconfig_policy_types_BGP, "default"
+            )
+            nb = protocol.bgp.neighbors.neighbor.entry(addr)
+            period = 1.0 if debug else 2.0
+            specs: set[gdata.SubscriptionSpec] = { nb.state.session_state.subscribe(period=period) }
+            if debug:
+                specs.add(nb.state.established_transitions.subscribe(period=1.0))
+                specs.add(nb.state.messages.sent.last_notification_error_code.subscribe(period=1.0))
+                specs.add(nb.state.messages.received.last_notification_error_code.subscribe(period=1.0))
+            want.add(dst.deliver(specs))
         _subs.declare(want)
 
     def on_srl_state(root: ?srl25_oper_root, err: ?Exception):
@@ -1016,6 +1067,17 @@ actor EbgpCustomerTransform(path, update_oper: proc(?y_2_oper.stratoweave_rfs__r
         s = BgpNeighborStats()
         if root is not None and addr is not None and vrf is not None:
             s = _read_xr_bgp(root, vrf, addr)
+        publish(s)
+
+    def on_arcos_state(root: ?arcos8_oper_root, err: ?Exception):
+        if err is not None:
+            print("EbgpCustomerTransform subscription error: {err}", err=True)
+            return
+        addr = _addr
+        vrf = _vrf
+        s = BgpNeighborStats()
+        if root is not None and addr is not None and vrf is not None:
+            s = _read_arcos_bgp(root, vrf, addr)
         publish(s)
 
     def publish(s: BgpNeighborStats):
