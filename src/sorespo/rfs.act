@@ -374,7 +374,24 @@ end-policy
             group_vpnv6.config.afi_safi_name = arcos8.openconfig_bgp_types_L3VPN_IPV6_UNICAST
 
             default_ni.mpls.global.config.ttl_propagation = True
-            default_ni.mpls.signaling_protocols.ldp.global.config.lsr_id = i.ipv4_address
+            ldp_label_block = default_ni.mpls.global.reserved_label_blocks.reserved_label_block.create("LDP")
+            ldp_label_block.config.local_id = "LDP"
+            ldp_label_block.config.lower_bound = 16000
+            ldp_label_block.config.upper_bound = 23999
+            ldp_label_block.config.usage = arcos8.arcos_mpls_LDP_COMMON
+            ldp_label_block.config.protocol_identifier = arcos8.arcos_openconfig_policy_types_LDP
+            ldp_label_block.config.protocol_name = "default"
+            bgp_label_block = default_ni.mpls.global.reserved_label_blocks.reserved_label_block.create("BGP")
+            bgp_label_block.config.local_id = "BGP"
+            bgp_label_block.config.lower_bound = 24000
+            bgp_label_block.config.upper_bound = 31999
+            bgp_label_block.config.usage = arcos8.arcos_mpls_BGP_COMMON
+            bgp_label_block.config.protocol_identifier = arcos8.openconfig_policy_types_BGP
+            bgp_label_block.config.protocol_name = "default"
+            ldp_global = default_ni.mpls.signaling_protocols.ldp.global
+            ldp_global.config.lsr_id = i.ipv4_address
+            ldp_global.enable.config.enable = True
+            ldp_global.fec_filter.config.export_policy = ["ACCEPT"]
 
             accept = dev.routing_policy.policy_definitions.policy_definition.create("ACCEPT")
             accept.config.name = "ACCEPT"
@@ -551,6 +568,10 @@ class BBInterface(base.BBInterface):
 
             ldp_intf = default_ni.mpls.signaling_protocols.ldp.interface_attributes.interfaces.interface.create(i.name)
             ldp_intf.config.interface_id = i.name
+            ldp_intf.config.link_hello = True
+            ldp_ipv4 = ldp_intf.address_families.address_family.create("IPV4")
+            ldp_ipv4.config.afi_name = "IPV4"
+            ldp_ipv4.config.enabled = True
             return dev
 
         raise UnsupportedDevice()
@@ -749,6 +770,7 @@ class Vrf(base.Vrf):
             bgp_protocol.config.identifier = arcos8.openconfig_policy_types_BGP
             bgp_protocol.config.name = "default"
             bgp_protocol.bgp.global.config.router_id = "10.0.0.{i.router_id}"
+            bgp_protocol.bgp.global.config.label_allocation_mode = arcos8.openconfig_network_instance_types_INSTANCE_LABEL
             ipv4 = bgp_protocol.bgp.global.afi_safis.afi_safi.create(arcos8.openconfig_bgp_types_IPV4_UNICAST)
             ipv4.config.afi_safi_name = arcos8.openconfig_bgp_types_IPV4_UNICAST
             rt_afi = ipv4.rt_afi_safis.rt_afi_safi.create(arcos8.openconfig_bgp_types_L3VPN_IPV4_UNICAST)
@@ -836,11 +858,12 @@ class VrfInterface(base.VrfInterface):
             intf.config.type = arcos8.iana_if_type_ethernetCsmacd
             intf.config.description = i.description
             intf.config.enabled = True
-            subif_index = 4095 + u64(vlan_id)
+            subif_index = u64(vlan_id)
             subif = intf.subinterfaces.subinterface.create(subif_index)
             subif.config.index = subif_index
             subif.config.description = i.description
-            subif.vlan.match.single_tagged.config.vlan_id = u64(vlan_id)
+            subif.config.enabled = True
+            subif.vlan.config.vlan_id = subif_index
             ipv4_address = i.ipv4_address
             if ipv4_address is not None:
                 subif.ipv4.config.enabled = True
