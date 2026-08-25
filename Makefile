@@ -40,7 +40,7 @@ gen:
 
 .PHONY: gen-ldep
 gen-ldep:
-	$(MAKE) gen DEP_OVERRIDES="--dep netconf=../../netconf --dep stratoweave=../../stratoweave --dep yang=../../acton-yang --dep actmf=../../actmf --dep http_router=../../http-router"
+	$(MAKE) gen DEP_OVERRIDES="--dep netconf=../../netconf --dep stratoweave=../../stratoweave --dep yang=../../acton-yang --dep tmf=../../actmf --dep http_router=../../http-router"
 
 .PHONY: pkg-upgrade
 pkg-upgrade:
