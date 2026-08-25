@@ -164,6 +164,8 @@ configure:
 
 .PHONY: configure-tmf640
 configure-tmf640:
+	settings=$$(jq -c '{"netinfra:global-settings": .["netinfra:netinfra"]["global-settings"]}' netinfra.json); \
+	curl -f -k -sS -X PUT -H "Content-Type: application/yang-data+json" -d "$$settings" $(STRATOWEAVE_API_ORIGIN)/restconf/data/netinfra:netinfra/global-settings
 	$(MAKE) send-config-tmf640-stream FILE="netinfra.json" FILTER="../common/netinfra-to-tmf640.jq"
 	$(MAKE) send-config-tmf640-stream FILE="l3vpn-svc.json" FILTER="../common/l3vpn-svc-to-tmf640.jq"
 
