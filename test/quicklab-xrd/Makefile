@@ -15,18 +15,21 @@ include ../common/quicklab.mk
 # Default: ams-core-1's customer access port Gi0-0-0-2 (-> cust-1, eBGP neighbor
 # 10.201.1.2 in VRF acme-65501). Gi0-0-0-N is the containerlab veth in the XRd
 # container that maps to GigabitEthernet0/0/0/N. The XRd container image ships
-# no `tc`, so run it from the host inside the container's network namespace.
+# no `tc`, so use the FRR image as a helper in the XRd network namespace.
 BGP_IMPAIR_ROUTER ?= ams-core-1
 BGP_IMPAIR_IF     ?= Gi0-0-0-2
+BGP_IMPAIR_IMAGE  ?= quay.io/frrouting/frr:10.3.1
 
 .PHONY: bgp-impair
 bgp-impair:
 	@echo "Dropping 100% of packets on $(BGP_IMPAIR_ROUTER) $(BGP_IMPAIR_IF) (link stays up; eBGP session drops after hold)"
-	sudo nsenter -t $$(docker inspect -f '{{.State.Pid}}' $(TESTENV)-$(BGP_IMPAIR_ROUTER)) -n \
-	    tc qdisc add dev $(BGP_IMPAIR_IF) root netem loss 100%
+	docker run --rm --network container:$(TESTENV)-$(BGP_IMPAIR_ROUTER) \
+	    --cap-add NET_ADMIN --entrypoint tc $(BGP_IMPAIR_IMAGE) \
+	    qdisc add dev $(BGP_IMPAIR_IF) root netem loss 100%
 
 .PHONY: bgp-restore
 bgp-restore:
 	@echo "Removing netem on $(BGP_IMPAIR_ROUTER) $(BGP_IMPAIR_IF)"
-	sudo nsenter -t $$(docker inspect -f '{{.State.Pid}}' $(TESTENV)-$(BGP_IMPAIR_ROUTER)) -n \
-	    tc qdisc del dev $(BGP_IMPAIR_IF) root || true
+	docker run --rm --network container:$(TESTENV)-$(BGP_IMPAIR_ROUTER) \
+	    --cap-add NET_ADMIN --entrypoint tc $(BGP_IMPAIR_IMAGE) \
+	    qdisc del dev $(BGP_IMPAIR_IF) root || true

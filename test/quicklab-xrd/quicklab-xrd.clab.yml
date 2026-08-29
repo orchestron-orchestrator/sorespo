@@ -75,6 +75,14 @@ topology:
       ports:
         - "80/tcp"
         - "830/tcp"
+    webui:
+      kind: linux
+      image: ${WEBUI_IMAGE}
+      image-pull-policy: if-not-present
+      env:
+        STRATOWEAVE_API_ORIGIN: http://sweave:80
+      ports:
+        - "127.0.0.1:${WEBUI_PORT}:3000/tcp"
 
   links:
     - endpoints: ["ams-core-1:Gi0-0-0-0", "fra-core-1:Gi0-0-0-0"]
