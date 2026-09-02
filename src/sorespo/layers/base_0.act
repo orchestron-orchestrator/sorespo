@@ -13,7 +13,9 @@ from sorespo.layers.y_0 import stratoweave_tmf__tmf_store__tmf640__service_entry
 from sorespo.layers.y_0 import ietf_l3vpn_svc__l3vpn_svc__vpn_services__vpn_service_entry
 from sorespo.layers.y_0 import ietf_l3vpn_svc__l3vpn_svc__sites__site_entry
 from sorespo.layers.y_0 import netinfra__netinfra__router_entry
+from sorespo.layers.y_0 import netinfra__netinfra__roadm_entry
 from sorespo.layers.y_0 import netinfra__netinfra__backbone_link_entry
+from sorespo.layers.y_0 import netinfra__netinfra__optical_link_entry
 from sorespo.layers.y_0 import netinfra__netinfra__global_settings
 from sorespo.layers.y_0_oper import ietf_l3vpn_svc__l3vpn_svc__sites__site_entry as ietf_l3vpn_svc__l3vpn_svc__sites__site_entry__oper
 from sorespo.layers.y_0_oper import netinfra__netinfra__backbone_link_entry as netinfra__netinfra__backbone_link_entry__oper
@@ -134,6 +136,31 @@ class Router(ttt.TransformFunction):
 
         return self.transform(modeled_input, linked).to_gdata(), None
 
+class ROADM(ttt.TransformFunction):
+    transform: mut(netinfra__netinfra__roadm_entry) -> yadata.MNode
+
+    @staticmethod
+    def input_type():
+        """Return the modeled input type for this transform"""
+        return netinfra__netinfra__roadm_entry
+
+    mut def transform_wrapper(self, i: ygdata.Node, linked: ygdata.Node, memory: ?ygdata.Node, dynstate: ?ygdata.Node) -> (ygdata.Node, ?ygdata.Node):
+        """Wrap the user provided transform method to convert from gdata to
+        modeled input and back to gdata
+        """
+        modeled_input = netinfra__netinfra__roadm_entry.from_gdata(i)
+
+        return self.transform(modeled_input).to_gdata(), None
+
+    mut def transform_xml(self, i: xml.Node, linked: ygdata.Node, memory: ?ygdata.Node, dynstate: ?ygdata.Node) -> (ygdata.Node, ?ygdata.Node):
+        """Wrap the user provided transform method to convert from XML to
+        modeled input and return gdata
+        """
+        gdata_input = yxml.from_xml(SRC_DNODE, i, loose=False, root_path=['netinfra:netinfra', 'roadm'])
+        modeled_input = netinfra__netinfra__roadm_entry.from_gdata(gdata_input)
+
+        return self.transform(modeled_input).to_gdata(), None
+
 class BBLink(ttt.TransformFunction):
     transform: mut(netinfra__netinfra__backbone_link_entry) -> yadata.MNode
 
@@ -166,6 +193,31 @@ class BBLink(ttt.TransformFunction):
         """
         gdata_input = yxml.from_xml(SRC_DNODE, i, loose=False, root_path=['netinfra:netinfra', 'backbone-link'])
         modeled_input = netinfra__netinfra__backbone_link_entry.from_gdata(gdata_input)
+
+        return self.transform(modeled_input).to_gdata(), None
+
+class OpticalLink(ttt.TransformFunction):
+    transform: mut(netinfra__netinfra__optical_link_entry) -> yadata.MNode
+
+    @staticmethod
+    def input_type():
+        """Return the modeled input type for this transform"""
+        return netinfra__netinfra__optical_link_entry
+
+    mut def transform_wrapper(self, i: ygdata.Node, linked: ygdata.Node, memory: ?ygdata.Node, dynstate: ?ygdata.Node) -> (ygdata.Node, ?ygdata.Node):
+        """Wrap the user provided transform method to convert from gdata to
+        modeled input and back to gdata
+        """
+        modeled_input = netinfra__netinfra__optical_link_entry.from_gdata(i)
+
+        return self.transform(modeled_input).to_gdata(), None
+
+    mut def transform_xml(self, i: xml.Node, linked: ygdata.Node, memory: ?ygdata.Node, dynstate: ?ygdata.Node) -> (ygdata.Node, ?ygdata.Node):
+        """Wrap the user provided transform method to convert from XML to
+        modeled input and return gdata
+        """
+        gdata_input = yxml.from_xml(SRC_DNODE, i, loose=False, root_path=['netinfra:netinfra', 'optical-link'])
+        modeled_input = netinfra__netinfra__optical_link_entry.from_gdata(gdata_input)
 
         return self.transform(modeled_input).to_gdata(), None
 
