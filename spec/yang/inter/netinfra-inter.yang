@@ -85,6 +85,24 @@ module netinfra-inter {
       }
     }
 
+    list roadm {
+      key name;
+      sw:transform sorespo.inter.ROADM;
+
+      leaf name {
+        type string;
+      }
+      leaf id {
+        type uint32;
+        description "roadm id";
+        mandatory true;
+      }
+      leaf role {
+        type string;
+        description "edge or core";
+      }
+    }
+
     list backbone-link {
       key "left-router left-interface right-router right-interface";
 
@@ -103,6 +121,40 @@ module netinfra-inter {
         type string;
       }
 
+      leaf vlan {
+        type uint16 {
+          range "1..4094";
+        }
+        description "VLAN tag for the link";
+      }
+
+      container optical {
+        description "OTN link parameters";
+        leaf left-roadm {
+          type leafref {
+            path "/netinfra-inter:netinfra/netinfra-inter:roadm/netinfra-inter:name";
+          }
+        }
+        leaf right-roadm {
+          type leafref {
+            path "/netinfra-inter:netinfra/netinfra-inter:roadm/netinfra-inter:name";
+          }
+        }
+        leaf left-port {
+          type string;
+        }
+        leaf right-port {
+          type string;
+        }
+        leaf-list otn-path {
+          type leafref {
+            path "/netinfra-inter:netinfra/netinfra-inter:roadm/netinfra-inter:name";
+          }
+          ordered-by user;
+          description "OTN path through intermediate ROADMs";
+        }
+      }
+
       container state {
         config false;
         description
@@ -116,6 +168,25 @@ module netinfra-inter {
             enum unknown;
           }
         }
+      }
+    }
+
+    list optical-link {
+      key "left-roadm left-port right-roadm right-port";
+
+      sw:transform sorespo.inter.OpticalLink;
+
+      leaf left-roadm {
+        type string;
+      }
+      leaf left-port {
+        type string;
+      }
+      leaf right-roadm {
+        type string;
+      }
+      leaf right-port {
+        type string;
       }
     }
 

@@ -1082,7 +1082,8 @@ SRC_DNODE_CHILD_127: DList = DList(module='netinfra', namespace='http://example.
         DExt(module='ietf-yang-tmf-map', namespace='urn:ietf:params:xml:ns:yang:ietf-yang-tmf-map', prefix='tmf', name='cfs-service', arg='ROADM', exts=[])
     ], children=[
     DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='name', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
-    DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='id', config=True, description='roadm id', mandatory=True, type=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)])))
+    DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='id', config=True, description='roadm id', mandatory=True, type=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)]))),
+    DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='role', config=True, description='edge or core', mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
 ])
 
 SRC_DNODE_CHILD_128: DList = DList(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='backbone-link', key=[
@@ -4792,6 +4793,10 @@ SRC_YANG_2: str = r"""module netinfra {
         type uint32;
         description "roadm id";
         mandatory true;
+      }
+      leaf role {
+        type string;
+        description "edge or core";
       }
     }
 
@@ -13077,17 +13082,19 @@ _breaker220: None = None
 class netinfra__netinfra__roadm_entry(yadata.MNode):
     name: str
     id: ?u64
+    role: ?str
 
-    mut def __init__(self, name: str, id: ?u64) -> None:
+    mut def __init__(self, name: str, id: ?u64, role: ?str) -> None:
         self.name = name
         self.id = id
+        self.role = role
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['netinfra:netinfra', 'roadm'])
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> netinfra__netinfra__roadm_entry:
-        return netinfra__netinfra__roadm_entry(name=n.get_str(ygdata.Id(NS_netinfra, 'name')), id=n.get_opt_u64(ygdata.Id(NS_netinfra, 'id')))
+        return netinfra__netinfra__roadm_entry(name=n.get_str(ygdata.Id(NS_netinfra, 'name')), id=n.get_opt_u64(ygdata.Id(NS_netinfra, 'id')), role=n.get_opt_str(ygdata.Id(NS_netinfra, 'role')))
 
     mut def copy(self) -> netinfra__netinfra__roadm_entry:
         """Create a deep copy of this adata object"""
@@ -13098,14 +13105,16 @@ class netinfra__netinfra__roadm(yadata.MKeyedList[str, netinfra__netinfra__roadm
     mut def __init__(self, elements: list[netinfra__netinfra__roadm_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
 
-    mut def create(self, key: str, id: ?u64=None) -> netinfra__netinfra__roadm_entry:
+    mut def create(self, key: str, id: ?u64=None, role: ?str=None) -> netinfra__netinfra__roadm_entry:
         e = self.get(key)
         if e is not None:
             if id is not None:
                 e.id = id
+            if role is not None:
+                e.role = role
             return e
         name = key
-        res = netinfra__netinfra__roadm_entry(name=name, id=id)
+        res = netinfra__netinfra__roadm_entry(name=name, id=id, role=role)
         self.elements.append(res)
         return res
 
@@ -17396,24 +17405,28 @@ _breaker450: None = None
 class netinfra__netinfra__roadm_entry_subs(SubscriptionNode):
     name: SubscriptionNode
     id: SubscriptionNode
+    role: SubscriptionNode
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
         self.name = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_netinfra, 'name'), parent=path))
         self.id = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_netinfra, 'id'), parent=path))
+        self.role = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_netinfra, 'role'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.name, self.id]
+        direct: list[SubscriptionNode] = [self.name, self.id, self.role]
         return direct
 
 _breaker451: None = None
 class netinfra__netinfra__roadm_subs(SubscriptionNode):
     name: SubscriptionNode
     id: SubscriptionNode
+    role: SubscriptionNode
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
         self.name = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_netinfra, 'name'), parent=path))
         self.id = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_netinfra, 'id'), parent=path))
+        self.role = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_netinfra, 'role'), parent=path))
 
     pure def entry(self, name: str) -> netinfra__netinfra__roadm_entry_subs:
         predicates = [
@@ -17423,7 +17436,7 @@ class netinfra__netinfra__roadm_subs(SubscriptionNode):
         return netinfra__netinfra__roadm_entry_subs(SubscriptionPath(ygdata.Id(NS_netinfra, 'roadm'), predicates=predicates, parent=base_path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.name, self.id]
+        direct: list[SubscriptionNode] = [self.name, self.id, self.role]
         return direct
 
 _breaker452: None = None

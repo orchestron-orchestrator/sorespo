@@ -1063,7 +1063,8 @@ SRC_DNODE_CHILD_124: DList = DList(module='netinfra', namespace='http://example.
         DExt(module='ietf-yang-tmf-map', namespace='urn:ietf:params:xml:ns:yang:ietf-yang-tmf-map', prefix='tmf', name='cfs-service', arg='ROADM', exts=[])
     ], children=[
     DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='name', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
-    DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='id', config=True, description='roadm id', mandatory=True, type=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)])))
+    DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='id', config=True, description='roadm id', mandatory=True, type=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)]))),
+    DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='role', config=True, description='edge or core', mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
 ])
 
 SRC_DNODE_CHILD_125: DList = DList(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='backbone-link', key=[
@@ -4770,6 +4771,10 @@ SRC_YANG_2: str = r"""module netinfra {
         type uint32;
         description "roadm id";
         mandatory true;
+      }
+      leaf role {
+        type string;
+        description "edge or core";
       }
     }
 
@@ -12937,17 +12942,19 @@ _breaker217: None = None
 class netinfra__netinfra__roadm_entry(yadata.MNode):
     name: str
     id: u64
+    role: ?str
 
-    mut def __init__(self, name: str, id: u64) -> None:
+    mut def __init__(self, name: str, id: u64, role: ?str) -> None:
         self.name = name
         self.id = id
+        self.role = role
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['netinfra:netinfra', 'roadm'])
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> netinfra__netinfra__roadm_entry:
-        return netinfra__netinfra__roadm_entry(name=n.get_str(ygdata.Id(NS_netinfra, 'name')), id=n.get_u64(ygdata.Id(NS_netinfra, 'id')))
+        return netinfra__netinfra__roadm_entry(name=n.get_str(ygdata.Id(NS_netinfra, 'name')), id=n.get_u64(ygdata.Id(NS_netinfra, 'id')), role=n.get_opt_str(ygdata.Id(NS_netinfra, 'role')))
 
     mut def copy(self) -> netinfra__netinfra__roadm_entry:
         """Create a deep copy of this adata object"""
@@ -12958,13 +12965,15 @@ class netinfra__netinfra__roadm(yadata.MKeyedList[str, netinfra__netinfra__roadm
     mut def __init__(self, elements: list[netinfra__netinfra__roadm_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
 
-    mut def create(self, key: str, id: u64) -> netinfra__netinfra__roadm_entry:
+    mut def create(self, key: str, id: u64, role: ?str=None) -> netinfra__netinfra__roadm_entry:
         e = self.get(key)
         if e is not None:
             e.id = id
+            if role is not None:
+                e.role = role
             return e
         name = key
-        res = netinfra__netinfra__roadm_entry(name=name, id=id)
+        res = netinfra__netinfra__roadm_entry(name=name, id=id, role=role)
         self.elements.append(res)
         return res
 
