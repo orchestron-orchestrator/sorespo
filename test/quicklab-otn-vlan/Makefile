@@ -49,3 +49,12 @@ bb-up-all:
 	        "set / interface $$iface admin-state enable" \
 	        || true; \
 	done
+
+.PHONY: otn-copy
+otn-copy:
+	docker cp ../../out/bin/sorespo $(TESTENV)-sweave:/sorespo
+	docker cp netinfra.xml $(TESTENV)-sweave:/netinfra.xml
+
+.PHONY: otn-run-and-configure
+otn-run-and-configure:
+	docker exec $(INTERACTIVE) $(TESTENV)-sweave /sorespo $(EXIT_ON_DONE) netinfra.xml --rts-bt-dbg

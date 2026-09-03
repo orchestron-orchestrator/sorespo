@@ -46,6 +46,10 @@ class BBLink(base.BBLink):
         print("CFS backbonelink transform running %s [%s] <-> %s [%s]" % (i.left_router, i.left_interface, i.right_router, i.right_interface))
         o = base.o_root()
         o.netinfra.backbone_link.create((i.left_router, i.left_interface, i.right_router, i.right_interface))
+
+        # if i.optical is not None:
+        #     print("JFDOAKFLDS")
+            
         return o
 
 
@@ -205,10 +209,17 @@ class L3VpnSite(base.L3VpnSite):
 
 class ROADM(base.ROADM):
     def transform(self, i):
-        print("ROADM transform")
-        return base.o_root()
+        print("CFS roadm transform running", i.name, i.id, i.role)
+        o = base.o_root()
+        o_roadm = o.netinfra.roadm.create(i.name, id=i.id, role=i.role)
+        if i.role == "edge":
+            o_roadm.edge_ipv4_address = "10.10.0.{i.id}"
+            
+        return o
 
 class OpticalLink(base.OpticalLink):
     def transform(self, i):
-        print("OpticalLink transform")
-        return base.o_root()
+        print("CFS OpticalLink transform running %s [%s] <-> %s [%s]" % (i.left_roadm, i.left_port, i.right_roadm, i.right_port))
+        o = base.o_root()
+        o.netinfra.optical_link.create((i.left_roadm, i.left_port, i.right_roadm, i.right_port))
+        return o

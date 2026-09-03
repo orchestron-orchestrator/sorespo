@@ -46,7 +46,8 @@ SRC_DNODE_CHILD_2: DList = DList(module='netinfra-inter', namespace='http://exam
     ], children=[
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='name', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='id', config=True, description='roadm id', mandatory=True, type=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)]))),
-    DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='role', config=True, description='edge or core', mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
+    DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='role', config=True, description='edge or core', mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
+    DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='edge-ipv4-address', config=True, mandatory=False, type=DTypeString(name='inet:ipv4-address', description='The ipv4-address type represents an IPv4 address in\ndotted-quad notation.  The IPv4 address may include a zone\nindex, separated by a % sign.\n\nThe zone index is used to disambiguate identical address\nvalues.  For link-local addresses, the zone index will\ntypically be the interface index number or the name of an\ninterface.  If the zone index is not present, the default\nzone of the device will be used.\n\nThe canonical format for the zone index is the numerical\nformat', reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(%[\\p{{N}}\\p{{L}}]+)?', pcre='^((([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(%[\\p{{N}}\\p{{L}}]+)?)$', invert=False)]))
 ])
 
 SRC_DNODE_CHILD_3: DList = DList(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='backbone-link', key=[
@@ -325,6 +326,9 @@ SRC_YANG_1: str = r"""module netinfra-inter {
       leaf role {
         type string;
         description "edge or core";
+      }
+      leaf edge-ipv4-address {
+        type inet:ipv4-address;
       }
     }
 
@@ -1157,18 +1161,20 @@ class netinfra_inter__netinfra__roadm_entry(yadata.MNode):
     name: str
     id: u64
     role: ?str
+    edge_ipv4_address: ?str
 
-    mut def __init__(self, name: str, id: u64, role: ?str) -> None:
+    mut def __init__(self, name: str, id: u64, role: ?str, edge_ipv4_address: ?str) -> None:
         self.name = name
         self.id = id
         self.role = role
+        self.edge_ipv4_address = edge_ipv4_address
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=False, root_path=['netinfra-inter:netinfra', 'roadm'])
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> netinfra_inter__netinfra__roadm_entry:
-        return netinfra_inter__netinfra__roadm_entry(name=n.get_str(ygdata.Id(NS_netinfra_inter, 'name')), id=n.get_u64(ygdata.Id(NS_netinfra_inter, 'id')), role=n.get_opt_str(ygdata.Id(NS_netinfra_inter, 'role')))
+        return netinfra_inter__netinfra__roadm_entry(name=n.get_str(ygdata.Id(NS_netinfra_inter, 'name')), id=n.get_u64(ygdata.Id(NS_netinfra_inter, 'id')), role=n.get_opt_str(ygdata.Id(NS_netinfra_inter, 'role')), edge_ipv4_address=n.get_opt_str(ygdata.Id(NS_netinfra_inter, 'edge-ipv4-address')))
 
     mut def copy(self) -> netinfra_inter__netinfra__roadm_entry:
         """Create a deep copy of this adata object"""
@@ -1179,15 +1185,17 @@ class netinfra_inter__netinfra__roadm(yadata.MKeyedList[str, netinfra_inter__net
     mut def __init__(self, elements: list[netinfra_inter__netinfra__roadm_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
 
-    mut def create(self, key: str, id: u64, role: ?str=None) -> netinfra_inter__netinfra__roadm_entry:
+    mut def create(self, key: str, id: u64, role: ?str=None, edge_ipv4_address: ?str=None) -> netinfra_inter__netinfra__roadm_entry:
         e = self.get(key)
         if e is not None:
             e.id = id
             if role is not None:
                 e.role = role
+            if edge_ipv4_address is not None:
+                e.edge_ipv4_address = edge_ipv4_address
             return e
         name = key
-        res = netinfra_inter__netinfra__roadm_entry(name=name, id=id, role=role)
+        res = netinfra_inter__netinfra__roadm_entry(name=name, id=id, role=role, edge_ipv4_address=edge_ipv4_address)
         self.elements.append(res)
         return res
 

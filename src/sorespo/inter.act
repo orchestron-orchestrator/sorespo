@@ -234,10 +234,48 @@ class L3Vpn(base.L3Vpn):
 
 class ROADM(base.ROADM):
     def transform(self, i):
-        print("ROADM transform")
-        return base.o_root()
+        o = base.o_root()
+        print("Intermediate roadm transform running", i.name, i.id)
+        dev = o.device.create(i.name, type="NokiaSRLinux_25_3_2")
+        dev.address.create("oob", address=i.name)
+        dev.credentials.username = "clab"
+        dev.credentials.password = "clab@123"
+
+        if i.role == "edge":
+            rfs = o.rfs.create(i.name)
+            rfs.irb_interface.create("irb1", ipv4_address=i.edge_ipv4_address, vlan_vrf="MAC-VRF-VLAN", default_vrf="otn-vlan")
+
+        return o
 
 class OpticalLink(base.OpticalLink):
     def transform(self, i):
-        print("OpticalLink transform")
-        return base.o_root()
+        o = base.o_root()
+        print("CFS OpticalLink transform running %s [%s] <-> %s [%s]" % (i.left_roadm, i.left_port, i.right_roadm, i.right_port))
+
+        left_rfs = o.rfs.create(i.left_roadm)
+        li = left_rfs.vlan_interface.create(i.left_port)
+        li.remote.device = i.right_roadm
+        li.remote.interface = i.right_port
+
+        right_rfs = o.rfs.create(i.right_roadm)
+        ri = right_rfs.vlan_interface.create(i.right_port)
+        ri.remote.device = i.left_roadm
+        ri.remote.interface = i.left_port
+        return o
+
+
+# class ActiveVlanLink(base.ActiveVlanLink):
+#     def transform(self, i):
+#         o = base.o_root()
+#         print("CFS ActiveVlanLink transform running %s [%s] <-> %s [%s]" % (i.left_roadm, i.left_port, i.right_roadm, i.right_port))
+
+#         left_rfs = o.rfs.create(i.left_roadm)
+#         li = left_rfs.vlan_interface.create(i.left_port)
+#         li.remote.device = i.right_roadm
+#         li.remote.interface = i.right_port
+
+#         right_rfs = o.rfs.create(i.right_roadm)
+#         ri = right_rfs.vlan_interface.create(i.right_port)
+#         ri.remote.device = i.left_roadm
+#         ri.remote.interface = i.left_port
+#         return o
