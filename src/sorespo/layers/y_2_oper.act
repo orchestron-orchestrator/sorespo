@@ -59,9 +59,22 @@ SRC_DNODE_CHILD_6: DList = DList(module='stratoweave-rfs', namespace='http://str
     DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='key', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
 ])
 
-SRC_DNODE_CHILD_7: DLeaf = DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='approval-required', config=True, description='Require approval of each individual configuration change to this device', default='false', mandatory=False, type=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
+SRC_DNODE_CHILD_7: DContainer = DContainer(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='ssh', config=True, description='SSH transport parameters used when connecting to this device. Applies\nto every SSH-based adapter (NETCONF over SSH, CLI, ...).', presence=False, children=[
+    DLeafList(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='cipher', config=True, description='Symmetric ciphers to offer, most preferred first.', min_elements=0, ordered_by='user', type=DTypeEnum(name='sw-rfs:ssh-cipher', description='Symmetric cipher, as negotiated in the SSH transport protocol.', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'chacha20-poly1305@openssh.com':0, 'aes256-gcm@openssh.com':1, 'aes128-gcm@openssh.com':2, 'aes256-ctr':3, 'aes192-ctr':4, 'aes128-ctr':5, 'aes256-cbc':6, 'aes192-cbc':7, 'aes128-cbc':8, '3des-cbc':9, 'none':10})),
+    DLeafList(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='mac', config=True, description='MAC algorithms to offer, most preferred first.', min_elements=0, ordered_by='user', type=DTypeEnum(name='sw-rfs:ssh-mac', description='Message authentication code, as negotiated in the SSH transport\nprotocol. Not used with AEAD ciphers, which authenticate themselves.', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'hmac-sha2-256-etm@openssh.com':0, 'hmac-sha2-512-etm@openssh.com':1, 'hmac-sha1-etm@openssh.com':2, 'hmac-sha2-256':3, 'hmac-sha2-512':4, 'hmac-sha1':5, 'none':6})),
+    DLeafList(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='key-exchange', config=True, description='Key exchange algorithms to offer, most preferred first.', min_elements=0, ordered_by='user', type=DTypeEnum(name='sw-rfs:ssh-key-exchange', description='Key exchange algorithm, as negotiated in the SSH transport protocol.', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'diffie-hellman-group-exchange-sha1':0, 'mlkem768x25519-sha256':1, 'mlkem768nistp256-sha256':2, 'sntrup761x25519-sha512':3, 'sntrup761x25519-sha512@openssh.com':4, 'curve25519-sha256':5, 'curve25519-sha256@libssh.org':6, 'ecdh-sha2-nistp256':7, 'ecdh-sha2-nistp384':8, 'ecdh-sha2-nistp521':9, 'diffie-hellman-group18-sha512':10, 'diffie-hellman-group16-sha512':11, 'diffie-hellman-group-exchange-sha256':12, 'diffie-hellman-group14-sha256':13, 'diffie-hellman-group14-sha1':14, 'diffie-hellman-group1-sha1':15})),
+    DLeafList(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='host-key-algorithm', config=True, description='Server host key algorithms to accept, most preferred first. This is\nwhat decides which host key type the device presents.', min_elements=0, ordered_by='user', type=DTypeEnum(name='sw-rfs:ssh-host-key-algorithm', description='Server host key algorithm, i.e. the key type we are willing to accept\nfrom the far end and verify the session signature with.', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'ssh-ed25519-cert-v01@openssh.com':0, 'sk-ssh-ed25519-cert-v01@openssh.com':1, 'ecdsa-sha2-nistp521-cert-v01@openssh.com':2, 'ecdsa-sha2-nistp384-cert-v01@openssh.com':3, 'ecdsa-sha2-nistp256-cert-v01@openssh.com':4, 'sk-ecdsa-sha2-nistp256-cert-v01@openssh.com':5, 'rsa-sha2-512-cert-v01@openssh.com':6, 'rsa-sha2-256-cert-v01@openssh.com':7, 'ssh-rsa-cert-v01@openssh.com':8, 'ssh-ed25519':9, 'ecdsa-sha2-nistp521':10, 'ecdsa-sha2-nistp384':11, 'ecdsa-sha2-nistp256':12, 'sk-ssh-ed25519@openssh.com':13, 'sk-ecdsa-sha2-nistp256@openssh.com':14, 'rsa-sha2-512':15, 'rsa-sha2-256':16, 'ssh-rsa':17})),
+    DLeafList(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='public-key-algorithm', config=True, description='Public key algorithms to offer for publickey authentication, most\npreferred first.', min_elements=0, ordered_by='user', type=DTypeEnum(name='sw-rfs:ssh-public-key-algorithm', description='Public key algorithm offered during publickey authentication.', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'ssh-ed25519-cert-v01@openssh.com':0, 'sk-ssh-ed25519-cert-v01@openssh.com':1, 'ecdsa-sha2-nistp521-cert-v01@openssh.com':2, 'ecdsa-sha2-nistp384-cert-v01@openssh.com':3, 'ecdsa-sha2-nistp256-cert-v01@openssh.com':4, 'sk-ecdsa-sha2-nistp256-cert-v01@openssh.com':5, 'rsa-sha2-512-cert-v01@openssh.com':6, 'rsa-sha2-256-cert-v01@openssh.com':7, 'ssh-rsa-cert-v01@openssh.com':8, 'ssh-ed25519':9, 'ecdsa-sha2-nistp521':10, 'ecdsa-sha2-nistp384':11, 'ecdsa-sha2-nistp256':12, 'sk-ssh-ed25519@openssh.com':13, 'sk-ecdsa-sha2-nistp256@openssh.com':14, 'rsa-sha2-512':15, 'rsa-sha2-256':16, 'ssh-rsa':17})),
+    DLeafList(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='compression-algorithm', config=True, description="Compression algorithms to offer, most preferred first. 'none' first\ndisables compression against peers that also offer it.", min_elements=0, ordered_by='user', type=DTypeEnum(name='sw-rfs:ssh-compression-algorithm', description='Transport compression algorithm.', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'none':0, 'zlib@openssh.com':1, 'zlib':2})),
+    DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='compression-level', config=True, description='zlib compression level, 1 (fastest) to 9 (smallest). Only relevant\nwhen a zlib compression algorithm is negotiated.', default='7', mandatory=False, type=DTypeIntegerUnsigned(name='uint8', description=None, reference=None, exts=[], builtin_type='uint8', default=None, ranges=Ranges([(1, 9)]))),
+    DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='rekey-after-bytes', config=True, description='Rekey after this many bytes have passed over the session. Absent\nmeans the RFC 4344 volume limit of the negotiated cipher. A value\ncan only lower that limit, never raise it.', mandatory=False, type=DTypeIntegerUnsigned(name='uint64', description=None, reference=None, exts=[], builtin_type='uint64', default=None, ranges=Ranges([(0, 18446744073709551615)]))),
+    DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='rekey-after-seconds', config=True, description='Rekey after this many seconds. Absent disables time-based rekeying.', mandatory=False, type=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967)]))),
+    DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='minimum-rsa-bits', config=True, description='Reject RSA host and public keys shorter than this.', default='1024', mandatory=False, type=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(1024, 2147483647)])))
+])
 
-SRC_DNODE_CHILD_8: DContainer = DContainer(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='mock', config=True, presence=False, children=[
+SRC_DNODE_CHILD_8: DLeaf = DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='approval-required', config=True, description='Require approval of each individual configuration change to this device', default='false', mandatory=False, type=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
+
+SRC_DNODE_CHILD_9: DContainer = DContainer(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='mock', config=True, presence=False, children=[
     DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='enabled', config=True, default='false', mandatory=False, type=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None)),
     DList(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='module', key=['name'], config=True, min_elements=0, ordered_by='system', children=[
         DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='name', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
@@ -71,26 +84,28 @@ SRC_DNODE_CHILD_8: DContainer = DContainer(module='stratoweave-rfs', namespace='
     ])
 ])
 
-SRC_DNODE_CHILD_9: DContainer = DContainer(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='debug', config=True, presence=False, children=[
+SRC_DNODE_CHILD_10: DContainer = DContainer(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='debug', config=True, presence=False, children=[
     DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='connection', config=True, default='false', mandatory=False, type=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
 ])
 
-SRC_DNODE_CHILD_10: DContainer = DContainer(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='feature-flags', config=True, presence=False, children=[
+SRC_DNODE_CHILD_11: DContainer = DContainer(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='feature-flags', config=True, presence=False, children=[
     DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='runtime-schema-fetch', config=True, default='false', mandatory=False, type=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
 ])
 
-SRC_DNODE_CHILD_12: DLeaf = DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='upgrade-campaign', config=True, description='The upgrade campaign that currently owns this device. A device is\nowned by at most one campaign at a time, which is what stops two\ncampaigns from scheduling the same device.', mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
+SRC_DNODE_CHILD_13: DLeaf = DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='upgrade-campaign', config=True, description='The upgrade campaign that currently owns this device. A device is\nowned by at most one campaign at a time, which is what stops two\ncampaigns from scheduling the same device.', mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
 
-SRC_DNODE_CHILD_13: DLeaf = DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='target-release', config=True, description="Name of the software release this device should be running, e.g.\n'17.18.03a'. Absent means no upgrade is intended and the manager\nstays idle.", mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
+SRC_DNODE_CHILD_14: DLeaf = DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='target-release', config=True, description="Name of the software release this device should be running, e.g.\n'17.18.03a'. Absent means no upgrade is intended and the manager\nstays idle.", mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
 
-SRC_DNODE_CHILD_14: DLeaf = DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='allow-staging', config=True, description='Whether the manager may run the non-impacting prepare job ahead of\nthe maintenance window. Set by the scheduler, which paces image\ntransfers across the fleet so they do not saturate the network.', default='false', mandatory=False, type=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
+SRC_DNODE_CHILD_15: DLeaf = DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='image-url', config=True, description='URL used by the device to fetch the target image. It must be reachable\nfrom the device. Supported schemes are platform-specific; IOS XE\nsupports scp, ftp, http and https. scp and ftp URLs may contain\ncredentials and must not be logged. The adapter derives the staged\nfilename from the final path component. If this leaf is absent, an\nadapter that requires an image URL reports prepare as failed.', mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
 
-SRC_DNODE_CHILD_15: DList = DList(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='veto', key=['holder'], config=True, description="Any holder may block the impacting install step by adding an entry;\nabsence of entries means go. The fleet scheduler holds one until it\nis this device's turn, and monitoring systems may add their own.\nEach holder removes only its own entry, so there is no contention.\nA veto blocks starting work; it never aborts an install already\nin flight.", min_elements=0, ordered_by='system', children=[
+SRC_DNODE_CHILD_16: DLeaf = DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='allow-staging', config=True, description='Whether the manager may run the non-impacting prepare job ahead of\nthe maintenance window. Set by the scheduler, which paces image\ntransfers across the fleet so they do not saturate the network.', default='false', mandatory=False, type=DTypeBoolean(name='boolean', description=None, reference=None, exts=[], builtin_type='boolean', default=None))
+
+SRC_DNODE_CHILD_17: DList = DList(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='veto', key=['holder'], config=True, description="Any holder may block the impacting install step by adding an entry;\nabsence of entries means go. The fleet scheduler holds one until it\nis this device's turn, and monitoring systems may add their own.\nEach holder removes only its own entry, so there is no contention.\nA veto blocks starting work; it never aborts an install already\nin flight.", min_elements=0, ordered_by='system', children=[
     DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='holder', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='reason', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
 ])
 
-SRC_DNODE_CHILD_16: DContainer = DContainer(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='state', config=False, presence=False, children=[
+SRC_DNODE_CHILD_18: DContainer = DContainer(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='state', config=False, presence=False, children=[
     DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='status', config=False, description='Overall status, aggregated from the jobs and the install checks.', mandatory=False, type=DTypeEnum(name='enumeration', description=None, reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'unknown':0, 'up-to-date':1, 'upgrade-needed':2, 'in-progress':3, 'succeeded':4, 'failed':5, 'rolled-back':6})),
     DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='running-release', config=False, description='Release the device was last observed to be running. Software is\ntreated as monolithic: one version name per device, as on IOS XE.', mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DList(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='job', key=['name'], config=False, description='One entry per job in the upgrade sequence. Jobs are idempotent and\nmay be re-run; prepare in particular may run long before install\nand is repeated as part of it.', min_elements=0, ordered_by='system', children=[
@@ -106,24 +121,24 @@ SRC_DNODE_CHILD_16: DContainer = DContainer(module='stratoweave-rfs', namespace=
         DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='detail', config=False, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
         DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='at', config=False, mandatory=False, type=DTypeString(name='yang:date-and-time', description="The date-and-time type is a profile of the ISO 8601\nstandard for representation of dates and times using the\nGregorian calendar.  The profile is defined by the\ndate-time production in Section 5.6 of RFC 3339 and the\nupdate defined in Section 2 of RFC 9557.  The value of\n60 for seconds is allowed only in the case of leap seconds.\n\nThe date-and-time type is compatible with the dateTime XML\nschema dateTime type with the following notable exceptions:\n\n(a) The date-and-time type does not allow negative years.\n\n(b) The time-offset Z indicates that the date-and-time\n    value is reported in UTC and that the local time zone\n    reference point is unknown.  The time-offset +00:00\n    indicates that the date-and-time value is reported in\n    UTC and that the local time zone reference point is UTC\n    (see Section 2 of RFC 9557).\n\nThis type is not equivalent to the DateAndTime textual\nconvention of the SMIv2 since RFC 3339 uses a different\nseparator between full-date and full-time and provides\nhigher resolution of time-secfrac.\n\nThe canonical format for date-and-time values with a known\ntime zone uses a numeric time zone offset that is calculated\nusing the device's configured known offset to UTC time.  A\nchange of the device's offset to UTC time will cause\ndate-and-time values to change accordingly.  Such changes\nmight happen periodically if a server automatically follows\ndaylight saving time (DST) time zone offset changes.  The\ncanonical format for date-and-time values reported in UTC\nwith an unknown local time zone offset SHOULD use the\ntime-offset Z and MAY use -00:00 for backwards\ncompatibility.", reference='ISO 8601: Data elements and interchange formats -- Information\n          interchange -- Representation of dates and times\nRFC 3339: Date and Time on the Internet: Timestamps\nRFC 9557: Date and Time on the Internet: Timestamps\n          with Additional Information\nRFC 2579: Textual Conventions for SMIv2\nXSD-TYPES: XML Schema Definition Language (XSD) 1.1\n           Part 2: Datatypes', exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='[0-9]{{4}}-(1[0-2]|0[1-9])-(0[1-9]|[1-2][0-9]|3[0-1])T(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]+)?(Z|[\\+\\-]((1[0-3]|0[0-9]):([0-5][0-9])|14:00))?', pcre='^([0-9]{{4}}-(1[0-2]|0[1-9])-(0[1-9]|[1-2][0-9]|3[0-1])T(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]+)?(Z|[\\+\\-]((1[0-3]|0[0-9]):([0-5][0-9])|14:00))?)$', invert=False)]))
     ]),
-    DContainer(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='postcheck', config=False, description='Evaluated after install to decide whether the upgrade actually\nlanded. A failing post-check triggers a rollback, which is why\ncleanup is sequenced last: on platforms without native rollback\nthe superseded image is the rollback path and must still be on\nthe device until the post-checks pass.', presence=False, children=[
+    DContainer(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='postcheck', config=False, description='Evaluated after install to decide whether the upgrade actually\nlanded. A failed post-check triggers rollback. Cleanup runs last so\nthe superseded image remains available for rollback until all\npost-checks pass.', presence=False, children=[
         DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='verdict', config=False, mandatory=False, type=DTypeEnum(name='enumeration', description=None, reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'not-run':0, 'pass':1, 'fail':2})),
         DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='detail', config=False, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
         DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='at', config=False, mandatory=False, type=DTypeString(name='yang:date-and-time', description="The date-and-time type is a profile of the ISO 8601\nstandard for representation of dates and times using the\nGregorian calendar.  The profile is defined by the\ndate-time production in Section 5.6 of RFC 3339 and the\nupdate defined in Section 2 of RFC 9557.  The value of\n60 for seconds is allowed only in the case of leap seconds.\n\nThe date-and-time type is compatible with the dateTime XML\nschema dateTime type with the following notable exceptions:\n\n(a) The date-and-time type does not allow negative years.\n\n(b) The time-offset Z indicates that the date-and-time\n    value is reported in UTC and that the local time zone\n    reference point is unknown.  The time-offset +00:00\n    indicates that the date-and-time value is reported in\n    UTC and that the local time zone reference point is UTC\n    (see Section 2 of RFC 9557).\n\nThis type is not equivalent to the DateAndTime textual\nconvention of the SMIv2 since RFC 3339 uses a different\nseparator between full-date and full-time and provides\nhigher resolution of time-secfrac.\n\nThe canonical format for date-and-time values with a known\ntime zone uses a numeric time zone offset that is calculated\nusing the device's configured known offset to UTC time.  A\nchange of the device's offset to UTC time will cause\ndate-and-time values to change accordingly.  Such changes\nmight happen periodically if a server automatically follows\ndaylight saving time (DST) time zone offset changes.  The\ncanonical format for date-and-time values reported in UTC\nwith an unknown local time zone offset SHOULD use the\ntime-offset Z and MAY use -00:00 for backwards\ncompatibility.", reference='ISO 8601: Data elements and interchange formats -- Information\n          interchange -- Representation of dates and times\nRFC 3339: Date and Time on the Internet: Timestamps\nRFC 9557: Date and Time on the Internet: Timestamps\n          with Additional Information\nRFC 2579: Textual Conventions for SMIv2\nXSD-TYPES: XML Schema Definition Language (XSD) 1.1\n           Part 2: Datatypes', exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='[0-9]{{4}}-(1[0-2]|0[1-9])-(0[1-9]|[1-2][0-9]|3[0-1])T(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]+)?(Z|[\\+\\-]((1[0-3]|0[0-9]):([0-5][0-9])|14:00))?', pcre='^([0-9]{{4}}-(1[0-2]|0[1-9])-(0[1-9]|[1-2][0-9]|3[0-1])T(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]+)?(Z|[\\+\\-]((1[0-3]|0[0-9]):([0-5][0-9])|14:00))?)$', invert=False)]))
     ])
 ])
 
-SRC_DNODE_CHILD_11: DContainer = DContainer(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='software', config=True, description='Per-device software management. Input comes from the fleet upgrade\nscheduler (or an operator directly); everything under state/ is\nreported by the SoftwareManager.', presence=False, children=[SRC_DNODE_CHILD_12, SRC_DNODE_CHILD_13, SRC_DNODE_CHILD_14, SRC_DNODE_CHILD_15, SRC_DNODE_CHILD_16])
+SRC_DNODE_CHILD_12: DContainer = DContainer(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='software', config=True, description='Per-device software management. Input comes from the fleet upgrade\nscheduler (or an operator directly); everything under state/ is\nreported by the SoftwareManager.', presence=False, children=[SRC_DNODE_CHILD_13, SRC_DNODE_CHILD_14, SRC_DNODE_CHILD_15, SRC_DNODE_CHILD_16, SRC_DNODE_CHILD_17, SRC_DNODE_CHILD_18])
 
-SRC_DNODE_CHILD_17: DContainer = DContainer(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='state', config=False, presence=False)
+SRC_DNODE_CHILD_19: DContainer = DContainer(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='state', config=False, presence=False)
 
 SRC_DNODE_CHILD_0: DList = DList(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='device', key=['name'], config=True, min_elements=0, ordered_by='system', exts=[
         DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='device', arg=None, exts=[])
-    ], children=[SRC_DNODE_CHILD_1, SRC_DNODE_CHILD_2, SRC_DNODE_CHILD_3, SRC_DNODE_CHILD_4, SRC_DNODE_CHILD_5, SRC_DNODE_CHILD_6, SRC_DNODE_CHILD_7, SRC_DNODE_CHILD_8, SRC_DNODE_CHILD_9, SRC_DNODE_CHILD_10, SRC_DNODE_CHILD_11, SRC_DNODE_CHILD_17])
+    ], children=[SRC_DNODE_CHILD_1, SRC_DNODE_CHILD_2, SRC_DNODE_CHILD_3, SRC_DNODE_CHILD_4, SRC_DNODE_CHILD_5, SRC_DNODE_CHILD_6, SRC_DNODE_CHILD_7, SRC_DNODE_CHILD_8, SRC_DNODE_CHILD_9, SRC_DNODE_CHILD_10, SRC_DNODE_CHILD_11, SRC_DNODE_CHILD_12, SRC_DNODE_CHILD_19])
 
-SRC_DNODE_CHILD_19: DLeaf = DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='name', config=True, description='Device name', mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
+SRC_DNODE_CHILD_21: DLeaf = DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='name', config=True, description='Device name', mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
 
-SRC_DNODE_CHILD_20: DContainer = DContainer(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='base-config', config=True, presence=False, exts=[
+SRC_DNODE_CHILD_22: DContainer = DContainer(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='base-config', config=True, presence=False, exts=[
         DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='rfs-transform', arg='sorespo.rfs.BaseConfig', exts=[])
     ], children=[
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='role', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
@@ -133,7 +148,7 @@ SRC_DNODE_CHILD_20: DContainer = DContainer(module='sorespo-rfs', namespace='htt
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ibgp-authentication-key', config=True, mandatory=True, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
 ])
 
-SRC_DNODE_CHILD_21: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='backbone-interface', key=['name'], config=True, min_elements=0, ordered_by='system', exts=[
+SRC_DNODE_CHILD_23: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='backbone-interface', key=['name'], config=True, min_elements=0, ordered_by='system', exts=[
         DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='rfs-transform', arg='sorespo.rfs.BBInterface', exts=[])
     ], children=[
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='name', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
@@ -150,7 +165,7 @@ SRC_DNODE_CHILD_21: DList = DList(module='sorespo-rfs', namespace='http://exampl
     ])
 ])
 
-SRC_DNODE_CHILD_22: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ibgp-neighbor', key=['address'], config=True, min_elements=0, ordered_by='system', exts=[
+SRC_DNODE_CHILD_24: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ibgp-neighbor', key=['address'], config=True, min_elements=0, ordered_by='system', exts=[
         DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='rfs-transform', arg='sorespo.rfs.IbgpNeighbor', exts=[])
     ], children=[
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='address', config=True, mandatory=False, type=DTypeUnion(name='inet:ip-address', description='The ip-address type represents an IP address and is IP\nversion neutral.  The format of the textual representation\nimplies the IP version.  This type supports scoped addresses\nby allowing zone identifiers in the address format.', reference='RFC 4007: IPv6 Scoped Address Architecture', exts=[], builtin_type='union', default=None, types=[DTypeString(name='inet:ipv4-address', description='The ipv4-address type represents an IPv4 address in\ndotted-quad notation.  The IPv4 address may include a zone\nindex, separated by a % sign.\n\nThe zone index is used to disambiguate identical address\nvalues.  For link-local addresses, the zone index will\ntypically be the interface index number or the name of an\ninterface.  If the zone index is not present, the default\nzone of the device will be used.\n\nThe canonical format for the zone index is the numerical\nformat', reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(%[\\p{{N}}\\p{{L}}]+)?', pcre='^((([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(%[\\p{{N}}\\p{{L}}]+)?)$', invert=False)]), DTypeString(name='inet:ipv6-address', description='The ipv6-address type represents an IPv6 address in full,\nmixed, shortened, and shortened-mixed notation.  The IPv6\naddress may include a zone index, separated by a % sign.\n\nThe zone index is used to disambiguate identical address\nvalues.  For link-local addresses, the zone index will\ntypically be the interface index number or the name of an\ninterface.  If the zone index is not present, the default\nzone of the device will be used.\n\nThe canonical format of IPv6 addresses uses the textual\nrepresentation defined in Section 4 of RFC 5952.  The\ncanonical format for the zone index is the numerical\nformat as described in Section 11.2 of RFC 4007.', reference='RFC 4291: IP Version 6 Addressing Architecture\nRFC 4007: IPv6 Scoped Address Architecture\nRFC 5952: A Recommendation for IPv6 Address Text\n          Representation', exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='((:|[0-9a-fA-F]{{0,4}}):)([0-9a-fA-F]{{0,4}}:){{0,5}}((([0-9a-fA-F]{{0,4}}:)?(:|[0-9a-fA-F]{{0,4}}))|(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\\.){{3}}(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))(%[\\p{{N}}\\p{{L}}]+)?', pcre='^(((:|[0-9a-fA-F]{{0,4}}):)([0-9a-fA-F]{{0,4}}:){{0,5}}((([0-9a-fA-F]{{0,4}}:)?(:|[0-9a-fA-F]{{0,4}}))|(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\\.){{3}}(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))(%[\\p{{N}}\\p{{L}}]+)?)$', invert=False), YangPattern(yang_regex='(([^:]+:){{6}}(([^:]+:[^:]+)|(.*\\..*)))|((([^:]+:)*[^:]+)?::(([^:]+:)*[^:]+)?)(%.+)?', pcre='^((([^\\:]+:){{6}}(([^\\:]+:[^\\:]+)|(.*\\..*)))|((([^\\:]+:)*[^\\:]+)?::(([^\\:]+:)*[^\\:]+)?)(%.+)?)$', invert=False)])])),
@@ -159,7 +174,7 @@ SRC_DNODE_CHILD_22: DList = DList(module='sorespo-rfs', namespace='http://exampl
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ibgp-authentication-key', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
 ])
 
-SRC_DNODE_CHILD_23: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='vrf', key=['name'], config=True, min_elements=0, ordered_by='system', exts=[
+SRC_DNODE_CHILD_25: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='vrf', key=['name'], config=True, min_elements=0, ordered_by='system', exts=[
         DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='rfs-transform', arg='sorespo.rfs.Vrf', exts=[])
     ], children=[
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='name', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
@@ -169,7 +184,7 @@ SRC_DNODE_CHILD_23: DList = DList(module='sorespo-rfs', namespace='http://exampl
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='asn', config=True, mandatory=True, type=DTypeIntegerUnsigned(name='inet:as-number', description='The as-number type represents autonomous system numbers\nwhich identify an Autonomous System (AS).  An AS is a set\nof routers under a single technical administration, using\nan interior gateway protocol and common metrics to route\npackets within the AS, and using an exterior gateway\nprotocol to route packets to other ASes.  IANA maintains\nthe AS number space and has delegated large parts to the\nregional registries.\n\nAutonomous system numbers were originally limited to 16\nbits.  BGP extensions have enlarged the autonomous system\nnumber space to 32 bits.  This type therefore uses an uint32\nbase type without a range restriction in order to support\na larger autonomous system number space.\n\nIn the value set and its semantics, this type is equivalent\nto the InetAutonomousSystemNumber textual convention of\nthe SMIv2.', reference='RFC 1930: Guidelines for creation, selection, and registration\n          of an Autonomous System (AS)\nRFC 4271: A Border Gateway Protocol 4 (BGP-4)\nRFC 4001: Textual Conventions for Internet Network Addresses\nRFC 6793: BGP Support for Four-Octet Autonomous System (AS)\n          Number Space', exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)])))
 ])
 
-SRC_DNODE_CHILD_24: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='vrf-interface', key=['name'], config=True, min_elements=0, ordered_by='system', exts=[
+SRC_DNODE_CHILD_26: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='vrf-interface', key=['name'], config=True, min_elements=0, ordered_by='system', exts=[
         DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='rfs-transform', arg='sorespo.rfs.VrfInterface', exts=[])
     ], children=[
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='name', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
@@ -179,7 +194,7 @@ SRC_DNODE_CHILD_24: DList = DList(module='sorespo-rfs', namespace='http://exampl
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ipv4-prefix-length', config=True, default='30', mandatory=False, type=DTypeIntegerUnsigned(name='uint8', description=None, reference=None, exts=[], builtin_type='uint8', default=None, ranges=Ranges([(1, 31)])))
 ])
 
-SRC_DNODE_CHILD_25: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ebgp-customer', key=[
+SRC_DNODE_CHILD_27: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ebgp-customer', key=[
 'vrf',
 'address'
     ], config=True, min_elements=0, ordered_by='system', exts=[
@@ -201,10 +216,10 @@ SRC_DNODE_CHILD_25: DList = DList(module='sorespo-rfs', namespace='http://exampl
     ])
 ])
 
-SRC_DNODE_CHILD_18: DList = DList(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='rfs', key=['name'], config=True, min_elements=0, ordered_by='system', children=[SRC_DNODE_CHILD_19, SRC_DNODE_CHILD_20, SRC_DNODE_CHILD_21, SRC_DNODE_CHILD_22, SRC_DNODE_CHILD_23, SRC_DNODE_CHILD_24, SRC_DNODE_CHILD_25])
+SRC_DNODE_CHILD_20: DList = DList(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='rfs', key=['name'], config=True, min_elements=0, ordered_by='system', children=[SRC_DNODE_CHILD_21, SRC_DNODE_CHILD_22, SRC_DNODE_CHILD_23, SRC_DNODE_CHILD_24, SRC_DNODE_CHILD_25, SRC_DNODE_CHILD_26, SRC_DNODE_CHILD_27])
 
 SRC_DNODE: DRoot = DRoot(
-    children=[SRC_DNODE_CHILD_0, SRC_DNODE_CHILD_18],
+    children=[SRC_DNODE_CHILD_0, SRC_DNODE_CHILD_20],
     identities=[],
     rpcs=[],
     module_metadata={'urn:ietf:params:xml:ns:yang:ietf-yang-types':('ietf-yang-types', '2025-12-22'), 'urn:ietf:params:xml:ns:yang:ietf-inet-types':('ietf-inet-types', '2013-07-15'), 'http://stratoweave.org/yang/stratoweave':('stratoweave', '2026-04-01'), 'http://stratoweave.org/yang/stratoweave-rfs':('stratoweave-rfs', None), 'http://example.com/sorespo-rfs':('sorespo-rfs', None)},
@@ -516,6 +531,211 @@ SRC_YANG_2: str = r"""module stratoweave-rfs {
 
   description "RFS services";
 
+  typedef ssh-cipher {
+    type enumeration {
+      enum "chacha20-poly1305@openssh.com";
+      enum "aes256-gcm@openssh.com";
+      enum "aes128-gcm@openssh.com";
+      enum "aes256-ctr";
+      enum "aes192-ctr";
+      enum "aes128-ctr";
+      enum "aes256-cbc";
+      enum "aes192-cbc";
+      enum "aes128-cbc";
+      enum "3des-cbc";
+      enum "none";
+    }
+    description
+      "Symmetric cipher, as negotiated in the SSH transport protocol.";
+  }
+
+  typedef ssh-mac {
+    type enumeration {
+      enum "hmac-sha2-256-etm@openssh.com";
+      enum "hmac-sha2-512-etm@openssh.com";
+      enum "hmac-sha1-etm@openssh.com";
+      enum "hmac-sha2-256";
+      enum "hmac-sha2-512";
+      enum "hmac-sha1";
+      enum "none";
+    }
+    description
+      "Message authentication code, as negotiated in the SSH transport
+     protocol. Not used with AEAD ciphers, which authenticate themselves.";
+  }
+
+  typedef ssh-key-exchange {
+    type enumeration {
+      enum "diffie-hellman-group-exchange-sha1";
+      enum "mlkem768x25519-sha256";
+      enum "mlkem768nistp256-sha256";
+      enum "sntrup761x25519-sha512";
+      enum "sntrup761x25519-sha512@openssh.com";
+      enum "curve25519-sha256";
+      enum "curve25519-sha256@libssh.org";
+      enum "ecdh-sha2-nistp256";
+      enum "ecdh-sha2-nistp384";
+      enum "ecdh-sha2-nistp521";
+      enum "diffie-hellman-group18-sha512";
+      enum "diffie-hellman-group16-sha512";
+      enum "diffie-hellman-group-exchange-sha256";
+      enum "diffie-hellman-group14-sha256";
+      enum "diffie-hellman-group14-sha1";
+      enum "diffie-hellman-group1-sha1";
+    }
+    description
+      "Key exchange algorithm, as negotiated in the SSH transport protocol.";
+  }
+
+  typedef ssh-host-key-algorithm {
+    type enumeration {
+      enum "ssh-ed25519-cert-v01@openssh.com";
+      enum "sk-ssh-ed25519-cert-v01@openssh.com";
+      enum "ecdsa-sha2-nistp521-cert-v01@openssh.com";
+      enum "ecdsa-sha2-nistp384-cert-v01@openssh.com";
+      enum "ecdsa-sha2-nistp256-cert-v01@openssh.com";
+      enum "sk-ecdsa-sha2-nistp256-cert-v01@openssh.com";
+      enum "rsa-sha2-512-cert-v01@openssh.com";
+      enum "rsa-sha2-256-cert-v01@openssh.com";
+      enum "ssh-rsa-cert-v01@openssh.com";
+      enum "ssh-ed25519";
+      enum "ecdsa-sha2-nistp521";
+      enum "ecdsa-sha2-nistp384";
+      enum "ecdsa-sha2-nistp256";
+      enum "sk-ssh-ed25519@openssh.com";
+      enum "sk-ecdsa-sha2-nistp256@openssh.com";
+      enum "rsa-sha2-512";
+      enum "rsa-sha2-256";
+      enum "ssh-rsa";
+    }
+    description
+      "Server host key algorithm, i.e. the key type we are willing to accept
+     from the far end and verify the session signature with.";
+  }
+
+  typedef ssh-public-key-algorithm {
+    type enumeration {
+      enum "ssh-ed25519-cert-v01@openssh.com";
+      enum "sk-ssh-ed25519-cert-v01@openssh.com";
+      enum "ecdsa-sha2-nistp521-cert-v01@openssh.com";
+      enum "ecdsa-sha2-nistp384-cert-v01@openssh.com";
+      enum "ecdsa-sha2-nistp256-cert-v01@openssh.com";
+      enum "sk-ecdsa-sha2-nistp256-cert-v01@openssh.com";
+      enum "rsa-sha2-512-cert-v01@openssh.com";
+      enum "rsa-sha2-256-cert-v01@openssh.com";
+      enum "ssh-rsa-cert-v01@openssh.com";
+      enum "ssh-ed25519";
+      enum "ecdsa-sha2-nistp521";
+      enum "ecdsa-sha2-nistp384";
+      enum "ecdsa-sha2-nistp256";
+      enum "sk-ssh-ed25519@openssh.com";
+      enum "sk-ecdsa-sha2-nistp256@openssh.com";
+      enum "rsa-sha2-512";
+      enum "rsa-sha2-256";
+      enum "ssh-rsa";
+    }
+    description
+      "Public key algorithm offered during publickey authentication.";
+  }
+
+  typedef ssh-compression-algorithm {
+    type enumeration {
+      enum "none";
+      enum "zlib@openssh.com";
+      enum "zlib";
+    }
+    description
+      "Transport compression algorithm.";
+  }
+
+  grouping ssh-client-config {
+    description
+      "SSH client transport parameters, shared by every adapter that talks to
+       a device over SSH (NETCONF, CLI, ...). Each algorithm leaf-list is the
+       ordered preference list sent in the SSH key exchange; leaving one empty
+       means the SSH library picks its own default set.";
+
+    leaf-list cipher {
+      description
+        "Symmetric ciphers to offer, most preferred first.";
+      type sw-rfs:ssh-cipher;
+      ordered-by user;
+    }
+
+    leaf-list mac {
+      description
+        "MAC algorithms to offer, most preferred first.";
+      type sw-rfs:ssh-mac;
+      ordered-by user;
+    }
+
+    leaf-list key-exchange {
+      description
+        "Key exchange algorithms to offer, most preferred first.";
+      type sw-rfs:ssh-key-exchange;
+      ordered-by user;
+    }
+
+    leaf-list host-key-algorithm {
+      description
+        "Server host key algorithms to accept, most preferred first. This is
+         what decides which host key type the device presents.";
+      type sw-rfs:ssh-host-key-algorithm;
+      ordered-by user;
+    }
+
+    leaf-list public-key-algorithm {
+      description
+        "Public key algorithms to offer for publickey authentication, most
+         preferred first.";
+      type sw-rfs:ssh-public-key-algorithm;
+      ordered-by user;
+    }
+
+    leaf-list compression-algorithm {
+      description
+        "Compression algorithms to offer, most preferred first. 'none' first
+         disables compression against peers that also offer it.";
+      type sw-rfs:ssh-compression-algorithm;
+      ordered-by user;
+    }
+
+    leaf compression-level {
+      description
+        "zlib compression level, 1 (fastest) to 9 (smallest). Only relevant
+         when a zlib compression algorithm is negotiated.";
+      type uint8 {
+        range "1..9";
+      }
+      default 7;
+    }
+
+    leaf rekey-after-bytes {
+      description
+        "Rekey after this many bytes have passed over the session. Absent
+         means the RFC 4344 volume limit of the negotiated cipher. A value
+         can only lower that limit, never raise it.";
+      type uint64;
+    }
+
+    leaf rekey-after-seconds {
+      description
+        "Rekey after this many seconds. Absent disables time-based rekeying.";
+      type uint32 {
+        range "0..4294967";
+      }
+    }
+
+    leaf minimum-rsa-bits {
+      description
+        "Reject RSA host and public keys shorter than this.";
+      type uint32 {
+        range "1024..2147483647";
+      }
+      default 1024;
+    }
+  }
+
   grouping check-result {
     leaf verdict {
       type enumeration {
@@ -604,6 +824,13 @@ SRC_YANG_2: str = r"""module stratoweave-rfs {
       }
     }
 
+    container ssh {
+      description
+        "SSH transport parameters used when connecting to this device. Applies
+         to every SSH-based adapter (NETCONF over SSH, CLI, ...).";
+      uses sw-rfs:ssh-client-config;
+    }
+
     leaf approval-required {
       description "Require approval of each individual configuration change to this device";
       type boolean;
@@ -667,6 +894,17 @@ SRC_YANG_2: str = r"""module stratoweave-rfs {
           "Name of the software release this device should be running, e.g.
            '17.18.03a'. Absent means no upgrade is intended and the manager
            stays idle.";
+        type string;
+      }
+
+      leaf image-url {
+        description
+          "URL used by the device to fetch the target image. It must be reachable
+           from the device. Supported schemes are platform-specific; IOS XE
+           supports scp, ftp, http and https. scp and ftp URLs may contain
+           credentials and must not be logged. The adapter derives the staged
+           filename from the final path component. If this leaf is absent, an
+           adapter that requires an image URL reports prepare as failed.";
         type string;
       }
 
@@ -759,10 +997,9 @@ SRC_YANG_2: str = r"""module stratoweave-rfs {
         container postcheck {
           description
             "Evaluated after install to decide whether the upgrade actually
-             landed. A failing post-check triggers a rollback, which is why
-             cleanup is sequenced last: on platforms without native rollback
-             the superseded image is the rollback path and must still be on
-             the device until the post-checks pass.";
+             landed. A failed post-check triggers rollback. Cleanup runs last so
+             the superseded image remains available for rollback until all
+             post-checks pass.";
           uses check-result;
         }
       }
@@ -2273,6 +2510,45 @@ class stratoweave_rfs__device__initial_credentials(yadata.MKeyedList[(username: 
 
 
 _breaker10: None = None
+class stratoweave_rfs__device__ssh(yadata.MNode):
+    cipher: list[str]
+    mac: list[str]
+    key_exchange: list[str]
+    host_key_algorithm: list[str]
+    public_key_algorithm: list[str]
+    compression_algorithm: list[str]
+    compression_level: ?u64
+    rekey_after_bytes: ?u64
+    rekey_after_seconds: ?u64
+    minimum_rsa_bits: ?u64
+
+    mut def __init__(self, cipher: ?list[str]=None, mac: ?list[str]=None, key_exchange: ?list[str]=None, host_key_algorithm: ?list[str]=None, public_key_algorithm: ?list[str]=None, compression_algorithm: ?list[str]=None, compression_level: ?u64, rekey_after_bytes: ?u64, rekey_after_seconds: ?u64, minimum_rsa_bits: ?u64) -> None:
+        self.cipher = cipher if cipher is not None else []
+        self.mac = mac if mac is not None else []
+        self.key_exchange = key_exchange if key_exchange is not None else []
+        self.host_key_algorithm = host_key_algorithm if host_key_algorithm is not None else []
+        self.public_key_algorithm = public_key_algorithm if public_key_algorithm is not None else []
+        self.compression_algorithm = compression_algorithm if compression_algorithm is not None else []
+        self.compression_level = compression_level
+        self.rekey_after_bytes = rekey_after_bytes
+        self.rekey_after_seconds = rekey_after_seconds
+        self.minimum_rsa_bits = minimum_rsa_bits
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['stratoweave-rfs:device', 'ssh'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> stratoweave_rfs__device__ssh:
+        if n is not None:
+            return stratoweave_rfs__device__ssh(cipher=n.get_opt_strs(ygdata.Id(NS_stratoweave_rfs, 'cipher')), mac=n.get_opt_strs(ygdata.Id(NS_stratoweave_rfs, 'mac')), key_exchange=n.get_opt_strs(ygdata.Id(NS_stratoweave_rfs, 'key-exchange')), host_key_algorithm=n.get_opt_strs(ygdata.Id(NS_stratoweave_rfs, 'host-key-algorithm')), public_key_algorithm=n.get_opt_strs(ygdata.Id(NS_stratoweave_rfs, 'public-key-algorithm')), compression_algorithm=n.get_opt_strs(ygdata.Id(NS_stratoweave_rfs, 'compression-algorithm')), compression_level=n.get_opt_u64(ygdata.Id(NS_stratoweave_rfs, 'compression-level')), rekey_after_bytes=n.get_opt_u64(ygdata.Id(NS_stratoweave_rfs, 'rekey-after-bytes')), rekey_after_seconds=n.get_opt_u64(ygdata.Id(NS_stratoweave_rfs, 'rekey-after-seconds')), minimum_rsa_bits=n.get_opt_u64(ygdata.Id(NS_stratoweave_rfs, 'minimum-rsa-bits')))
+        return stratoweave_rfs__device__ssh()
+
+    mut def copy(self) -> stratoweave_rfs__device__ssh:
+        """Create a deep copy of this adata object"""
+        return stratoweave_rfs__device__ssh.from_gdata(self.to_gdata())
+
+
+_breaker11: None = None
 class stratoweave_rfs__device__mock__module_entry(yadata.MNode):
     name: str
     namespace: ?str
@@ -2296,7 +2572,7 @@ class stratoweave_rfs__device__mock__module_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__device__mock__module_entry.from_gdata(self.to_gdata())
 
-_breaker11: None = None
+_breaker12: None = None
 class stratoweave_rfs__device__mock__module(yadata.MKeyedList[str, stratoweave_rfs__device__mock__module_entry]):
     mut def __init__(self, elements: list[stratoweave_rfs__device__mock__module_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
@@ -2331,7 +2607,7 @@ class stratoweave_rfs__device__mock__module(yadata.MKeyedList[str, stratoweave_r
         return stratoweave_rfs__device__mock__module(elements=copied_elements)
 
 
-_breaker12: None = None
+_breaker13: None = None
 class stratoweave_rfs__device__mock(yadata.MNode):
     enabled: ?bool
     module: stratoweave_rfs__device__mock__module
@@ -2354,7 +2630,7 @@ class stratoweave_rfs__device__mock(yadata.MNode):
         return stratoweave_rfs__device__mock.from_gdata(self.to_gdata())
 
 
-_breaker13: None = None
+_breaker14: None = None
 class stratoweave_rfs__device__debug(yadata.MNode):
     connection: ?bool
 
@@ -2375,7 +2651,7 @@ class stratoweave_rfs__device__debug(yadata.MNode):
         return stratoweave_rfs__device__debug.from_gdata(self.to_gdata())
 
 
-_breaker14: None = None
+_breaker15: None = None
 class stratoweave_rfs__device__feature_flags(yadata.MNode):
     runtime_schema_fetch: ?bool
 
@@ -2396,7 +2672,7 @@ class stratoweave_rfs__device__feature_flags(yadata.MNode):
         return stratoweave_rfs__device__feature_flags.from_gdata(self.to_gdata())
 
 
-_breaker15: None = None
+_breaker16: None = None
 class stratoweave_rfs__device__software__veto_entry(yadata.MNode):
     holder: str
     reason: ?str
@@ -2416,7 +2692,7 @@ class stratoweave_rfs__device__software__veto_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__device__software__veto_entry.from_gdata(self.to_gdata())
 
-_breaker16: None = None
+_breaker17: None = None
 class stratoweave_rfs__device__software__veto(yadata.MKeyedList[str, stratoweave_rfs__device__software__veto_entry]):
     mut def __init__(self, elements: list[stratoweave_rfs__device__software__veto_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.holder == k, elements)
@@ -2449,7 +2725,7 @@ class stratoweave_rfs__device__software__veto(yadata.MKeyedList[str, stratoweave
         return stratoweave_rfs__device__software__veto(elements=copied_elements)
 
 
-_breaker17: None = None
+_breaker18: None = None
 class stratoweave_rfs__device__software__state__job_entry(yadata.MNode):
     name: str
     state: ?str
@@ -2477,7 +2753,7 @@ class stratoweave_rfs__device__software__state__job_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__device__software__state__job_entry.from_gdata(self.to_gdata())
 
-_breaker18: None = None
+_breaker19: None = None
 class stratoweave_rfs__device__software__state__job(yadata.MKeyedList[str, stratoweave_rfs__device__software__state__job_entry]):
     mut def __init__(self, elements: list[stratoweave_rfs__device__software__state__job_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
@@ -2518,7 +2794,7 @@ class stratoweave_rfs__device__software__state__job(yadata.MKeyedList[str, strat
         return stratoweave_rfs__device__software__state__job(elements=copied_elements)
 
 
-_breaker19: None = None
+_breaker20: None = None
 class stratoweave_rfs__device__software__state__precheck(yadata.MNode):
     verdict: ?str
     detail: ?str
@@ -2543,7 +2819,7 @@ class stratoweave_rfs__device__software__state__precheck(yadata.MNode):
         return stratoweave_rfs__device__software__state__precheck.from_gdata(self.to_gdata())
 
 
-_breaker20: None = None
+_breaker21: None = None
 class stratoweave_rfs__device__software__state__postcheck(yadata.MNode):
     verdict: ?str
     detail: ?str
@@ -2568,7 +2844,7 @@ class stratoweave_rfs__device__software__state__postcheck(yadata.MNode):
         return stratoweave_rfs__device__software__state__postcheck.from_gdata(self.to_gdata())
 
 
-_breaker21: None = None
+_breaker22: None = None
 class stratoweave_rfs__device__software__state(yadata.MNode):
     status: ?str
     running_release: ?str
@@ -2597,17 +2873,19 @@ class stratoweave_rfs__device__software__state(yadata.MNode):
         return stratoweave_rfs__device__software__state.from_gdata(self.to_gdata())
 
 
-_breaker22: None = None
+_breaker23: None = None
 class stratoweave_rfs__device__software(yadata.MNode):
     upgrade_campaign: ?str
     target_release: ?str
+    image_url: ?str
     allow_staging: ?bool
     veto: stratoweave_rfs__device__software__veto
     state: stratoweave_rfs__device__software__state
 
-    mut def __init__(self, upgrade_campaign: ?str, target_release: ?str, allow_staging: ?bool, veto: list[stratoweave_rfs__device__software__veto_entry]=[], state: ?stratoweave_rfs__device__software__state=None) -> None:
+    mut def __init__(self, upgrade_campaign: ?str, target_release: ?str, image_url: ?str, allow_staging: ?bool, veto: list[stratoweave_rfs__device__software__veto_entry]=[], state: ?stratoweave_rfs__device__software__state=None) -> None:
         self.upgrade_campaign = upgrade_campaign
         self.target_release = target_release
+        self.image_url = image_url
         self.allow_staging = allow_staging
         self.veto = stratoweave_rfs__device__software__veto(elements=veto)
         self.state = state if state is not None else stratoweave_rfs__device__software__state()
@@ -2618,7 +2896,7 @@ class stratoweave_rfs__device__software(yadata.MNode):
     @staticmethod
     mut def from_gdata(n: ?ygdata.Node) -> stratoweave_rfs__device__software:
         if n is not None:
-            return stratoweave_rfs__device__software(upgrade_campaign=n.get_opt_str(ygdata.Id(NS_stratoweave_rfs, 'upgrade-campaign')), target_release=n.get_opt_str(ygdata.Id(NS_stratoweave_rfs, 'target-release')), allow_staging=n.get_opt_bool(ygdata.Id(NS_stratoweave_rfs, 'allow-staging')), veto=stratoweave_rfs__device__software__veto.from_gdata(n.get_opt_list(ygdata.Id(NS_stratoweave_rfs, 'veto'))), state=stratoweave_rfs__device__software__state.from_gdata(n.get_opt_cnt(ygdata.Id(NS_stratoweave_rfs, 'state'))))
+            return stratoweave_rfs__device__software(upgrade_campaign=n.get_opt_str(ygdata.Id(NS_stratoweave_rfs, 'upgrade-campaign')), target_release=n.get_opt_str(ygdata.Id(NS_stratoweave_rfs, 'target-release')), image_url=n.get_opt_str(ygdata.Id(NS_stratoweave_rfs, 'image-url')), allow_staging=n.get_opt_bool(ygdata.Id(NS_stratoweave_rfs, 'allow-staging')), veto=stratoweave_rfs__device__software__veto.from_gdata(n.get_opt_list(ygdata.Id(NS_stratoweave_rfs, 'veto'))), state=stratoweave_rfs__device__software__state.from_gdata(n.get_opt_cnt(ygdata.Id(NS_stratoweave_rfs, 'state'))))
         return stratoweave_rfs__device__software()
 
     mut def copy(self) -> stratoweave_rfs__device__software:
@@ -2626,7 +2904,7 @@ class stratoweave_rfs__device__software(yadata.MNode):
         return stratoweave_rfs__device__software.from_gdata(self.to_gdata())
 
 
-_breaker23: None = None
+_breaker24: None = None
 class stratoweave_rfs__device__state(yadata.MNode):
 
     mut def __init__(self) -> None:
@@ -2646,7 +2924,7 @@ class stratoweave_rfs__device__state(yadata.MNode):
         return stratoweave_rfs__device__state.from_gdata(self.to_gdata())
 
 
-_breaker24: None = None
+_breaker25: None = None
 class stratoweave_rfs__device_entry(yadata.MNode):
     name: str
     description: ?str
@@ -2654,6 +2932,7 @@ class stratoweave_rfs__device_entry(yadata.MNode):
     address: stratoweave_rfs__device__address
     credentials: stratoweave_rfs__device__credentials
     initial_credentials: stratoweave_rfs__device__initial_credentials
+    ssh: stratoweave_rfs__device__ssh
     approval_required: ?bool
     mock: stratoweave_rfs__device__mock
     debug: stratoweave_rfs__device__debug
@@ -2661,13 +2940,14 @@ class stratoweave_rfs__device_entry(yadata.MNode):
     software: stratoweave_rfs__device__software
     state: stratoweave_rfs__device__state
 
-    mut def __init__(self, name: str, description: ?str, type: ?str, address: list[stratoweave_rfs__device__address_entry]=[], credentials: ?stratoweave_rfs__device__credentials=None, initial_credentials: list[stratoweave_rfs__device__initial_credentials_entry]=[], approval_required: ?bool, mock: ?stratoweave_rfs__device__mock=None, debug: ?stratoweave_rfs__device__debug=None, feature_flags: ?stratoweave_rfs__device__feature_flags=None, software: ?stratoweave_rfs__device__software=None, state: ?stratoweave_rfs__device__state=None) -> None:
+    mut def __init__(self, name: str, description: ?str, type: ?str, address: list[stratoweave_rfs__device__address_entry]=[], credentials: ?stratoweave_rfs__device__credentials=None, initial_credentials: list[stratoweave_rfs__device__initial_credentials_entry]=[], ssh: ?stratoweave_rfs__device__ssh=None, approval_required: ?bool, mock: ?stratoweave_rfs__device__mock=None, debug: ?stratoweave_rfs__device__debug=None, feature_flags: ?stratoweave_rfs__device__feature_flags=None, software: ?stratoweave_rfs__device__software=None, state: ?stratoweave_rfs__device__state=None) -> None:
         self.name = name
         self.description = description
         self.type = type
         self.address = stratoweave_rfs__device__address(elements=address)
         self.credentials = credentials if credentials is not None else stratoweave_rfs__device__credentials()
         self.initial_credentials = stratoweave_rfs__device__initial_credentials(elements=initial_credentials)
+        self.ssh = ssh if ssh is not None else stratoweave_rfs__device__ssh()
         self.approval_required = approval_required
         self.mock = mock if mock is not None else stratoweave_rfs__device__mock()
         self.debug = debug if debug is not None else stratoweave_rfs__device__debug()
@@ -2680,13 +2960,13 @@ class stratoweave_rfs__device_entry(yadata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> stratoweave_rfs__device_entry:
-        return stratoweave_rfs__device_entry(name=n.get_str(ygdata.Id(NS_stratoweave_rfs, 'name')), description=n.get_opt_str(ygdata.Id(NS_stratoweave_rfs, 'description')), type=n.get_opt_str(ygdata.Id(NS_stratoweave_rfs, 'type')), address=stratoweave_rfs__device__address.from_gdata(n.get_opt_list(ygdata.Id(NS_stratoweave_rfs, 'address'))), credentials=stratoweave_rfs__device__credentials.from_gdata(n.get_opt_cnt(ygdata.Id(NS_stratoweave_rfs, 'credentials'))), initial_credentials=stratoweave_rfs__device__initial_credentials.from_gdata(n.get_opt_list(ygdata.Id(NS_stratoweave_rfs, 'initial-credentials'))), approval_required=n.get_opt_bool(ygdata.Id(NS_stratoweave_rfs, 'approval-required')), mock=stratoweave_rfs__device__mock.from_gdata(n.get_opt_cnt(ygdata.Id(NS_stratoweave_rfs, 'mock'))), debug=stratoweave_rfs__device__debug.from_gdata(n.get_opt_cnt(ygdata.Id(NS_stratoweave_rfs, 'debug'))), feature_flags=stratoweave_rfs__device__feature_flags.from_gdata(n.get_opt_cnt(ygdata.Id(NS_stratoweave_rfs, 'feature-flags'))), software=stratoweave_rfs__device__software.from_gdata(n.get_opt_cnt(ygdata.Id(NS_stratoweave_rfs, 'software'))), state=stratoweave_rfs__device__state.from_gdata(n.get_opt_cnt(ygdata.Id(NS_stratoweave_rfs, 'state'))))
+        return stratoweave_rfs__device_entry(name=n.get_str(ygdata.Id(NS_stratoweave_rfs, 'name')), description=n.get_opt_str(ygdata.Id(NS_stratoweave_rfs, 'description')), type=n.get_opt_str(ygdata.Id(NS_stratoweave_rfs, 'type')), address=stratoweave_rfs__device__address.from_gdata(n.get_opt_list(ygdata.Id(NS_stratoweave_rfs, 'address'))), credentials=stratoweave_rfs__device__credentials.from_gdata(n.get_opt_cnt(ygdata.Id(NS_stratoweave_rfs, 'credentials'))), initial_credentials=stratoweave_rfs__device__initial_credentials.from_gdata(n.get_opt_list(ygdata.Id(NS_stratoweave_rfs, 'initial-credentials'))), ssh=stratoweave_rfs__device__ssh.from_gdata(n.get_opt_cnt(ygdata.Id(NS_stratoweave_rfs, 'ssh'))), approval_required=n.get_opt_bool(ygdata.Id(NS_stratoweave_rfs, 'approval-required')), mock=stratoweave_rfs__device__mock.from_gdata(n.get_opt_cnt(ygdata.Id(NS_stratoweave_rfs, 'mock'))), debug=stratoweave_rfs__device__debug.from_gdata(n.get_opt_cnt(ygdata.Id(NS_stratoweave_rfs, 'debug'))), feature_flags=stratoweave_rfs__device__feature_flags.from_gdata(n.get_opt_cnt(ygdata.Id(NS_stratoweave_rfs, 'feature-flags'))), software=stratoweave_rfs__device__software.from_gdata(n.get_opt_cnt(ygdata.Id(NS_stratoweave_rfs, 'software'))), state=stratoweave_rfs__device__state.from_gdata(n.get_opt_cnt(ygdata.Id(NS_stratoweave_rfs, 'state'))))
 
     mut def copy(self) -> stratoweave_rfs__device_entry:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__device_entry.from_gdata(self.to_gdata())
 
-_breaker25: None = None
+_breaker26: None = None
 class stratoweave_rfs__device(yadata.MKeyedList[str, stratoweave_rfs__device_entry]):
     mut def __init__(self, elements: list[stratoweave_rfs__device_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
@@ -2723,7 +3003,7 @@ class stratoweave_rfs__device(yadata.MKeyedList[str, stratoweave_rfs__device_ent
         return stratoweave_rfs__device(elements=copied_elements)
 
 
-_breaker26: None = None
+_breaker27: None = None
 class stratoweave_rfs__rfs__base_config(yadata.MNode):
     role: ?str
     ipv4_address: ?str
@@ -2752,7 +3032,7 @@ class stratoweave_rfs__rfs__base_config(yadata.MNode):
         return stratoweave_rfs__rfs__base_config.from_gdata(self.to_gdata())
 
 
-_breaker27: None = None
+_breaker28: None = None
 class stratoweave_rfs__rfs__backbone_interface__remote(yadata.MNode):
     device: ?str
     interface: ?str
@@ -2775,7 +3055,7 @@ class stratoweave_rfs__rfs__backbone_interface__remote(yadata.MNode):
         return stratoweave_rfs__rfs__backbone_interface__remote.from_gdata(self.to_gdata())
 
 
-_breaker28: None = None
+_breaker29: None = None
 class stratoweave_rfs__rfs__backbone_interface__state(yadata.MNode):
     oper_status: ?str
 
@@ -2796,7 +3076,7 @@ class stratoweave_rfs__rfs__backbone_interface__state(yadata.MNode):
         return stratoweave_rfs__rfs__backbone_interface__state.from_gdata(self.to_gdata())
 
 
-_breaker29: None = None
+_breaker30: None = None
 class stratoweave_rfs__rfs__backbone_interface_entry(yadata.MNode):
     name: str
     ipv4_address: ?str
@@ -2826,7 +3106,7 @@ class stratoweave_rfs__rfs__backbone_interface_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__rfs__backbone_interface_entry.from_gdata(self.to_gdata())
 
-_breaker30: None = None
+_breaker31: None = None
 class stratoweave_rfs__rfs__backbone_interface(yadata.MKeyedList[str, stratoweave_rfs__rfs__backbone_interface_entry]):
     mut def __init__(self, elements: list[stratoweave_rfs__rfs__backbone_interface_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
@@ -2865,7 +3145,7 @@ class stratoweave_rfs__rfs__backbone_interface(yadata.MKeyedList[str, stratoweav
         return stratoweave_rfs__rfs__backbone_interface(elements=copied_elements)
 
 
-_breaker31: None = None
+_breaker32: None = None
 class stratoweave_rfs__rfs__ibgp_neighbor_entry(yadata.MNode):
     address: str
     asn: ?u64
@@ -2889,7 +3169,7 @@ class stratoweave_rfs__rfs__ibgp_neighbor_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__rfs__ibgp_neighbor_entry.from_gdata(self.to_gdata())
 
-_breaker32: None = None
+_breaker33: None = None
 class stratoweave_rfs__rfs__ibgp_neighbor(yadata.MKeyedList[str, stratoweave_rfs__rfs__ibgp_neighbor_entry]):
     mut def __init__(self, elements: list[stratoweave_rfs__rfs__ibgp_neighbor_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.address == k, elements)
@@ -2926,7 +3206,7 @@ class stratoweave_rfs__rfs__ibgp_neighbor(yadata.MKeyedList[str, stratoweave_rfs
         return stratoweave_rfs__rfs__ibgp_neighbor(elements=copied_elements)
 
 
-_breaker33: None = None
+_breaker34: None = None
 class stratoweave_rfs__rfs__vrf_entry(yadata.MNode):
     name: str
     description: ?str
@@ -2952,7 +3232,7 @@ class stratoweave_rfs__rfs__vrf_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__rfs__vrf_entry.from_gdata(self.to_gdata())
 
-_breaker34: None = None
+_breaker35: None = None
 class stratoweave_rfs__rfs__vrf(yadata.MKeyedList[str, stratoweave_rfs__rfs__vrf_entry]):
     mut def __init__(self, elements: list[stratoweave_rfs__rfs__vrf_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
@@ -2991,7 +3271,7 @@ class stratoweave_rfs__rfs__vrf(yadata.MKeyedList[str, stratoweave_rfs__rfs__vrf
         return stratoweave_rfs__rfs__vrf(elements=copied_elements)
 
 
-_breaker35: None = None
+_breaker36: None = None
 class stratoweave_rfs__rfs__vrf_interface_entry(yadata.MNode):
     name: str
     description: ?str
@@ -3017,7 +3297,7 @@ class stratoweave_rfs__rfs__vrf_interface_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__rfs__vrf_interface_entry.from_gdata(self.to_gdata())
 
-_breaker36: None = None
+_breaker37: None = None
 class stratoweave_rfs__rfs__vrf_interface(yadata.MKeyedList[str, stratoweave_rfs__rfs__vrf_interface_entry]):
     mut def __init__(self, elements: list[stratoweave_rfs__rfs__vrf_interface_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
@@ -3056,7 +3336,7 @@ class stratoweave_rfs__rfs__vrf_interface(yadata.MKeyedList[str, stratoweave_rfs
         return stratoweave_rfs__rfs__vrf_interface(elements=copied_elements)
 
 
-_breaker37: None = None
+_breaker38: None = None
 class stratoweave_rfs__rfs__ebgp_customer__state(yadata.MNode):
     session_state: ?str
     last_event: ?str
@@ -3087,7 +3367,7 @@ class stratoweave_rfs__rfs__ebgp_customer__state(yadata.MNode):
         return stratoweave_rfs__rfs__ebgp_customer__state.from_gdata(self.to_gdata())
 
 
-_breaker38: None = None
+_breaker39: None = None
 class stratoweave_rfs__rfs__ebgp_customer_entry(yadata.MNode):
     vrf: str
     address: str
@@ -3117,7 +3397,7 @@ class stratoweave_rfs__rfs__ebgp_customer_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__rfs__ebgp_customer_entry.from_gdata(self.to_gdata())
 
-_breaker39: None = None
+_breaker40: None = None
 class stratoweave_rfs__rfs__ebgp_customer(yadata.MKeyedList[(vrf: str, address: str), stratoweave_rfs__rfs__ebgp_customer_entry]):
     mut def __init__(self, elements: list[stratoweave_rfs__rfs__ebgp_customer_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.vrf == k.vrf and e.address == k.address, elements)
@@ -3156,7 +3436,7 @@ class stratoweave_rfs__rfs__ebgp_customer(yadata.MKeyedList[(vrf: str, address: 
         return stratoweave_rfs__rfs__ebgp_customer(elements=copied_elements)
 
 
-_breaker40: None = None
+_breaker41: None = None
 class stratoweave_rfs__rfs_entry(yadata.MNode):
     name: str
     base_config: stratoweave_rfs__rfs__base_config
@@ -3186,7 +3466,7 @@ class stratoweave_rfs__rfs_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__rfs_entry.from_gdata(self.to_gdata())
 
-_breaker41: None = None
+_breaker42: None = None
 class stratoweave_rfs__rfs(yadata.MKeyedList[str, stratoweave_rfs__rfs_entry]):
     mut def __init__(self, elements: list[stratoweave_rfs__rfs_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
@@ -3217,7 +3497,7 @@ class stratoweave_rfs__rfs(yadata.MKeyedList[str, stratoweave_rfs__rfs_entry]):
         return stratoweave_rfs__rfs(elements=copied_elements)
 
 
-_breaker42: None = None
+_breaker43: None = None
 class root(yadata.MNode):
     device: stratoweave_rfs__device
     rfs: stratoweave_rfs__rfs
@@ -3245,7 +3525,7 @@ actor rpc_root(tp: ygdata.TreeProvider):
 
 
 
-_breaker43: None = None
+_breaker44: None = None
 class stratoweave_rfs__device__address__initial_credentials_entry_subs(SubscriptionNode):
     username: SubscriptionNode
     password: SubscriptionNode
@@ -3261,7 +3541,7 @@ class stratoweave_rfs__device__address__initial_credentials_entry_subs(Subscript
         direct: list[SubscriptionNode] = [self.username, self.password, self.key]
         return direct
 
-_breaker44: None = None
+_breaker45: None = None
 class stratoweave_rfs__device__address__initial_credentials_subs(SubscriptionNode):
     username: SubscriptionNode
     password: SubscriptionNode
@@ -3285,7 +3565,7 @@ class stratoweave_rfs__device__address__initial_credentials_subs(SubscriptionNod
         direct: list[SubscriptionNode] = [self.username, self.password, self.key]
         return direct
 
-_breaker45: None = None
+_breaker46: None = None
 class stratoweave_rfs__device__address_entry_subs(SubscriptionNode):
     name: SubscriptionNode
     address: SubscriptionNode
@@ -3303,7 +3583,7 @@ class stratoweave_rfs__device__address_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.address, self.port, self.initial_credentials]
         return direct
 
-_breaker46: None = None
+_breaker47: None = None
 class stratoweave_rfs__device__address_subs(SubscriptionNode):
     name: SubscriptionNode
     address: SubscriptionNode
@@ -3327,7 +3607,7 @@ class stratoweave_rfs__device__address_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.address, self.port, self.initial_credentials]
         return direct
 
-_breaker47: None = None
+_breaker48: None = None
 class stratoweave_rfs__device__credentials__key_entry_subs(SubscriptionNode):
     key: SubscriptionNode
     private_key: SubscriptionNode
@@ -3341,7 +3621,7 @@ class stratoweave_rfs__device__credentials__key_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.key, self.private_key]
         return direct
 
-_breaker48: None = None
+_breaker49: None = None
 class stratoweave_rfs__device__credentials__key_subs(SubscriptionNode):
     key: SubscriptionNode
     private_key: SubscriptionNode
@@ -3361,7 +3641,7 @@ class stratoweave_rfs__device__credentials__key_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.key, self.private_key]
         return direct
 
-_breaker49: None = None
+_breaker50: None = None
 class stratoweave_rfs__device__credentials_subs(SubscriptionNode):
     username: SubscriptionNode
     password: SubscriptionNode
@@ -3377,7 +3657,7 @@ class stratoweave_rfs__device__credentials_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.username, self.password, self.key]
         return direct
 
-_breaker50: None = None
+_breaker51: None = None
 class stratoweave_rfs__device__initial_credentials_entry_subs(SubscriptionNode):
     username: SubscriptionNode
     password: SubscriptionNode
@@ -3393,7 +3673,7 @@ class stratoweave_rfs__device__initial_credentials_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.username, self.password, self.key]
         return direct
 
-_breaker51: None = None
+_breaker52: None = None
 class stratoweave_rfs__device__initial_credentials_subs(SubscriptionNode):
     username: SubscriptionNode
     password: SubscriptionNode
@@ -3417,7 +3697,37 @@ class stratoweave_rfs__device__initial_credentials_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.username, self.password, self.key]
         return direct
 
-_breaker52: None = None
+_breaker53: None = None
+class stratoweave_rfs__device__ssh_subs(SubscriptionNode):
+    cipher: SubscriptionNode
+    mac: SubscriptionNode
+    key_exchange: SubscriptionNode
+    host_key_algorithm: SubscriptionNode
+    public_key_algorithm: SubscriptionNode
+    compression_algorithm: SubscriptionNode
+    compression_level: SubscriptionNode
+    rekey_after_bytes: SubscriptionNode
+    rekey_after_seconds: SubscriptionNode
+    minimum_rsa_bits: SubscriptionNode
+
+    pure def __init__(self, path: ?SubscriptionPath=None) -> None:
+        SubscriptionNode.__init__(self, path)
+        self.cipher = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'cipher'), parent=path))
+        self.mac = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'mac'), parent=path))
+        self.key_exchange = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'key-exchange'), parent=path))
+        self.host_key_algorithm = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'host-key-algorithm'), parent=path))
+        self.public_key_algorithm = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'public-key-algorithm'), parent=path))
+        self.compression_algorithm = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'compression-algorithm'), parent=path))
+        self.compression_level = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'compression-level'), parent=path))
+        self.rekey_after_bytes = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'rekey-after-bytes'), parent=path))
+        self.rekey_after_seconds = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'rekey-after-seconds'), parent=path))
+        self.minimum_rsa_bits = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'minimum-rsa-bits'), parent=path))
+
+    pure def _direct_children(self) -> list[SubscriptionNode]:
+        direct: list[SubscriptionNode] = [self.cipher, self.mac, self.key_exchange, self.host_key_algorithm, self.public_key_algorithm, self.compression_algorithm, self.compression_level, self.rekey_after_bytes, self.rekey_after_seconds, self.minimum_rsa_bits]
+        return direct
+
+_breaker54: None = None
 class stratoweave_rfs__device__mock__module_entry_subs(SubscriptionNode):
     name: SubscriptionNode
     namespace: SubscriptionNode
@@ -3435,7 +3745,7 @@ class stratoweave_rfs__device__mock__module_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.namespace, self.revision, self.feature]
         return direct
 
-_breaker53: None = None
+_breaker55: None = None
 class stratoweave_rfs__device__mock__module_subs(SubscriptionNode):
     name: SubscriptionNode
     namespace: SubscriptionNode
@@ -3459,7 +3769,7 @@ class stratoweave_rfs__device__mock__module_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.namespace, self.revision, self.feature]
         return direct
 
-_breaker54: None = None
+_breaker56: None = None
 class stratoweave_rfs__device__mock_subs(SubscriptionNode):
     enabled: SubscriptionNode
     module: stratoweave_rfs__device__mock__module_subs
@@ -3473,7 +3783,7 @@ class stratoweave_rfs__device__mock_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.enabled, self.module]
         return direct
 
-_breaker55: None = None
+_breaker57: None = None
 class stratoweave_rfs__device__debug_subs(SubscriptionNode):
     connection: SubscriptionNode
 
@@ -3485,7 +3795,7 @@ class stratoweave_rfs__device__debug_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.connection]
         return direct
 
-_breaker56: None = None
+_breaker58: None = None
 class stratoweave_rfs__device__feature_flags_subs(SubscriptionNode):
     runtime_schema_fetch: SubscriptionNode
 
@@ -3497,7 +3807,7 @@ class stratoweave_rfs__device__feature_flags_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.runtime_schema_fetch]
         return direct
 
-_breaker57: None = None
+_breaker59: None = None
 class stratoweave_rfs__device__software__veto_entry_subs(SubscriptionNode):
     holder: SubscriptionNode
     reason: SubscriptionNode
@@ -3511,7 +3821,7 @@ class stratoweave_rfs__device__software__veto_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.holder, self.reason]
         return direct
 
-_breaker58: None = None
+_breaker60: None = None
 class stratoweave_rfs__device__software__veto_subs(SubscriptionNode):
     holder: SubscriptionNode
     reason: SubscriptionNode
@@ -3531,7 +3841,7 @@ class stratoweave_rfs__device__software__veto_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.holder, self.reason]
         return direct
 
-_breaker59: None = None
+_breaker61: None = None
 class stratoweave_rfs__device__software__state__job_entry_subs(SubscriptionNode):
     name: SubscriptionNode
     state: SubscriptionNode
@@ -3553,7 +3863,7 @@ class stratoweave_rfs__device__software__state__job_entry_subs(SubscriptionNode)
         direct: list[SubscriptionNode] = [self.name, self.state, self.started, self.ended, self.progress, self.message]
         return direct
 
-_breaker60: None = None
+_breaker62: None = None
 class stratoweave_rfs__device__software__state__job_subs(SubscriptionNode):
     name: SubscriptionNode
     state: SubscriptionNode
@@ -3581,7 +3891,7 @@ class stratoweave_rfs__device__software__state__job_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.state, self.started, self.ended, self.progress, self.message]
         return direct
 
-_breaker61: None = None
+_breaker63: None = None
 class stratoweave_rfs__device__software__state__precheck_subs(SubscriptionNode):
     verdict: SubscriptionNode
     detail: SubscriptionNode
@@ -3597,7 +3907,7 @@ class stratoweave_rfs__device__software__state__precheck_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.verdict, self.detail, self.at]
         return direct
 
-_breaker62: None = None
+_breaker64: None = None
 class stratoweave_rfs__device__software__state__postcheck_subs(SubscriptionNode):
     verdict: SubscriptionNode
     detail: SubscriptionNode
@@ -3613,7 +3923,7 @@ class stratoweave_rfs__device__software__state__postcheck_subs(SubscriptionNode)
         direct: list[SubscriptionNode] = [self.verdict, self.detail, self.at]
         return direct
 
-_breaker63: None = None
+_breaker65: None = None
 class stratoweave_rfs__device__software__state_subs(SubscriptionNode):
     status: SubscriptionNode
     running_release: SubscriptionNode
@@ -3633,10 +3943,11 @@ class stratoweave_rfs__device__software__state_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.status, self.running_release, self.job, self.precheck, self.postcheck]
         return direct
 
-_breaker64: None = None
+_breaker66: None = None
 class stratoweave_rfs__device__software_subs(SubscriptionNode):
     upgrade_campaign: SubscriptionNode
     target_release: SubscriptionNode
+    image_url: SubscriptionNode
     allow_staging: SubscriptionNode
     veto: stratoweave_rfs__device__software__veto_subs
     state: stratoweave_rfs__device__software__state_subs
@@ -3645,15 +3956,16 @@ class stratoweave_rfs__device__software_subs(SubscriptionNode):
         SubscriptionNode.__init__(self, path)
         self.upgrade_campaign = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'upgrade-campaign'), parent=path))
         self.target_release = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'target-release'), parent=path))
+        self.image_url = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'image-url'), parent=path))
         self.allow_staging = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'allow-staging'), parent=path))
         self.veto = stratoweave_rfs__device__software__veto_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'veto'), parent=path))
         self.state = stratoweave_rfs__device__software__state_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'state'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.upgrade_campaign, self.target_release, self.allow_staging, self.veto, self.state]
+        direct: list[SubscriptionNode] = [self.upgrade_campaign, self.target_release, self.image_url, self.allow_staging, self.veto, self.state]
         return direct
 
-_breaker65: None = None
+_breaker67: None = None
 class stratoweave_rfs__device__state_subs(SubscriptionNode):
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -3663,7 +3975,7 @@ class stratoweave_rfs__device__state_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = []
         return direct
 
-_breaker66: None = None
+_breaker68: None = None
 class stratoweave_rfs__device_entry_subs(SubscriptionNode):
     name: SubscriptionNode
     description: SubscriptionNode
@@ -3671,6 +3983,7 @@ class stratoweave_rfs__device_entry_subs(SubscriptionNode):
     address: stratoweave_rfs__device__address_subs
     credentials: stratoweave_rfs__device__credentials_subs
     initial_credentials: stratoweave_rfs__device__initial_credentials_subs
+    ssh: stratoweave_rfs__device__ssh_subs
     approval_required: SubscriptionNode
     mock: stratoweave_rfs__device__mock_subs
     debug: stratoweave_rfs__device__debug_subs
@@ -3686,6 +3999,7 @@ class stratoweave_rfs__device_entry_subs(SubscriptionNode):
         self.address = stratoweave_rfs__device__address_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'address'), parent=path))
         self.credentials = stratoweave_rfs__device__credentials_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'credentials'), parent=path))
         self.initial_credentials = stratoweave_rfs__device__initial_credentials_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'initial-credentials'), parent=path))
+        self.ssh = stratoweave_rfs__device__ssh_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'ssh'), parent=path))
         self.approval_required = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'approval-required'), parent=path))
         self.mock = stratoweave_rfs__device__mock_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'mock'), parent=path))
         self.debug = stratoweave_rfs__device__debug_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'debug'), parent=path))
@@ -3694,10 +4008,10 @@ class stratoweave_rfs__device_entry_subs(SubscriptionNode):
         self.state = stratoweave_rfs__device__state_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'state'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.name, self.description, self.type, self.address, self.credentials, self.initial_credentials, self.approval_required, self.mock, self.debug, self.feature_flags, self.software, self.state]
+        direct: list[SubscriptionNode] = [self.name, self.description, self.type, self.address, self.credentials, self.initial_credentials, self.ssh, self.approval_required, self.mock, self.debug, self.feature_flags, self.software, self.state]
         return direct
 
-_breaker67: None = None
+_breaker69: None = None
 class stratoweave_rfs__device_subs(SubscriptionNode):
     name: SubscriptionNode
     description: SubscriptionNode
@@ -3705,6 +4019,7 @@ class stratoweave_rfs__device_subs(SubscriptionNode):
     address: stratoweave_rfs__device__address_subs
     credentials: stratoweave_rfs__device__credentials_subs
     initial_credentials: stratoweave_rfs__device__initial_credentials_subs
+    ssh: stratoweave_rfs__device__ssh_subs
     approval_required: SubscriptionNode
     mock: stratoweave_rfs__device__mock_subs
     debug: stratoweave_rfs__device__debug_subs
@@ -3719,6 +4034,7 @@ class stratoweave_rfs__device_subs(SubscriptionNode):
         self.address = stratoweave_rfs__device__address_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'address'), parent=path))
         self.credentials = stratoweave_rfs__device__credentials_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'credentials'), parent=path))
         self.initial_credentials = stratoweave_rfs__device__initial_credentials_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'initial-credentials'), parent=path))
+        self.ssh = stratoweave_rfs__device__ssh_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'ssh'), parent=path))
         self.approval_required = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'approval-required'), parent=path))
         self.mock = stratoweave_rfs__device__mock_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'mock'), parent=path))
         self.debug = stratoweave_rfs__device__debug_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'debug'), parent=path))
@@ -3734,10 +4050,10 @@ class stratoweave_rfs__device_subs(SubscriptionNode):
         return stratoweave_rfs__device_entry_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'device'), predicates=predicates, parent=base_path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.name, self.description, self.type, self.address, self.credentials, self.initial_credentials, self.approval_required, self.mock, self.debug, self.feature_flags, self.software, self.state]
+        direct: list[SubscriptionNode] = [self.name, self.description, self.type, self.address, self.credentials, self.initial_credentials, self.ssh, self.approval_required, self.mock, self.debug, self.feature_flags, self.software, self.state]
         return direct
 
-_breaker68: None = None
+_breaker70: None = None
 class stratoweave_rfs__rfs__base_config_subs(SubscriptionNode):
     role: SubscriptionNode
     ipv4_address: SubscriptionNode
@@ -3757,7 +4073,7 @@ class stratoweave_rfs__rfs__base_config_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.role, self.ipv4_address, self.ipv6_address, self.asn, self.ibgp_authentication_key]
         return direct
 
-_breaker69: None = None
+_breaker71: None = None
 class stratoweave_rfs__rfs__backbone_interface__remote_subs(SubscriptionNode):
     device: SubscriptionNode
     interface: SubscriptionNode
@@ -3771,7 +4087,7 @@ class stratoweave_rfs__rfs__backbone_interface__remote_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.device, self.interface]
         return direct
 
-_breaker70: None = None
+_breaker72: None = None
 class stratoweave_rfs__rfs__backbone_interface__state_subs(SubscriptionNode):
     oper_status: SubscriptionNode
 
@@ -3783,7 +4099,7 @@ class stratoweave_rfs__rfs__backbone_interface__state_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.oper_status]
         return direct
 
-_breaker71: None = None
+_breaker73: None = None
 class stratoweave_rfs__rfs__backbone_interface_entry_subs(SubscriptionNode):
     name: SubscriptionNode
     ipv4_address: SubscriptionNode
@@ -3807,7 +4123,7 @@ class stratoweave_rfs__rfs__backbone_interface_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.ipv4_address, self.ipv4_prefix_length, self.ipv6_address, self.ipv6_prefix_length, self.remote, self.state]
         return direct
 
-_breaker72: None = None
+_breaker74: None = None
 class stratoweave_rfs__rfs__backbone_interface_subs(SubscriptionNode):
     name: SubscriptionNode
     ipv4_address: SubscriptionNode
@@ -3837,7 +4153,7 @@ class stratoweave_rfs__rfs__backbone_interface_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.ipv4_address, self.ipv4_prefix_length, self.ipv6_address, self.ipv6_prefix_length, self.remote, self.state]
         return direct
 
-_breaker73: None = None
+_breaker75: None = None
 class stratoweave_rfs__rfs__ibgp_neighbor_entry_subs(SubscriptionNode):
     address: SubscriptionNode
     asn: SubscriptionNode
@@ -3855,7 +4171,7 @@ class stratoweave_rfs__rfs__ibgp_neighbor_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.address, self.asn, self.description, self.ibgp_authentication_key]
         return direct
 
-_breaker74: None = None
+_breaker76: None = None
 class stratoweave_rfs__rfs__ibgp_neighbor_subs(SubscriptionNode):
     address: SubscriptionNode
     asn: SubscriptionNode
@@ -3879,7 +4195,7 @@ class stratoweave_rfs__rfs__ibgp_neighbor_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.address, self.asn, self.description, self.ibgp_authentication_key]
         return direct
 
-_breaker75: None = None
+_breaker77: None = None
 class stratoweave_rfs__rfs__vrf_entry_subs(SubscriptionNode):
     name: SubscriptionNode
     description: SubscriptionNode
@@ -3899,7 +4215,7 @@ class stratoweave_rfs__rfs__vrf_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.description, self.id, self.router_id, self.asn]
         return direct
 
-_breaker76: None = None
+_breaker78: None = None
 class stratoweave_rfs__rfs__vrf_subs(SubscriptionNode):
     name: SubscriptionNode
     description: SubscriptionNode
@@ -3925,7 +4241,7 @@ class stratoweave_rfs__rfs__vrf_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.description, self.id, self.router_id, self.asn]
         return direct
 
-_breaker77: None = None
+_breaker79: None = None
 class stratoweave_rfs__rfs__vrf_interface_entry_subs(SubscriptionNode):
     name: SubscriptionNode
     description: SubscriptionNode
@@ -3945,7 +4261,7 @@ class stratoweave_rfs__rfs__vrf_interface_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.description, self.vrf, self.ipv4_address, self.ipv4_prefix_length]
         return direct
 
-_breaker78: None = None
+_breaker80: None = None
 class stratoweave_rfs__rfs__vrf_interface_subs(SubscriptionNode):
     name: SubscriptionNode
     description: SubscriptionNode
@@ -3971,7 +4287,7 @@ class stratoweave_rfs__rfs__vrf_interface_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.description, self.vrf, self.ipv4_address, self.ipv4_prefix_length]
         return direct
 
-_breaker79: None = None
+_breaker81: None = None
 class stratoweave_rfs__rfs__ebgp_customer__state_subs(SubscriptionNode):
     session_state: SubscriptionNode
     last_event: SubscriptionNode
@@ -3993,7 +4309,7 @@ class stratoweave_rfs__rfs__ebgp_customer__state_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.session_state, self.last_event, self.established_transitions, self.debug_active, self.negotiated_hold_time, self.last_notification]
         return direct
 
-_breaker80: None = None
+_breaker82: None = None
 class stratoweave_rfs__rfs__ebgp_customer_entry_subs(SubscriptionNode):
     vrf: SubscriptionNode
     address: SubscriptionNode
@@ -4017,7 +4333,7 @@ class stratoweave_rfs__rfs__ebgp_customer_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.vrf, self.address, self.local_asn, self.peer_asn, self.description, self.authentication_key, self.state]
         return direct
 
-_breaker81: None = None
+_breaker83: None = None
 class stratoweave_rfs__rfs__ebgp_customer_subs(SubscriptionNode):
     vrf: SubscriptionNode
     address: SubscriptionNode
@@ -4048,7 +4364,7 @@ class stratoweave_rfs__rfs__ebgp_customer_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.vrf, self.address, self.local_asn, self.peer_asn, self.description, self.authentication_key, self.state]
         return direct
 
-_breaker82: None = None
+_breaker84: None = None
 class stratoweave_rfs__rfs_entry_subs(SubscriptionNode):
     name: SubscriptionNode
     base_config: stratoweave_rfs__rfs__base_config_subs
@@ -4072,7 +4388,7 @@ class stratoweave_rfs__rfs_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.base_config, self.backbone_interface, self.ibgp_neighbor, self.vrf, self.vrf_interface, self.ebgp_customer]
         return direct
 
-_breaker83: None = None
+_breaker85: None = None
 class stratoweave_rfs__rfs_subs(SubscriptionNode):
     name: SubscriptionNode
     base_config: stratoweave_rfs__rfs__base_config_subs
@@ -4102,7 +4418,7 @@ class stratoweave_rfs__rfs_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.name, self.base_config, self.backbone_interface, self.ibgp_neighbor, self.vrf, self.vrf_interface, self.ebgp_customer]
         return direct
 
-_breaker84: None = None
+_breaker86: None = None
 class root_subs(SubscriptionNode):
     device: stratoweave_rfs__device_subs
     rfs: stratoweave_rfs__rfs_subs
