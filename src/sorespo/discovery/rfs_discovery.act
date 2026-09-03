@@ -210,7 +210,7 @@ def discover_base_config(dev: gdata.Node, device_type: str, authentication_key_h
                 as_number_str = bgp.autonomous_system
                 if as_number_str is not None:
                     asn = u64(as_number_str!)
-                for nb in bgp!.neighbor.elements:
+                for nb in bgp!.neighbor:
                     auth = nb.authentication
                     if auth is not None:
                         encrypted: ?str = auth.password
@@ -290,7 +290,7 @@ def _srl_interface_ipv4(subiface: ?srl25.srl_nokia_interfaces__interface__subint
     addrs = subiface!.ipv4?.address
     if addrs is None:
         return (None, None)
-    for addr in addrs!.elements:
+    for addr in addrs!:
         prefix = addr.ip_prefix
         parts = prefix.split("/")
         ipv4_address: ?str = parts[0]
@@ -353,7 +353,7 @@ def discover_bb_interfaces(dev: gdata.Node, device_type: str) -> list[stratoweav
             if remote_device is None or remote_interface is None:
                 continue
             (ipv4_address, ipv4_prefix_length) = (None, None)
-            for subiface in intf!.subinterface!.elements:
+            for subiface in intf!.subinterface!:
                 (ipv4_address, ipv4_prefix_length) = _srl_interface_ipv4(subiface)
                 break
             result.append(stratoweave_rfs__rfs__backbone_interface_entry(
@@ -641,7 +641,7 @@ def _device_to_rfs(dev: gdata.Node, device_type: str, rfs_entry: rfs_layer.strat
     router_id = router_id_from_ipv4(ipv4_address)
 
     for bbi in discover_bb_interfaces(dev, device_type):
-        rfs_entry.backbone_interface.elements.append(bbi)
+        rfs_entry.backbone_interface[bbi.name] = bbi
 
     _append_ibgp_neighbors(dev, device_type, rfs_entry, asn, authentication_key_hints)
     _append_vrfs(dev, device_type, rfs_entry, router_id, asn)
