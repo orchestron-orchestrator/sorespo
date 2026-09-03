@@ -1,0 +1,37 @@
+name: Retarget stable pull requests
+
+# `stable` is the default branch, so GitHub uses it as the base of each new pull
+# request. But `stable` is only supposed to move with fast-forward merges from `main`.
+#
+# `pull_request_target` gives this workflow a writable token on pull requests
+# from forks. It also runs a copy of this workflow on the base branch, so a PR
+# can't disable it.
+
+on:
+  pull_request_target:
+    # `synchronize` ensures the check runs and fails again if new commits are pushed
+    types: [opened, edited, synchronize]
+
+permissions: {}
+
+jobs:
+  retarget:
+    name: "PR base branch"
+    if: github.event.pull_request.base.ref == 'stable'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: "Retarget to main"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          if gh pr edit "$PR" --repo "$GITHUB_REPOSITORY" --base main; then
+            gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body \
+              "Moved the base branch of this pull request to \`main\`. The \`stable\` branch only moves by fast-forward from \`main\`, so it cannot take pull requests; GitHub proposed it because it is the repository default branch. See [docs/development.md](https://github.com/$GITHUB_REPOSITORY/blob/main/docs/development.md)."
+            exit 0
+          fi
+
+          echo "::error title=Retarget this pull request to main::Could not move this pull request off 'stable' automatically. The 'stable' branch only moves by fast-forward from 'main', so it cannot take pull requests. Edit this pull request and change the base branch to 'main'."
+          exit 1
