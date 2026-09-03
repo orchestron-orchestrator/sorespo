@@ -13,12 +13,16 @@ import stratoweave.ttt as ttt
 import sorespo.device_types as sw_device_types
 import sorespo.layers.t_3 as t_3
 import sorespo.layers.y_3 as y_3
+import sorespo.layers.y_3_oper as y_3_oper
 import sorespo.layers.t_2 as t_2
 import sorespo.layers.y_2 as y_2
+import sorespo.layers.y_2_oper as y_2_oper
 import sorespo.layers.t_1 as t_1
 import sorespo.layers.y_1 as y_1
+import sorespo.layers.y_1_oper as y_1_oper
 import sorespo.layers.t_0 as t_0
 import sorespo.layers.y_0 as y_0
+import sorespo.layers.y_0_oper as y_0_oper
 import stratoweave.device_schema as swds
 import sorespo.devices.CiscoIosXr_25_3_1 as dev_CiscoIosXr_25_3_1
 import sorespo.devices.CiscoIosXr_25_3_1_oper as dev_CiscoIosXr_25_3_1_oper
@@ -50,6 +54,18 @@ def schema_for_layer(layer):
         return y_1.SRC_DNODE
     if layer == 0:
         return y_0.SRC_DNODE
+    raise ValueError('Invalid layer: {layer}')
+
+
+def oper_schema_for_layer(layer):
+    if layer == 3:
+        return y_3_oper.SRC_DNODE
+    if layer == 2:
+        return y_2_oper.SRC_DNODE
+    if layer == 1:
+        return y_1_oper.SRC_DNODE
+    if layer == 0:
+        return y_0_oper.SRC_DNODE
     raise ValueError('Invalid layer: {layer}')
 
 
@@ -406,4 +422,4 @@ device_types: dict[str, swdev.DeviceType] = dict(
     list(generated_device_types.items()) + list(sw_device_types.device_types.items())
 )
 
-SYSSPEC = swapp.SysSpec(device_types, get_layers, schema_for_layer)
+SYSSPEC = swapp.SysSpec(device_types, get_layers, schema_for_layer, oper_schema_for_layer)
