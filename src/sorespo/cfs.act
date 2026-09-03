@@ -47,9 +47,10 @@ class BBLink(base.BBLink):
         o = base.o_root()
         o.netinfra.backbone_link.create((i.left_router, i.left_interface, i.right_router, i.right_interface))
 
-        # if i.optical is not None:
-        #     print("JFDOAKFLDS")
-            
+        if i.optical is not None:
+            # TODO: check if they exist rather than forcing casting from optional to value
+            ol = o.netinfra.active_optical_link.create((i.optical.left_roadm!, i.optical.left_port!, i.optical.right_roadm!, i.optical.right_port!), vlan=i.vlan!)
+            ol.otn_path = i.optical.otn_path
         return o
 
 
@@ -214,7 +215,7 @@ class ROADM(base.ROADM):
         o_roadm = o.netinfra.roadm.create(i.name, id=i.id, role=i.role)
         if i.role == "edge":
             o_roadm.edge_ipv4_address = "10.10.0.{i.id}"
-            
+
         return o
 
 class OpticalLink(base.OpticalLink):

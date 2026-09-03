@@ -124,39 +124,6 @@ module netinfra-inter {
         type string;
       }
 
-      leaf vlan {
-        type uint16 {
-          range "1..4094";
-        }
-        description "VLAN tag for the link";
-      }
-
-      container optical {
-        description "OTN link parameters";
-        leaf left-roadm {
-          type leafref {
-            path "/netinfra-inter:netinfra/netinfra-inter:roadm/netinfra-inter:name";
-          }
-        }
-        leaf right-roadm {
-          type leafref {
-            path "/netinfra-inter:netinfra/netinfra-inter:roadm/netinfra-inter:name";
-          }
-        }
-        leaf left-port {
-          type string;
-        }
-        leaf right-port {
-          type string;
-        }
-        leaf-list otn-path {
-          type leafref {
-            path "/netinfra-inter:netinfra/netinfra-inter:roadm/netinfra-inter:name";
-          }
-          ordered-by user;
-          description "OTN path through intermediate ROADMs";
-        }
-      }
 
       container state {
         config false;
@@ -171,6 +138,41 @@ module netinfra-inter {
             enum unknown;
           }
         }
+      }
+    }
+
+    list active-optical-link {
+      key "left-roadm left-port right-roadm right-port";
+
+      sw:transform sorespo.inter.ActiveVlanLink;
+      leaf vlan {
+        type uint16 {
+          range "1..4094";
+        }
+        description "VLAN tag for the link";
+      }
+      leaf left-roadm {
+        type leafref {
+          path "/netinfra-inter:netinfra/netinfra-inter:roadm/netinfra-inter:name";
+        }
+      }
+      leaf right-roadm {
+        type leafref {
+          path "/netinfra-inter:netinfra/netinfra-inter:roadm/netinfra-inter:name";
+        }
+      }
+      leaf left-port {
+        type string;
+      }
+      leaf right-port {
+        type string;
+      }
+      leaf-list otn-path {
+        type leafref {
+          path "/netinfra-inter:netinfra/netinfra-inter:roadm/netinfra-inter:name";
+        }
+        ordered-by user;
+        description "OTN path through intermediate ROADMs";
       }
     }
 
