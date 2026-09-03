@@ -5,8 +5,10 @@ from sorespo.layers.y_0_loose import netinfra__netinfra
 from sorespo.layers.y_0_loose import ietf_l3vpn_svc__l3vpn_svc
 from sorespo.layers.y_0_loose import ietf_l3vpn_svc_bgp
 from sorespo.layers.y_0_loose import ietf_l3vpn_svc_customer_managed
-from sorespo.layers.y_2_loose import stratoweave_rfs__rfs__backbone_interface_entry
+from sorespo.layers.y_2_loose import stratoweave_rfs__rfs__backbone_interface
+from sorespo.layers.y_2_loose import stratoweave_rfs__rfs__vrf_interface
 from sorespo.layers.y_2_loose import stratoweave_rfs__rfs__vrf_interface_entry
+from sorespo.layers.y_2_loose import stratoweave_rfs__rfs__ebgp_customer
 from sorespo.layers.y_2_loose import stratoweave_rfs__rfs__ebgp_customer_entry
 import sorespo.discovery.rfs_discovery as rfsd
 
@@ -100,7 +102,7 @@ def _is_left_side(ipv4_address: ?str) -> ?bool:
     return None
 
 
-def _aggregate_backbone_links(per_device: dict[str, list[stratoweave_rfs__rfs__backbone_interface_entry]], netinfra: netinfra__netinfra) -> None:
+def _aggregate_backbone_links(per_device: dict[str, stratoweave_rfs__rfs__backbone_interface], netinfra: netinfra__netinfra) -> None:
     pairs: set[BackboneLinkKey] = set()
     for local in sorted([n for n in per_device.keys()]):
         for bbi in per_device[local]:
@@ -145,7 +147,7 @@ def _customer_name_from_vpn_id(vpn_id: str) -> ?str:
     return parts[0]
 
 
-def _match_ebgp_customer(vif: stratoweave_rfs__rfs__vrf_interface_entry, ebgp_for_device: list[stratoweave_rfs__rfs__ebgp_customer_entry], vrf_interface_count: int) -> ?stratoweave_rfs__rfs__ebgp_customer_entry:
+def _match_ebgp_customer(vif: stratoweave_rfs__rfs__vrf_interface_entry, ebgp_for_device: Collection[stratoweave_rfs__rfs__ebgp_customer_entry], vrf_interface_count: int) -> ?stratoweave_rfs__rfs__ebgp_customer_entry:
     """Match an eBGP neighbor to one access, not just to the VRF."""
     vrf = vif.vrf!
     (site_id, sna_id, vpn_id) = rfsd.parse_vrf_if_description(vif.description)
@@ -189,10 +191,10 @@ def _match_ebgp_customer(vif: stratoweave_rfs__rfs__vrf_interface_entry, ebgp_fo
     return None
 
 
-def _aggregate_l3vpn(per_device_vrf_ifs: dict[str, list[stratoweave_rfs__rfs__vrf_interface_entry]], per_device_ebgp: dict[str, list[stratoweave_rfs__rfs__ebgp_customer_entry]], l3vpn_svc: ietf_l3vpn_svc__l3vpn_svc) -> None:
+def _aggregate_l3vpn(per_device_vrf_ifs: dict[str, stratoweave_rfs__rfs__vrf_interface], per_device_ebgp: dict[str, stratoweave_rfs__rfs__ebgp_customer], l3vpn_svc: ietf_l3vpn_svc__l3vpn_svc) -> None:
     for device in sorted([n for n in per_device_vrf_ifs.keys()]):
         ebgp = per_device_ebgp.get(device)
-        ebgp_for_device: list[stratoweave_rfs__rfs__ebgp_customer_entry] = ebgp! if ebgp is not None else []
+        ebgp_for_device = ebgp! if ebgp is not None else stratoweave_rfs__rfs__ebgp_customer(elements=[])
 
         vrf_interface_count: dict[str, int] = {}
         for vif in per_device_vrf_ifs[device]:
@@ -251,9 +253,9 @@ def _set_or_assert_ibgp_authentication_key(existing: ?str, discovered: ?str) -> 
 def discover(devices: dict[str, gdata.Node], authentication_key_hints: list[str]) -> gdata.Node:
     cfs_root = cfs_layer.root()
     rfs_root = rfsd.discover_rfs_root(devices, authentication_key_hints)
-    bb_interfaces_by_device: dict[str, list[stratoweave_rfs__rfs__backbone_interface_entry]] = {}
-    vrf_ifs_by_device: dict[str, list[stratoweave_rfs__rfs__vrf_interface_entry]] = {}
-    ebgp_by_device: dict[str, list[stratoweave_rfs__rfs__ebgp_customer_entry]] = {}
+    bb_interfaces_by_device: dict[str, stratoweave_rfs__rfs__backbone_interface] = {}
+    vrf_ifs_by_device: dict[str, stratoweave_rfs__rfs__vrf_interface] = {}
+    ebgp_by_device: dict[str, stratoweave_rfs__rfs__ebgp_customer] = {}
     ibgp_authentication_key: ?str = None
 
     for rfs_entry in rfs_root.rfs:
@@ -279,9 +281,9 @@ def discover(devices: dict[str, gdata.Node], authentication_key_hints: list[str]
             mock=True,
         )
 
-        bb_interfaces_by_device[name] = rfs_entry.backbone_interface.elements
-        vrf_ifs_by_device[name] = rfs_entry.vrf_interface.elements
-        ebgp_by_device[name] = rfs_entry.ebgp_customer.elements
+        bb_interfaces_by_device[name] = rfs_entry.backbone_interface
+        vrf_ifs_by_device[name] = rfs_entry.vrf_interface
+        ebgp_by_device[name] = rfs_entry.ebgp_customer
 
     _aggregate_backbone_links(bb_interfaces_by_device, cfs_root.netinfra)
     _aggregate_l3vpn(vrf_ifs_by_device, ebgp_by_device, cfs_root.l3vpn_svc)
