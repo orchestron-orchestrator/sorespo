@@ -1063,8 +1063,7 @@ SRC_DNODE_CHILD_124: DList = DList(module='netinfra', namespace='http://example.
         DExt(module='ietf-yang-tmf-map', namespace='urn:ietf:params:xml:ns:yang:ietf-yang-tmf-map', prefix='tmf', name='cfs-service', arg='ROADM', exts=[])
     ], children=[
     DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='name', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
-    DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='id', config=True, description='roadm id', mandatory=True, type=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)]))),
-    DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='role', config=True, description='edge or core', mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
+    DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='id', config=True, description='roadm id', mandatory=True, type=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)])))
 ])
 
 SRC_DNODE_CHILD_125: DList = DList(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='backbone-link', key=[
@@ -1080,8 +1079,8 @@ SRC_DNODE_CHILD_125: DList = DList(module='netinfra', namespace='http://example.
     DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='left-interface', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='right-router', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='right-interface', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
-    DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='vlan', config=True, description='VLAN tag for the link', mandatory=False, type=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(1, 4094)]))),
     DContainer(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='optical', config=True, description='OTN link parameters', presence=False, children=[
+        DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='vlan', config=True, description='VLAN tag for the link', mandatory=False, type=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(1, 4094)]))),
         DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='left-roadm', config=True, mandatory=False, type=DTypeLeafref(name='leafref', description=None, reference=None, exts=[], builtin_type='leafref', default=None, path=yxpath.AbsoluteLocationPath([yxpath.NodeTestStep('netinfra', 'netinfra', []), yxpath.NodeTestStep('netinfra', 'roadm', []), yxpath.NodeTestStep('netinfra', 'name', [])]), require_instance=False, target_type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))),
         DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='right-roadm', config=True, mandatory=False, type=DTypeLeafref(name='leafref', description=None, reference=None, exts=[], builtin_type='leafref', default=None, path=yxpath.AbsoluteLocationPath([yxpath.NodeTestStep('netinfra', 'netinfra', []), yxpath.NodeTestStep('netinfra', 'roadm', []), yxpath.NodeTestStep('netinfra', 'name', [])]), require_instance=False, target_type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))),
         DLeaf(module='netinfra', namespace='http://example.com/netinfra', prefix='netinfra', name='left-port', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
@@ -4772,10 +4771,6 @@ SRC_YANG_2: str = r"""module netinfra {
         description "roadm id";
         mandatory true;
       }
-      leaf role {
-        type string;
-        description "edge or core";
-      }
     }
 
     list backbone-link {
@@ -4796,15 +4791,15 @@ SRC_YANG_2: str = r"""module netinfra {
       leaf right-interface {
         type string;
       }
-      leaf vlan {
-        type uint16 {
-          range "1..4094";
-        }
-        description "VLAN tag for the link";
-      }
 
       container optical {
         description "OTN link parameters";
+        leaf vlan {
+          type uint16 {
+            range "1..4094";
+          }
+          description "VLAN tag for the link";
+        }
         leaf left-roadm {
           type leafref {
             path "/netinfra:netinfra/netinfra:roadm/netinfra:name";
@@ -12956,19 +12951,17 @@ _breaker217: None = None
 class netinfra__netinfra__roadm_entry(yadata.MNode):
     name: str
     id: ?u64
-    role: ?str
 
-    mut def __init__(self, name: str, id: ?u64, role: ?str) -> None:
+    mut def __init__(self, name: str, id: ?u64) -> None:
         self.name = name
         self.id = id
-        self.role = role
 
     mut def to_gdata(self) -> ygdata.Node:
         return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['netinfra:netinfra', 'roadm'])
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> netinfra__netinfra__roadm_entry:
-        return netinfra__netinfra__roadm_entry(name=n.get_str(ygdata.Id(NS_netinfra, 'name')), id=n.get_opt_u64(ygdata.Id(NS_netinfra, 'id')), role=n.get_opt_str(ygdata.Id(NS_netinfra, 'role')))
+        return netinfra__netinfra__roadm_entry(name=n.get_str(ygdata.Id(NS_netinfra, 'name')), id=n.get_opt_u64(ygdata.Id(NS_netinfra, 'id')))
 
     mut def copy(self) -> netinfra__netinfra__roadm_entry:
         """Create a deep copy of this adata object"""
@@ -12979,16 +12972,14 @@ class netinfra__netinfra__roadm(yadata.MKeyedList[str, netinfra__netinfra__roadm
     mut def __init__(self, elements: list[netinfra__netinfra__roadm_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
 
-    mut def create(self, key: str, id: ?u64=None, role: ?str=None) -> netinfra__netinfra__roadm_entry:
+    mut def create(self, key: str, id: ?u64=None) -> netinfra__netinfra__roadm_entry:
         e = self.get(key)
         if e is not None:
             if id is not None:
                 e.id = id
-            if role is not None:
-                e.role = role
             return e
         name = key
-        res = netinfra__netinfra__roadm_entry(name=name, id=id, role=role)
+        res = netinfra__netinfra__roadm_entry(name=name, id=id)
         self.elements.append(res)
         return res
 
@@ -13011,13 +13002,15 @@ class netinfra__netinfra__roadm(yadata.MKeyedList[str, netinfra__netinfra__roadm
 
 _breaker219: None = None
 class netinfra__netinfra__backbone_link__optical(yadata.MNode):
+    vlan: ?u64
     left_roadm: ?str
     right_roadm: ?str
     left_port: ?str
     right_port: ?str
     otn_path: list[str]
 
-    mut def __init__(self, left_roadm: ?str, right_roadm: ?str, left_port: ?str, right_port: ?str, otn_path: ?list[str]=None) -> None:
+    mut def __init__(self, vlan: ?u64, left_roadm: ?str, right_roadm: ?str, left_port: ?str, right_port: ?str, otn_path: ?list[str]=None) -> None:
+        self.vlan = vlan
         self.left_roadm = left_roadm
         self.right_roadm = right_roadm
         self.left_port = left_port
@@ -13030,7 +13023,7 @@ class netinfra__netinfra__backbone_link__optical(yadata.MNode):
     @staticmethod
     mut def from_gdata(n: ?ygdata.Node) -> netinfra__netinfra__backbone_link__optical:
         if n is not None:
-            return netinfra__netinfra__backbone_link__optical(left_roadm=n.get_opt_str(ygdata.Id(NS_netinfra, 'left-roadm')), right_roadm=n.get_opt_str(ygdata.Id(NS_netinfra, 'right-roadm')), left_port=n.get_opt_str(ygdata.Id(NS_netinfra, 'left-port')), right_port=n.get_opt_str(ygdata.Id(NS_netinfra, 'right-port')), otn_path=n.get_opt_strs(ygdata.Id(NS_netinfra, 'otn-path')))
+            return netinfra__netinfra__backbone_link__optical(vlan=n.get_opt_u64(ygdata.Id(NS_netinfra, 'vlan')), left_roadm=n.get_opt_str(ygdata.Id(NS_netinfra, 'left-roadm')), right_roadm=n.get_opt_str(ygdata.Id(NS_netinfra, 'right-roadm')), left_port=n.get_opt_str(ygdata.Id(NS_netinfra, 'left-port')), right_port=n.get_opt_str(ygdata.Id(NS_netinfra, 'right-port')), otn_path=n.get_opt_strs(ygdata.Id(NS_netinfra, 'otn-path')))
         return netinfra__netinfra__backbone_link__optical()
 
     mut def copy(self) -> netinfra__netinfra__backbone_link__optical:
@@ -13044,15 +13037,13 @@ class netinfra__netinfra__backbone_link_entry(yadata.MNode):
     left_interface: str
     right_router: str
     right_interface: str
-    vlan: ?u64
     optical: netinfra__netinfra__backbone_link__optical
 
-    mut def __init__(self, left_router: str, left_interface: str, right_router: str, right_interface: str, vlan: ?u64, optical: ?netinfra__netinfra__backbone_link__optical=None) -> None:
+    mut def __init__(self, left_router: str, left_interface: str, right_router: str, right_interface: str, optical: ?netinfra__netinfra__backbone_link__optical=None) -> None:
         self.left_router = left_router
         self.left_interface = left_interface
         self.right_router = right_router
         self.right_interface = right_interface
-        self.vlan = vlan
         self.optical = optical if optical is not None else netinfra__netinfra__backbone_link__optical()
 
     mut def to_gdata(self) -> ygdata.Node:
@@ -13060,7 +13051,7 @@ class netinfra__netinfra__backbone_link_entry(yadata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> netinfra__netinfra__backbone_link_entry:
-        return netinfra__netinfra__backbone_link_entry(left_router=n.get_str(ygdata.Id(NS_netinfra, 'left-router')), left_interface=n.get_str(ygdata.Id(NS_netinfra, 'left-interface')), right_router=n.get_str(ygdata.Id(NS_netinfra, 'right-router')), right_interface=n.get_str(ygdata.Id(NS_netinfra, 'right-interface')), vlan=n.get_opt_u64(ygdata.Id(NS_netinfra, 'vlan')), optical=netinfra__netinfra__backbone_link__optical.from_gdata(n.get_opt_cnt(ygdata.Id(NS_netinfra, 'optical'))))
+        return netinfra__netinfra__backbone_link_entry(left_router=n.get_str(ygdata.Id(NS_netinfra, 'left-router')), left_interface=n.get_str(ygdata.Id(NS_netinfra, 'left-interface')), right_router=n.get_str(ygdata.Id(NS_netinfra, 'right-router')), right_interface=n.get_str(ygdata.Id(NS_netinfra, 'right-interface')), optical=netinfra__netinfra__backbone_link__optical.from_gdata(n.get_opt_cnt(ygdata.Id(NS_netinfra, 'optical'))))
 
     mut def copy(self) -> netinfra__netinfra__backbone_link_entry:
         """Create a deep copy of this adata object"""
@@ -13071,14 +13062,12 @@ class netinfra__netinfra__backbone_link(yadata.MKeyedList[(left_router: str, lef
     mut def __init__(self, elements: list[netinfra__netinfra__backbone_link_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.left_router == k.left_router and e.left_interface == k.left_interface and e.right_router == k.right_router and e.right_interface == k.right_interface, elements)
 
-    mut def create(self, key: (left_router: str, left_interface: str, right_router: str, right_interface: str), vlan: ?u64=None) -> netinfra__netinfra__backbone_link_entry:
+    mut def create(self, key: (left_router: str, left_interface: str, right_router: str, right_interface: str)) -> netinfra__netinfra__backbone_link_entry:
         e = self.get(key)
         if e is not None:
-            if vlan is not None:
-                e.vlan = vlan
             return e
         (left_router=left_router, left_interface=left_interface, right_router=right_router, right_interface=right_interface) = key
-        res = netinfra__netinfra__backbone_link_entry(left_router=left_router, left_interface=left_interface, right_router=right_router, right_interface=right_interface, vlan=vlan)
+        res = netinfra__netinfra__backbone_link_entry(left_router=left_router, left_interface=left_interface, right_router=right_router, right_interface=right_interface)
         self.elements.append(res)
         return res
 

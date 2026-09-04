@@ -97,13 +97,6 @@ module netinfra-inter {
         description "roadm id";
         mandatory true;
       }
-      leaf role {
-        type string;
-        description "edge or core";
-      }
-      leaf edge-ipv4-address {
-        type inet:ipv4-address;
-      }
     }
 
     list backbone-link {
@@ -123,7 +116,44 @@ module netinfra-inter {
       leaf right-interface {
         type string;
       }
-
+      
+      container optical {
+        description "OTN link parameters";
+        leaf vlan {
+          type uint16 {
+            range "1..4094";
+          }
+          mandatory true;
+          description "VLAN tag for the link";
+        }
+        leaf left-roadm {
+          type leafref {
+            path "/netinfra-inter:netinfra/netinfra-inter:roadm/netinfra-inter:name";
+          }
+          mandatory true;
+        }
+        leaf right-roadm {
+          type leafref {
+            path "/netinfra-inter:netinfra/netinfra-inter:roadm/netinfra-inter:name";
+          }
+          mandatory true;
+        }
+        leaf left-port {
+          type string;
+          mandatory true;
+        }
+        leaf right-port {
+          type string;
+          mandatory true;
+        }
+        leaf-list otn-path {
+          type leafref {
+            path "/netinfra-inter:netinfra/netinfra-inter:roadm/netinfra-inter:name";
+          }
+          ordered-by user;
+          description "OTN path through intermediate ROADMs";
+        }
+      }
 
       container state {
         config false;
@@ -138,42 +168,6 @@ module netinfra-inter {
             enum unknown;
           }
         }
-      }
-    }
-
-    list active-optical-link {
-      key "left-roadm left-port right-roadm right-port";
-
-      sw:transform sorespo.inter.ActiveVlanLink;
-      leaf vlan {
-        type uint16 {
-          range "1..4094";
-        }
-        mandatory true;
-        description "VLAN tag for the link";
-      }
-      leaf left-roadm {
-        type leafref {
-          path "/netinfra-inter:netinfra/netinfra-inter:roadm/netinfra-inter:name";
-        }
-      }
-      leaf right-roadm {
-        type leafref {
-          path "/netinfra-inter:netinfra/netinfra-inter:roadm/netinfra-inter:name";
-        }
-      }
-      leaf left-port {
-        type string;
-      }
-      leaf right-port {
-        type string;
-      }
-      leaf-list otn-path {
-        type leafref {
-          path "/netinfra-inter:netinfra/netinfra-inter:roadm/netinfra-inter:name";
-        }
-        ordered-by user;
-        description "OTN path through intermediate ROADMs";
       }
     }
 

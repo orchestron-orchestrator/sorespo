@@ -57,8 +57,8 @@ def net_from_ip_address(ip_address):
 def _bb_interface_description(remote_device: str, remote_interface: str) -> str:
     return "Link to {remote_device} [{remote_interface}]"
 
-def _vlan_interface_description(remote_device: str, remote_interface: str) -> str:
-    return "OTN link to {remote_device} [{remote_interface}]"
+def _roadm_interface_description(remote_device: str, remote_interface: str) -> str:
+    return "ROADM link to {remote_device} [{remote_interface}]"
 
 def _bridged_vlan_interface_description(remote_device: str, remote_interface: str) -> str:
     return "Active OTN link to {remote_device} [{remote_interface}]"
@@ -750,52 +750,68 @@ actor EbgpCustomerTransform(path, update_oper: proc(?y_2_oper.stratoweave_rfs__r
         _vrf = conf.vrf
         declare()
 
-class IrbInterface(base.IrbInterface):
+# class IrbInterface(base.IrbInterface):
+#     def transform(self, i, di):
+#         if "srl_nokia-system" in di.modules:
+#             dev = srl25.root()
+#             index = dev.interface.create(i.name).subinterface.create(0)
+#             index.ipv4.admin_state = "enable"
+#             index.ipv4.address.create("{i.ipv4_address}/24")
+
+#             ni = dev.network_instance.create("MAC-VRF-VLAN%s" % str(i.vlan), type=srl25.srl_nokia_network_instance_mac_vrf, admin_state="enable")
+#             ni.interface.create("%s.0" % i.name)
+
+#             ni_default = dev.network_instance.create("otn-vlan", type=srl25.srl_nokia_network_instance_ip_vrf, admin_state="enable")
+#             ni_default.interface.create("%s.0" % i.name)
+
+#             return dev
+#         raise UnsupportedDevice()
+
+
+# VLAN interface between ROADMs
+class RoadmVlanInterface(base.RoadmVlanInterface):
     def transform(self, i, di):
-        if "srl_nokia-system" in di.modules:
-            dev = srl25.root()
-            index = dev.interface.create(i.name).subinterface.create(0)
-            index.ipv4.admin_state = "enable"
-            index.ipv4.address.create("{i.ipv4_address}/24")
-
-            ni = dev.network_instance.create("MAC-VRF-VLAN%s" % str(i.vlan), type=srl25.srl_nokia_network_instance_mac_vrf, admin_state="enable")
-            ni.interface.create("%s.0" % i.name)
-
-            ni_default = dev.network_instance.create("otn-vlan", type=srl25.srl_nokia_network_instance_ip_vrf, admin_state="enable")
-            ni_default.interface.create("%s.0" % i.name)
-
-            return dev
-        raise UnsupportedDevice()
-
-
-class VlanInterface(base.VlanInterface):
-    def transform(self, i, di):
-        # TODO: is this transform necessary?
         if "srl_nokia-system" in di.modules:
             print("RFS /rfs{{{di.name}}}/vlan-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}] for Nokia SRLinux", err=True)
             dev = srl25.root()
 
             # Create the interface
             intf = dev.interface.create(i.name)
-            intf.description = _vlan_interface_description(i.remote.device, i.remote.interface)
+            intf.description = _roadm_interface_description(i.remote.device, i.remote.interface)
             intf.admin_state = "enable"
             intf.vlan_tagging = True
 
+            subif = intf.subinterface.create(100, type=srl25.srl_nokia_interfaces_bridged, admin_state="enable")
+            subif.description = _roadm_interface_description(i.remote.device, i.remote.interface)
             return dev
 
         raise UnsupportedDevice()
 
 
-class VlanBridgeInterface(base.VlanBridgeInterface):
+# class VlanBridgeInterface(base.VlanBridgeInterface):
+#     def transform(self, i, di):
+#         if "srl_nokia-system" in di.modules:
+#             dev = srl25.root()
+#             intf = dev.interface.create(i.interface, admin_state="enable", vlan_tagging=True)
+#             subif = intf.subinterface.create(i.vlan, type=srl25.srl_nokia_interfaces_bridged, admin_state="enable")
+#             subif.description = _bridged_vlan_interface_description(i.remote.device, i.remote.interface)
+#             subif.vlan.encap.create_single_tagged().vlan_id = int(i.vlan)
+
+#             ni = dev.network_instance.create("MAC-VRF-VLAN%s" % str(i.vlan), type=srl25.srl_nokia_network_instance_mac_vrf, admin_state="enable")
+#             ni.interface.create("%s.%s" % (i.interface, str(i.vlan)))
+#             return dev
+#         raise UnsupportedDevice()
+
+class RouterFacingRoadmInterface(base.RouterFacingRoadmInterface):
     def transform(self, i, di):
         if "srl_nokia-system" in di.modules:
             dev = srl25.root()
-            intf = dev.interface.create(i.interface, admin_state="enable", vlan_tagging=True)
-            subif = intf.subinterface.create(i.vlan, type=srl25.srl_nokia_interfaces_bridged, admin_state="enable")
-            subif.description = _bridged_vlan_interface_description(i.remote.device, i.remote.interface)
-            subif.vlan.encap.create_single_tagged().vlan_id = int(i.vlan)
+            intf = dev.interface.create(i.interface, admin_state="enable")
+            # subif = intf.subinterface.create(i.vlan, type=srl25.srl_nokia_interfaces_bridged, admin_state="enable")
+            # subif.description = _bridged_vlan_interface_description(i.remote.device, i.remote.interface)
+            # subif.vlan.encap.create_single_tagged().vlan_id = int(i.vlan)
 
-            ni = dev.network_instance.create("MAC-VRF-VLAN%s" % str(i.vlan), type=srl25.srl_nokia_network_instance_mac_vrf, admin_state="enable")
-            ni.interface.create("%s.%s" % (i.interface, str(i.vlan)))
+            # ni = dev.network_instance.create("MAC-VRF-VLAN%s" % str(i.vlan), type=srl25.srl_nokia_network_instance_mac_vrf, admin_state="enable")
+            # ni.interface.create("%s.%s" % (i.interface, str(i.vlan)))
             return dev
         raise UnsupportedDevice()

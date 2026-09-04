@@ -20,9 +20,9 @@ L3VPN BGP-EVPN VXLAN VPN.
                          |                                                                   |                    
                          |ethernet1/3.100                                                    |                    
                       +--+----------------+                          +-------------------+   |                    
-                      |    ams-core-1     |ethernet1/2               |    sto-core-1     |   |                    
-                      |     10.0.0.1      +--------------------------+     10.0.0.3      +---+                    
-                      |  (Nokia SR Linux) |               ethernet1/1|  (Nokia SR Linux) |ethernet1/4.100                
+                      |    ams-core-1     |ethernet1/2    ethernet1/1|    sto-core-1     |   |                    
+                      |     10.0.0.1      +-----[RO1]------[RO2]-----+     10.0.0.3      +---+                    
+                      |  (Nokia SR Linux) |   e1/1 e1/2  e1/1 e1/2   |  (Nokia SR Linux) |ethernet1/4.100                
                       +--+----------------+                          +--+--------------+-+                        
                          |ethernet1/1                                   |ethernet1/2   |ethernet1/3                          
                          |                                              |              |                          
