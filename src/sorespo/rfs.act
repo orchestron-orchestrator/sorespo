@@ -60,6 +60,9 @@ def _bb_interface_description(remote_device: str, remote_interface: str) -> str:
 def _vlan_interface_description(remote_device: str, remote_interface: str) -> str:
     return "OTN link to {remote_device} [{remote_interface}]"
 
+def _bridged_vlan_interface_description(remote_device: str, remote_interface: str) -> str:
+    return "Active OTN link to {remote_device} [{remote_interface}]"
+
 def bb_interface_subscription_owner_id(interface_name: str) -> str:
     return "backbone-interface:{interface_name}"
 
@@ -789,4 +792,19 @@ class VlanInterface(base.VlanInterface):
 
             return dev
 
+        raise UnsupportedDevice()
+
+
+class VlanBridgeInterface(base.VlanBridgeInterface):
+    def transform(self, i, di):
+        if "srl_nokia-system" in di.modules:
+            dev = srl25.root()
+            intf = dev.interface.create(i.interface, admin_state="enable", vlan_tagging=True)
+            subif = intf.subinterface.create(i.vlan, type=srl25.srl_nokia_interfaces_bridged, admin_state="enable")
+            subif.description = _bridged_vlan_interface_description(i.remote.device, i.remote.interface)
+            subif.vlan.encap.create_single_tagged().vlan_id = int(i.vlan)
+
+            ni = dev.network_instance.create("MAC-VRF-VLAN%s" % str(i.vlan), type=srl25.srl_nokia_network_instance_mac_vrf, admin_state="enable")
+            ni.interface.create("%s.%s" % (i.interface, str(i.vlan)))
+            return dev
         raise UnsupportedDevice()

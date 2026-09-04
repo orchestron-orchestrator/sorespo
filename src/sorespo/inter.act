@@ -267,15 +267,17 @@ class OpticalLink(base.OpticalLink):
 class ActiveVlanLink(base.ActiveVlanLink):
     def transform(self, i):
         o = base.o_root()
-        # print("CFS ActiveVlanLink transform running %s [%s] <-> %s [%s]" % (i.left_roadm, i.left_port, i.right_roadm, i.right_port))
+        print("CFS ActiveVlanLink transform running %s [%s] <-> %s [%s]" % (i.left_roadm, i.left_port, i.right_roadm, i.right_port))
 
-        # left_rfs = o.rfs.create(i.left_roadm)
-        # li = left_rfs.vlan_interface.create(i.left_port)
-        # li.remote.device = i.right_roadm
-        # li.remote.interface = i.right_port
+        left_rfs = o.rfs.create(i.left_roadm)
+        li = left_rfs.bridged_vlan.create(i.left_port)
+        li.vlan = i.vlan
+        li.remote.device = i.right_roadm
+        li.remote.interface = i.right_port
 
-        # right_rfs = o.rfs.create(i.right_roadm)
-        # ri = right_rfs.vlan_interface.create(i.right_port)
-        # ri.remote.device = i.left_roadm
-        # ri.remote.interface = i.left_port
+        right_rfs = o.rfs.create(i.right_roadm)
+        ri = right_rfs.bridged_vlan.create(i.right_port)
+        ri.vlan = i.vlan
+        ri.remote.device = i.left_roadm
+        ri.remote.interface = i.left_port
         return o

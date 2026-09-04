@@ -566,14 +566,16 @@ class srl_nokia_interfaces__interface__subinterface__vlan(yadata.MNode):
 _breaker10: None = None
 class srl_nokia_interfaces__interface__subinterface_entry(yadata.MNode):
     index: u64
+    type: ?Identityref
     description: ?str
     admin_state: ?str
     ipv4: srl_nokia_interfaces__interface__subinterface__ipv4
     ipv6: srl_nokia_interfaces__interface__subinterface__ipv6
     vlan: srl_nokia_interfaces__interface__subinterface__vlan
 
-    mut def __init__(self, index: u64, description: ?str, admin_state: ?str, ipv4: ?srl_nokia_interfaces__interface__subinterface__ipv4=None, ipv6: ?srl_nokia_interfaces__interface__subinterface__ipv6=None, vlan: ?srl_nokia_interfaces__interface__subinterface__vlan=None) -> None:
+    mut def __init__(self, index: u64, type: ?Identityref, description: ?str, admin_state: ?str, ipv4: ?srl_nokia_interfaces__interface__subinterface__ipv4=None, ipv6: ?srl_nokia_interfaces__interface__subinterface__ipv6=None, vlan: ?srl_nokia_interfaces__interface__subinterface__vlan=None) -> None:
         self.index = index
+        self.type = type
         self.description = description
         self.admin_state = admin_state
         self.ipv4 = ipv4 if ipv4 is not None else srl_nokia_interfaces__interface__subinterface__ipv4()
@@ -585,7 +587,7 @@ class srl_nokia_interfaces__interface__subinterface_entry(yadata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> srl_nokia_interfaces__interface__subinterface_entry:
-        return srl_nokia_interfaces__interface__subinterface_entry(index=n.get_u64(ygdata.Id(NS_srl_nokia_interfaces, 'index')), description=n.get_opt_str(ygdata.Id(NS_srl_nokia_interfaces, 'description')), admin_state=n.get_opt_str(ygdata.Id(NS_srl_nokia_interfaces, 'admin-state')), ipv4=srl_nokia_interfaces__interface__subinterface__ipv4.from_gdata(n.get_opt_cnt(ygdata.Id(NS_srl_nokia_interfaces, 'ipv4'))), ipv6=srl_nokia_interfaces__interface__subinterface__ipv6.from_gdata(n.get_opt_cnt(ygdata.Id(NS_srl_nokia_interfaces, 'ipv6'))), vlan=srl_nokia_interfaces__interface__subinterface__vlan.from_gdata(n.get_opt_cnt(ygdata.Id(NS_srl_nokia_interfaces_vlans, 'vlan'))))
+        return srl_nokia_interfaces__interface__subinterface_entry(index=n.get_u64(ygdata.Id(NS_srl_nokia_interfaces, 'index')), type=n.get_opt_Identityref(ygdata.Id(NS_srl_nokia_interfaces, 'type')), description=n.get_opt_str(ygdata.Id(NS_srl_nokia_interfaces, 'description')), admin_state=n.get_opt_str(ygdata.Id(NS_srl_nokia_interfaces, 'admin-state')), ipv4=srl_nokia_interfaces__interface__subinterface__ipv4.from_gdata(n.get_opt_cnt(ygdata.Id(NS_srl_nokia_interfaces, 'ipv4'))), ipv6=srl_nokia_interfaces__interface__subinterface__ipv6.from_gdata(n.get_opt_cnt(ygdata.Id(NS_srl_nokia_interfaces, 'ipv6'))), vlan=srl_nokia_interfaces__interface__subinterface__vlan.from_gdata(n.get_opt_cnt(ygdata.Id(NS_srl_nokia_interfaces_vlans, 'vlan'))))
 
     mut def copy(self) -> srl_nokia_interfaces__interface__subinterface_entry:
         """Create a deep copy of this adata object"""
@@ -596,16 +598,18 @@ class srl_nokia_interfaces__interface__subinterface(yadata.MKeyedList[u64, srl_n
     mut def __init__(self, elements: list[srl_nokia_interfaces__interface__subinterface_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.index == k, elements)
 
-    mut def create(self, key: u64, description: ?str=None, admin_state: ?str=None) -> srl_nokia_interfaces__interface__subinterface_entry:
+    mut def create(self, key: u64, type: ?Identityref=None, description: ?str=None, admin_state: ?str=None) -> srl_nokia_interfaces__interface__subinterface_entry:
         e = self.get(key)
         if e is not None:
+            if type is not None:
+                e.type = type
             if description is not None:
                 e.description = description
             if admin_state is not None:
                 e.admin_state = admin_state
             return e
         index = key
-        res = srl_nokia_interfaces__interface__subinterface_entry(index=index, description=description, admin_state=admin_state)
+        res = srl_nokia_interfaces__interface__subinterface_entry(index=index, type=type, description=description, admin_state=admin_state)
         self.elements.append(res)
         return res
 

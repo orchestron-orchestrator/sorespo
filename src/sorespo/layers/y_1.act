@@ -76,7 +76,7 @@ SRC_DNODE_CHILD_4: DList = DList(module='netinfra-inter', namespace='http://exam
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='left-port', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='right-roadm', config=True, mandatory=False, type=DTypeLeafref(name='leafref', description=None, reference=None, exts=[], builtin_type='leafref', default=None, path=yxpath.AbsoluteLocationPath([yxpath.NodeTestStep('netinfra-inter', 'netinfra', []), yxpath.NodeTestStep('netinfra-inter', 'roadm', []), yxpath.NodeTestStep('netinfra-inter', 'name', [])]), require_instance=False, target_type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))),
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='right-port', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
-    DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='vlan', config=True, description='VLAN tag for the link', mandatory=False, type=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(1, 4094)]))),
+    DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='vlan', config=True, description='VLAN tag for the link', mandatory=True, type=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(1, 4094)]))),
     DLeafList(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='otn-path', config=True, description='OTN path through intermediate ROADMs', min_elements=0, ordered_by='user', type=DTypeLeafref(name='leafref', description=None, reference=None, exts=[], builtin_type='leafref', default=None, path=yxpath.AbsoluteLocationPath([yxpath.NodeTestStep('netinfra-inter', 'netinfra', []), yxpath.NodeTestStep('netinfra-inter', 'roadm', []), yxpath.NodeTestStep('netinfra-inter', 'name', [])]), require_instance=False, target_type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])))
 ])
 
@@ -383,6 +383,7 @@ SRC_YANG_1: str = r"""module netinfra-inter {
         type uint16 {
           range "1..4094";
         }
+        mandatory true;
         description "VLAN tag for the link";
       }
       leaf left-roadm {
@@ -1287,10 +1288,10 @@ class netinfra_inter__netinfra__active_optical_link_entry(yadata.MNode):
     left_port: str
     right_roadm: str
     right_port: str
-    vlan: ?u64
+    vlan: u64
     otn_path: list[str]
 
-    mut def __init__(self, left_roadm: str, left_port: str, right_roadm: str, right_port: str, vlan: ?u64, otn_path: ?list[str]=None) -> None:
+    mut def __init__(self, left_roadm: str, left_port: str, right_roadm: str, right_port: str, vlan: u64, otn_path: ?list[str]=None) -> None:
         self.left_roadm = left_roadm
         self.left_port = left_port
         self.right_roadm = right_roadm
@@ -1303,7 +1304,7 @@ class netinfra_inter__netinfra__active_optical_link_entry(yadata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> netinfra_inter__netinfra__active_optical_link_entry:
-        return netinfra_inter__netinfra__active_optical_link_entry(left_roadm=n.get_str(ygdata.Id(NS_netinfra_inter, 'left-roadm')), left_port=n.get_str(ygdata.Id(NS_netinfra_inter, 'left-port')), right_roadm=n.get_str(ygdata.Id(NS_netinfra_inter, 'right-roadm')), right_port=n.get_str(ygdata.Id(NS_netinfra_inter, 'right-port')), vlan=n.get_opt_u64(ygdata.Id(NS_netinfra_inter, 'vlan')), otn_path=n.get_opt_strs(ygdata.Id(NS_netinfra_inter, 'otn-path')))
+        return netinfra_inter__netinfra__active_optical_link_entry(left_roadm=n.get_str(ygdata.Id(NS_netinfra_inter, 'left-roadm')), left_port=n.get_str(ygdata.Id(NS_netinfra_inter, 'left-port')), right_roadm=n.get_str(ygdata.Id(NS_netinfra_inter, 'right-roadm')), right_port=n.get_str(ygdata.Id(NS_netinfra_inter, 'right-port')), vlan=n.get_u64(ygdata.Id(NS_netinfra_inter, 'vlan')), otn_path=n.get_opt_strs(ygdata.Id(NS_netinfra_inter, 'otn-path')))
 
     mut def copy(self) -> netinfra_inter__netinfra__active_optical_link_entry:
         """Create a deep copy of this adata object"""
@@ -1314,11 +1315,10 @@ class netinfra_inter__netinfra__active_optical_link(yadata.MKeyedList[(left_road
     mut def __init__(self, elements: list[netinfra_inter__netinfra__active_optical_link_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.left_roadm == k.left_roadm and e.left_port == k.left_port and e.right_roadm == k.right_roadm and e.right_port == k.right_port, elements)
 
-    mut def create(self, key: (left_roadm: str, left_port: str, right_roadm: str, right_port: str), vlan: ?u64=None) -> netinfra_inter__netinfra__active_optical_link_entry:
+    mut def create(self, key: (left_roadm: str, left_port: str, right_roadm: str, right_port: str), vlan: u64) -> netinfra_inter__netinfra__active_optical_link_entry:
         e = self.get(key)
         if e is not None:
-            if vlan is not None:
-                e.vlan = vlan
+            e.vlan = vlan
             return e
         (left_roadm=left_roadm, left_port=left_port, right_roadm=right_roadm, right_port=right_port) = key
         res = netinfra_inter__netinfra__active_optical_link_entry(left_roadm=left_roadm, left_port=left_port, right_roadm=right_roadm, right_port=right_port, vlan=vlan)
