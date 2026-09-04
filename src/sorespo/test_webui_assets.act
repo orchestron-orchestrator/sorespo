@@ -1,0 +1,21 @@
+import testing
+
+import sorespo.webui_assets as webui_assets
+
+
+def _test_webui_assets_decode():
+    # Decodes every embedded asset, so any base64/escaping corruption fails
+    # here instead of at orchestrator startup.
+    a = webui_assets.assets()
+    count = len(a)
+    testing.assertTrue(count > 40, "expected the full asset set, got {count} entries")
+
+    index_body = a.get("/index.html")
+    if index_body is not None:
+        testing.assertTrue(index_body.lower().startswith("<!doctype html>"), "index must be the SPA entry page")
+    else:
+        raise ValueError("missing /index.html in embedded assets")
+
+    for path, body in a.items():
+        testing.assertTrue(len(body) > 0, "empty embedded asset: " + path)
+        testing.assertTrue(path.startswith("/"), "asset path must be absolute: " + path)

@@ -4,7 +4,7 @@ import { createDemoFetch } from '$lib/demo/handlers';
 
 /**
  * Non-null only in demo builds (PUBLIC_DEMO=1): a fetch-compatible function
- * that answers every /api/* request from the in-memory demo dataset. The
+ * that answers every backend API request from the in-memory demo dataset. The
  * data clients use `(demoFetch ?? fetchFn)` so the mock also wins over the
  * SvelteKit load `fetch` passed in by route loaders.
  *

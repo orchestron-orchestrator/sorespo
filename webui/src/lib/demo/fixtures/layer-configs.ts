@@ -4,7 +4,7 @@ import {
   deviceConfigXml
 } from '$lib/demo/fixtures/device-configs';
 
-// Blobs for /api/layer/{0..3}: the CFS → Intermediate → RFS → Device
+// Blobs for /layer/{0..3}: the CFS → Intermediate → RFS → Device
 // transformation chain. Layer 0 (JSON) and layer 3 are rendered live from the
 // demo state so edits show up when re-inspecting; the intermediate layers are
 // representative static content.

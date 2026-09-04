@@ -1,8 +1,8 @@
-import type { RestconfRequestOptions } from '$lib/core/restconf/proxy-types';
+import type { RestconfRequestOptions } from '$lib/core/restconf/types';
 
 import { demoFetch } from '$lib/demo/gate';
 
-const RESTCONF_BASE = '/api/restconf';
+const RESTCONF_BASE = '/restconf';
 // Synchronous RESTCONF writes wait for device application, which cannot finish
 // while an approval-required change is pending in the configuration queue.
 const ASYNC_WRITE_HEADERS = { async: 'true' } as const;
@@ -14,8 +14,9 @@ function normalizePath(path: string): string {
 }
 
 function encodeListKeyPart(value: string): string {
-  // The /api proxy forwards the raw request path, so list keys need exactly
-  // the single percent-encoding RFC 8040 prescribes.
+  // The raw request path reaches the backend without decoding (both when the
+  // UI is served by the sorespo binary and through the vite dev proxy), so
+  // list keys need exactly the single percent-encoding RFC 8040 prescribes.
   return encodeURIComponent(value.trim());
 }
 

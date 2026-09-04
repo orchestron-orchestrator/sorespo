@@ -26,8 +26,8 @@ import {
   type DemoState
 } from '$lib/demo/state';
 
-// A fetch-compatible request handler that answers every /api/* call the UI
-// makes from the in-memory demo state. Anything unrecognized gets a 404 so
+// A fetch-compatible request handler that answers every backend API call the
+// UI makes from the in-memory demo state. Anything unrecognized gets a 404 so
 // new call sites fail loudly instead of silently rendering nothing.
 
 const RESPONSE_DELAY_MS = 90;
@@ -241,7 +241,7 @@ function upsertSite(list: Record<string, any>[], entry: Record<string, any>): vo
   upsertListEntry(list, 'site-id', next);
 }
 
-// ── the RESTCONF branch (/api/restconf/...) ──
+// ── the RESTCONF branch (/restconf/...) ──
 
 async function handleRestconf(
   segments: string[],
@@ -449,7 +449,7 @@ function applyCfsPayload(init: RequestInit | undefined): void {
   }
 }
 
-// ── the orchestrator branch (/api/...) ──
+// ── the orchestrator branch ──
 
 function deviceInfo(state: DemoState, name: string): Record<string, unknown> | null {
   const device = state.devices[name];
@@ -610,17 +610,15 @@ export function createDemoFetch(): typeof fetch {
 
     await delay();
 
-    if (url.pathname.startsWith('/api/restconf/')) {
-      const segments = url.pathname.slice('/api/restconf/'.length).split('/').filter(Boolean);
+    if (url.pathname.startsWith('/restconf/')) {
+      const segments = url.pathname.slice('/restconf/'.length).split('/').filter(Boolean);
       return handleRestconf(segments, method, init, url.searchParams);
     }
 
-    if (url.pathname.startsWith('/api/')) {
-      const segments = url.pathname.slice('/api/'.length).split('/').filter(Boolean);
-      return handleOrchestron(segments, method, init, url.searchParams, acceptHeader);
-    }
-
-    return notFound(`the demo only serves /api paths, got ${url.pathname}`);
+    // Everything else is an orchestrator API path; handleOrchestron 404s
+    // unknown segments loudly.
+    const segments = url.pathname.split('/').filter(Boolean);
+    return handleOrchestron(segments, method, init, url.searchParams, acceptHeader);
   }) as typeof fetch;
 
   return demoFetch;
