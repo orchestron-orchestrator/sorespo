@@ -754,16 +754,15 @@ class IrbInterface(base.IrbInterface):
     def transform(self, i, di):
         if "srl_nokia-system" in di.modules:
             dev = srl25.root()
-            # Add dynamically the "10"
-            index = dev.interface.create(i.name).subinterface.create(10)
+            index = dev.interface.create(i.name).subinterface.create(0)
             index.ipv4.admin_state = "enable"
             index.ipv4.address.create("{i.ipv4_address}/24")
 
-            ni = dev.network_instance.create("MAC-VRF-VLAN10", type=srl25.srl_nokia_network_instance_mac_vrf, admin_state="enable")
-            ni.interface.create("%s.10" % i.name)
+            ni = dev.network_instance.create("MAC-VRF-VLAN%s" % str(i.vlan), type=srl25.srl_nokia_network_instance_mac_vrf, admin_state="enable")
+            ni.interface.create("%s.0" % i.name)
 
             ni_default = dev.network_instance.create("otn-vlan", type=srl25.srl_nokia_network_instance_ip_vrf, admin_state="enable")
-            ni_default.interface.create("%s.10" % i.name)
+            ni_default.interface.create("%s.0" % i.name)
 
             return dev
         raise UnsupportedDevice()
@@ -771,24 +770,16 @@ class IrbInterface(base.IrbInterface):
 
 class VlanInterface(base.VlanInterface):
     def transform(self, i, di):
-        print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}]", err=True)
-        if_description = _vlan_interface_description(i.remote.device, i.remote.interface)
-
+        # TODO: is this transform necessary?
         if "srl_nokia-system" in di.modules:
-            print("RFS /rfs{{{di.name}}}/backbone-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}] for Nokia SRLinux", err=True)
+            print("RFS /rfs{{{di.name}}}/vlan-interface transform running [{i.name}] <-> {i.remote.device} [{i.remote.interface}] for Nokia SRLinux", err=True)
             dev = srl25.root()
 
             # Create the interface
             intf = dev.interface.create(i.name)
-            intf.description = if_description
+            intf.description = _vlan_interface_description(i.remote.device, i.remote.interface)
             intf.admin_state = "enable"
             intf.vlan_tagging = True
-
-            # subif = intf.subinterface.create(1, description=if_description, admin_state="enable")
-
-            # Only create vrf on edge routers
-            # ni = dev.network_instance.create("otn-vlan")
-            # ni.interface.create("%s.1" % i.name)
 
             return dev
 

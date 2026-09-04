@@ -138,7 +138,7 @@ SRC_DNODE_CHILD_21: DList = DList(module='sorespo-rfs', namespace='http://exampl
     ], children=[
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='name', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ipv4-address', config=True, mandatory=False, type=DTypeString(name='inet:ipv4-address', description='The ipv4-address type represents an IPv4 address in\ndotted-quad notation.  The IPv4 address may include a zone\nindex, separated by a % sign.\n\nThe zone index is used to disambiguate identical address\nvalues.  For link-local addresses, the zone index will\ntypically be the interface index number or the name of an\ninterface.  If the zone index is not present, the default\nzone of the device will be used.\n\nThe canonical format for the zone index is the numerical\nformat', reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(%[\\p{{N}}\\p{{L}}]+)?', pcre='^((([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){{3}}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(%[\\p{{N}}\\p{{L}}]+)?)$', invert=False)])),
-    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='vlan-vrf', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
+    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='vlan', config=True, mandatory=False, type=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(1, 4094)]))),
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='default-vrf', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
 ])
 
@@ -293,8 +293,10 @@ SRC_YANG_0: str = r"""module sorespo-rfs {
           leaf ipv4-address {
             type inet:ipv4-address;
           }
-          leaf vlan-vrf {
-            type string;
+          leaf vlan {
+            type uint16 {
+              range "1..4094";
+            }
           }
           leaf default-vrf {
             type string;
@@ -2843,13 +2845,13 @@ _breaker27: None = None
 class stratoweave_rfs__rfs__irb_interface_entry(yadata.MNode):
     name: str
     ipv4_address: ?str
-    vlan_vrf: ?str
+    vlan: ?u64
     default_vrf: ?str
 
-    mut def __init__(self, name: str, ipv4_address: ?str, vlan_vrf: ?str, default_vrf: ?str) -> None:
+    mut def __init__(self, name: str, ipv4_address: ?str, vlan: ?u64, default_vrf: ?str) -> None:
         self.name = name
         self.ipv4_address = ipv4_address
-        self.vlan_vrf = vlan_vrf
+        self.vlan = vlan
         self.default_vrf = default_vrf
 
     mut def to_gdata(self) -> ygdata.Node:
@@ -2857,7 +2859,7 @@ class stratoweave_rfs__rfs__irb_interface_entry(yadata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> stratoweave_rfs__rfs__irb_interface_entry:
-        return stratoweave_rfs__rfs__irb_interface_entry(name=n.get_str(ygdata.Id(NS_sorespo_rfs, 'name')), ipv4_address=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'ipv4-address')), vlan_vrf=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'vlan-vrf')), default_vrf=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'default-vrf')))
+        return stratoweave_rfs__rfs__irb_interface_entry(name=n.get_str(ygdata.Id(NS_sorespo_rfs, 'name')), ipv4_address=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'ipv4-address')), vlan=n.get_opt_u64(ygdata.Id(NS_sorespo_rfs, 'vlan')), default_vrf=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'default-vrf')))
 
     mut def copy(self) -> stratoweave_rfs__rfs__irb_interface_entry:
         """Create a deep copy of this adata object"""
@@ -2868,18 +2870,18 @@ class stratoweave_rfs__rfs__irb_interface(yadata.MKeyedList[str, stratoweave_rfs
     mut def __init__(self, elements: list[stratoweave_rfs__rfs__irb_interface_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
 
-    mut def create(self, key: str, ipv4_address: ?str=None, vlan_vrf: ?str=None, default_vrf: ?str=None) -> stratoweave_rfs__rfs__irb_interface_entry:
+    mut def create(self, key: str, ipv4_address: ?str=None, vlan: ?u64=None, default_vrf: ?str=None) -> stratoweave_rfs__rfs__irb_interface_entry:
         e = self.get(key)
         if e is not None:
             if ipv4_address is not None:
                 e.ipv4_address = ipv4_address
-            if vlan_vrf is not None:
-                e.vlan_vrf = vlan_vrf
+            if vlan is not None:
+                e.vlan = vlan
             if default_vrf is not None:
                 e.default_vrf = default_vrf
             return e
         name = key
-        res = stratoweave_rfs__rfs__irb_interface_entry(name=name, ipv4_address=ipv4_address, vlan_vrf=vlan_vrf, default_vrf=default_vrf)
+        res = stratoweave_rfs__rfs__irb_interface_entry(name=name, ipv4_address=ipv4_address, vlan=vlan, default_vrf=default_vrf)
         self.elements.append(res)
         return res
 
@@ -4067,31 +4069,31 @@ _breaker77: None = None
 class stratoweave_rfs__rfs__irb_interface_entry_subs(SubscriptionNode):
     name: SubscriptionNode
     ipv4_address: SubscriptionNode
-    vlan_vrf: SubscriptionNode
+    vlan: SubscriptionNode
     default_vrf: SubscriptionNode
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
         self.name = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'name'), parent=path))
         self.ipv4_address = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'ipv4-address'), parent=path))
-        self.vlan_vrf = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'vlan-vrf'), parent=path))
+        self.vlan = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'vlan'), parent=path))
         self.default_vrf = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'default-vrf'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.name, self.ipv4_address, self.vlan_vrf, self.default_vrf]
+        direct: list[SubscriptionNode] = [self.name, self.ipv4_address, self.vlan, self.default_vrf]
         return direct
 
 _breaker78: None = None
 class stratoweave_rfs__rfs__irb_interface_subs(SubscriptionNode):
     name: SubscriptionNode
     ipv4_address: SubscriptionNode
-    vlan_vrf: SubscriptionNode
+    vlan: SubscriptionNode
     default_vrf: SubscriptionNode
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
         self.name = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'name'), parent=path))
         self.ipv4_address = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'ipv4-address'), parent=path))
-        self.vlan_vrf = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'vlan-vrf'), parent=path))
+        self.vlan = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'vlan'), parent=path))
         self.default_vrf = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'default-vrf'), parent=path))
 
     pure def entry(self, name: str) -> stratoweave_rfs__rfs__irb_interface_entry_subs:
@@ -4102,7 +4104,7 @@ class stratoweave_rfs__rfs__irb_interface_subs(SubscriptionNode):
         return stratoweave_rfs__rfs__irb_interface_entry_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'irb-interface'), predicates=predicates, parent=base_path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.name, self.ipv4_address, self.vlan_vrf, self.default_vrf]
+        direct: list[SubscriptionNode] = [self.name, self.ipv4_address, self.vlan, self.default_vrf]
         return direct
 
 _breaker79: None = None
