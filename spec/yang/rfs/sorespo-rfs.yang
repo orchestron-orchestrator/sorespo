@@ -43,9 +43,10 @@ module sorespo-rfs {
             }
         }
 
-        list roadm-vlan-interface {
+        list roadm-roadm-interface {
           key name;
-          sw:rfs-transform sorespo.rfs.RoadmVlanInterface;
+          sw:rfs-transform sorespo.rfs.RoadmRoadmInterface;
+          description "ROADM to ROADM interfaces";
           leaf name {
               type string;
           }
@@ -64,14 +65,9 @@ module sorespo-rfs {
         list router-facing-roadm-interface {
           key interface;
           sw:rfs-transform sorespo.rfs.RouterFacingRoadmInterface;
+          description "ROADM to router interfaces";
           leaf interface {
               type string;
-          }
-          leaf vlan {
-            type uint16 {
-              range "1..4094";
-            }
-            mandatory true;
           }
           container remote {
               leaf router {
@@ -84,6 +80,22 @@ module sorespo-rfs {
               }
           }
         }
+        list roadm-vlan {
+          key interface;
+          sw:rfs-transform sorespo.rfs.RoadmSubifaceVlan;
+          description "vlans";
+          leaf interface {
+            type string;
+            mandatory true;
+          }
+          leaf vlan {
+            type uint16 {
+              range "1..4094";
+            }
+            mandatory true;
+          }
+        }
+
         list backbone-interface {
             key name;
 

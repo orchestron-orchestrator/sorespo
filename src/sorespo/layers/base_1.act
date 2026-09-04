@@ -75,7 +75,7 @@ class ROADM(ttt.TransformFunction):
         return self.transform(modeled_input).to_gdata(), None
 
 class BBLink(ttt.TransformFunction):
-    transform: mut(netinfra_inter__netinfra__backbone_link_entry) -> yadata.MNode
+    transform: mut(netinfra_inter__netinfra__backbone_link_entry, linked: ygdata.Node) -> yadata.MNode
 
     @staticmethod
     def input_type():
@@ -98,7 +98,7 @@ class BBLink(ttt.TransformFunction):
         """
         modeled_input = netinfra_inter__netinfra__backbone_link_entry.from_gdata(i)
 
-        return self.transform(modeled_input).to_gdata(), None
+        return self.transform(modeled_input, linked).to_gdata(), None
 
     mut def transform_xml(self, i: xml.Node, linked: ygdata.Node, memory: ?ygdata.Node, dynstate: ?ygdata.Node) -> (ygdata.Node, ?ygdata.Node):
         """Wrap the user provided transform method to convert from XML to
@@ -107,7 +107,7 @@ class BBLink(ttt.TransformFunction):
         gdata_input = yxml.from_xml(SRC_DNODE, i, loose=False, root_path=['netinfra-inter:netinfra', 'backbone-link'])
         modeled_input = netinfra_inter__netinfra__backbone_link_entry.from_gdata(gdata_input)
 
-        return self.transform(modeled_input).to_gdata(), None
+        return self.transform(modeled_input, linked).to_gdata(), None
 
 class OpticalLink(ttt.TransformFunction):
     transform: mut(netinfra_inter__netinfra__optical_link_entry) -> yadata.MNode

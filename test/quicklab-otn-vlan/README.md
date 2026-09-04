@@ -1,4 +1,4 @@
-# Quicklab SRL
+# Quicklab OTN VLAN simulation
 
 This lab contains four core routers. All of the routers run Nokia SR Linux.
 

@@ -55,7 +55,8 @@ SRC_DNODE_CHILD_3: DList = DList(module='netinfra-inter', namespace='http://exam
 'right-router',
 'right-interface'
     ], config=True, min_elements=0, ordered_by='system', exts=[
-        DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='transform', arg='sorespo.inter.BBLink', exts=[])
+        DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='transform', arg='sorespo.inter.BBLink', exts=[]),
+        DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='link', arg='optical-link', exts=[DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='path', arg='/netinfra-inter:netinfra/netinfra-inter:optical-link', exts=[])])
     ], children=[
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='left-router', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DLeaf(module='netinfra-inter', namespace='http://example.com/netinfra-inter', prefix='netinfra-inter', name='left-interface', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
@@ -341,6 +342,9 @@ SRC_YANG_1: str = r"""module netinfra-inter {
       key "left-router left-interface right-router right-interface";
 
       sw:transform sorespo.inter.BBLink;
+      sw:link optical-link {
+          sw:path /netinfra-inter:netinfra/netinfra-inter:optical-link;
+      }
 
       leaf left-router {
         type string;

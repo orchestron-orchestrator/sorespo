@@ -57,7 +57,8 @@ def combine_link_status(left: ?str, right: ?str) -> ?str:
 
 
 class BBLink(base.BBLink):
-    def transform(self, i):
+    # TODO: Bug here, when added linkedInput, does not execute anymore
+    def transform(self, i, linked):
         print("Intermediate backbonelink transform running %s [%s] <-> %s [%s]" % (i.left_router, i.left_interface, i.right_router, i.right_interface))
         o = base.o_root()
         link_id = letter_position(i.left_router[0]) + letter_position(i.right_router[0])
@@ -74,15 +75,26 @@ class BBLink(base.BBLink):
         if i.optical is not None:
             left_roadm_rfs = o.rfs.create(i.optical.left_roadm)
             lri = left_roadm_rfs.router_facing_roadm_interface.create(i.optical.left_port)
-            lri.vlan = i.optical.vlan
             lri.remote.router = i.left_router
             lri.remote.interface = i.left_interface
 
             right_roadm_rfs = o.rfs.create(i.optical.right_roadm)
             rri = right_roadm_rfs.router_facing_roadm_interface.create(i.optical.right_port)
-            rri.vlan = i.optical.vlan
             rri.remote.router = i.right_router
             rri.remote.interface = i.right_interface
+
+            links = y_1.root.from_gdata(linked).netinfra.optical_link
+            # TODO: based on len(otn-path)
+            for link in links:
+                # TODO: need testing
+                print("Linkkkk %s" % link.left_roadm)
+                # TODO: check also (left=right and right=left)?
+                if i.optical.left_roadm == link.left_roadm and i.optical.right_roadm == link.right_roadm:
+                    lor_rfs = o.rfs.create(i.optical.left_roadm)
+                    lor_rfs.roadm_vlan.create(link.left_port, vlan=i.optical.vlan)
+
+                    ror_rfs = o.rfs.create(i.optical.right_roadm)
+                    ror_rfs.roadm_vlan.create(link.right_port, vlan=i.optical.vlan)
         return o
 
 
@@ -260,33 +272,13 @@ class OpticalLink(base.OpticalLink):
         print("CFS OpticalLink transform running %s [%s] <-> %s [%s]" % (i.left_roadm, i.left_port, i.right_roadm, i.right_port))
 
         left_rfs = o.rfs.create(i.left_roadm)
-        li = left_rfs.roadm_vlan_interface.create(i.left_port)
+        li = left_rfs.roadm_roadm_interface.create(i.left_port)
         li.remote.device = i.right_roadm
         li.remote.interface = i.right_port
 
         right_rfs = o.rfs.create(i.right_roadm)
-        ri = right_rfs.roadm_vlan_interface.create(i.right_port)
+        ri = right_rfs.roadm_roadm_interface.create(i.right_port)
         ri.remote.device = i.left_roadm
         ri.remote.interface = i.left_port
         return o
 
-
-# class ActiveVlanLink(base.ActiveVlanLink):
-#     def transform(self, i):
-#         o = base.o_root()
-#         print("CFS ActiveVlanLink transform running %s [%s] <-> %s [%s]" % (i.left_roadm, i.left_port, i.right_roadm, i.right_port))
-#         print("TODO: should pass through otn path")
-#         print(i.otn_path)
-
-#         left_rfs = o.rfs.create(i.left_roadm)
-#         li = left_rfs.bridged_vlan.create(i.left_port)
-#         li.vlan = i.vlan
-#         li.remote.device = i.right_roadm
-#         li.remote.interface = i.right_port
-
-#         right_rfs = o.rfs.create(i.right_roadm)
-#         ri = right_rfs.bridged_vlan.create(i.right_port)
-#         ri.vlan = i.vlan
-#         ri.remote.device = i.left_roadm
-#         ri.remote.interface = i.left_port
-#         return o

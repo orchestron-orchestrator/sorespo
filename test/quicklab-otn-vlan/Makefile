@@ -1,6 +1,6 @@
 TESTENV=sorespo-quicklab-otn-vlan
 
-ROUTERS_SRL=sto-core-1 lju-core-1 ams-core-1 fra-core-1
+ROUTERS_SRL=sto-core-1 lju-core-1 ams-core-1 fra-core-1 roadm-1 roadm-2
 ROUTERS_FRR=cust-1 cust-2 cust-3 cust-4
 
 include ../common/clab.mk
@@ -58,3 +58,4 @@ otn-copy:
 .PHONY: otn-run-and-configure
 otn-run-and-configure:
 	docker exec $(INTERACTIVE) $(TESTENV)-sweave /sorespo $(EXIT_ON_DONE) netinfra.xml --rts-bt-dbg
+# 	docker exec $(INTERACTIVE) $(TESTENV)-sweave /sorespo $(EXIT_ON_DONE) netinfra.xml --rts-bt-dbg > logs/clab-deploy.log 2>&1
