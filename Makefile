@@ -42,6 +42,13 @@ gen:
 gen-ldep:
 	$(MAKE) gen DEP_OVERRIDES="--dep netconf=../../netconf --dep stratoweave=../../stratoweave --dep yang=../../acton-yang --dep tmf=../../actmf --dep http_router=../../http-router"
 
+# Rebuild the web UI and regenerate the embedded-assets module
+# (src/sorespo/webui_assets.act, committed). Requires bun.
+.PHONY: gen-webui
+gen-webui:
+	rm -rf webui/build
+	cd webui && bun install --frozen-lockfile && bun run check && bun run build && bun scripts/gen-embedded-assets.mjs
+
 .PHONY: pkg-upgrade
 pkg-upgrade:
 	acton pkg upgrade

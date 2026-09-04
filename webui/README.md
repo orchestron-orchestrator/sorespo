@@ -1,26 +1,28 @@
 # SORESPO Web UI
 
-The SORESPO Web UI is a SvelteKit application. Each SORESPO test environment
-runs it as a Containerlab node alongside the `sweave` application container.
+The SORESPO Web UI is a SvelteKit application built as a static SPA and
+embedded into the `sorespo` binary: the StratoWeave HTTP server serves the UI
+on the same port as the APIs (80 by default), with an `index.html` fallback
+for client-routed pages. There is no separate Web UI container or server.
 
 ## Test Environments
 
-Choose an environment under `test/` and run its Make targets from the repository
-root. For example:
+Choose an environment under `test/` and run its Make targets from the
+repository root. For example:
 
 ```bash
 TESTENV=test/quicklab-srl
 make -C "$TESTENV" start
 ```
 
-The Web UI is available at <http://localhost:3000> even when
-SORESPO is not yet running inside `sweave`.
+The `sweave` container publishes the SORESPO HTTP port on
+<http://localhost:3000>; the Web UI appears there as soon as SORESPO is
+running inside `sweave` (`make -C "$TESTENV" tutorial` does all of it). Set
+`WEBUI_PORT` to change the host port.
 
 ```bash
 make -C "$TESTENV" stop
 ```
-
-Set `WEBUI_PORT` to change the host port or `WEBUI_IMAGE` to use another image.
 
 ## Local Development
 
@@ -32,22 +34,19 @@ bun install --frozen-lockfile
 cd ..
 ```
 
-With the selected test environment running, replace its Web UI node with Vite:
+With the selected test environment running, start Vite:
 
 ```bash
 make -C "$TESTENV" dev-webui
 ```
 
-Vite serves <http://localhost:3000>, proxies API requests to the running
-`sweave` container, and reloads changes under `webui/src`.
+Vite serves <http://localhost:5173> (`WEBUI_DEV_PORT`), proxies API requests
+to the running `sweave` container (`STRATOWEAVE_API_ORIGIN`), and reloads
+changes under `webui/src`. The embedded UI at `WEBUI_PORT` is unaffected.
 
 ```bash
 make -C "$TESTENV" stop-dev-webui
-make -C "$TESTENV" restore-webui
 ```
-
-`stop-dev-webui` stops Vite. `restore-webui` stops Vite and restarts the
-Containerlab Web UI node.
 
 Run checks and builds from `webui/`:
 
@@ -56,17 +55,20 @@ bun run check
 bun run build
 ```
 
-## Build a Local Image
+## Embedded Assets
 
-Build and use the adapter-node image without publishing it:
+The production UI ships inside the sorespo binary. After changing the UI,
+regenerate the embedded-assets module and commit it:
 
 ```bash
-docker build -t sorespo-webui:local webui
-make -C "$TESTENV" start WEBUI_IMAGE=sorespo-webui:local
+make gen-webui   # builds webui/ and rewrites src/sorespo/webui_assets.act
 ```
 
-The default image is `ghcr.io/stratoweave/sorespo-webui:tip`. Images listen on
-port 3000 and read the SORESPO backend URL from `STRATOWEAVE_API_ORIGIN`.
+CI regenerates the module and fails on any diff, so the build must stay
+deterministic (see `kit.version` in `svelte.config.js`). Only text assets can
+be embedded (the HTTP server sends `str` bodies); binary files such as images
+must be inlined into the bundle — the logo is imported in Svelte and inlined
+as a data URI via `assetsInlineLimit` in `vite.config.ts`.
 
 ## Demo
 
@@ -80,9 +82,3 @@ PUBLIC_DEMO=1 bun run dev
 
 `build:demo` writes the deployable static site to `build/`. Demo mode powers
 the [interactive tour](https://www.stratoweave.org/tutorials/exploring-the-webui/).
-
-## API Proxy
-
-The browser sends same-origin requests to `/api/*`. In normal builds,
-`src/hooks.server.ts` forwards them to `STRATOWEAVE_API_ORIGIN`. The test
-environment sets this variable for both the Web UI node and Vite server.

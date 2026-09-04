@@ -1,9 +1,10 @@
 build-sweave-image:
 	docker build --build-arg http_proxy=$(http_proxy) --build-arg https_proxy=$(https_proxy) -t sorespo-sweave-base -f ../common/Dockerfile.sweave .
 
-# The sweave container publishes RESTCONF on port 80 with a Docker-assigned
-# host port (see the `ports:` stanza in each *.clab.yml). Discover the actual
-# host port at parse time.
+# The sweave container publishes the sorespo HTTP port 80 (APIs + embedded
+# Web UI) on 127.0.0.1:$(WEBUI_PORT) (see the `ports:` in each
+# *.clab.yml). Discover the actual host port at parse time so port overrides
+# keep working.
 STRATOWEAVE_API_ORIGIN := $(shell port=$$(docker port $(TESTENV)-sweave 80/tcp 2>/dev/null | sed -n 's/.*:\([0-9][0-9]*\)$$/\1/p' | head -n 1); if [ -n "$$port" ]; then echo "http://localhost:$$port"; fi)
 
 licenses/%:
@@ -36,6 +37,8 @@ start: build-sweave-image
 	@echo "SORESPO Web UI: http://localhost:$(WEBUI_PORT)"
 
 WEBUI_HOST ?= 127.0.0.1
+# Vite dev server port. The embedded UI already occupies WEBUI_PORT.
+WEBUI_DEV_PORT ?= 5173
 WEBUI_PIDFILE ?= logs/webui-dev.pid
 WEBUI_LOG ?= logs/webui-dev.log
 WEBUI_PATH := $(abspath ../../webui)
@@ -46,18 +49,17 @@ api-url:
 
 .PHONY: dev-webui
 dev-webui:
-	@docker stop $(TESTENV)-webui >/dev/null 2>&1 || true
 	@mkdir -p logs
-	@listener_pid=$$(lsof -iTCP:$(WEBUI_PORT) -sTCP:LISTEN -n -P -t 2>/dev/null | head -n 1); \
+	@listener_pid=$$(lsof -iTCP:$(WEBUI_DEV_PORT) -sTCP:LISTEN -n -P -t 2>/dev/null | head -n 1); \
 	if [ -n "$$listener_pid" ]; then \
 		cmd=$$(ps -p "$$listener_pid" -o args= 2>/dev/null); \
 		if printf '%s' "$$cmd" | grep -Fq 'webui/node_modules/.bin/vite dev'; then \
 			echo "$$listener_pid" > "$(WEBUI_PIDFILE)"; \
-			echo "WebUI dev server already running on http://$(WEBUI_HOST):$(WEBUI_PORT) (pid $$listener_pid)"; \
+			echo "WebUI dev server already running on http://$(WEBUI_HOST):$(WEBUI_DEV_PORT) (pid $$listener_pid)"; \
 			echo "Log: $(WEBUI_LOG)"; \
 			exit 0; \
 		fi; \
-		echo "Port $(WEBUI_PORT) is already in use by: $$cmd"; \
+		echo "Port $(WEBUI_DEV_PORT) is already in use by: $$cmd"; \
 		exit 1; \
 	fi
 	@other_webui_pids=$$(pgrep -f "$(WEBUI_PATH)/[n]ode_modules/.bin/vite dev" 2>/dev/null); \
@@ -69,17 +71,17 @@ dev-webui:
 	@if [ -f "$(WEBUI_PIDFILE)" ]; then \
 		pid=$$(cat "$(WEBUI_PIDFILE)"); \
 		if kill -0 "$$pid" 2>/dev/null; then \
-			echo "Tracked WebUI process $$pid is still running but not listening on port $(WEBUI_PORT)"; \
+			echo "Tracked WebUI process $$pid is still running but not listening on port $(WEBUI_DEV_PORT)"; \
 			echo "Run 'make stop-dev-webui' first"; \
 			exit 1; \
 		fi; \
 		rm -f "$(WEBUI_PIDFILE)"; \
 	fi
-	@echo "Starting WebUI dev server on http://$(WEBUI_HOST):$(WEBUI_PORT)"
+	@echo "Starting WebUI dev server on http://$(WEBUI_HOST):$(WEBUI_DEV_PORT)"
 	@echo "Proxying API requests to $(STRATOWEAVE_API_ORIGIN)"
-	@cd $(WEBUI_PATH) && nohup env STRATOWEAVE_API_ORIGIN="$(STRATOWEAVE_API_ORIGIN)" bun run dev -- --host $(WEBUI_HOST) --port $(WEBUI_PORT) --strictPort </dev/null >"$(abspath $(WEBUI_LOG))" 2>&1 &
+	@cd $(WEBUI_PATH) && nohup env STRATOWEAVE_API_ORIGIN="$(STRATOWEAVE_API_ORIGIN)" bun run dev -- --host $(WEBUI_HOST) --port $(WEBUI_DEV_PORT) --strictPort </dev/null >"$(abspath $(WEBUI_LOG))" 2>&1 &
 	@sleep 3
-	@listener_pid=$$(lsof -iTCP:$(WEBUI_PORT) -sTCP:LISTEN -n -P -t 2>/dev/null | head -n 1); \
+	@listener_pid=$$(lsof -iTCP:$(WEBUI_DEV_PORT) -sTCP:LISTEN -n -P -t 2>/dev/null | head -n 1); \
 	if [ -n "$$listener_pid" ]; then \
 		echo "$$listener_pid" > "$(WEBUI_PIDFILE)"; \
 		echo "WebUI dev server started (pid $$listener_pid)"; \
@@ -100,14 +102,14 @@ stop-dev-webui:
 			stopped=1; \
 		fi; \
 	done; \
-	listener_pid=$$(lsof -iTCP:$(WEBUI_PORT) -sTCP:LISTEN -n -P -t 2>/dev/null | head -n 1); \
+	listener_pid=$$(lsof -iTCP:$(WEBUI_DEV_PORT) -sTCP:LISTEN -n -P -t 2>/dev/null | head -n 1); \
 	if [ -n "$$listener_pid" ]; then \
 		cmd=$$(ps -p "$$listener_pid" -o args= 2>/dev/null); \
 		if printf '%s' "$$cmd" | grep -Fq 'webui/node_modules/.bin/vite dev'; then \
 			kill "$$listener_pid" 2>/dev/null || true; \
 			stopped=1; \
 		else \
-			echo "Port $(WEBUI_PORT) is in use by a non-WebUI process: $$cmd"; \
+			echo "Port $(WEBUI_DEV_PORT) is in use by a non-WebUI process: $$cmd"; \
 		fi; \
 	fi; \
 	if [ -f "$(WEBUI_PIDFILE)" ]; then \
@@ -123,11 +125,6 @@ stop-dev-webui:
 	else \
 		echo "WebUI dev server is not running"; \
 	fi
-
-.PHONY: restore-webui
-restore-webui: stop-dev-webui
-	@docker start $(TESTENV)-webui >/dev/null
-	@echo "Containerlab Web UI restored on http://localhost:$(WEBUI_PORT)"
 
 .PHONY: stop
 stop:

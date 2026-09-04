@@ -54,44 +54,21 @@ jobs:
           name: sorespo-macos-aarch64
           path: out/bin/sorespo
 
-  webui:
+  webui-assets:
     # Local push + fork PRs only (local PRs are skipped because push ran them).
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     steps:
       - name: "Check out repository code"
         uses: actions/checkout@v4
-      - name: "Set up QEMU"
-        uses: docker/setup-qemu-action@v3
-      - name: "Set up Docker Buildx"
-        uses: docker/setup-buildx-action@v3
-      - name: "Log in to GitHub Container Registry"
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: docker/login-action@v3
+      - name: "Set up Bun"
+        uses: oven-sh/setup-bun@v2
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: "Build Web UI image"
-        uses: docker/build-push-action@v6
-        with:
-          context: webui
-          platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-          tags: |
-            ghcr.io/stratoweave/sorespo-webui:tip
-            ghcr.io/stratoweave/sorespo-webui:sha-${{ github.sha }}
-          labels: |
-            org.opencontainers.image.source=https://github.com/${{ github.repository }}
-            org.opencontainers.image.revision=${{ github.sha }}
-      - name: "Verify Web UI image is public"
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+          bun-version: "1.3.14"
+      - name: "Ensure embedded Web UI assets are up to date"
         run: |
-          docker logout ghcr.io
-          docker pull ghcr.io/stratoweave/sorespo-webui:tip
+          make gen-webui
+          git diff --exit-code
 
   release:
     # Only run on the main branch
@@ -100,7 +77,11 @@ jobs:
     permissions:
       # Required for uploading release assets
       contents: write
-    needs: build-and-test
+    # webui-assets gates the release so tip binaries can never ship a stale
+    # embedded UI (committed webui_assets.act out of sync with webui/).
+    needs:
+      - build-and-test
+      - webui-assets
     env:
       TAG: tip
     steps:
@@ -182,11 +163,6 @@ jobs:
         if: ${{ startsWith(env.IMAGE_PATH, 'ghcr.io') && (matrix.TESTENV == 'quicklab' || matrix.TESTENV == 'quicklab-crpd' || matrix.TESTENV == 'quicklab-xrd') }}
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-      # Build the Web UI image locally so the lab tests this branch's webui
-      # code instead of pulling the published :tip image (the clab node uses
-      # image-pull-policy: if-not-present).
-      - name: "Build Web UI image"
-        run: docker build -t ghcr.io/stratoweave/sorespo-webui:tip webui
       - name: "Start quicklab"
         run: |
           make -C test/${{ matrix.TESTENV }} start
