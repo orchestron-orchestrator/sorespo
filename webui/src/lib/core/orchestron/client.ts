@@ -1,6 +1,6 @@
 import { demoFetch } from '$lib/demo/gate';
 
-const API_BASE = '/api';
+const API_BASE = '';
 
 export interface DeviceSummary {
   id: string;
