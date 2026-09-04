@@ -112,9 +112,10 @@
               {@const unitX = deltaX / length}
               {@const unitY = deltaY / length}
               {@const siteEdgeOffset =
-                Math.abs(unitX) * (siteCardWidth / 2) +
-                Math.abs(unitY) * (siteCardHeight / 2) -
-                6}
+                Math.min(
+                  unitX ? siteCardWidth / 2 / Math.abs(unitX) : Infinity,
+                  unitY ? siteCardHeight / 2 / Math.abs(unitY) : Infinity
+                ) - 6}
               <line
                 x1={router.x + unitX * (routerRadius + 4)}
                 y1={router.y + unitY * (routerRadius + 4)}
