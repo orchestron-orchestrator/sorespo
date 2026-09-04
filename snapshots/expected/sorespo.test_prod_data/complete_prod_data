@@ -134,6 +134,12 @@ address_family_element_5 = vrf_element_2.address_families.address_family.create(
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor element: 10.201.1.2
 neighbor_element_2 = vrf_element_2.neighbors.neighbor.create('10.201.1.2', remote_as=u64(65501), description='Customer eBGP SITE-1 [SNA-1-1] in VPN acme-65501 to 10.201.1.2')
 
+# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[address='10.201.1.2']/timers
+neighbor_element_2.timers.keepalive_interval = u64(1)
+
+# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[address='10.201.1.2']/timers/holdtime
+holdtime = neighbor_element_2.timers.create_holdtime(holdtime_number=u64(3))
+
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[address='10.201.1.2']/address-families/address-family element: ipv4-unicast
 address_family_element_6 = neighbor_element_2.address_families.address_family.create('ipv4-unicast')
 
@@ -313,6 +319,12 @@ address_family_element_5 = vrf_element_2.address_families.address_family.create(
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor element: 10.202.1.2
 neighbor_element_2 = vrf_element_2.neighbors.neighbor.create('10.202.1.2', remote_as=u64(65501), description='Customer eBGP SITE-2 [SNA-2-1] in VPN acme-65501 to 10.202.1.2')
 
+# Container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[address='10.202.1.2']/timers
+neighbor_element_2.timers.keepalive_interval = u64(1)
+
+# P-container: /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[address='10.202.1.2']/timers/holdtime
+holdtime = neighbor_element_2.timers.create_holdtime(holdtime_number=u64(3))
+
 # List /um-router-bgp-cfg:router/bgp/as[as-number='65001']/vrfs/vrf[vrf-name='acme-65501']/neighbors/neighbor[address='10.202.1.2']/address-families/address-family element: ipv4-unicast
 address_family_element_6 = neighbor_element_2.address_families.address_family.create('ipv4-unicast')
 
@@ -419,7 +431,7 @@ instance_element = LJU_CORE_1.configuration.routing_instances.instance.create('a
 group_element = instance_element.protocols.bgp.group.create('customer', passive=True)
 
 # List /configuration/routing-instances/instance[name='acme-65501']/protocols/bgp/group[name='customer']/neighbor element: 10.204.1.2
-neighbor_element = group_element.neighbor.create('10.204.1.2', description='Customer eBGP SITE-4 [SNA-4-1] in VPN acme-65501 to 10.204.1.2', peer_as='65501', as_override=True)
+neighbor_element = group_element.neighbor.create('10.204.1.2', description='Customer eBGP SITE-4 [SNA-4-1] in VPN acme-65501 to 10.204.1.2', hold_time=u64(3), peer_as='65501', as_override=True)
 
 # List /configuration/routing-instances/instance[name='acme-65501']/interface element: eth3.100
 interface_element_2 = instance_element.interface.create('eth3.100')
@@ -592,7 +604,7 @@ instance_element = STO_CORE_1.configuration.routing_instances.instance.create('a
 group_element = instance_element.protocols.bgp.group.create('customer', passive=True)
 
 # List /configuration/routing-instances/instance[name='acme-65501']/protocols/bgp/group[name='customer']/neighbor element: 10.203.1.2
-neighbor_element = group_element.neighbor.create('10.203.1.2', description='Customer eBGP SITE-3 [SNA-3-1] in VPN acme-65501 to 10.203.1.2', peer_as='65501', as_override=True)
+neighbor_element = group_element.neighbor.create('10.203.1.2', description='Customer eBGP SITE-3 [SNA-3-1] in VPN acme-65501 to 10.203.1.2', hold_time=u64(3), peer_as='65501', as_override=True)
 
 # List /configuration/routing-instances/instance[name='acme-65501']/interface element: eth4.100
 interface_element_2 = instance_element.interface.create('eth4.100')
