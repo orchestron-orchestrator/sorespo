@@ -55,7 +55,21 @@ export default defineConfig({
   },
   server: {
     proxy: Object.fromEntries(
-      API_PROXY_PREFIXES.map((prefix) => [prefix, { target: API_PROXY_TARGET }])
+      API_PROXY_PREFIXES.map((prefix) => [
+        prefix,
+        {
+          target: API_PROXY_TARGET,
+          // The browser terminal (/device/<name>/terminal) is a WebSocket. The
+          // backend checks that the Origin host matches the Host header, so
+          // present the proxy target as the origin instead of the dev server.
+          ws: true,
+          configure(proxy) {
+            proxy.on('proxyReqWs', (proxyReq) => {
+              proxyReq.setHeader('origin', API_PROXY_TARGET);
+            });
+          }
+        }
+      ])
     )
   }
 });

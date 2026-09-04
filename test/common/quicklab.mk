@@ -141,8 +141,12 @@ copy:
 	docker cp netinfra.xml $(TESTENV)-sweave:/netinfra.xml
 
 .PHONY: run
+# The browser terminal (Web UI "Terminal" page) is off by default in
+# StratoWeave; the labs turn it on.
+SORESPO_FLAGS ?= --terminal-enabled
+
 run:
-	docker exec $(INTERACTIVE) $(TESTENV)-sweave /sorespo --rts-bt-dbg
+	docker exec $(INTERACTIVE) $(TESTENV)-sweave /sorespo $(SORESPO_FLAGS) --rts-bt-dbg
 
 ifndef CI
 INTERACTIVE=-it
@@ -152,7 +156,7 @@ endif
 
 .PHONY: run-and-configure
 run-and-configure:
-	docker exec $(INTERACTIVE) $(TESTENV)-sweave /sorespo $(EXIT_ON_DONE) netinfra.xml l3vpn-svc.xml --rts-bt-dbg
+	docker exec $(INTERACTIVE) $(TESTENV)-sweave /sorespo $(SORESPO_FLAGS) $(EXIT_ON_DONE) netinfra.xml l3vpn-svc.xml --rts-bt-dbg
 
 .PHONY: configure
 configure:

@@ -160,6 +160,7 @@
         </button>
         <a class="btn btn-secondary" href={appHref(`/devices/${deviceId}/config`)}>View Configuration</a>
         <a class="btn btn-secondary" href={appHref(`/devices/${deviceId}/log`)}>Configuration Log</a>
+        <a class="btn btn-secondary" href={appHref(`/devices/${deviceId}/terminal`)}>Terminal</a>
       </div>
 
       <div class="device-detail__grid">

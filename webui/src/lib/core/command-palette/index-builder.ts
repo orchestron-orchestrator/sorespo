@@ -57,6 +57,14 @@ export async function fetchDynamicEntries(
           href: `/devices/${device.id}`,
           keywords: device.id
         });
+        entries.push({
+          id: `device-terminal:${device.id}`,
+          category: 'Devices',
+          label: `${device.name} terminal`,
+          description: 'Open an SSH terminal',
+          href: `/devices/${device.id}/terminal`,
+          keywords: `${device.id} ssh shell cli`
+        });
       }
     } catch {
       // ignore — palette still shows other entries
