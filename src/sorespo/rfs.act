@@ -617,6 +617,8 @@ class EbgpCustomer(base.EbgpCustomer):
             af.create_as_override()
             if i.authentication_key is not None:
                 neighbor.password.encrypted = cisco_type7_encrypt(i.authentication_key!, 4)
+            neighbor.timers.keepalive_interval = 1
+            neighbor.timers.create_holdtime(holdtime_number=3)
 
             return dev
 
@@ -629,7 +631,7 @@ class EbgpCustomer(base.EbgpCustomer):
             group = ri.protocols.bgp.group.create("customer")
 
             authentication_key = junos_encrypt(i.authentication_key!, "4") if i.authentication_key is not None else None
-            group.neighbor.create(i.address, description=i.description, authentication_key=authentication_key, peer_as=str(i.peer_asn), as_override=True)
+            group.neighbor.create(i.address, description=i.description, authentication_key=authentication_key, peer_as=str(i.peer_asn), as_override=True, hold_time=3)
 
             return dev
 
@@ -643,6 +645,7 @@ class EbgpCustomer(base.EbgpCustomer):
             neighbor = bgp.neighbor.create(i.address, peer_as=i.peer_asn, peer_group="customer")
             if i.authentication_key is not None:
                 neighbor.authentication.password = nokia_srl_aes1_encrypt(i.authentication_key!, _SRL_AES1_SALT)
+            neighbor.timers.connect_retry = 3
             neighbor.timers.hold_time = 3
             neighbor.timers.keepalive_interval = 1
 

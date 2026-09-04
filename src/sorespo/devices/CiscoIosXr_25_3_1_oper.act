@@ -204,6 +204,14 @@ SRC_DNODE_CHILD_25: DContainer = DContainer(module='Cisco-IOS-XR-um-router-bgp-c
         DContainer(module='Cisco-IOS-XR-um-router-bgp-cfg', namespace='http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg', prefix='um-router-bgp-cfg', name='password', config=True, description='Set a password', presence=False, children=[
             DLeaf(module='Cisco-IOS-XR-um-router-bgp-cfg', namespace='http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg', prefix='um-router-bgp-cfg', name='encrypted', config=True, description='Specifies a password will follow', mandatory=False, type=DTypeString(name='xr:Proprietary-password', description="The Proprietary-password type is used to store password\nusing the Cisco proprietary hash function.\nWhen a clear text value is set to a leaf of this type, the\nserver calculates a password hash and stores the result\nin the datastore. The password is never stored in clear text.\n\nWhen a leaf of this type is read, the stored password hash is\nreturned.\n\nA value of this type matches one of the forms:\n\n  !<clear text password>\n  <password hash>\n\nThe '!' prefix signals that the value is clear text. When\nsuch a value is received by the server, a hash value is\ncalculated. This value is stored in the configuration data\nstore.\n\nIf a value starting without '!' is received, the server knows\nthat the value already represents a hashed value, and stores\nit as is in the data store.", reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[YangPattern(yang_regex='(!.+)|([^!].+)', pcre='^((!.+)|([^!].+))$', invert=False)]))
         ]),
+        DContainer(module='Cisco-IOS-XR-um-router-bgp-cfg', namespace='http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg', prefix='um-router-bgp-cfg', name='timers', config=True, description='BGP per neighbor timers', presence=False, children=[
+            DLeaf(module='Cisco-IOS-XR-um-router-bgp-cfg', namespace='http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg', prefix='um-router-bgp-cfg', name='keepalive-interval', config=True, description='Keepalive interval', mandatory=False, type=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 65535)]))),
+            DContainer(module='Cisco-IOS-XR-um-router-bgp-cfg', namespace='http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg', prefix='um-router-bgp-cfg', name='holdtime', config=True, description='Holdtime', must=[
+DMust(condition='../keepalive-interval and holdtime-number', description=None, error_app_tag=None, error_message=None, reference=None)
+                ], presence=True, children=[
+                DLeaf(module='Cisco-IOS-XR-um-router-bgp-cfg', namespace='http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg', prefix='um-router-bgp-cfg', name='holdtime-number', config=True, description='Holdtime', mandatory=False, type=DTypeIntegerUnsigned(name='uint32', description=None, reference=None, exts=[], builtin_type='uint32', default=None, ranges=Ranges([(3, 65535)])))
+            ])
+        ]),
         DContainer(module='Cisco-IOS-XR-um-router-bgp-cfg', namespace='http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg', prefix='um-router-bgp-cfg', name='address-families', config=True, description='Enter Address Family command mode', presence=False, children=[
             DList(module='Cisco-IOS-XR-um-router-bgp-cfg', namespace='http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg', prefix='um-router-bgp-cfg', name='address-family', key=['af-name'], config=True, description='Enter Address Family command mode', min_elements=0, ordered_by='system', children=[
                 DLeaf(module='Cisco-IOS-XR-um-router-bgp-cfg', namespace='http://cisco.com/ns/yang/Cisco-IOS-XR-um-router-bgp-cfg', prefix='um-router-bgp-cfg', name='af-name', config=True, description='Enter Address Family command mode', mandatory=False, type=DTypeEnum(name='Bgp-address-family', description='Bgp address family', reference=None, exts=[], builtin_type='enumeration', default=None, name_to_val={'ipv4-unicast':0, 'ipv4-multicast':1, 'ipv4-labeled-unicast':2, 'ipv4-tunnel':3, 'vpnv4-unicast':4, 'ipv6-unicast':5, 'ipv6-multicast':6, 'ipv6-labeled-unicast':7, 'vpnv6-unicast':8, 'ipv4-mdt':9, 'l2vpn-vpls-vpws':10, 'ipv4-rt-filter':11, 'ipv4-mvpn':12, 'ipv6-mvpn':13, 'l2vpn-evpn':14, 'link-state-link-state':15, 'vpnv4-multicast':16, 'vpnv6-multicast':17, 'ipv4-flowspec':18, 'ipv6-flowspec':19, 'vpnv4-flowspec':20, 'vpnv6-flowspec':21, 'l2vpn-mspw':22, 'ipv4-sr-policy':23, 'ipv6-sr-policy':24, 'all-address-family':25})),
@@ -377106,6 +377114,63 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
 
 
 _breaker69: None = None
+class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers__holdtime(yadata.MNode):
+    holdtime_number: ?u64
+
+    mut def __init__(self, holdtime_number: ?u64) -> None:
+        self.holdtime_number = holdtime_number
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['Cisco-IOS-XR-um-router-bgp-cfg:router', 'bgp', 'as', 'vrfs', 'vrf', 'neighbors', 'neighbor', 'timers', 'holdtime'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers__holdtime:
+        if n is not None:
+            return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers__holdtime(holdtime_number=n.get_opt_u64(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'holdtime-number')))
+        return None
+
+    mut def copy(self) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers__holdtime:
+        """Create a deep copy of this adata object"""
+        ad = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers__holdtime.from_gdata(self.to_gdata())
+        if ad is not None:
+            return ad
+        raise Exception('Unreachable in Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers__holdtime.copy()')
+
+
+_breaker70: None = None
+class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers(yadata.MNode):
+    keepalive_interval: ?u64
+    holdtime: ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers__holdtime
+
+    mut def __init__(self, keepalive_interval: ?u64, holdtime: ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers__holdtime=None) -> None:
+        self.keepalive_interval = keepalive_interval
+        self.holdtime = holdtime
+
+    mut def create_holdtime(self, holdtime_number: ?u64=None) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers__holdtime:
+        existing = self.holdtime
+        if existing is not None:
+            if holdtime_number is not None:
+                existing.holdtime_number = holdtime_number
+            return existing
+        res = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers__holdtime(holdtime_number=holdtime_number)
+        self.holdtime = res
+        return res
+
+    mut def to_gdata(self) -> ygdata.Node:
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['Cisco-IOS-XR-um-router-bgp-cfg:router', 'bgp', 'as', 'vrfs', 'vrf', 'neighbors', 'neighbor', 'timers'])
+
+    @staticmethod
+    mut def from_gdata(n: ?ygdata.Node) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers:
+        if n is not None:
+            return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers(keepalive_interval=n.get_opt_u64(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'keepalive-interval')), holdtime=Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers__holdtime.from_gdata(n.get_opt_cnt(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'holdtime'))))
+        return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers()
+
+    mut def copy(self) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers:
+        """Create a deep copy of this adata object"""
+        return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers.from_gdata(self.to_gdata())
+
+
+_breaker71: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family__route_policy(yadata.MNode):
     out: ?str
     in_: ?str
@@ -377128,7 +377193,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family__route_policy.from_gdata(self.to_gdata())
 
 
-_breaker70: None = None
+_breaker72: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family__as_override(yadata.MNode):
 
     mut def __init__(self) -> None:
@@ -377151,7 +377216,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         raise Exception('Unreachable in Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family__as_override.copy()')
 
 
-_breaker71: None = None
+_breaker73: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry(yadata.MNode):
     af_name: str
     route_policy: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family__route_policy
@@ -377181,7 +377246,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry.from_gdata(self.to_gdata())
 
-_breaker72: None = None
+_breaker74: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family(yadata.MKeyedList[str, Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e: e.af_name, elements)
@@ -377212,7 +377277,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family(elements=copied_elements)
 
 
-_breaker73: None = None
+_breaker75: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families(yadata.MNode):
     address_family: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family
 
@@ -377233,19 +377298,21 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families.from_gdata(self.to_gdata())
 
 
-_breaker74: None = None
+_breaker76: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry(yadata.MNode):
     address: str
     remote_as: ?value
     description: ?str
     password: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__password
+    timers: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers
     address_families: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families
 
-    mut def __init__(self, address: str, remote_as: ?value, description: ?str, password: ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__password=None, address_families: ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families=None) -> None:
+    mut def __init__(self, address: str, remote_as: ?value, description: ?str, password: ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__password=None, timers: ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers=None, address_families: ?Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families=None) -> None:
         self.address = address
         self.remote_as = remote_as
         self.description = description
         self.password = password if password is not None else Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__password()
+        self.timers = timers if timers is not None else Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers()
         self.address_families = address_families if address_families is not None else Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families()
 
     mut def to_gdata(self) -> ygdata.Node:
@@ -377253,13 +377320,13 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry:
-        return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry(address=n.get_str(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'address')), remote_as=n.get_opt_value(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'remote-as')), description=n.get_opt_str(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'description')), password=Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__password.from_gdata(n.get_opt_cnt(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'password'))), address_families=Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families.from_gdata(n.get_opt_cnt(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'address-families'))))
+        return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry(address=n.get_str(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'address')), remote_as=n.get_opt_value(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'remote-as')), description=n.get_opt_str(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'description')), password=Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__password.from_gdata(n.get_opt_cnt(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'password'))), timers=Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers.from_gdata(n.get_opt_cnt(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'timers'))), address_families=Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families.from_gdata(n.get_opt_cnt(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'address-families'))))
 
     mut def copy(self) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry:
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry.from_gdata(self.to_gdata())
 
-_breaker75: None = None
+_breaker77: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor(yadata.MKeyedList[str, Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e: e.address, elements)
@@ -377294,7 +377361,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor(elements=copied_elements)
 
 
-_breaker76: None = None
+_breaker78: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors(yadata.MNode):
     neighbor: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor
 
@@ -377315,7 +377382,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors.from_gdata(self.to_gdata())
 
 
-_breaker77: None = None
+_breaker79: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry(yadata.MNode):
     vrf_name: str
     rd: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__rd
@@ -377339,7 +377406,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry.from_gdata(self.to_gdata())
 
-_breaker78: None = None
+_breaker80: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf(yadata.MKeyedList[str, Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e: e.vrf_name, elements)
@@ -377370,7 +377437,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf(elements=copied_elements)
 
 
-_breaker79: None = None
+_breaker81: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs(yadata.MNode):
     vrf: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf
 
@@ -377391,7 +377458,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs(ya
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs.from_gdata(self.to_gdata())
 
 
-_breaker80: None = None
+_breaker82: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_entry(yadata.MNode):
     as_number: value
     neighbors: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors
@@ -377419,7 +377486,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_entry(ya
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_entry.from_gdata(self.to_gdata())
 
-_breaker81: None = None
+_breaker83: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as(yadata.MList[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_entry]=[]) -> None:
         self._elements = elements
@@ -377465,7 +377532,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as(yadata.M
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as(elements=copied_elements)
 
 
-_breaker82: None = None
+_breaker84: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp(yadata.MNode):
     as_: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as
 
@@ -377486,7 +377553,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp(yadata.MNode
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp.from_gdata(self.to_gdata())
 
 
-_breaker83: None = None
+_breaker85: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router(yadata.MNode):
     bgp: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp
 
@@ -377507,7 +377574,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router(yadata.MNode):
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router.from_gdata(self.to_gdata())
 
 
-_breaker84: None = None
+_breaker86: None = None
 class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry(yadata.MNode):
     route_policy_name: str
     rpl_route_policy: ?str
@@ -377527,7 +377594,7 @@ class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_po
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry.from_gdata(self.to_gdata())
 
-_breaker85: None = None
+_breaker87: None = None
 class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy(yadata.MKeyedList[str, Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e: e.route_policy_name, elements)
@@ -377560,7 +377627,7 @@ class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_po
         return Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy(elements=copied_elements)
 
 
-_breaker86: None = None
+_breaker88: None = None
 class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies(yadata.MNode):
     route_policy: Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy
 
@@ -377581,7 +377648,7 @@ class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies(yadata.MN
         return Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies.from_gdata(self.to_gdata())
 
 
-_breaker87: None = None
+_breaker89: None = None
 class Cisco_IOS_XR_um_route_policy_cfg__routing_policy(yadata.MNode):
     route_policies: Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies
 
@@ -377602,7 +377669,7 @@ class Cisco_IOS_XR_um_route_policy_cfg__routing_policy(yadata.MNode):
         return Cisco_IOS_XR_um_route_policy_cfg__routing_policy.from_gdata(self.to_gdata())
 
 
-_breaker88: None = None
+_breaker90: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry(yadata.MNode):
     af_name: str
 
@@ -377620,7 +377687,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry.from_gdata(self.to_gdata())
 
-_breaker89: None = None
+_breaker91: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family(yadata.MKeyedList[str, Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e: e.af_name, elements)
@@ -377651,7 +377718,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family(
         return Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family(elements=copied_elements)
 
 
-_breaker90: None = None
+_breaker92: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families(yadata.MNode):
     address_family: Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family
 
@@ -377672,7 +377739,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families(yadata.MNode):
         return Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families.from_gdata(self.to_gdata())
 
 
-_breaker91: None = None
+_breaker93: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry(yadata.MNode):
     interface_name: str
 
@@ -377690,7 +377757,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry(yadat
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry.from_gdata(self.to_gdata())
 
-_breaker92: None = None
+_breaker94: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface(yadata.MKeyedList[str, Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e: e.interface_name, elements)
@@ -377721,7 +377788,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface(yadata.MKey
         return Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface(elements=copied_elements)
 
 
-_breaker93: None = None
+_breaker95: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces(yadata.MNode):
     interface: Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface
 
@@ -377742,7 +377809,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces(yadata.MNode):
         return Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces.from_gdata(self.to_gdata())
 
 
-_breaker94: None = None
+_breaker96: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp(yadata.MNode):
     address_families: Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families
     interfaces: Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces
@@ -377768,7 +377835,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp(yadata.MNode):
         raise Exception('Unreachable in Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp.copy()')
 
 
-_breaker95: None = None
+_breaker97: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls(yadata.MNode):
     ldp: ?Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp
 
@@ -377797,7 +377864,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls(yadata.MNode):
         return Cisco_IOS_XR_um_mpls_ldp_cfg__mpls.from_gdata(self.to_gdata())
 
 
-_breaker96: None = None
+_breaker98: None = None
 class Cisco_IOS_XR_um_hostname_cfg__hostname(yadata.MNode):
     system_network_name: ?str
 
@@ -377818,7 +377885,7 @@ class Cisco_IOS_XR_um_hostname_cfg__hostname(yadata.MNode):
         return Cisco_IOS_XR_um_hostname_cfg__hostname.from_gdata(self.to_gdata())
 
 
-_breaker97: None = None
+_breaker99: None = None
 class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry(yadata.MNode):
     interface_name: str
     state: ?str
@@ -377838,7 +377905,7 @@ class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__in
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry.from_gdata(self.to_gdata())
 
-_breaker98: None = None
+_breaker100: None = None
 class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface(yadata.MKeyedList[str, Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e: e.interface_name, elements)
@@ -377871,7 +377938,7 @@ class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__in
         return Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface(elements=copied_elements)
 
 
-_breaker99: None = None
+_breaker101: None = None
 class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr(yadata.MNode):
     interface: Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface
 
@@ -377892,7 +377959,7 @@ class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr(yad
         return Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr.from_gdata(self.to_gdata())
 
 
-_breaker100: None = None
+_breaker102: None = None
 class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces(yadata.MNode):
     interface_xr: Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr
 
@@ -377913,7 +377980,7 @@ class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces(yadata.MNode):
         return Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces.from_gdata(self.to_gdata())
 
 
-_breaker101: None = None
+_breaker103: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf__neighbors__neighbor_entry(yadata.MNode):
     neighbor_address: str
     connection_state: ?str
@@ -377941,7 +378008,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrf
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf__neighbors__neighbor_entry.from_gdata(self.to_gdata())
 
-_breaker102: None = None
+_breaker104: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf__neighbors__neighbor(yadata.MKeyedList[str, Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf__neighbors__neighbor_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf__neighbors__neighbor_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e: e.neighbor_address, elements)
@@ -377982,7 +378049,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrf
         return Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf__neighbors__neighbor(elements=copied_elements)
 
 
-_breaker103: None = None
+_breaker105: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf__neighbors(yadata.MNode):
     neighbor: Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf__neighbors__neighbor
 
@@ -378003,7 +378070,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrf
         return Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf__neighbors.from_gdata(self.to_gdata())
 
 
-_breaker104: None = None
+_breaker106: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf_entry(yadata.MNode):
     vrf_name: str
     neighbors: Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf__neighbors
@@ -378023,7 +378090,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrf
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf_entry.from_gdata(self.to_gdata())
 
-_breaker105: None = None
+_breaker107: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf(yadata.MKeyedList[str, Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e: e.vrf_name, elements)
@@ -378054,7 +378121,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrf
         return Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf(elements=copied_elements)
 
 
-_breaker106: None = None
+_breaker108: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs(yadata.MNode):
     vrf: Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf
 
@@ -378075,7 +378142,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrf
         return Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs.from_gdata(self.to_gdata())
 
 
-_breaker107: None = None
+_breaker109: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active(yadata.MNode):
     vrfs: Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs
 
@@ -378096,7 +378163,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active(yada
         return Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active.from_gdata(self.to_gdata())
 
 
-_breaker108: None = None
+_breaker110: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance_entry(yadata.MNode):
     instance_name: str
     instance_active: Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active
@@ -378116,7 +378183,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance_entry(yadata.MNode):
         """Create a deep copy of this adata object"""
         return Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance_entry.from_gdata(self.to_gdata())
 
-_breaker109: None = None
+_breaker111: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance(yadata.MKeyedList[str, Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance_entry]):
     mut def __init__(self, elements: list[Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e: e.instance_name, elements)
@@ -378147,7 +378214,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance(yadata.MKeyedList[str
         return Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance(elements=copied_elements)
 
 
-_breaker110: None = None
+_breaker112: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances(yadata.MNode):
     instance: Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance
 
@@ -378168,7 +378235,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances(yadata.MNode):
         return Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances.from_gdata(self.to_gdata())
 
 
-_breaker111: None = None
+_breaker113: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp(yadata.MNode):
     instances: Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances
 
@@ -378189,7 +378256,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp(yadata.MNode):
         return Cisco_IOS_XR_ipv4_bgp_oper__bgp.from_gdata(self.to_gdata())
 
 
-_breaker112: None = None
+_breaker114: None = None
 class root(yadata.MNode):
     vrfs: Cisco_IOS_XR_um_vrf_cfg__vrfs
     um_interface_cfg_interfaces: Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces
@@ -378231,7 +378298,7 @@ actor rpc_root(tp: ygdata.TreeProvider):
 
 
 
-_breaker113: None = None
+_breaker115: None = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import__route_target__two_byte_as_route_targets__two_byte_as_route_target_entry_subs(SubscriptionNode):
     two_byte_as_number: SubscriptionNode
     asn2_index: SubscriptionNode
@@ -378247,7 +378314,7 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import_
         direct: list[SubscriptionNode] = [self.two_byte_as_number, self.asn2_index, self.stitching]
         return direct
 
-_breaker114: None = None
+_breaker116: None = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import__route_target__two_byte_as_route_targets__two_byte_as_route_target_subs(SubscriptionNode):
     two_byte_as_number: SubscriptionNode
     asn2_index: SubscriptionNode
@@ -378271,7 +378338,7 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import_
         direct: list[SubscriptionNode] = [self.two_byte_as_number, self.asn2_index, self.stitching]
         return direct
 
-_breaker115: None = None
+_breaker117: None = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import__route_target__two_byte_as_route_targets_subs(SubscriptionNode):
     two_byte_as_route_target: Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import__route_target__two_byte_as_route_targets__two_byte_as_route_target_subs
 
@@ -378283,7 +378350,7 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import_
         direct: list[SubscriptionNode] = [self.two_byte_as_route_target]
         return direct
 
-_breaker116: None = None
+_breaker118: None = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import__route_target_subs(SubscriptionNode):
     two_byte_as_route_targets: Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import__route_target__two_byte_as_route_targets_subs
 
@@ -378295,7 +378362,7 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import_
         direct: list[SubscriptionNode] = [self.two_byte_as_route_targets]
         return direct
 
-_breaker117: None = None
+_breaker119: None = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import_subs(SubscriptionNode):
     route_target: Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import__route_target_subs
 
@@ -378307,7 +378374,7 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import_
         direct: list[SubscriptionNode] = [self.route_target]
         return direct
 
-_breaker118: None = None
+_breaker120: None = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export__route_target__two_byte_as_route_targets__two_byte_as_route_target_entry_subs(SubscriptionNode):
     two_byte_as_number: SubscriptionNode
     asn2_index: SubscriptionNode
@@ -378323,7 +378390,7 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export_
         direct: list[SubscriptionNode] = [self.two_byte_as_number, self.asn2_index, self.stitching]
         return direct
 
-_breaker119: None = None
+_breaker121: None = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export__route_target__two_byte_as_route_targets__two_byte_as_route_target_subs(SubscriptionNode):
     two_byte_as_number: SubscriptionNode
     asn2_index: SubscriptionNode
@@ -378347,7 +378414,7 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export_
         direct: list[SubscriptionNode] = [self.two_byte_as_number, self.asn2_index, self.stitching]
         return direct
 
-_breaker120: None = None
+_breaker122: None = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export__route_target__two_byte_as_route_targets_subs(SubscriptionNode):
     two_byte_as_route_target: Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export__route_target__two_byte_as_route_targets__two_byte_as_route_target_subs
 
@@ -378359,7 +378426,7 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export_
         direct: list[SubscriptionNode] = [self.two_byte_as_route_target]
         return direct
 
-_breaker121: None = None
+_breaker123: None = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export__route_target_subs(SubscriptionNode):
     two_byte_as_route_targets: Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export__route_target__two_byte_as_route_targets_subs
 
@@ -378371,7 +378438,7 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export_
         direct: list[SubscriptionNode] = [self.two_byte_as_route_targets]
         return direct
 
-_breaker122: None = None
+_breaker124: None = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export_subs(SubscriptionNode):
     route_target: Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export__route_target_subs
 
@@ -378383,7 +378450,7 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export_
         direct: list[SubscriptionNode] = [self.route_target]
         return direct
 
-_breaker123: None = None
+_breaker125: None = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast_subs(SubscriptionNode):
     import: Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__import_subs
     export: Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast__export_subs
@@ -378397,7 +378464,7 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast_subs(Sub
         direct: list[SubscriptionNode] = [self.import, self.export]
         return direct
 
-_breaker124: None = None
+_breaker126: None = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4_subs(SubscriptionNode):
     unicast: Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4__unicast_subs
 
@@ -378409,7 +378476,7 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4_subs(Subscription
         direct: list[SubscriptionNode] = [self.unicast]
         return direct
 
-_breaker125: None = None
+_breaker127: None = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family_subs(SubscriptionNode):
     ipv4: Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family__ipv4_subs
 
@@ -378421,7 +378488,7 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.ipv4]
         return direct
 
-_breaker126: None = None
+_breaker128: None = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf_entry_subs(SubscriptionNode):
     vrf_name: SubscriptionNode
     address_family: Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family_subs
@@ -378437,7 +378504,7 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf_entry_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.vrf_name, self.address_family, self.description]
         return direct
 
-_breaker127: None = None
+_breaker129: None = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf_subs(SubscriptionNode):
     vrf_name: SubscriptionNode
     address_family: Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf__address_family_subs
@@ -378459,7 +378526,7 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.vrf_name, self.address_family, self.description]
         return direct
 
-_breaker128: None = None
+_breaker130: None = None
 class Cisco_IOS_XR_um_vrf_cfg__vrfs_subs(SubscriptionNode):
     vrf: Cisco_IOS_XR_um_vrf_cfg__vrfs__vrf_subs
 
@@ -378471,7 +378538,7 @@ class Cisco_IOS_XR_um_vrf_cfg__vrfs_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.vrf]
         return direct
 
-_breaker129: None = None
+_breaker131: None = None
 class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__ipv4__addresses__address_subs(SubscriptionNode):
     address: SubscriptionNode
     netmask: SubscriptionNode
@@ -378485,7 +378552,7 @@ class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__ipv
         direct: list[SubscriptionNode] = [self.address, self.netmask]
         return direct
 
-_breaker130: None = None
+_breaker132: None = None
 class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__ipv4__addresses_subs(SubscriptionNode):
     address: Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__ipv4__addresses__address_subs
 
@@ -378497,7 +378564,7 @@ class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__ipv
         direct: list[SubscriptionNode] = [self.address]
         return direct
 
-_breaker131: None = None
+_breaker133: None = None
 class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__ipv4_subs(SubscriptionNode):
     addresses: Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__ipv4__addresses_subs
 
@@ -378509,7 +378576,7 @@ class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__ipv
         direct: list[SubscriptionNode] = [self.addresses]
         return direct
 
-_breaker132: None = None
+_breaker134: None = None
 class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__shutdown_subs(SubscriptionNode):
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -378519,7 +378586,7 @@ class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__shu
         direct: list[SubscriptionNode] = []
         return direct
 
-_breaker133: None = None
+_breaker135: None = None
 class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__encapsulation__dot1q_subs(SubscriptionNode):
     vlan_id: SubscriptionNode
 
@@ -378531,7 +378598,7 @@ class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__enc
         direct: list[SubscriptionNode] = [self.vlan_id]
         return direct
 
-_breaker134: None = None
+_breaker136: None = None
 class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__encapsulation_subs(SubscriptionNode):
     dot1q: Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__encapsulation__dot1q_subs
 
@@ -378543,7 +378610,7 @@ class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__enc
         direct: list[SubscriptionNode] = [self.dot1q]
         return direct
 
-_breaker135: None = None
+_breaker137: None = None
 class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface_entry_subs(SubscriptionNode):
     interface_name: SubscriptionNode
     ipv4: Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__ipv4_subs
@@ -378565,7 +378632,7 @@ class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface_entr
         direct: list[SubscriptionNode] = [self.interface_name, self.ipv4, self.shutdown, self.description, self.encapsulation, self.vrf]
         return direct
 
-_breaker136: None = None
+_breaker138: None = None
 class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface_subs(SubscriptionNode):
     interface_name: SubscriptionNode
     ipv4: Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface__ipv4_subs
@@ -378593,7 +378660,7 @@ class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface_subs
         direct: list[SubscriptionNode] = [self.interface_name, self.ipv4, self.shutdown, self.description, self.encapsulation, self.vrf]
         return direct
 
-_breaker137: None = None
+_breaker139: None = None
 class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces_subs(SubscriptionNode):
     interface: Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces__interface_subs
 
@@ -378605,7 +378672,7 @@ class Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces_subs(Subscripti
         direct: list[SubscriptionNode] = [self.interface]
         return direct
 
-_breaker138: None = None
+_breaker140: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net_entry_subs(SubscriptionNode):
     net_id: SubscriptionNode
 
@@ -378617,7 +378684,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.net_id]
         return direct
 
-_breaker139: None = None
+_breaker141: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net_subs(SubscriptionNode):
     net_id: SubscriptionNode
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -378635,7 +378702,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.net_id]
         return direct
 
-_breaker140: None = None
+_breaker142: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets_subs(SubscriptionNode):
     net: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__nets__net_subs
 
@@ -378647,7 +378714,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.net]
         return direct
 
-_breaker141: None = None
+_breaker143: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level_entry_subs(SubscriptionNode):
     level_number: SubscriptionNode
     default_metric: SubscriptionNode
@@ -378661,7 +378728,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.level_number, self.default_metric]
         return direct
 
-_breaker142: None = None
+_breaker144: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level_subs(SubscriptionNode):
     level_number: SubscriptionNode
     default_metric: SubscriptionNode
@@ -378681,7 +378748,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.level_number, self.default_metric]
         return direct
 
-_breaker143: None = None
+_breaker145: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels_subs(SubscriptionNode):
     metric_level: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family__metric_levels__metric_level_subs
 
@@ -378693,7 +378760,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.metric_level]
         return direct
 
-_breaker144: None = None
+_breaker146: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family_entry_subs(SubscriptionNode):
     af_name: SubscriptionNode
     saf_name: SubscriptionNode
@@ -378709,7 +378776,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.af_name, self.saf_name, self.metric_levels]
         return direct
 
-_breaker145: None = None
+_breaker147: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family_subs(SubscriptionNode):
     af_name: SubscriptionNode
     saf_name: SubscriptionNode
@@ -378732,7 +378799,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.af_name, self.saf_name, self.metric_levels]
         return direct
 
-_breaker146: None = None
+_breaker148: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families_subs(SubscriptionNode):
     address_family: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface__address_families__address_family_subs
 
@@ -378744,7 +378811,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.address_family]
         return direct
 
-_breaker147: None = None
+_breaker149: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface_entry_subs(SubscriptionNode):
     interface_name: SubscriptionNode
     state: SubscriptionNode
@@ -378764,7 +378831,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.interface_name, self.state, self.circuit_type, self.point_to_point, self.address_families]
         return direct
 
-_breaker148: None = None
+_breaker150: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface_subs(SubscriptionNode):
     interface_name: SubscriptionNode
     state: SubscriptionNode
@@ -378790,7 +378857,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.interface_name, self.state, self.circuit_type, self.point_to_point, self.address_families]
         return direct
 
-_breaker149: None = None
+_breaker151: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces_subs(SubscriptionNode):
     interface: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__interfaces__interface_subs
 
@@ -378802,7 +378869,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.interface]
         return direct
 
-_breaker150: None = None
+_breaker152: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family__metric_style__wide_subs(SubscriptionNode):
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -378812,7 +378879,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = []
         return direct
 
-_breaker151: None = None
+_breaker153: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family__metric_style_subs(SubscriptionNode):
     wide: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family__metric_style__wide_subs
 
@@ -378824,7 +378891,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.wide]
         return direct
 
-_breaker152: None = None
+_breaker154: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family_entry_subs(SubscriptionNode):
     af_name: SubscriptionNode
     saf_name: SubscriptionNode
@@ -378840,7 +378907,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.af_name, self.saf_name, self.metric_style]
         return direct
 
-_breaker153: None = None
+_breaker155: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family_subs(SubscriptionNode):
     af_name: SubscriptionNode
     saf_name: SubscriptionNode
@@ -378863,7 +378930,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.af_name, self.saf_name, self.metric_style]
         return direct
 
-_breaker154: None = None
+_breaker156: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families_subs(SubscriptionNode):
     address_family: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process__address_families__address_family_subs
 
@@ -378875,7 +378942,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.address_family]
         return direct
 
-_breaker155: None = None
+_breaker157: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process_entry_subs(SubscriptionNode):
     process_id: SubscriptionNode
     is_type: SubscriptionNode
@@ -378895,7 +378962,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.process_id, self.is_type, self.nets, self.interfaces, self.address_families]
         return direct
 
-_breaker156: None = None
+_breaker158: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process_subs(SubscriptionNode):
     process_id: SubscriptionNode
     is_type: SubscriptionNode
@@ -378921,7 +378988,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.process_id, self.is_type, self.nets, self.interfaces, self.address_families]
         return direct
 
-_breaker157: None = None
+_breaker159: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes_subs(SubscriptionNode):
     process: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes__process_subs
 
@@ -378933,7 +379000,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processe
         direct: list[SubscriptionNode] = [self.process]
         return direct
 
-_breaker158: None = None
+_breaker160: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis_subs(SubscriptionNode):
     processes: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis__processes_subs
 
@@ -378945,7 +379012,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis_subs(Subs
         direct: list[SubscriptionNode] = [self.processes]
         return direct
 
-_breaker159: None = None
+_breaker161: None = None
 class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router_subs(SubscriptionNode):
     isis: Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router__isis_subs
 
@@ -378957,7 +379024,7 @@ class Cisco_IOS_XR_um_router_isis_cfg__um_router_isis_cfg_router_subs(Subscripti
         direct: list[SubscriptionNode] = [self.isis]
         return direct
 
-_breaker160: None = None
+_breaker162: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__use_subs(SubscriptionNode):
     neighbor_group: SubscriptionNode
 
@@ -378969,7 +379036,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         direct: list[SubscriptionNode] = [self.neighbor_group]
         return direct
 
-_breaker161: None = None
+_breaker163: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_entry_subs(SubscriptionNode):
     address: SubscriptionNode
     use: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__use_subs
@@ -378985,7 +379052,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         direct: list[SubscriptionNode] = [self.address, self.use, self.description]
         return direct
 
-_breaker162: None = None
+_breaker164: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_subs(SubscriptionNode):
     address: SubscriptionNode
     use: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor__use_subs
@@ -379007,7 +379074,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         direct: list[SubscriptionNode] = [self.address, self.use, self.description]
         return direct
 
-_breaker163: None = None
+_breaker165: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors_subs(SubscriptionNode):
     neighbor: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors__neighbor_subs
 
@@ -379019,7 +379086,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         direct: list[SubscriptionNode] = [self.neighbor]
         return direct
 
-_breaker164: None = None
+_breaker166: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__password_subs(SubscriptionNode):
     encrypted: SubscriptionNode
 
@@ -379031,7 +379098,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         direct: list[SubscriptionNode] = [self.encrypted]
         return direct
 
-_breaker165: None = None
+_breaker167: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family_entry_subs(SubscriptionNode):
     af_name: SubscriptionNode
 
@@ -379043,7 +379110,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         direct: list[SubscriptionNode] = [self.af_name]
         return direct
 
-_breaker166: None = None
+_breaker168: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family_subs(SubscriptionNode):
     af_name: SubscriptionNode
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -379061,7 +379128,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         direct: list[SubscriptionNode] = [self.af_name]
         return direct
 
-_breaker167: None = None
+_breaker169: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families_subs(SubscriptionNode):
     address_family: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group__address_families__address_family_subs
 
@@ -379073,7 +379140,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         direct: list[SubscriptionNode] = [self.address_family]
         return direct
 
-_breaker168: None = None
+_breaker170: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group_entry_subs(SubscriptionNode):
     neighbor_group_name: SubscriptionNode
     remote_as: SubscriptionNode
@@ -379093,7 +379160,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         direct: list[SubscriptionNode] = [self.neighbor_group_name, self.remote_as, self.password, self.update_source, self.address_families]
         return direct
 
-_breaker169: None = None
+_breaker171: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group_subs(SubscriptionNode):
     neighbor_group_name: SubscriptionNode
     remote_as: SubscriptionNode
@@ -379119,7 +379186,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         direct: list[SubscriptionNode] = [self.neighbor_group_name, self.remote_as, self.password, self.update_source, self.address_families]
         return direct
 
-_breaker170: None = None
+_breaker172: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups_subs(SubscriptionNode):
     neighbor_group: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbor_groups__neighbor_group_subs
 
@@ -379131,7 +379198,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbo
         direct: list[SubscriptionNode] = [self.neighbor_group]
         return direct
 
-_breaker171: None = None
+_breaker173: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family_entry_subs(SubscriptionNode):
     af_name: SubscriptionNode
 
@@ -379143,7 +379210,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address
         direct: list[SubscriptionNode] = [self.af_name]
         return direct
 
-_breaker172: None = None
+_breaker174: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family_subs(SubscriptionNode):
     af_name: SubscriptionNode
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -379161,7 +379228,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address
         direct: list[SubscriptionNode] = [self.af_name]
         return direct
 
-_breaker173: None = None
+_breaker175: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families_subs(SubscriptionNode):
     address_family: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address_families__address_family_subs
 
@@ -379173,7 +379240,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__address
         direct: list[SubscriptionNode] = [self.address_family]
         return direct
 
-_breaker174: None = None
+_breaker176: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__bgp_subs(SubscriptionNode):
     router_id: SubscriptionNode
 
@@ -379185,7 +379252,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__bgp_sub
         direct: list[SubscriptionNode] = [self.router_id]
         return direct
 
-_breaker175: None = None
+_breaker177: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__rd__two_byte_as_subs(SubscriptionNode):
     two_byte_as_number: SubscriptionNode
     asn2_index: SubscriptionNode
@@ -379199,7 +379266,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         direct: list[SubscriptionNode] = [self.two_byte_as_number, self.asn2_index]
         return direct
 
-_breaker176: None = None
+_breaker178: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__rd_subs(SubscriptionNode):
     two_byte_as: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__rd__two_byte_as_subs
 
@@ -379211,7 +379278,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         direct: list[SubscriptionNode] = [self.two_byte_as]
         return direct
 
-_breaker177: None = None
+_breaker179: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family_entry_subs(SubscriptionNode):
     af_name: SubscriptionNode
 
@@ -379223,7 +379290,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         direct: list[SubscriptionNode] = [self.af_name]
         return direct
 
-_breaker178: None = None
+_breaker180: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family_subs(SubscriptionNode):
     af_name: SubscriptionNode
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -379241,7 +379308,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         direct: list[SubscriptionNode] = [self.af_name]
         return direct
 
-_breaker179: None = None
+_breaker181: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families_subs(SubscriptionNode):
     address_family: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__address_families__address_family_subs
 
@@ -379253,7 +379320,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         direct: list[SubscriptionNode] = [self.address_family]
         return direct
 
-_breaker180: None = None
+_breaker182: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__password_subs(SubscriptionNode):
     encrypted: SubscriptionNode
 
@@ -379265,7 +379332,33 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         direct: list[SubscriptionNode] = [self.encrypted]
         return direct
 
-_breaker181: None = None
+_breaker183: None = None
+class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers__holdtime_subs(SubscriptionNode):
+    holdtime_number: SubscriptionNode
+
+    pure def __init__(self, path: ?SubscriptionPath=None) -> None:
+        SubscriptionNode.__init__(self, path)
+        self.holdtime_number = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'holdtime-number'), parent=path))
+
+    pure def _direct_children(self) -> list[SubscriptionNode]:
+        direct: list[SubscriptionNode] = [self.holdtime_number]
+        return direct
+
+_breaker184: None = None
+class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers_subs(SubscriptionNode):
+    keepalive_interval: SubscriptionNode
+    holdtime: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers__holdtime_subs
+
+    pure def __init__(self, path: ?SubscriptionPath=None) -> None:
+        SubscriptionNode.__init__(self, path)
+        self.keepalive_interval = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'keepalive-interval'), parent=path))
+        self.holdtime = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers__holdtime_subs(SubscriptionPath(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'holdtime'), parent=path))
+
+    pure def _direct_children(self) -> list[SubscriptionNode]:
+        direct: list[SubscriptionNode] = [self.keepalive_interval, self.holdtime]
+        return direct
+
+_breaker185: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family__route_policy_subs(SubscriptionNode):
     out: SubscriptionNode
     in_: SubscriptionNode
@@ -379279,7 +379372,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         direct: list[SubscriptionNode] = [self.out, self.in_]
         return direct
 
-_breaker182: None = None
+_breaker186: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family__as_override_subs(SubscriptionNode):
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -379289,7 +379382,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         direct: list[SubscriptionNode] = []
         return direct
 
-_breaker183: None = None
+_breaker187: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_entry_subs(SubscriptionNode):
     af_name: SubscriptionNode
     route_policy: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family__route_policy_subs
@@ -379305,7 +379398,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         direct: list[SubscriptionNode] = [self.af_name, self.route_policy, self.as_override]
         return direct
 
-_breaker184: None = None
+_breaker188: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_subs(SubscriptionNode):
     af_name: SubscriptionNode
     route_policy: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family__route_policy_subs
@@ -379327,7 +379420,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         direct: list[SubscriptionNode] = [self.af_name, self.route_policy, self.as_override]
         return direct
 
-_breaker185: None = None
+_breaker189: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families_subs(SubscriptionNode):
     address_family: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families__address_family_subs
 
@@ -379339,12 +379432,13 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         direct: list[SubscriptionNode] = [self.address_family]
         return direct
 
-_breaker186: None = None
+_breaker190: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry_subs(SubscriptionNode):
     address: SubscriptionNode
     remote_as: SubscriptionNode
     description: SubscriptionNode
     password: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__password_subs
+    timers: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers_subs
     address_families: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families_subs
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -379353,18 +379447,20 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         self.remote_as = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'remote-as'), parent=path))
         self.description = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'description'), parent=path))
         self.password = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__password_subs(SubscriptionPath(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'password'), parent=path))
+        self.timers = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers_subs(SubscriptionPath(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'timers'), parent=path))
         self.address_families = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families_subs(SubscriptionPath(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'address-families'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.address, self.remote_as, self.description, self.password, self.address_families]
+        direct: list[SubscriptionNode] = [self.address, self.remote_as, self.description, self.password, self.timers, self.address_families]
         return direct
 
-_breaker187: None = None
+_breaker191: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_subs(SubscriptionNode):
     address: SubscriptionNode
     remote_as: SubscriptionNode
     description: SubscriptionNode
     password: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__password_subs
+    timers: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers_subs
     address_families: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families_subs
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
@@ -379372,6 +379468,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         self.remote_as = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'remote-as'), parent=path))
         self.description = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'description'), parent=path))
         self.password = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__password_subs(SubscriptionPath(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'password'), parent=path))
+        self.timers = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__timers_subs(SubscriptionPath(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'timers'), parent=path))
         self.address_families = Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor__address_families_subs(SubscriptionPath(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'address-families'), parent=path))
 
     pure def entry(self, address: str) -> Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry_subs:
@@ -379382,10 +379479,10 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         return Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_entry_subs(SubscriptionPath(ygdata.Id(NS_Cisco_IOS_XR_um_router_bgp_cfg, 'neighbor'), predicates=predicates, parent=base_path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.address, self.remote_as, self.description, self.password, self.address_families]
+        direct: list[SubscriptionNode] = [self.address, self.remote_as, self.description, self.password, self.timers, self.address_families]
         return direct
 
-_breaker188: None = None
+_breaker192: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors_subs(SubscriptionNode):
     neighbor: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__neighbors__neighbor_subs
 
@@ -379397,7 +379494,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         direct: list[SubscriptionNode] = [self.neighbor]
         return direct
 
-_breaker189: None = None
+_breaker193: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_entry_subs(SubscriptionNode):
     vrf_name: SubscriptionNode
     rd: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__rd_subs
@@ -379415,7 +379512,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         direct: list[SubscriptionNode] = [self.vrf_name, self.rd, self.address_families, self.neighbors]
         return direct
 
-_breaker190: None = None
+_breaker194: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_subs(SubscriptionNode):
     vrf_name: SubscriptionNode
     rd: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf__rd_subs
@@ -379439,7 +379536,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__v
         direct: list[SubscriptionNode] = [self.vrf_name, self.rd, self.address_families, self.neighbors]
         return direct
 
-_breaker191: None = None
+_breaker195: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs_subs(SubscriptionNode):
     vrf: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs__vrf_subs
 
@@ -379451,7 +379548,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__vrfs_su
         direct: list[SubscriptionNode] = [self.vrf]
         return direct
 
-_breaker192: None = None
+_breaker196: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_entry_subs(SubscriptionNode):
     as_number: SubscriptionNode
     neighbors: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors_subs
@@ -379473,7 +379570,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_entry_su
         direct: list[SubscriptionNode] = [self.as_number, self.neighbors, self.neighbor_groups, self.address_families, self.bgp, self.vrfs]
         return direct
 
-_breaker193: None = None
+_breaker197: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_subs(SubscriptionNode):
     as_number: SubscriptionNode
     neighbors: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as__neighbors_subs
@@ -379501,7 +379598,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_subs(Sub
         direct: list[SubscriptionNode] = [self.as_number, self.neighbors, self.neighbor_groups, self.address_families, self.bgp, self.vrfs]
         return direct
 
-_breaker194: None = None
+_breaker198: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp_subs(SubscriptionNode):
     as_: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp__as_subs
 
@@ -379513,7 +379610,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp_subs(Subscri
         direct: list[SubscriptionNode] = [self.as_]
         return direct
 
-_breaker195: None = None
+_breaker199: None = None
 class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router_subs(SubscriptionNode):
     bgp: Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router__bgp_subs
 
@@ -379525,7 +379622,7 @@ class Cisco_IOS_XR_um_router_bgp_cfg__um_router_bgp_cfg_router_subs(Subscription
         direct: list[SubscriptionNode] = [self.bgp]
         return direct
 
-_breaker196: None = None
+_breaker200: None = None
 class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_entry_subs(SubscriptionNode):
     route_policy_name: SubscriptionNode
     rpl_route_policy: SubscriptionNode
@@ -379539,7 +379636,7 @@ class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_po
         direct: list[SubscriptionNode] = [self.route_policy_name, self.rpl_route_policy]
         return direct
 
-_breaker197: None = None
+_breaker201: None = None
 class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_subs(SubscriptionNode):
     route_policy_name: SubscriptionNode
     rpl_route_policy: SubscriptionNode
@@ -379559,7 +379656,7 @@ class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_po
         direct: list[SubscriptionNode] = [self.route_policy_name, self.rpl_route_policy]
         return direct
 
-_breaker198: None = None
+_breaker202: None = None
 class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies_subs(SubscriptionNode):
     route_policy: Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies__route_policy_subs
 
@@ -379571,7 +379668,7 @@ class Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies_subs(Subs
         direct: list[SubscriptionNode] = [self.route_policy]
         return direct
 
-_breaker199: None = None
+_breaker203: None = None
 class Cisco_IOS_XR_um_route_policy_cfg__routing_policy_subs(SubscriptionNode):
     route_policies: Cisco_IOS_XR_um_route_policy_cfg__routing_policy__route_policies_subs
 
@@ -379583,7 +379680,7 @@ class Cisco_IOS_XR_um_route_policy_cfg__routing_policy_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.route_policies]
         return direct
 
-_breaker200: None = None
+_breaker204: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_entry_subs(SubscriptionNode):
     af_name: SubscriptionNode
 
@@ -379595,7 +379692,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_
         direct: list[SubscriptionNode] = [self.af_name]
         return direct
 
-_breaker201: None = None
+_breaker205: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_subs(SubscriptionNode):
     af_name: SubscriptionNode
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -379613,7 +379710,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_
         direct: list[SubscriptionNode] = [self.af_name]
         return direct
 
-_breaker202: None = None
+_breaker206: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families_subs(SubscriptionNode):
     address_family: Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families__address_family_subs
 
@@ -379625,7 +379722,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families_subs(Subscriptio
         direct: list[SubscriptionNode] = [self.address_family]
         return direct
 
-_breaker203: None = None
+_breaker207: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry_subs(SubscriptionNode):
     interface_name: SubscriptionNode
 
@@ -379637,7 +379734,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_entry_subs(
         direct: list[SubscriptionNode] = [self.interface_name]
         return direct
 
-_breaker204: None = None
+_breaker208: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_subs(SubscriptionNode):
     interface_name: SubscriptionNode
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
@@ -379655,7 +379752,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_subs(Subscr
         direct: list[SubscriptionNode] = [self.interface_name]
         return direct
 
-_breaker205: None = None
+_breaker209: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces_subs(SubscriptionNode):
     interface: Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces__interface_subs
 
@@ -379667,7 +379764,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces_subs(SubscriptionNode)
         direct: list[SubscriptionNode] = [self.interface]
         return direct
 
-_breaker206: None = None
+_breaker210: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp_subs(SubscriptionNode):
     address_families: Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__address_families_subs
     interfaces: Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp__interfaces_subs
@@ -379681,7 +379778,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.address_families, self.interfaces]
         return direct
 
-_breaker207: None = None
+_breaker211: None = None
 class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls_subs(SubscriptionNode):
     ldp: Cisco_IOS_XR_um_mpls_ldp_cfg__mpls__ldp_subs
 
@@ -379693,7 +379790,7 @@ class Cisco_IOS_XR_um_mpls_ldp_cfg__mpls_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.ldp]
         return direct
 
-_breaker208: None = None
+_breaker212: None = None
 class Cisco_IOS_XR_um_hostname_cfg__hostname_subs(SubscriptionNode):
     system_network_name: SubscriptionNode
 
@@ -379705,7 +379802,7 @@ class Cisco_IOS_XR_um_hostname_cfg__hostname_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.system_network_name]
         return direct
 
-_breaker209: None = None
+_breaker213: None = None
 class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_entry_subs(SubscriptionNode):
     interface_name: SubscriptionNode
     state: SubscriptionNode
@@ -379719,7 +379816,7 @@ class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__in
         direct: list[SubscriptionNode] = [self.interface_name, self.state]
         return direct
 
-_breaker210: None = None
+_breaker214: None = None
 class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_subs(SubscriptionNode):
     interface_name: SubscriptionNode
     state: SubscriptionNode
@@ -379739,7 +379836,7 @@ class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__in
         direct: list[SubscriptionNode] = [self.interface_name, self.state]
         return direct
 
-_breaker211: None = None
+_breaker215: None = None
 class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr_subs(SubscriptionNode):
     interface: Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr__interface_subs
 
@@ -379751,7 +379848,7 @@ class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr_sub
         direct: list[SubscriptionNode] = [self.interface]
         return direct
 
-_breaker212: None = None
+_breaker216: None = None
 class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces_subs(SubscriptionNode):
     interface_xr: Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces__interface_xr_subs
 
@@ -379763,7 +379860,7 @@ class Cisco_IOS_XR_pfi_im_cmd_oper__pfi_im_cmd_oper_interfaces_subs(Subscription
         direct: list[SubscriptionNode] = [self.interface_xr]
         return direct
 
-_breaker213: None = None
+_breaker217: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf__neighbors__neighbor_entry_subs(SubscriptionNode):
     neighbor_address: SubscriptionNode
     connection_state: SubscriptionNode
@@ -379785,7 +379882,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrf
         direct: list[SubscriptionNode] = [self.neighbor_address, self.connection_state, self.hold_time, self.reset_reason, self.last_notify_error_code, self.last_notify_error_subcode]
         return direct
 
-_breaker214: None = None
+_breaker218: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf__neighbors__neighbor_subs(SubscriptionNode):
     neighbor_address: SubscriptionNode
     connection_state: SubscriptionNode
@@ -379813,7 +379910,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrf
         direct: list[SubscriptionNode] = [self.neighbor_address, self.connection_state, self.hold_time, self.reset_reason, self.last_notify_error_code, self.last_notify_error_subcode]
         return direct
 
-_breaker215: None = None
+_breaker219: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf__neighbors_subs(SubscriptionNode):
     neighbor: Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf__neighbors__neighbor_subs
 
@@ -379825,7 +379922,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrf
         direct: list[SubscriptionNode] = [self.neighbor]
         return direct
 
-_breaker216: None = None
+_breaker220: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf_entry_subs(SubscriptionNode):
     vrf_name: SubscriptionNode
     neighbors: Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf__neighbors_subs
@@ -379839,7 +379936,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrf
         direct: list[SubscriptionNode] = [self.vrf_name, self.neighbors]
         return direct
 
-_breaker217: None = None
+_breaker221: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf_subs(SubscriptionNode):
     vrf_name: SubscriptionNode
     neighbors: Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf__neighbors_subs
@@ -379859,7 +379956,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrf
         direct: list[SubscriptionNode] = [self.vrf_name, self.neighbors]
         return direct
 
-_breaker218: None = None
+_breaker222: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs_subs(SubscriptionNode):
     vrf: Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs__vrf_subs
 
@@ -379871,7 +379968,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrf
         direct: list[SubscriptionNode] = [self.vrf]
         return direct
 
-_breaker219: None = None
+_breaker223: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active_subs(SubscriptionNode):
     vrfs: Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active__vrfs_subs
 
@@ -379883,7 +379980,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active_subs
         direct: list[SubscriptionNode] = [self.vrfs]
         return direct
 
-_breaker220: None = None
+_breaker224: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance_entry_subs(SubscriptionNode):
     instance_name: SubscriptionNode
     instance_active: Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active_subs
@@ -379897,7 +379994,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance_entry_subs(Subscripti
         direct: list[SubscriptionNode] = [self.instance_name, self.instance_active]
         return direct
 
-_breaker221: None = None
+_breaker225: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance_subs(SubscriptionNode):
     instance_name: SubscriptionNode
     instance_active: Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance__instance_active_subs
@@ -379917,7 +380014,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance_subs(SubscriptionNode
         direct: list[SubscriptionNode] = [self.instance_name, self.instance_active]
         return direct
 
-_breaker222: None = None
+_breaker226: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances_subs(SubscriptionNode):
     instance: Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances__instance_subs
 
@@ -379929,7 +380026,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.instance]
         return direct
 
-_breaker223: None = None
+_breaker227: None = None
 class Cisco_IOS_XR_ipv4_bgp_oper__bgp_subs(SubscriptionNode):
     instances: Cisco_IOS_XR_ipv4_bgp_oper__bgp__instances_subs
 
@@ -379941,7 +380038,7 @@ class Cisco_IOS_XR_ipv4_bgp_oper__bgp_subs(SubscriptionNode):
         direct: list[SubscriptionNode] = [self.instances]
         return direct
 
-_breaker224: None = None
+_breaker228: None = None
 class root_subs(SubscriptionNode):
     vrfs: Cisco_IOS_XR_um_vrf_cfg__vrfs_subs
     um_interface_cfg_interfaces: Cisco_IOS_XR_um_interface_cfg__um_interface_cfg_interfaces_subs

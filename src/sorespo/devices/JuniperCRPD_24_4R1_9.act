@@ -566,15 +566,17 @@ class junos_conf_root__configuration__routing_instances__instance__protocols__bg
     name: str
     description: ?str
     multihop: ?junos_conf_root__configuration__routing_instances__instance__protocols__bgp__group__neighbor__multihop
+    hold_time: ?value
     authentication_key: ?str
     authentication_algorithm: ?str
     peer_as: ?str
     as_override: ?bool
 
-    mut def __init__(self, name: str, description: ?str, multihop: ?junos_conf_root__configuration__routing_instances__instance__protocols__bgp__group__neighbor__multihop=None, authentication_key: ?str, authentication_algorithm: ?str, peer_as: ?str, as_override: ?bool) -> None:
+    mut def __init__(self, name: str, description: ?str, multihop: ?junos_conf_root__configuration__routing_instances__instance__protocols__bgp__group__neighbor__multihop=None, hold_time: ?value, authentication_key: ?str, authentication_algorithm: ?str, peer_as: ?str, as_override: ?bool) -> None:
         self.name = name
         self.description = description
         self.multihop = multihop
+        self.hold_time = hold_time
         self.authentication_key = authentication_key
         self.authentication_algorithm = authentication_algorithm
         self.peer_as = peer_as
@@ -597,7 +599,7 @@ class junos_conf_root__configuration__routing_instances__instance__protocols__bg
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> junos_conf_root__configuration__routing_instances__instance__protocols__bgp__group__neighbor_entry:
-        return junos_conf_root__configuration__routing_instances__instance__protocols__bgp__group__neighbor_entry(name=n.get_str(ygdata.Id(NS_junos_conf_root, 'name')), description=n.get_opt_str(ygdata.Id(NS_junos_conf_root, 'description')), multihop=junos_conf_root__configuration__routing_instances__instance__protocols__bgp__group__neighbor__multihop.from_gdata(n.get_opt_cnt(ygdata.Id(NS_junos_conf_root, 'multihop'))), authentication_key=n.get_opt_str(ygdata.Id(NS_junos_conf_root, 'authentication-key')), authentication_algorithm=n.get_opt_str(ygdata.Id(NS_junos_conf_root, 'authentication-algorithm')), peer_as=n.get_opt_str(ygdata.Id(NS_junos_conf_root, 'peer-as')), as_override=n.get_opt_empty(ygdata.Id(NS_junos_conf_root, 'as-override')))
+        return junos_conf_root__configuration__routing_instances__instance__protocols__bgp__group__neighbor_entry(name=n.get_str(ygdata.Id(NS_junos_conf_root, 'name')), description=n.get_opt_str(ygdata.Id(NS_junos_conf_root, 'description')), multihop=junos_conf_root__configuration__routing_instances__instance__protocols__bgp__group__neighbor__multihop.from_gdata(n.get_opt_cnt(ygdata.Id(NS_junos_conf_root, 'multihop'))), hold_time=n.get_opt_value(ygdata.Id(NS_junos_conf_root, 'hold-time')), authentication_key=n.get_opt_str(ygdata.Id(NS_junos_conf_root, 'authentication-key')), authentication_algorithm=n.get_opt_str(ygdata.Id(NS_junos_conf_root, 'authentication-algorithm')), peer_as=n.get_opt_str(ygdata.Id(NS_junos_conf_root, 'peer-as')), as_override=n.get_opt_empty(ygdata.Id(NS_junos_conf_root, 'as-override')))
 
     mut def copy(self) -> junos_conf_root__configuration__routing_instances__instance__protocols__bgp__group__neighbor_entry:
         """Create a deep copy of this adata object"""
@@ -608,11 +610,13 @@ class junos_conf_root__configuration__routing_instances__instance__protocols__bg
     mut def __init__(self, elements: list[junos_conf_root__configuration__routing_instances__instance__protocols__bgp__group__neighbor_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e: e.name, elements)
 
-    mut def create(self, key: str, description: ?str=None, authentication_key: ?str=None, authentication_algorithm: ?str=None, peer_as: ?str=None, as_override: ?bool=None) -> junos_conf_root__configuration__routing_instances__instance__protocols__bgp__group__neighbor_entry:
+    mut def create(self, key: str, description: ?str=None, hold_time: ?value=None, authentication_key: ?str=None, authentication_algorithm: ?str=None, peer_as: ?str=None, as_override: ?bool=None) -> junos_conf_root__configuration__routing_instances__instance__protocols__bgp__group__neighbor_entry:
         e = self.get(key)
         if e is not None:
             if description is not None:
                 e.description = description
+            if hold_time is not None:
+                e.hold_time = hold_time
             if authentication_key is not None:
                 e.authentication_key = authentication_key
             if authentication_algorithm is not None:
@@ -623,7 +627,7 @@ class junos_conf_root__configuration__routing_instances__instance__protocols__bg
                 e.as_override = as_override
             return e
         name = key
-        res = junos_conf_root__configuration__routing_instances__instance__protocols__bgp__group__neighbor_entry(name=name, description=description, authentication_key=authentication_key, authentication_algorithm=authentication_algorithm, peer_as=peer_as, as_override=as_override)
+        res = junos_conf_root__configuration__routing_instances__instance__protocols__bgp__group__neighbor_entry(name=name, description=description, hold_time=hold_time, authentication_key=authentication_key, authentication_algorithm=authentication_algorithm, peer_as=peer_as, as_override=as_override)
         self._append(res)
         return res
 
