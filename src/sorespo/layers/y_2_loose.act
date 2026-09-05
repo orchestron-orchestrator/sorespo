@@ -127,7 +127,10 @@ SRC_DNODE_CHILD_16: DList = DList(module='sorespo-rfs', namespace='http://exampl
     ])
 ])
 
-SRC_DNODE_CHILD_17: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='roadm-vlan', key=['interface'], config=True, description='vlans', min_elements=0, ordered_by='system', exts=[
+SRC_DNODE_CHILD_17: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='roadm-vlan', key=[
+'interface',
+'vlan'
+    ], config=True, description='vlans', min_elements=0, ordered_by='system', exts=[
         DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='rfs-transform', arg='sorespo.rfs.RoadmSubifaceVlan', exts=[])
     ], children=[
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='interface', config=True, mandatory=True, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
@@ -292,7 +295,7 @@ SRC_YANG_0: str = r"""module sorespo-rfs {
           }
         }
         list roadm-vlan {
-          key interface;
+          key "interface vlan";
           sw:rfs-transform sorespo.rfs.RoadmSubifaceVlan;
           description "vlans";
           leaf interface {
@@ -2787,9 +2790,9 @@ class stratoweave_rfs__rfs__user_interface(yadata.MKeyedList[str, stratoweave_rf
 _breaker27: None = None
 class stratoweave_rfs__rfs__roadm_vlan_entry(yadata.MNode):
     interface: str
-    vlan: ?u64
+    vlan: u64
 
-    mut def __init__(self, interface: str, vlan: ?u64) -> None:
+    mut def __init__(self, interface: str, vlan: u64) -> None:
         self.interface = interface
         self.vlan = vlan
 
@@ -2798,24 +2801,22 @@ class stratoweave_rfs__rfs__roadm_vlan_entry(yadata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> stratoweave_rfs__rfs__roadm_vlan_entry:
-        return stratoweave_rfs__rfs__roadm_vlan_entry(interface=n.get_str(ygdata.Id(NS_sorespo_rfs, 'interface')), vlan=n.get_opt_u64(ygdata.Id(NS_sorespo_rfs, 'vlan')))
+        return stratoweave_rfs__rfs__roadm_vlan_entry(interface=n.get_str(ygdata.Id(NS_sorespo_rfs, 'interface')), vlan=n.get_u64(ygdata.Id(NS_sorespo_rfs, 'vlan')))
 
     mut def copy(self) -> stratoweave_rfs__rfs__roadm_vlan_entry:
         """Create a deep copy of this adata object"""
         return stratoweave_rfs__rfs__roadm_vlan_entry.from_gdata(self.to_gdata())
 
 _breaker28: None = None
-class stratoweave_rfs__rfs__roadm_vlan(yadata.MKeyedList[str, stratoweave_rfs__rfs__roadm_vlan_entry]):
+class stratoweave_rfs__rfs__roadm_vlan(yadata.MKeyedList[(interface: str, vlan: u64), stratoweave_rfs__rfs__roadm_vlan_entry]):
     mut def __init__(self, elements: list[stratoweave_rfs__rfs__roadm_vlan_entry]=[]) -> None:
-        yadata.MKeyedList.__init__(self, lambda e, k: e.interface == k, elements)
+        yadata.MKeyedList.__init__(self, lambda e, k: e.interface == k.interface and e.vlan == k.vlan, elements)
 
-    mut def create(self, key: str, vlan: ?u64=None) -> stratoweave_rfs__rfs__roadm_vlan_entry:
+    mut def create(self, key: (interface: str, vlan: u64)) -> stratoweave_rfs__rfs__roadm_vlan_entry:
         e = self.get(key)
         if e is not None:
-            if vlan is not None:
-                e.vlan = vlan
             return e
-        interface = key
+        (interface=interface, vlan=vlan) = key
         res = stratoweave_rfs__rfs__roadm_vlan_entry(interface=interface, vlan=vlan)
         self.elements.append(res)
         return res

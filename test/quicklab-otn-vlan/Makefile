@@ -1,22 +1,45 @@
 TESTENV=sorespo-quicklab-otn-vlan
+TOPOLOGY_GENERATOR=./randomize.py
 
-ROUTERS_SRL=ams-core-1 sto-core-1
+ROUTERS_SRL=$(shell python3 $(TOPOLOGY_GENERATOR) router-nodes netinfra.xml 2>/dev/null)
 ROUTERS_FRR=
 CPE_IDS=
 POST_DEPLOY_TARGETS=apply-optical-latency
+BB_INTERFACES=$(shell python3 $(TOPOLOGY_GENERATOR) backbone-interfaces netinfra.xml 2>/dev/null)
 
 include ../common/clab.mk
 include ../common/containers.mk
 include ../common/quicklab.mk
 
-# Each entry is "<router>:<srl-interface>". Mirrors netinfra.xml's
-# backbone-link entry (2 endpoints). Use the SRL
-# interface name (ethernet-1/X), not the linux veth (e1-X).
-BB_INTERFACES = \
-    ams-core-1:ethernet-1/2 \
-	sto-core-1:ethernet-1/1
-
 SHELL := /bin/bash
+
+ROUTERS ?= 2
+ROADMS ?= 3
+BACKBONE_LINKS ?= 1
+MIN_SPAN_KM ?= 200
+MAX_SPAN_KM ?= 500
+SEED ?=
+
+.PHONY: randomize
+randomize:
+	@set -e; \
+	tmpdir=$$(mktemp -d); \
+	trap 'rm -rf "$$tmpdir"' EXIT; \
+	python3 $(TOPOLOGY_GENERATOR) generate \
+		--routers $(ROUTERS) \
+		--roadms $(ROADMS) \
+		--backbone-links $(BACKBONE_LINKS) \
+		--min-span-km $(MIN_SPAN_KM) \
+		--max-span-km $(MAX_SPAN_KM) \
+		--netinfra "$$tmpdir/netinfra.xml" \
+		--topology "$$tmpdir/quicklab-otn-vlan.clab.yml" \
+		$(if $(SEED),--seed $(SEED),); \
+	if docker ps -aq --filter "label=containerlab=$(TESTENV)" | grep -q .; then \
+		echo "Destroying the running $(TESTENV) topology before replacing it"; \
+		$(CLAB_BIN) destroy --topo $(TESTENV:sorespo-%=%).clab.yml --log-level info; \
+	fi; \
+	mv "$$tmpdir/netinfra.xml" netinfra.xml; \
+	mv "$$tmpdir/quicklab-otn-vlan.clab.yml" quicklab-otn-vlan.clab.yml
 
 # sr_cli flags:
 #   -e  → pre-command "enter candidate"
@@ -82,8 +105,7 @@ apply-optical-latency:
 PING_COUNT ?= 3
 
 .PHONY: ping
-ping:
-	docker exec $(TESTENV)-ams-core-1 sr_cli "ping -c $(PING_COUNT) network-instance default 10.0.20.2"
+ping: test-ping
 
 .PHONY: test-ping
 test-ping::
@@ -105,6 +127,8 @@ test-ping::
 				"$$left_name|$$left_container|$$left_ip|$$right_name|$$right_ip" \
 				"$$right_name|$$right_container|$$right_ip|$$left_name|$$left_ip"; do \
 				IFS='|' read -r source_name source_container source_ip destination_name destination_ip <<< "$$direction"; \
+				docker exec "$(TESTENV)-$$source_container" sr_cli \
+					"ping -c 1 -W 1 -I $$source_ip network-instance default $$destination_ip" >/dev/null 2>&1 || true; \
 				output=$$(docker exec "$(TESTENV)-$$source_container" sr_cli \
 					"ping -c $(PING_COUNT) -I $$source_ip network-instance default $$destination_ip" 2>&1); \
 				status=$$?; \
