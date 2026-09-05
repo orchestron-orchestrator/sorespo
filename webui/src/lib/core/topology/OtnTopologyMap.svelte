@@ -8,7 +8,7 @@
   } from '$lib/core/topology/otn-model';
   import { appHref } from '$lib/core/util/nav';
 
-  import type { OtnGraph } from '$lib/core/topology/otn-model';
+  import type { OtnGraph, OtnRoadm } from '$lib/core/topology/otn-model';
 
   let { graph }: { graph: OtnGraph } = $props();
   let selectedPathId: string | null = $state(null);
@@ -20,6 +20,30 @@
 
   function togglePath(pathId: string): void {
     selectedPathId = selectedPathId === pathId ? null : pathId;
+  }
+
+  function roadmLabelPosition(roadm: OtnRoadm): { x: number; y: number; anchor: 'start' | 'middle' | 'end' } {
+    const attachedRouters = graph.attachments
+      .filter((attachment) => attachment.roadm === roadm.name)
+      .map((attachment) => attachment.routerPoint);
+    if (attachedRouters.length === 0) {
+      const rightSide = roadm.x >= graph.width / 2;
+      return { x: rightSide ? roadmRadius + 12 : -roadmRadius - 12, y: 5, anchor: rightSide ? 'start' : 'end' };
+    }
+
+    const routerX = attachedRouters.reduce((sum, router) => sum + router.x, 0) / attachedRouters.length;
+    const routerY = attachedRouters.reduce((sum, router) => sum + router.y, 0) / attachedRouters.length;
+    const deltaX = routerX - roadm.x;
+    const deltaY = routerY - roadm.y;
+    const length = Math.hypot(deltaX, deltaY) || 1;
+    const tangentX = -deltaY / length;
+    const tangentY = deltaX / length;
+    const distance = roadmRadius + 16;
+    return {
+      x: tangentX * distance,
+      y: tangentY * distance + 5,
+      anchor: Math.abs(tangentX) < 0.35 ? 'middle' : tangentX > 0 ? 'start' : 'end'
+    };
   }
 
   onMount(() => {
@@ -107,6 +131,7 @@
 
         <g class="otn__roadms">
           {#each graph.roadms as roadm}
+            {@const label = roadmLabelPosition(roadm)}
             <a href={appHref(`/devices/${encodeURIComponent(roadm.name)}`)}>
               <g class="otn__roadm" transform={`translate(${roadm.x}, ${roadm.y})`}>
                 <rect
@@ -121,8 +146,9 @@
                 <circle class="otn__roadm-center" r="6"></circle>
                 <text
                   class="otn__roadm-name"
-                  text-anchor="middle"
-                  y={roadm.y > graph.height / 2 ? -roadmRadius - 14 : roadmRadius + 24}
+                  text-anchor={label.anchor}
+                  x={label.x}
+                  y={label.y}
                 >{roadm.name}</text>
               </g>
             </a>
@@ -277,6 +303,10 @@
     fill: var(--sw-text-primary);
     font-size: 11px;
     font-weight: 650;
+    paint-order: stroke;
+    stroke: rgba(8, 16, 32, 0.96);
+    stroke-linejoin: round;
+    stroke-width: 5px;
     pointer-events: none;
   }
 

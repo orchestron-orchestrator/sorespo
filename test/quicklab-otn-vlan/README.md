@@ -24,20 +24,26 @@ make run-and-configure
 directions of each ROADM-to-ROADM link using Containerlab netem. Reapply them to
 an already-running topology with `make apply-optical-latency`.
 
-Generate a random complete ROADM mesh, random router attachments, and
-deliberately multi-hop backbone paths with no repeated ROADM:
+Generate a sparse geographic ROADM topology with edge router attachments and
+shortest-path optical routes:
 
 ```bash
 make randomize ROUTERS=4 ROADMS=6 BACKBONE_LINKS=4
 ```
 
 Use `SEED=<integer>` to reproduce a topology. `MIN_SPAN_KM` and `MAX_SPAN_KM`
-default to 200 and 500. Router counts are limited to 2-26, at least three ROADMs
-are required, and at least `ROUTERS - 1` backbone links are required so every
-router remains reachable. The generator reports when the current addressing or
-port limits cannot represent the requested counts. Randomizing destroys a
-currently running instance of this lab before replacing its topology files.
-Afterward, run `make start`, `make copy`, and `make run-and-configure` as usual.
+default to 200 and 500. ROADMs receive latitude and longitude coordinates, and
+fiber distance and latency are calculated from those coordinates. The physical
+network uses a minimum spanning tree plus short, non-crossing redundancy links;
+it is never a complete mesh. Routers attach to ROADMs on the geographic hull.
+Each router consistently uses that same edge ROADM as the first or last node of
+every optical path, allowing the dashboard to render both devices as one site.
+Router counts are limited to 2-26, at least three ROADMs are required, and at
+least `ROUTERS - 1` backbone links are required so every router remains
+reachable. The generator reports when the current addressing or port limits
+cannot represent the requested counts. Randomizing destroys any currently
+running instance of this lab before replacing its topology files. Afterward,
+run `make start`, `make copy`, and `make run-and-configure` as usual.
 
 In another terminal, verify end-to-end connectivity through the OTN path:
 

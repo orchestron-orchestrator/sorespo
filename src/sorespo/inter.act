@@ -255,22 +255,24 @@ class ROADM(base.ROADM):
         return o
 
 class OpticalLink(base.OpticalLink):
-    def transform(self, i):
+    def transform(self, i: y_1.netinfra_inter__netinfra__optical_link_entry):
         o = base.o_root()
-        print("CFS OpticalLink transform running %s [%s] <-> %s [%s]" % (i.left_roadm, i.left_port, i.right_roadm, i.right_port))
+        left_port = i.left_port
+        right_port = i.right_port
+        if isinstance(left_port, str) and isinstance(right_port, str):
+            print("Intermediate OpticalLink transform running %s [%s] <-> %s [%s]" % (i.left_roadm, left_port, i.right_roadm, right_port))
+            left_rfs = o.rfs.create(i.left_roadm)
+            li = left_rfs.line_interface.create(left_port)
+            li.remote.device = i.right_roadm
+            li.remote.interface = right_port
 
-        left_rfs = o.rfs.create(i.left_roadm)
-        li = left_rfs.line_interface.create(i.left_port)
-        li.remote.device = i.right_roadm
-        li.remote.interface = i.right_port
+            right_rfs = o.rfs.create(i.right_roadm)
+            ri = right_rfs.line_interface.create(right_port)
+            ri.remote.device = i.left_roadm
+            ri.remote.interface = left_port
 
-        right_rfs = o.rfs.create(i.right_roadm)
-        ri = right_rfs.line_interface.create(i.right_port)
-        ri.remote.device = i.left_roadm
-        ri.remote.interface = i.left_port
-
-        for vlan in i.vlan:
-            left_rfs.roadm_vlan.create((i.left_port, vlan))
-            right_rfs.roadm_vlan.create((i.right_port, vlan))
+            for vlan in i.vlan:
+                left_rfs.roadm_vlan.create((left_port, vlan))
+                right_rfs.roadm_vlan.create((right_port, vlan))
         return o
 

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 import argparse
+import heapq
 import json
+import math
 import random
 import string
 import tempfile
@@ -11,6 +13,7 @@ from pathlib import Path
 
 NETINFRA_NS = "http://example.com/netinfra"
 MAX_SRL_PORT = 32
+EARTH_RADIUS_KM = 6371.0088
 
 
 def child(parent, name, value=None):
@@ -101,6 +104,204 @@ def select_router_pairs(router_count, backbone_link_count, rng):
     return selected
 
 
+def haversine_km(left, right):
+    left_latitude, left_longitude = map(math.radians, left)
+    right_latitude, right_longitude = map(math.radians, right)
+    latitude_delta = right_latitude - left_latitude
+    longitude_delta = right_longitude - left_longitude
+    chord = (
+        math.sin(latitude_delta / 2) ** 2
+        + math.cos(left_latitude) * math.cos(right_latitude) * math.sin(longitude_delta / 2) ** 2
+    )
+    return EARTH_RADIUS_KM * 2 * math.asin(math.sqrt(chord))
+
+
+def destination_coordinate(origin, bearing, distance_km):
+    latitude, longitude = map(math.radians, origin)
+    angular_distance = distance_km / EARTH_RADIUS_KM
+    destination_latitude = math.asin(
+        math.sin(latitude) * math.cos(angular_distance)
+        + math.cos(latitude) * math.sin(angular_distance) * math.cos(bearing)
+    )
+    destination_longitude = longitude + math.atan2(
+        math.sin(bearing) * math.sin(angular_distance) * math.cos(latitude),
+        math.cos(angular_distance) - math.sin(latitude) * math.sin(destination_latitude),
+    )
+    normalized_longitude = (math.degrees(destination_longitude) + 180) % 360 - 180
+    return round(math.degrees(destination_latitude), 6), round(normalized_longitude, 6)
+
+
+def generate_roadm_coordinates(roadm_count, min_span_km, max_span_km, rng):
+    columns = math.ceil(math.sqrt(roadm_count))
+    rows = math.ceil(roadm_count / columns)
+    spacing_km = (min_span_km + max_span_km) / 2
+    jitter_km = min(
+        spacing_km * 0.08,
+        max(0, spacing_km - min_span_km) / 4,
+        max(0, max_span_km - spacing_km) / 4,
+    )
+    rotation = rng.uniform(-math.pi, math.pi)
+    center_latitude = rng.uniform(47.0, 55.0)
+    center_longitude = rng.uniform(3.0, 15.0)
+    if max_span_km - min_span_km <= max(2, spacing_km * 0.02):
+        return {
+            index: destination_coordinate(
+                (center_latitude, center_longitude),
+                rotation if offset >= 0 else rotation + math.pi,
+                abs(offset) * spacing_km,
+            )
+            for index in range(1, roadm_count + 1)
+            for offset in [index - (roadm_count + 1) / 2]
+        }
+
+    planar_points = {}
+
+    for index in range(1, roadm_count + 1):
+        row, column = divmod(index - 1, columns)
+        x = (column - (columns - 1) / 2) * spacing_km + rng.uniform(-jitter_km, jitter_km)
+        y = (row - (rows - 1) / 2) * spacing_km + rng.uniform(-jitter_km, jitter_km)
+        planar_points[index] = (
+            x * math.cos(rotation) - y * math.sin(rotation),
+            x * math.sin(rotation) + y * math.cos(rotation),
+        )
+
+    mean_x = sum(point[0] for point in planar_points.values()) / roadm_count
+    mean_y = sum(point[1] for point in planar_points.values()) / roadm_count
+    coordinates = {}
+    for index, (x, y) in planar_points.items():
+        x -= mean_x
+        y -= mean_y
+        latitude = center_latitude + y / 110.574
+        longitude = center_longitude + x / (111.320 * math.cos(math.radians(center_latitude)))
+        coordinates[index] = (round(latitude, 6), round(longitude, 6))
+    return coordinates
+
+
+def projected_points(coordinates):
+    center_latitude = sum(latitude for latitude, _ in coordinates.values()) / len(coordinates)
+    longitude_scale = math.cos(math.radians(center_latitude))
+    return {
+        index: (longitude * longitude_scale, latitude)
+        for index, (latitude, longitude) in coordinates.items()
+    }
+
+
+def segments_cross(first, second, points):
+    first_left, first_right = first
+    second_left, second_right = second
+    if len({first_left, first_right, second_left, second_right}) < 4:
+        return False
+
+    def orientation(start, end, point):
+        return (end[0] - start[0]) * (point[1] - start[1]) - (end[1] - start[1]) * (point[0] - start[0])
+
+    a, b = points[first_left], points[first_right]
+    c, d = points[second_left], points[second_right]
+    return orientation(a, b, c) * orientation(a, b, d) < 0 and orientation(c, d, a) * orientation(c, d, b) < 0
+
+
+def build_optical_edges(coordinates, min_span_km, max_span_km, rng):
+    candidates = []
+    for left in coordinates:
+        for right in range(left + 1, len(coordinates) + 1):
+            span_km = round(haversine_km(coordinates[left], coordinates[right]))
+            if min_span_km <= span_km <= max_span_km:
+                candidates.append((span_km, rng.random(), left, right))
+    candidates.sort()
+
+    parents = {index: index for index in coordinates}
+
+    def find(index):
+        while parents[index] != index:
+            parents[index] = parents[parents[index]]
+            index = parents[index]
+        return index
+
+    selected = []
+    selected_pairs = set()
+    for span_km, _, left, right in candidates:
+        left_root = find(left)
+        right_root = find(right)
+        if left_root == right_root:
+            continue
+        parents[left_root] = right_root
+        selected.append((left, right, span_km))
+        selected_pairs.add((left, right))
+        if len(selected) == len(coordinates) - 1:
+            break
+
+    if len(selected) != len(coordinates) - 1:
+        raise ValueError("unable to connect ROADMs within the requested span range")
+
+    points = projected_points(coordinates)
+    degrees = {index: 0 for index in coordinates}
+    for left, right, _ in selected:
+        degrees[left] += 1
+        degrees[right] += 1
+
+    complete_edge_count = len(coordinates) * (len(coordinates) - 1) // 2
+    extra_target = min(
+        max(1, len(coordinates) // 2),
+        max(0, complete_edge_count - len(selected) - 1),
+    )
+    if extra_target == 0:
+        return selected
+    for span_km, _, left, right in candidates:
+        pair = (left, right)
+        if pair in selected_pairs or degrees[left] >= 4 or degrees[right] >= 4:
+            continue
+        if any(segments_cross(pair, (edge_left, edge_right), points) for edge_left, edge_right, _ in selected):
+            continue
+        selected.append((left, right, span_km))
+        selected_pairs.add(pair)
+        degrees[left] += 1
+        degrees[right] += 1
+        if len(selected) >= len(coordinates) - 1 + extra_target:
+            break
+    return selected
+
+
+def peripheral_roadms(coordinates):
+    points = projected_points(coordinates)
+    ordered = sorted((x, y, index) for index, (x, y) in points.items())
+
+    def cross(origin, left, right):
+        return (left[0] - origin[0]) * (right[1] - origin[1]) - (left[1] - origin[1]) * (right[0] - origin[0])
+
+    lower = []
+    for point in ordered:
+        while len(lower) >= 2 and cross(lower[-2], lower[-1], point) <= 0:
+            lower.pop()
+        lower.append(point)
+    upper = []
+    for point in reversed(ordered):
+        while len(upper) >= 2 and cross(upper[-2], upper[-1], point) <= 0:
+            upper.pop()
+        upper.append(point)
+    return [point[2] for point in lower[:-1] + upper[:-1]]
+
+
+def shortest_path(start, end, edges):
+    adjacency = {}
+    for left, right, span_km in edges:
+        adjacency.setdefault(left, []).append((right, span_km))
+        adjacency.setdefault(right, []).append((left, span_km))
+    queue = [(0, start, [])]
+    visited = set()
+    while queue:
+        distance, node, path = heapq.heappop(queue)
+        if node in visited:
+            continue
+        path = [*path, node]
+        if node == end:
+            return path
+        visited.add(node)
+        for neighbor, span_km in adjacency.get(node, []):
+            if neighbor not in visited:
+                heapq.heappush(queue, (distance + span_km, neighbor, path))
+    raise ValueError(f"no optical path between ROADM-{start} and ROADM-{end}")
+
+
 def generate(args):
     validate_counts(args.routers, args.roadms, args.backbone_links)
     if args.min_span_km < 1 or args.max_span_km < args.min_span_km:
@@ -116,26 +317,33 @@ def generate(args):
     roadm_ports = {index: 1 for index in roadm_names}
     topology_links = []
     optical_links = []
+    coordinates = generate_roadm_coordinates(args.roadms, args.min_span_km, args.max_span_km, rng)
+    physical_edges = build_optical_edges(coordinates, args.min_span_km, args.max_span_km, rng)
+    for left, right, span_km in physical_edges:
+        left_port = roadm_ports[left]
+        right_port = roadm_ports[right]
+        roadm_ports[left] += 1
+        roadm_ports[right] += 1
+        optical_links.append((left, left_port, right, right_port, span_km, span_km * 5))
+        topology_links.append(
+            {"endpoints": [f"roadm-{left}:e1-{left_port}", f"roadm-{right}:e1-{right_port}"]}
+        )
 
-    for left in range(1, args.roadms + 1):
-        for right in range(left + 1, args.roadms + 1):
-            left_port = roadm_ports[left]
-            right_port = roadm_ports[right]
-            roadm_ports[left] += 1
-            roadm_ports[right] += 1
-            span_km = rng.randint(args.min_span_km, args.max_span_km)
-            optical_links.append((left, left_port, right, right_port, span_km, span_km * 5))
-            topology_links.append(
-                {"endpoints": [f"roadm-{left}:e1-{left_port}", f"roadm-{right}:e1-{right_port}"]}
-            )
-
-    attachment_pairs = [(left, right) for left in range(1, args.roadms) for right in range(left + 2, args.roadms + 1)]
+    edge_roadms = peripheral_roadms(coordinates)
+    router_roadms = {
+        router: edge_roadms[((router - 1) * len(edge_roadms)) // args.routers]
+        for router in router_names
+    }
     backbone_links = []
     for link_index, (first_router, second_router) in enumerate(router_pairs, start=1):
-        left_roadm, right_roadm = rng.choice(attachment_pairs)
         left_router, right_router = first_router, second_router
         if rng.choice((False, True)):
             left_router, right_router = right_router, left_router
+        left_roadm = router_roadms[left_router]
+        right_roadm = router_roadms[right_router]
+        if left_roadm == right_roadm:
+            candidates = [roadm for roadm in edge_roadms if roadm != left_roadm]
+            right_roadm = max(candidates, key=lambda roadm: haversine_km(coordinates[left_roadm], coordinates[roadm]))
 
         left_router_port = router_ports[left_router]
         right_router_port = router_ports[right_router]
@@ -146,10 +354,7 @@ def generate(args):
         roadm_ports[left_roadm] += 1
         roadm_ports[right_roadm] += 1
 
-        intermediate = list(range(left_roadm + 1, right_roadm))
-        selected_intermediate = [node for node in intermediate if rng.random() < 0.75]
-        if not selected_intermediate:
-            selected_intermediate = [rng.choice(intermediate)]
+        routed_roadms = shortest_path(left_roadm, right_roadm, physical_edges)
 
         topology_links.extend(
             [
@@ -167,7 +372,7 @@ def generate(args):
                 "left_roadm_port": left_roadm_port,
                 "right_roadm": right_roadm,
                 "right_roadm_port": right_roadm_port,
-                "path": selected_intermediate,
+                "path": routed_roadms[1:-1],
                 "vlan": 99 + link_index,
             }
         )
@@ -196,6 +401,8 @@ def generate(args):
         roadm = child(netinfra, "roadm")
         child(roadm, "name", name)
         child(roadm, "id", index)
+        child(roadm, "latitude", f"{coordinates[index][0]:.6f}")
+        child(roadm, "longitude", f"{coordinates[index][1]:.6f}")
 
     for link in backbone_links:
         backbone = child(netinfra, "backbone-link")
@@ -268,7 +475,7 @@ def generate(args):
 
     print(f"Randomized topology (seed {seed}):")
     print(f"  {args.routers} routers, {args.roadms} ROADMs, {args.backbone_links} backbone links")
-    print(f"  {len(optical_links)} ROADM mesh links, spans {args.min_span_km}-{args.max_span_km} km")
+    print(f"  {len(optical_links)} sparse ROADM links, spans {args.min_span_km}-{args.max_span_km} km")
     for link in backbone_links:
         path = [link["left_roadm"], *link["path"], link["right_roadm"]]
         print(

@@ -89,6 +89,7 @@ const ROADMS_RADIUS = 28;
 const ROUTER_WIDTH = 112;
 const ROUTER_HEIGHT = 46;
 const VIEW_PADDING = 72;
+const SITE_GAP = 18;
 
 function nonEmpty(value: unknown): string {
   return String(value ?? '').trim();
@@ -125,6 +126,91 @@ function ringPoint(index: number, count: number, centerX: number, centerY: numbe
     x: centerX + Math.cos(angle) * radiusX,
     y: centerY + Math.sin(angle) * radiusY
   };
+}
+
+function numericCoordinate(value: unknown): number | null {
+  const coordinate = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(coordinate) ? coordinate : null;
+}
+
+function coordinateRoadmPoints(
+  roadms: NetinfraRoadmApi[],
+  centerX: number,
+  centerY: number,
+  radiusX: number,
+  radiusY: number
+): OtnPoint[] | null {
+  const coordinates = roadms.map((roadm) => ({
+    latitude: numericCoordinate(roadm.latitude),
+    longitude: numericCoordinate(roadm.longitude)
+  }));
+  if (coordinates.some(({ latitude, longitude }) => latitude === null || longitude === null)) return null;
+
+  const typedCoordinates = coordinates as { latitude: number; longitude: number }[];
+  const centerLatitude = typedCoordinates.reduce((sum, point) => sum + point.latitude, 0) / typedCoordinates.length;
+  const centerLongitude = typedCoordinates.reduce((sum, point) => sum + point.longitude, 0) / typedCoordinates.length;
+  const longitudeScale = Math.cos((centerLatitude * Math.PI) / 180);
+  const projected = typedCoordinates.map(({ latitude, longitude }) => ({
+    x: (longitude - centerLongitude) * longitudeScale,
+    y: centerLatitude - latitude
+  }));
+  const maxX = Math.max(...projected.map(({ x }) => Math.abs(x)), Number.EPSILON);
+  const maxY = Math.max(...projected.map(({ y }) => Math.abs(y)), Number.EPSILON);
+  const scale = Math.min(radiusX / maxX, radiusY / maxY);
+  return projected.map(({ x, y }) => ({ x: centerX + x * scale, y: centerY + y * scale }));
+}
+
+function positionedRouters(
+  routers: NetinfraRouterApi[],
+  backboneLinks: NetinfraBackboneLinkApi[],
+  roadmMap: Map<string, OtnRoadm>,
+  centerX: number,
+  centerY: number,
+  radiusX: number,
+  radiusY: number
+): OtnRouter[] {
+  const anchorsByRouter = new Map<string, OtnRoadm>();
+  for (const link of backboneLinks) {
+    const leftRouter = nonEmpty(link['left-router']);
+    const leftRoadm = roadmMap.get(nonEmpty(link.optical?.['left-roadm']));
+    if (leftRouter && leftRoadm && !anchorsByRouter.has(leftRouter)) anchorsByRouter.set(leftRouter, leftRoadm);
+
+    const rightRouter = nonEmpty(link['right-router']);
+    const rightRoadm = roadmMap.get(nonEmpty(link.optical?.['right-roadm']));
+    if (rightRouter && rightRoadm && !anchorsByRouter.has(rightRouter)) anchorsByRouter.set(rightRouter, rightRoadm);
+  }
+
+  const routersByRoadm = new Map<string, string[]>();
+  for (const [router, roadm] of anchorsByRouter) {
+    const colocated = routersByRoadm.get(roadm.name) ?? [];
+    colocated.push(router);
+    routersByRoadm.set(roadm.name, colocated);
+  }
+
+  return routers.map((router, index) => {
+    const name = nonEmpty(router.name);
+    const fallback = ringPoint(index, routers.length, centerX, centerY, radiusX, radiusY);
+    const anchor = anchorsByRouter.get(name);
+    if (!anchor) return { name, id: typeof router.id === 'number' ? router.id : null, ...fallback };
+
+    const angle = Math.atan2(anchor.y - centerY, anchor.x - centerX);
+    const outwardX = Math.cos(angle);
+    const outwardY = Math.sin(angle);
+    const routerEdgeDistance = Math.min(
+      Math.abs(outwardX) > Number.EPSILON ? ROUTER_WIDTH / 2 / Math.abs(outwardX) : Infinity,
+      Math.abs(outwardY) > Number.EPSILON ? ROUTER_HEIGHT / 2 / Math.abs(outwardY) : Infinity
+    );
+    const distance = ROADMS_RADIUS + SITE_GAP + routerEdgeDistance;
+    const colocated = routersByRoadm.get(anchor.name) ?? [name];
+    const lane = colocated.indexOf(name) - (colocated.length - 1) / 2;
+    const tangentOffset = lane * (ROUTER_HEIGHT + SITE_GAP);
+    return {
+      name,
+      id: typeof router.id === 'number' ? router.id : null,
+      x: anchor.x + outwardX * distance - outwardY * tangentOffset,
+      y: anchor.y + outwardY * distance + outwardX * tangentOffset
+    };
+  });
 }
 
 function edgeKey(left: string, right: string): string {
@@ -205,18 +291,29 @@ export function buildOtnGraph(payload: NetinfraPayload): OtnGraph {
   const roadmRadiusY = Math.max(155, Math.min(height * 0.25, 95 + roadmApis.length * 18));
   const routerRadiusX = width / 2 - VIEW_PADDING - ROUTER_WIDTH / 2;
   const routerRadiusY = height / 2 - VIEW_PADDING - ROUTER_HEIGHT / 2;
+  const coordinatePoints = coordinateRoadmPoints(
+    roadmApis,
+    centerX,
+    centerY,
+    roadmRadiusX,
+    roadmRadiusY
+  );
 
   const roadms: OtnRoadm[] = roadmApis.map((roadm, index) => ({
     name: nonEmpty(roadm.name),
     id: typeof roadm.id === 'number' ? roadm.id : null,
-    ...ringPoint(index, roadmApis.length, centerX, centerY, roadmRadiusX, roadmRadiusY)
+    ...(coordinatePoints?.[index] ?? ringPoint(index, roadmApis.length, centerX, centerY, roadmRadiusX, roadmRadiusY))
   }));
-  const routers: OtnRouter[] = routerApis.map((router, index) => ({
-    name: nonEmpty(router.name),
-    id: typeof router.id === 'number' ? router.id : null,
-    ...ringPoint(index, routerApis.length, centerX, centerY, routerRadiusX, routerRadiusY)
-  }));
-  const roadmMap = new Map(roadms.map((roadm) => [roadm.name, roadm]));
+  const roadmMap = new Map<string, OtnRoadm>(roadms.map((roadm) => [roadm.name, roadm]));
+  const routers = positionedRouters(
+    routerApis,
+    backboneLinks,
+    roadmMap,
+    centerX,
+    centerY,
+    routerRadiusX,
+    routerRadiusY
+  );
   const routerMap = new Map(routers.map((router) => [router.name, router]));
   const nodePoints = new Map<string, OtnPoint>([
     ...roadms.map((roadm): [string, OtnPoint] => [roadm.name, roadm]),

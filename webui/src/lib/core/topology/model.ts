@@ -32,6 +32,8 @@ export interface NetinfraBackboneLinkApi {
 export interface NetinfraRoadmApi {
   name?: string;
   id?: number;
+  latitude?: number | string;
+  longitude?: number | string;
 }
 
 export interface NetinfraOpticalLinkApi {

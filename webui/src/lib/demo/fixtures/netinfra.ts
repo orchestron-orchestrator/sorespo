@@ -30,19 +30,19 @@ export const NETINFRA_ROUTERS: NetinfraRouterApi[] = [
 ];
 
 export const NETINFRA_ROADMS: NetinfraRoadmApi[] = [
-  { name: 'AMS-ROADM-1', id: 1 },
-  { name: 'FRA-ROADM-1', id: 2 },
-  { name: 'STO-ROADM-1', id: 3 },
-  { name: 'LJU-ROADM-1', id: 4 }
+  { name: 'AMS-ROADM-1', id: 1, latitude: 52.3676, longitude: 4.9041 },
+  { name: 'FRA-ROADM-1', id: 2, latitude: 50.1109, longitude: 8.6821 },
+  { name: 'STO-ROADM-1', id: 3, latitude: 59.3293, longitude: 18.0686 },
+  { name: 'LJU-ROADM-1', id: 4, latitude: 46.0569, longitude: 14.5058 }
 ];
 
 export const NETINFRA_OPTICAL_LINKS: NetinfraOpticalLinkApi[] = [
-  { 'left-roadm': 'AMS-ROADM-1', 'left-port': 'ethernet-1/1', 'right-roadm': 'FRA-ROADM-1', 'right-port': 'ethernet-1/1', latency: 2940 },
-  { 'left-roadm': 'AMS-ROADM-1', 'left-port': 'ethernet-1/2', 'right-roadm': 'STO-ROADM-1', 'right-port': 'ethernet-1/1', latency: 2210 },
-  { 'left-roadm': 'AMS-ROADM-1', 'left-port': 'ethernet-1/3', 'right-roadm': 'LJU-ROADM-1', 'right-port': 'ethernet-1/1', latency: 1725 },
-  { 'left-roadm': 'FRA-ROADM-1', 'left-port': 'ethernet-1/2', 'right-roadm': 'STO-ROADM-1', 'right-port': 'ethernet-1/2', latency: 3670 },
-  { 'left-roadm': 'FRA-ROADM-1', 'left-port': 'ethernet-1/3', 'right-roadm': 'LJU-ROADM-1', 'right-port': 'ethernet-1/2', latency: 3130 },
-  { 'left-roadm': 'STO-ROADM-1', 'left-port': 'ethernet-1/3', 'right-roadm': 'LJU-ROADM-1', 'right-port': 'ethernet-1/3', latency: 2480 }
+  { 'left-roadm': 'AMS-ROADM-1', 'left-port': 'ethernet-1/1', 'right-roadm': 'FRA-ROADM-1', 'right-port': 'ethernet-1/1', latency: 1815 },
+  { 'left-roadm': 'AMS-ROADM-1', 'left-port': 'ethernet-1/2', 'right-roadm': 'STO-ROADM-1', 'right-port': 'ethernet-1/1', latency: 5625 },
+  { 'left-roadm': 'AMS-ROADM-1', 'left-port': 'ethernet-1/3', 'right-roadm': 'LJU-ROADM-1', 'right-port': 'ethernet-1/1', latency: 4940 },
+  { 'left-roadm': 'FRA-ROADM-1', 'left-port': 'ethernet-1/2', 'right-roadm': 'STO-ROADM-1', 'right-port': 'ethernet-1/2', latency: 5935 },
+  { 'left-roadm': 'FRA-ROADM-1', 'left-port': 'ethernet-1/3', 'right-roadm': 'LJU-ROADM-1', 'right-port': 'ethernet-1/2', latency: 3120 },
+  { 'left-roadm': 'STO-ROADM-1', 'left-port': 'ethernet-1/3', 'right-roadm': 'LJU-ROADM-1', 'right-port': 'ethernet-1/3', latency: 7475 }
 ];
 
 export const NETINFRA_BACKBONE_LINKS: NetinfraBackboneLinkApi[] = [
