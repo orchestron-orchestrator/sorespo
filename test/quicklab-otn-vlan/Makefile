@@ -13,9 +13,9 @@ include ../common/quicklab.mk
 
 SHELL := /bin/bash
 
-ROUTERS ?= 2
-ROADMS ?= 3
-BACKBONE_LINKS ?= 1
+ROUTERS ?= 3
+ROADMS ?= 8
+BACKBONE_LINKS ?= 2
 MIN_SPAN_KM ?= 200
 MAX_SPAN_KM ?= 500
 SEED ?=

@@ -3,23 +3,48 @@
 
   import { listServiceModuleMeta } from '$lib/core/registry/service-modules';
   import { fetchDevices, type DeviceSummary } from '$lib/core/orchestron/client';
+  import OtnTopologyMap from '$lib/core/topology/OtnTopologyMap.svelte';
   import TopologyMap from '$lib/core/topology/TopologyMap.svelte';
   import { buildTopologyGraph } from '$lib/core/topology/model';
+  import { buildOtnGraph } from '$lib/core/topology/otn-model';
   import { restconfGetJson } from '$lib/core/restconf/client';
   import { onGlobalRefresh } from '$lib/core/util/global-refresh';
   import { appHref } from '$lib/core/util/nav';
 
   import type { L3VpnSitesPayload, NetinfraPayload, TopologyGraph } from '$lib/core/topology/model';
+  import type { OtnGraph } from '$lib/core/topology/otn-model';
 
   const modules = listServiceModuleMeta();
+  const topologyViews = ['l3vpn', 'otn'] as const;
+  type TopologyView = (typeof topologyViews)[number];
 
   let devices: DeviceSummary[] = $state([]);
   let loadingDevices = $state(true);
   let loadError = $state('');
   let topologyGraph: TopologyGraph | null = $state(null);
+  let otnGraph: OtnGraph | null = $state(null);
   let loadingTopology = $state(true);
   let topologyError = $state('');
   let topologyNote = $state('');
+  let topologyView: TopologyView = $state('l3vpn');
+
+  function selectTopologyView(view: TopologyView, focus = false): void {
+    topologyView = view;
+    if (focus) {
+      queueMicrotask(() => document.getElementById(`topology-tab-${view}`)?.focus());
+    }
+  }
+
+  function handleTopologyTabKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
+      return;
+    }
+    event.preventDefault();
+    const currentIndex = topologyViews.indexOf(topologyView);
+    const direction = event.key === 'ArrowRight' ? 1 : -1;
+    const nextIndex = (currentIndex + direction + topologyViews.length) % topologyViews.length;
+    selectTopologyView(topologyViews[nextIndex], true);
+  }
 
   function configDotColor(device: DeviceSummary): string {
     return device.hasRunningConfig === false ? 'var(--sw-danger)' : 'var(--sw-success)';
@@ -73,6 +98,7 @@
         netinfraResult.value,
         sitesResult.status === 'fulfilled' ? sitesResult.value : null
       );
+      otnGraph = buildOtnGraph(netinfraResult.value);
 
       if (sitesResult.status !== 'fulfilled') {
         topologyNote = sitesResult.reason instanceof Error
@@ -140,7 +166,31 @@
   <section class="overview__section" data-tour="topology">
     <div class="section-head">
       <div>
-        <h3>Network Topology</h3>
+        <h3>Topology</h3>
+      </div>
+      <div class="topology-tabs" role="tablist" aria-label="Topology view">
+        <button
+          id="topology-tab-l3vpn"
+          type="button"
+          role="tab"
+          aria-selected={topologyView === 'l3vpn'}
+          aria-controls="topology-panel-l3vpn"
+          tabindex={topologyView === 'l3vpn' ? 0 : -1}
+          class:active={topologyView === 'l3vpn'}
+          onclick={() => selectTopologyView('l3vpn')}
+          onkeydown={handleTopologyTabKeydown}
+        >L3VPN</button>
+        <button
+          id="topology-tab-otn"
+          type="button"
+          role="tab"
+          aria-selected={topologyView === 'otn'}
+          aria-controls="topology-panel-otn"
+          tabindex={topologyView === 'otn' ? 0 : -1}
+          class:active={topologyView === 'otn'}
+          onclick={() => selectTopologyView('otn')}
+          onkeydown={handleTopologyTabKeydown}
+        >OTN</button>
       </div>
     </div>
 
@@ -148,10 +198,22 @@
       <div class="loading-state">Loading topology...</div>
     {:else if topologyError}
       <div class="error-state">{topologyError}</div>
-    {:else if topologyGraph && topologyGraph.routers.length === 0}
-      <div class="empty-state">No routers were returned by the topology API.</div>
-    {:else if topologyGraph}
-      <TopologyMap graph={topologyGraph} note={topologyNote} />
+    {:else if topologyView === 'l3vpn'}
+      <div id="topology-panel-l3vpn" role="tabpanel" aria-labelledby="topology-tab-l3vpn">
+        {#if topologyGraph && topologyGraph.routers.length === 0}
+          <div class="empty-state">No routers were returned by the topology API.</div>
+        {:else if topologyGraph}
+          <TopologyMap graph={topologyGraph} note={topologyNote} />
+        {/if}
+      </div>
+    {:else}
+      <div id="topology-panel-otn" role="tabpanel" aria-labelledby="topology-tab-otn">
+        {#if otnGraph && otnGraph.roadms.length === 0}
+          <div class="empty-state">No ROADMs were returned by the topology API.</div>
+        {:else if otnGraph}
+          <OtnTopologyMap graph={otnGraph} />
+        {/if}
+      </div>
     {/if}
   </section>
 
@@ -279,6 +341,42 @@
     margin: 0.25rem 0 0;
     color: var(--sw-text-secondary);
     font-size: 13px;
+  }
+
+  .topology-tabs {
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    border-radius: var(--sw-radius-md);
+    background: var(--sw-bg-deep);
+  }
+
+  .topology-tabs button {
+    min-width: 78px;
+    padding: 7px 14px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--sw-text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .topology-tabs button:hover {
+    color: var(--sw-text-primary);
+  }
+
+  .topology-tabs button:focus-visible {
+    outline: 2px solid var(--sw-border-focus);
+    outline-offset: 1px;
+  }
+
+  .topology-tabs button.active {
+    background: var(--sw-bg-elevated);
+    color: var(--sw-accent);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   }
 
   .device-table {

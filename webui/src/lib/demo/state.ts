@@ -1,10 +1,17 @@
-import type { NetinfraBackboneLinkApi, NetinfraRouterApi } from '$lib/core/topology/model';
+import type {
+  NetinfraBackboneLinkApi,
+  NetinfraOpticalLinkApi,
+  NetinfraRoadmApi,
+  NetinfraRouterApi
+} from '$lib/core/topology/model';
 
 import { makeDeviceStaticInfo, type DemoDeviceStaticInfo } from '$lib/demo/fixtures/devices';
 import { L3VPN_SITES, L3VPN_VPN_SERVICES } from '$lib/demo/fixtures/l3vpn';
 import {
   NETINFRA_BACKBONE_LINKS,
   NETINFRA_GLOBAL_SETTINGS,
+  NETINFRA_OPTICAL_LINKS,
+  NETINFRA_ROADMS,
   NETINFRA_ROUTERS
 } from '$lib/demo/fixtures/netinfra';
 import { INITIAL_LOG, INITIAL_QUEUE } from '$lib/demo/fixtures/seed';
@@ -33,7 +40,9 @@ export interface DemoDeviceState {
 export interface DemoState {
   globalSettings: Record<string, unknown>;
   routers: NetinfraRouterApi[];
+  roadms: NetinfraRoadmApi[];
   backboneLinks: NetinfraBackboneLinkApi[];
+  opticalLinks: NetinfraOpticalLinkApi[];
   vpnServices: Record<string, any>[];
   sites: Record<string, any>[];
   devices: Record<string, DemoDeviceState>;
@@ -46,7 +55,9 @@ function materialize(): DemoState {
   const next: DemoState = {
     globalSettings: structuredClone(NETINFRA_GLOBAL_SETTINGS),
     routers: structuredClone(NETINFRA_ROUTERS),
+    roadms: structuredClone(NETINFRA_ROADMS),
     backboneLinks: structuredClone(NETINFRA_BACKBONE_LINKS),
+    opticalLinks: structuredClone(NETINFRA_OPTICAL_LINKS),
     vpnServices: structuredClone(L3VPN_VPN_SERVICES),
     sites: structuredClone(L3VPN_SITES),
     devices: {},
@@ -67,6 +78,17 @@ function materialize(): DemoState {
         timestamp: String(nowSeconds - seed.ageSeconds),
         ...(seed.conf_diff ? { conf_diff: seed.conf_diff } : {})
       }))
+    };
+  }
+
+  for (const roadm of NETINFRA_ROADMS) {
+    const name = String(roadm.name);
+    next.devices[name] = {
+      staticInfo: makeDeviceStaticInfo(name, roadm.id ?? 0),
+      hasRunningConfig: true,
+      hasTargetConfig: true,
+      queue: [],
+      log: []
     };
   }
 

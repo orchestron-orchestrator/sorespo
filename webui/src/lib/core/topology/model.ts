@@ -16,9 +16,30 @@ export interface NetinfraBackboneLinkApi {
   'left-interface'?: string;
   'right-router'?: string;
   'right-interface'?: string;
+  optical?: {
+    vlan?: number;
+    'left-roadm'?: string;
+    'left-port'?: string;
+    'right-roadm'?: string;
+    'right-port'?: string;
+    'otn-path'?: string[];
+  };
   state?: {
     'link-status'?: string;
   };
+}
+
+export interface NetinfraRoadmApi {
+  name?: string;
+  id?: number;
+}
+
+export interface NetinfraOpticalLinkApi {
+  'left-roadm'?: string;
+  'left-port'?: string;
+  'right-roadm'?: string;
+  'right-port'?: string;
+  latency?: number;
 }
 
 export type LinkStatus = 'up' | 'down' | 'unknown';
@@ -26,7 +47,9 @@ export type LinkStatus = 'up' | 'down' | 'unknown';
 export interface NetinfraPayload {
   'netinfra:netinfra'?: {
     router?: NetinfraRouterApi[];
+    roadm?: NetinfraRoadmApi[];
     'backbone-link'?: NetinfraBackboneLinkApi[];
+    'optical-link'?: NetinfraOpticalLinkApi[];
   };
 }
 

@@ -72,7 +72,9 @@ function netinfraTree(state: DemoState): Record<string, unknown> {
   return {
     'global-settings': state.globalSettings,
     router: state.routers,
-    'backbone-link': state.backboneLinks
+    roadm: state.roadms,
+    'backbone-link': state.backboneLinks,
+    'optical-link': state.opticalLinks
   };
 }
 
