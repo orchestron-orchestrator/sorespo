@@ -3,6 +3,7 @@ TESTENV=sorespo-quicklab-otn-vlan
 ROUTERS_SRL=ams-core-1 sto-core-1
 ROUTERS_FRR=
 CPE_IDS=
+POST_DEPLOY_TARGETS=apply-optical-latency
 
 include ../common/clab.mk
 include ../common/containers.mk
@@ -59,6 +60,24 @@ run-and-configure:
 .PHONY: configure
 configure:
 	$(MAKE) send-config-wait FILE="netinfra.xml"
+
+.PHONY: apply-optical-latency
+apply-optical-latency:
+	@link_count=$$(xmllint --xpath 'count(//*[local-name()="optical-link"])' netinfra.xml); \
+	for ((index = 1; index <= link_count; index++)); do \
+		left_roadm=$$(xmllint --xpath "string((//*[local-name()='optical-link'])[$$index]/*[local-name()='left-roadm'])" netinfra.xml | tr '[:upper:]' '[:lower:]'); \
+		left_port=$$(xmllint --xpath "string((//*[local-name()='optical-link'])[$$index]/*[local-name()='left-port'])" netinfra.xml | sed -E 's|^ethernet-|e|; s|/|-|g'); \
+		right_roadm=$$(xmllint --xpath "string((//*[local-name()='optical-link'])[$$index]/*[local-name()='right-roadm'])" netinfra.xml | tr '[:upper:]' '[:lower:]'); \
+		right_port=$$(xmllint --xpath "string((//*[local-name()='optical-link'])[$$index]/*[local-name()='right-port'])" netinfra.xml | sed -E 's|^ethernet-|e|; s|/|-|g'); \
+		latency=$$(xmllint --xpath "string((//*[local-name()='optical-link'])[$$index]/*[local-name()='latency'])" netinfra.xml); \
+		if [[ -z "$$latency" ]]; then \
+			echo "Missing latency for optical link $$left_roadm <-> $$right_roadm" >&2; \
+			exit 1; \
+		fi; \
+		echo "Applying $${latency}us one-way latency to $$left_roadm:$$left_port <-> $$right_roadm:$$right_port"; \
+		$(CLAB_BIN) tools netem set --node "$(TESTENV)-$$left_roadm" --interface "$$left_port" --delay "$${latency}us"; \
+		$(CLAB_BIN) tools netem set --node "$(TESTENV)-$$right_roadm" --interface "$$right_port" --delay "$${latency}us"; \
+	done
 
 PING_COUNT ?= 3
 

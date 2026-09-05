@@ -1,3 +1,5 @@
+POST_DEPLOY_TARGETS ?=
+
 build-sweave-image:
 	docker build --build-arg http_proxy=$(http_proxy) --build-arg https_proxy=$(https_proxy) -t sorespo-sweave-base -f ../common/Dockerfile.sweave .
 
@@ -32,6 +34,9 @@ licenses/%:
 .PHONY: start
 start: build-sweave-image
 	$(CLAB_BIN) deploy --topo $(TESTENV:sorespo-%=%).clab.yml --log-level debug --reconfigure
+	@if [ -n "$(strip $(POST_DEPLOY_TARGETS))" ]; then \
+		$(MAKE) --no-print-directory $(POST_DEPLOY_TARGETS); \
+	fi
 	@$(MAKE) --no-print-directory api-url
 	@echo "SORESPO Web UI: http://localhost:$(WEBUI_PORT)"
 
