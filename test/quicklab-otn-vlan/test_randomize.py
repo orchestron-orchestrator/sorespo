@@ -16,6 +16,24 @@ def text(element, name):
 
 
 class RandomTopologyTests(unittest.TestCase):
+    def test_non_optimal_path_uses_loop_free_detour(self):
+        edges = [
+            (1, 2, 100),
+            (2, 4, 100),
+            (1, 3, 100),
+            (3, 5, 100),
+            (5, 4, 100),
+        ]
+
+        optimal = randomize.shortest_path(1, 4, edges)
+        routed = randomize.non_optimal_path(1, 4, edges, random.Random(42))
+
+        self.assertGreater(len(routed), len(optimal))
+        self.assertEqual(len(routed), len(set(routed)))
+        physical_edges = {frozenset((left, right)) for left, right, _ in edges}
+        for left, right in zip(routed, routed[1:]):
+            self.assertIn(frozenset((left, right)), physical_edges)
+
     def test_physical_graph_is_connected_sparse_and_geographic(self):
         for roadm_count in range(3, 21):
             for seed in range(10):
@@ -84,11 +102,21 @@ class RandomTopologyTests(unittest.TestCase):
             }
             names = {f"ROADM-{index}": index for index in coordinates}
             edge_roadms = set(randomize.peripheral_roadms(coordinates))
+            optical_links = root.findall(".//netinfra:optical-link", NS)
             physical_edges = {
                 frozenset((text(link, "left-roadm"), text(link, "right-roadm")))
-                for link in root.findall(".//netinfra:optical-link", NS)
+                for link in optical_links
             }
+            physical_spans = [
+                (
+                    names[text(link, "left-roadm")],
+                    names[text(link, "right-roadm")],
+                    int(text(link, "latency")) // 5,
+                )
+                for link in optical_links
+            ]
             router_sites = {}
+            detour_found = False
 
             for link in root.findall(".//netinfra:backbone-link", NS):
                 optical = link.find("netinfra:optical", NS)
@@ -99,13 +127,20 @@ class RandomTopologyTests(unittest.TestCase):
                 ]
                 self.assertIn(names[path[0]], edge_roadms)
                 self.assertIn(names[path[-1]], edge_roadms)
+                self.assertEqual(len(path), len(set(path)))
                 for left, right in zip(path, path[1:]):
                     self.assertIn(frozenset((left, right)), physical_edges)
+                optimal = randomize.shortest_path(
+                    names[path[0]], names[path[-1]], physical_spans
+                )
+                detour_found |= len(path) > len(optimal)
                 for router_name, roadm_name in (
                     (text(link, "left-router"), path[0]),
                     (text(link, "right-router"), path[-1]),
                 ):
                     self.assertEqual(router_sites.setdefault(router_name, roadm_name), roadm_name)
+
+            self.assertTrue(detour_found)
 
 
 if __name__ == "__main__":

@@ -302,6 +302,39 @@ def shortest_path(start, end, edges):
     raise ValueError(f"no optical path between ROADM-{start} and ROADM-{end}")
 
 
+def non_optimal_path(start, end, edges, rng):
+    optimal_path = shortest_path(start, end, edges)
+    adjacency = {node: [] for edge in edges for node in edge[:2]}
+    for left, right, _ in edges:
+        adjacency[left].append(right)
+        adjacency[right].append(left)
+
+    path = [start]
+    visited = {start}
+
+    def find_detour(node):
+        neighbors = list(adjacency[node])
+        rng.shuffle(neighbors)
+        neighbors.sort(key=lambda neighbor: neighbor == end)
+        for neighbor in neighbors:
+            if neighbor in visited:
+                continue
+            if neighbor == end:
+                if len(path) + 1 > len(optimal_path):
+                    return [*path, end]
+                continue
+            visited.add(neighbor)
+            path.append(neighbor)
+            detour = find_detour(neighbor)
+            if detour is not None:
+                return detour
+            path.pop()
+            visited.remove(neighbor)
+        return None
+
+    return find_detour(start) or optimal_path
+
+
 def generate(args):
     validate_counts(args.routers, args.roadms, args.backbone_links)
     if args.min_span_km < 1 or args.max_span_km < args.min_span_km:
@@ -354,7 +387,7 @@ def generate(args):
         roadm_ports[left_roadm] += 1
         roadm_ports[right_roadm] += 1
 
-        routed_roadms = shortest_path(left_roadm, right_roadm, physical_edges)
+        routed_roadms = non_optimal_path(left_roadm, right_roadm, physical_edges, rng)
 
         topology_links.extend(
             [

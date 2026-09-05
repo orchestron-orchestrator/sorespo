@@ -25,7 +25,7 @@ directions of each ROADM-to-ROADM link using Containerlab netem. Reapply them to
 an already-running topology with `make apply-optical-latency`.
 
 Generate a sparse geographic ROADM topology with edge router attachments and
-shortest-path optical routes:
+non-optimal optical routes:
 
 ```bash
 make randomize ROUTERS=4 ROADMS=6 BACKBONE_LINKS=4
@@ -38,6 +38,9 @@ network uses a minimum spanning tree plus short, non-crossing redundancy links;
 it is never a complete mesh. Routers attach to ROADMs on the geographic hull.
 Each router consistently uses that same edge ROADM as the first or last node of
 every optical path, allowing the dashboard to render both devices as one site.
+Where the physical graph permits it, routes deliberately take a randomized
+loop-free detour through more ROADMs than the distance-optimal path. They fall
+back to the optimal path only when no such simple detour exists.
 Router counts are limited to 2-26, at least three ROADMs are required, and at
 least `ROUTERS - 1` backbone links are required so every router remains
 reachable. The generator reports when the current addressing or port limits

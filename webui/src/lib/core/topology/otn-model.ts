@@ -90,6 +90,7 @@ const ROUTER_WIDTH = 112;
 const ROUTER_HEIGHT = 46;
 const VIEW_PADDING = 72;
 const SITE_GAP = 18;
+const PATH_LANE_GAP = 9;
 
 function nonEmpty(value: unknown): string {
   return String(value ?? '').trim();
@@ -258,7 +259,8 @@ function buildOffsetSegments(
       const deltaX = end.x - start.x;
       const deltaY = end.y - start.y;
       const length = Math.hypot(deltaX, deltaY) || 1;
-      const offset = lane * 7;
+      const canonicalDirection = from.localeCompare(to) <= 0 ? 1 : -1;
+      const offset = lane * PATH_LANE_GAP * canonicalDirection;
       const offsetX = (-deltaY / length) * offset;
       const offsetY = (deltaX / length) * offset;
 
