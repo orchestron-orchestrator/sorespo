@@ -123,18 +123,20 @@ SRC_DNODE_CHILD_0: DList = DList(module='stratoweave-rfs', namespace='http://str
 
 SRC_DNODE_CHILD_19: DLeaf = DLeaf(module='stratoweave-rfs', namespace='http://stratoweave.org/yang/stratoweave-rfs', prefix='sw-rfs', name='name', config=True, description='Device name', mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
 
-SRC_DNODE_CHILD_20: DContainer = DContainer(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='base-config', config=True, presence=False, exts=[
+SRC_DNODE_CHILD_20: DContainer = DContainer(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='base-config', config=True, must=[
+DMust(condition="role = 'roadm' or (ipv4-address and ipv6-address and asn and ibgp-authentication-key)", description=None, error_app_tag=None, error_message='Router base configuration requires IPv4, IPv6, ASN, and iBGP authentication values', reference=None)
+    ], presence=False, exts=[
         DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='rfs-transform', arg='sorespo.rfs.BaseConfig', exts=[])
     ], children=[
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='role', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
-    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ipv4-address', config=True, mandatory=True, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
-    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ipv6-address', config=True, mandatory=True, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
-    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='asn', config=True, mandatory=True, type=DTypeIntegerUnsigned(name='inet:as-number', description='The as-number type represents autonomous system numbers\nwhich identify an Autonomous System (AS).  An AS is a set\nof routers under a single technical administration, using\nan interior gateway protocol and common metrics to route\npackets within the AS, and using an exterior gateway\nprotocol to route packets to other ASes.  IANA maintains\nthe AS number space and has delegated large parts to the\nregional registries.\n\nAutonomous system numbers were originally limited to 16\nbits.  BGP extensions have enlarged the autonomous system\nnumber space to 32 bits.  This type therefore uses an uint32\nbase type without a range restriction in order to support\na larger autonomous system number space.\n\nIn the value set and its semantics, this type is equivalent\nto the InetAutonomousSystemNumber textual convention of\nthe SMIv2.', reference='RFC 1930: Guidelines for creation, selection, and registration\n          of an Autonomous System (AS)\nRFC 4271: A Border Gateway Protocol 4 (BGP-4)\nRFC 4001: Textual Conventions for Internet Network Addresses\nRFC 6793: BGP Support for Four-Octet Autonomous System (AS)\n          Number Space', exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)]))),
-    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ibgp-authentication-key', config=True, mandatory=True, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
+    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ipv4-address', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]), when="not(../role = 'roadm')"),
+    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ipv6-address', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]), when="not(../role = 'roadm')"),
+    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='asn', config=True, mandatory=False, type=DTypeIntegerUnsigned(name='inet:as-number', description='The as-number type represents autonomous system numbers\nwhich identify an Autonomous System (AS).  An AS is a set\nof routers under a single technical administration, using\nan interior gateway protocol and common metrics to route\npackets within the AS, and using an exterior gateway\nprotocol to route packets to other ASes.  IANA maintains\nthe AS number space and has delegated large parts to the\nregional registries.\n\nAutonomous system numbers were originally limited to 16\nbits.  BGP extensions have enlarged the autonomous system\nnumber space to 32 bits.  This type therefore uses an uint32\nbase type without a range restriction in order to support\na larger autonomous system number space.\n\nIn the value set and its semantics, this type is equivalent\nto the InetAutonomousSystemNumber textual convention of\nthe SMIv2.', reference='RFC 1930: Guidelines for creation, selection, and registration\n          of an Autonomous System (AS)\nRFC 4271: A Border Gateway Protocol 4 (BGP-4)\nRFC 4001: Textual Conventions for Internet Network Addresses\nRFC 6793: BGP Support for Four-Octet Autonomous System (AS)\n          Number Space', exts=[], builtin_type='uint32', default=None, ranges=Ranges([(0, 4294967295)])), when="not(../role = 'roadm')"),
+    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='ibgp-authentication-key', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]), when="not(../role = 'roadm')")
 ])
 
-SRC_DNODE_CHILD_21: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='roadm-roadm-interface', key=['name'], config=True, description='ROADM to ROADM interfaces', min_elements=0, ordered_by='system', exts=[
-        DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='rfs-transform', arg='sorespo.rfs.RoadmRoadmInterface', exts=[])
+SRC_DNODE_CHILD_21: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='line-interface', key=['name'], config=True, description='ROADM to ROADM interfaces', min_elements=0, ordered_by='system', exts=[
+        DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='rfs-transform', arg='sorespo.rfs.LineInterface', exts=[])
     ], children=[
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='name', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
     DContainer(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='remote', config=True, presence=False, children=[
@@ -143,10 +145,11 @@ SRC_DNODE_CHILD_21: DList = DList(module='sorespo-rfs', namespace='http://exampl
     ])
 ])
 
-SRC_DNODE_CHILD_22: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='router-facing-roadm-interface', key=['interface'], config=True, description='ROADM to router interfaces', min_elements=0, ordered_by='system', exts=[
-        DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='rfs-transform', arg='sorespo.rfs.RouterFacingRoadmInterface', exts=[])
+SRC_DNODE_CHILD_22: DList = DList(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='user-interface', key=['interface'], config=True, description='ROADM to router interfaces', min_elements=0, ordered_by='system', exts=[
+        DExt(module='stratoweave', namespace='http://stratoweave.org/yang/stratoweave', prefix='sw', name='rfs-transform', arg='sorespo.rfs.UserInterface', exts=[])
     ], children=[
     DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='interface', config=True, mandatory=False, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
+    DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='vlan', config=True, mandatory=True, type=DTypeIntegerUnsigned(name='uint16', description=None, reference=None, exts=[], builtin_type='uint16', default=None, ranges=Ranges([(1, 4094)]))),
     DContainer(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='remote', config=True, presence=False, children=[
         DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='router', config=True, mandatory=True, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[])),
         DLeaf(module='sorespo-rfs', namespace='http://example.com/sorespo-rfs', prefix='sorespo-rfs', name='interface', config=True, mandatory=True, type=DTypeString(name='string', description=None, reference=None, exts=[], builtin_type='string', default=None, length=None, patterns=[]))
@@ -256,6 +259,9 @@ SRC_YANG_0: str = r"""module sorespo-rfs {
         container base-config {
 
             sw:rfs-transform sorespo.rfs.BaseConfig;
+          must "role = 'roadm' or (ipv4-address and ipv6-address and asn and ibgp-authentication-key)" {
+            error-message "Router base configuration requires IPv4, IPv6, ASN, and iBGP authentication values";
+          }
 
             leaf role {
                 type string;
@@ -263,28 +269,28 @@ SRC_YANG_0: str = r"""module sorespo-rfs {
 
             leaf ipv4-address {
                 type string;
-                mandatory true;
+              when "not(../role = 'roadm')";
             }
 
             leaf ipv6-address {
                 type string;
-                mandatory true;
+              when "not(../role = 'roadm')";
             }
 
             leaf asn {
                 type inet:as-number;
-                mandatory true;
+              when "not(../role = 'roadm')";
             }
 
             leaf ibgp-authentication-key {
                 type string;
-                mandatory true;
+              when "not(../role = 'roadm')";
             }
         }
 
-        list roadm-roadm-interface {
+        list line-interface {
           key name;
-          sw:rfs-transform sorespo.rfs.RoadmRoadmInterface;
+          sw:rfs-transform sorespo.rfs.LineInterface;
           description "ROADM to ROADM interfaces";
           leaf name {
               type string;
@@ -301,12 +307,18 @@ SRC_YANG_0: str = r"""module sorespo-rfs {
           }
         }
 
-        list router-facing-roadm-interface {
+        list user-interface {
           key interface;
-          sw:rfs-transform sorespo.rfs.RouterFacingRoadmInterface;
+          sw:rfs-transform sorespo.rfs.UserInterface;
           description "ROADM to router interfaces";
           leaf interface {
               type string;
+          }
+          leaf vlan {
+            type uint16 {
+              range "1..4094";
+            }
+            mandatory true;
           }
           container remote {
               leaf router {
@@ -2833,7 +2845,7 @@ class stratoweave_rfs__rfs__base_config(yadata.MNode):
 
 
 _breaker27: None = None
-class stratoweave_rfs__rfs__roadm_roadm_interface__remote(yadata.MNode):
+class stratoweave_rfs__rfs__line_interface__remote(yadata.MNode):
     device: ?str
     interface: ?str
 
@@ -2842,60 +2854,60 @@ class stratoweave_rfs__rfs__roadm_roadm_interface__remote(yadata.MNode):
         self.interface = interface
 
     mut def to_gdata(self) -> ygdata.Node:
-        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:roadm-roadm-interface', 'remote'])
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:line-interface', 'remote'])
 
     @staticmethod
-    mut def from_gdata(n: ?ygdata.Node) -> stratoweave_rfs__rfs__roadm_roadm_interface__remote:
+    mut def from_gdata(n: ?ygdata.Node) -> stratoweave_rfs__rfs__line_interface__remote:
         if n is not None:
-            return stratoweave_rfs__rfs__roadm_roadm_interface__remote(device=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'device')), interface=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'interface')))
-        return stratoweave_rfs__rfs__roadm_roadm_interface__remote()
+            return stratoweave_rfs__rfs__line_interface__remote(device=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'device')), interface=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'interface')))
+        return stratoweave_rfs__rfs__line_interface__remote()
 
-    mut def copy(self) -> stratoweave_rfs__rfs__roadm_roadm_interface__remote:
+    mut def copy(self) -> stratoweave_rfs__rfs__line_interface__remote:
         """Create a deep copy of this adata object"""
-        return stratoweave_rfs__rfs__roadm_roadm_interface__remote.from_gdata(self.to_gdata())
+        return stratoweave_rfs__rfs__line_interface__remote.from_gdata(self.to_gdata())
 
 
 _breaker28: None = None
-class stratoweave_rfs__rfs__roadm_roadm_interface_entry(yadata.MNode):
+class stratoweave_rfs__rfs__line_interface_entry(yadata.MNode):
     name: str
-    remote: stratoweave_rfs__rfs__roadm_roadm_interface__remote
+    remote: stratoweave_rfs__rfs__line_interface__remote
 
-    mut def __init__(self, name: str, remote: ?stratoweave_rfs__rfs__roadm_roadm_interface__remote=None) -> None:
+    mut def __init__(self, name: str, remote: ?stratoweave_rfs__rfs__line_interface__remote=None) -> None:
         self.name = name
-        self.remote = remote if remote is not None else stratoweave_rfs__rfs__roadm_roadm_interface__remote()
+        self.remote = remote if remote is not None else stratoweave_rfs__rfs__line_interface__remote()
 
     mut def to_gdata(self) -> ygdata.Node:
-        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:roadm-roadm-interface'])
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:line-interface'])
 
     @staticmethod
-    mut def from_gdata(n: ygdata.Node) -> stratoweave_rfs__rfs__roadm_roadm_interface_entry:
-        return stratoweave_rfs__rfs__roadm_roadm_interface_entry(name=n.get_str(ygdata.Id(NS_sorespo_rfs, 'name')), remote=stratoweave_rfs__rfs__roadm_roadm_interface__remote.from_gdata(n.get_opt_cnt(ygdata.Id(NS_sorespo_rfs, 'remote'))))
+    mut def from_gdata(n: ygdata.Node) -> stratoweave_rfs__rfs__line_interface_entry:
+        return stratoweave_rfs__rfs__line_interface_entry(name=n.get_str(ygdata.Id(NS_sorespo_rfs, 'name')), remote=stratoweave_rfs__rfs__line_interface__remote.from_gdata(n.get_opt_cnt(ygdata.Id(NS_sorespo_rfs, 'remote'))))
 
-    mut def copy(self) -> stratoweave_rfs__rfs__roadm_roadm_interface_entry:
+    mut def copy(self) -> stratoweave_rfs__rfs__line_interface_entry:
         """Create a deep copy of this adata object"""
-        return stratoweave_rfs__rfs__roadm_roadm_interface_entry.from_gdata(self.to_gdata())
+        return stratoweave_rfs__rfs__line_interface_entry.from_gdata(self.to_gdata())
 
 _breaker29: None = None
-class stratoweave_rfs__rfs__roadm_roadm_interface(yadata.MKeyedList[str, stratoweave_rfs__rfs__roadm_roadm_interface_entry]):
-    mut def __init__(self, elements: list[stratoweave_rfs__rfs__roadm_roadm_interface_entry]=[]) -> None:
+class stratoweave_rfs__rfs__line_interface(yadata.MKeyedList[str, stratoweave_rfs__rfs__line_interface_entry]):
+    mut def __init__(self, elements: list[stratoweave_rfs__rfs__line_interface_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.name == k, elements)
 
-    mut def create(self, key: str) -> stratoweave_rfs__rfs__roadm_roadm_interface_entry:
+    mut def create(self, key: str) -> stratoweave_rfs__rfs__line_interface_entry:
         e = self.get(key)
         if e is not None:
             return e
         name = key
-        res = stratoweave_rfs__rfs__roadm_roadm_interface_entry(name=name)
+        res = stratoweave_rfs__rfs__line_interface_entry(name=name)
         self.elements.append(res)
         return res
 
     @staticmethod
-    mut def from_gdata(n: ?ygdata.List) -> list[stratoweave_rfs__rfs__roadm_roadm_interface_entry]:
+    mut def from_gdata(n: ?ygdata.List) -> list[stratoweave_rfs__rfs__line_interface_entry]:
         if n is not None:
-            return [stratoweave_rfs__rfs__roadm_roadm_interface_entry.from_gdata(e) for e in n.elements]
+            return [stratoweave_rfs__rfs__line_interface_entry.from_gdata(e) for e in n.elements]
         return []
 
-    mut def copy(self) -> stratoweave_rfs__rfs__roadm_roadm_interface:
+    mut def copy(self) -> stratoweave_rfs__rfs__line_interface:
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
@@ -2903,11 +2915,11 @@ class stratoweave_rfs__rfs__roadm_roadm_interface(yadata.MKeyedList[str, stratow
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
-        return stratoweave_rfs__rfs__roadm_roadm_interface(elements=copied_elements)
+        return stratoweave_rfs__rfs__line_interface(elements=copied_elements)
 
 
 _breaker30: None = None
-class stratoweave_rfs__rfs__router_facing_roadm_interface__remote(yadata.MNode):
+class stratoweave_rfs__rfs__user_interface__remote(yadata.MNode):
     router: ?str
     interface: ?str
 
@@ -2916,60 +2928,64 @@ class stratoweave_rfs__rfs__router_facing_roadm_interface__remote(yadata.MNode):
         self.interface = interface
 
     mut def to_gdata(self) -> ygdata.Node:
-        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:router-facing-roadm-interface', 'remote'])
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:user-interface', 'remote'])
 
     @staticmethod
-    mut def from_gdata(n: ?ygdata.Node) -> stratoweave_rfs__rfs__router_facing_roadm_interface__remote:
+    mut def from_gdata(n: ?ygdata.Node) -> stratoweave_rfs__rfs__user_interface__remote:
         if n is not None:
-            return stratoweave_rfs__rfs__router_facing_roadm_interface__remote(router=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'router')), interface=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'interface')))
-        return stratoweave_rfs__rfs__router_facing_roadm_interface__remote()
+            return stratoweave_rfs__rfs__user_interface__remote(router=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'router')), interface=n.get_opt_str(ygdata.Id(NS_sorespo_rfs, 'interface')))
+        return stratoweave_rfs__rfs__user_interface__remote()
 
-    mut def copy(self) -> stratoweave_rfs__rfs__router_facing_roadm_interface__remote:
+    mut def copy(self) -> stratoweave_rfs__rfs__user_interface__remote:
         """Create a deep copy of this adata object"""
-        return stratoweave_rfs__rfs__router_facing_roadm_interface__remote.from_gdata(self.to_gdata())
+        return stratoweave_rfs__rfs__user_interface__remote.from_gdata(self.to_gdata())
 
 
 _breaker31: None = None
-class stratoweave_rfs__rfs__router_facing_roadm_interface_entry(yadata.MNode):
+class stratoweave_rfs__rfs__user_interface_entry(yadata.MNode):
     interface: str
-    remote: stratoweave_rfs__rfs__router_facing_roadm_interface__remote
+    vlan: ?u64
+    remote: stratoweave_rfs__rfs__user_interface__remote
 
-    mut def __init__(self, interface: str, remote: ?stratoweave_rfs__rfs__router_facing_roadm_interface__remote=None) -> None:
+    mut def __init__(self, interface: str, vlan: ?u64, remote: ?stratoweave_rfs__rfs__user_interface__remote=None) -> None:
         self.interface = interface
-        self.remote = remote if remote is not None else stratoweave_rfs__rfs__router_facing_roadm_interface__remote()
+        self.vlan = vlan
+        self.remote = remote if remote is not None else stratoweave_rfs__rfs__user_interface__remote()
 
     mut def to_gdata(self) -> ygdata.Node:
-        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:router-facing-roadm-interface'])
+        return yadata.from_adata(SRC_DNODE, self, loose=True, root_path=['stratoweave-rfs:rfs', 'sorespo-rfs:user-interface'])
 
     @staticmethod
-    mut def from_gdata(n: ygdata.Node) -> stratoweave_rfs__rfs__router_facing_roadm_interface_entry:
-        return stratoweave_rfs__rfs__router_facing_roadm_interface_entry(interface=n.get_str(ygdata.Id(NS_sorespo_rfs, 'interface')), remote=stratoweave_rfs__rfs__router_facing_roadm_interface__remote.from_gdata(n.get_opt_cnt(ygdata.Id(NS_sorespo_rfs, 'remote'))))
+    mut def from_gdata(n: ygdata.Node) -> stratoweave_rfs__rfs__user_interface_entry:
+        return stratoweave_rfs__rfs__user_interface_entry(interface=n.get_str(ygdata.Id(NS_sorespo_rfs, 'interface')), vlan=n.get_opt_u64(ygdata.Id(NS_sorespo_rfs, 'vlan')), remote=stratoweave_rfs__rfs__user_interface__remote.from_gdata(n.get_opt_cnt(ygdata.Id(NS_sorespo_rfs, 'remote'))))
 
-    mut def copy(self) -> stratoweave_rfs__rfs__router_facing_roadm_interface_entry:
+    mut def copy(self) -> stratoweave_rfs__rfs__user_interface_entry:
         """Create a deep copy of this adata object"""
-        return stratoweave_rfs__rfs__router_facing_roadm_interface_entry.from_gdata(self.to_gdata())
+        return stratoweave_rfs__rfs__user_interface_entry.from_gdata(self.to_gdata())
 
 _breaker32: None = None
-class stratoweave_rfs__rfs__router_facing_roadm_interface(yadata.MKeyedList[str, stratoweave_rfs__rfs__router_facing_roadm_interface_entry]):
-    mut def __init__(self, elements: list[stratoweave_rfs__rfs__router_facing_roadm_interface_entry]=[]) -> None:
+class stratoweave_rfs__rfs__user_interface(yadata.MKeyedList[str, stratoweave_rfs__rfs__user_interface_entry]):
+    mut def __init__(self, elements: list[stratoweave_rfs__rfs__user_interface_entry]=[]) -> None:
         yadata.MKeyedList.__init__(self, lambda e, k: e.interface == k, elements)
 
-    mut def create(self, key: str) -> stratoweave_rfs__rfs__router_facing_roadm_interface_entry:
+    mut def create(self, key: str, vlan: ?u64=None) -> stratoweave_rfs__rfs__user_interface_entry:
         e = self.get(key)
         if e is not None:
+            if vlan is not None:
+                e.vlan = vlan
             return e
         interface = key
-        res = stratoweave_rfs__rfs__router_facing_roadm_interface_entry(interface=interface)
+        res = stratoweave_rfs__rfs__user_interface_entry(interface=interface, vlan=vlan)
         self.elements.append(res)
         return res
 
     @staticmethod
-    mut def from_gdata(n: ?ygdata.List) -> list[stratoweave_rfs__rfs__router_facing_roadm_interface_entry]:
+    mut def from_gdata(n: ?ygdata.List) -> list[stratoweave_rfs__rfs__user_interface_entry]:
         if n is not None:
-            return [stratoweave_rfs__rfs__router_facing_roadm_interface_entry.from_gdata(e) for e in n.elements]
+            return [stratoweave_rfs__rfs__user_interface_entry.from_gdata(e) for e in n.elements]
         return []
 
-    mut def copy(self) -> stratoweave_rfs__rfs__router_facing_roadm_interface:
+    mut def copy(self) -> stratoweave_rfs__rfs__user_interface:
         """Create a deep copy of this list object"""
         # Copy each element in the list
         copied_elements = []
@@ -2977,7 +2993,7 @@ class stratoweave_rfs__rfs__router_facing_roadm_interface(yadata.MKeyedList[str,
             ce = e.copy()
             if ce is not None:
                 copied_elements.append(ce)
-        return stratoweave_rfs__rfs__router_facing_roadm_interface(elements=copied_elements)
+        return stratoweave_rfs__rfs__user_interface(elements=copied_elements)
 
 
 _breaker33: None = None
@@ -3441,8 +3457,8 @@ _breaker48: None = None
 class stratoweave_rfs__rfs_entry(yadata.MNode):
     name: str
     base_config: stratoweave_rfs__rfs__base_config
-    roadm_roadm_interface: stratoweave_rfs__rfs__roadm_roadm_interface
-    router_facing_roadm_interface: stratoweave_rfs__rfs__router_facing_roadm_interface
+    line_interface: stratoweave_rfs__rfs__line_interface
+    user_interface: stratoweave_rfs__rfs__user_interface
     roadm_vlan: stratoweave_rfs__rfs__roadm_vlan
     backbone_interface: stratoweave_rfs__rfs__backbone_interface
     ibgp_neighbor: stratoweave_rfs__rfs__ibgp_neighbor
@@ -3450,11 +3466,11 @@ class stratoweave_rfs__rfs_entry(yadata.MNode):
     vrf_interface: stratoweave_rfs__rfs__vrf_interface
     ebgp_customer: stratoweave_rfs__rfs__ebgp_customer
 
-    mut def __init__(self, name: str, base_config: ?stratoweave_rfs__rfs__base_config=None, roadm_roadm_interface: list[stratoweave_rfs__rfs__roadm_roadm_interface_entry]=[], router_facing_roadm_interface: list[stratoweave_rfs__rfs__router_facing_roadm_interface_entry]=[], roadm_vlan: list[stratoweave_rfs__rfs__roadm_vlan_entry]=[], backbone_interface: list[stratoweave_rfs__rfs__backbone_interface_entry]=[], ibgp_neighbor: list[stratoweave_rfs__rfs__ibgp_neighbor_entry]=[], vrf: list[stratoweave_rfs__rfs__vrf_entry]=[], vrf_interface: list[stratoweave_rfs__rfs__vrf_interface_entry]=[], ebgp_customer: list[stratoweave_rfs__rfs__ebgp_customer_entry]=[]) -> None:
+    mut def __init__(self, name: str, base_config: ?stratoweave_rfs__rfs__base_config=None, line_interface: list[stratoweave_rfs__rfs__line_interface_entry]=[], user_interface: list[stratoweave_rfs__rfs__user_interface_entry]=[], roadm_vlan: list[stratoweave_rfs__rfs__roadm_vlan_entry]=[], backbone_interface: list[stratoweave_rfs__rfs__backbone_interface_entry]=[], ibgp_neighbor: list[stratoweave_rfs__rfs__ibgp_neighbor_entry]=[], vrf: list[stratoweave_rfs__rfs__vrf_entry]=[], vrf_interface: list[stratoweave_rfs__rfs__vrf_interface_entry]=[], ebgp_customer: list[stratoweave_rfs__rfs__ebgp_customer_entry]=[]) -> None:
         self.name = name
         self.base_config = base_config if base_config is not None else stratoweave_rfs__rfs__base_config()
-        self.roadm_roadm_interface = stratoweave_rfs__rfs__roadm_roadm_interface(elements=roadm_roadm_interface)
-        self.router_facing_roadm_interface = stratoweave_rfs__rfs__router_facing_roadm_interface(elements=router_facing_roadm_interface)
+        self.line_interface = stratoweave_rfs__rfs__line_interface(elements=line_interface)
+        self.user_interface = stratoweave_rfs__rfs__user_interface(elements=user_interface)
         self.roadm_vlan = stratoweave_rfs__rfs__roadm_vlan(elements=roadm_vlan)
         self.backbone_interface = stratoweave_rfs__rfs__backbone_interface(elements=backbone_interface)
         self.ibgp_neighbor = stratoweave_rfs__rfs__ibgp_neighbor(elements=ibgp_neighbor)
@@ -3467,7 +3483,7 @@ class stratoweave_rfs__rfs_entry(yadata.MNode):
 
     @staticmethod
     mut def from_gdata(n: ygdata.Node) -> stratoweave_rfs__rfs_entry:
-        return stratoweave_rfs__rfs_entry(name=n.get_str(ygdata.Id(NS_stratoweave_rfs, 'name')), base_config=stratoweave_rfs__rfs__base_config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_sorespo_rfs, 'base-config'))), roadm_roadm_interface=stratoweave_rfs__rfs__roadm_roadm_interface.from_gdata(n.get_opt_list(ygdata.Id(NS_sorespo_rfs, 'roadm-roadm-interface'))), router_facing_roadm_interface=stratoweave_rfs__rfs__router_facing_roadm_interface.from_gdata(n.get_opt_list(ygdata.Id(NS_sorespo_rfs, 'router-facing-roadm-interface'))), roadm_vlan=stratoweave_rfs__rfs__roadm_vlan.from_gdata(n.get_opt_list(ygdata.Id(NS_sorespo_rfs, 'roadm-vlan'))), backbone_interface=stratoweave_rfs__rfs__backbone_interface.from_gdata(n.get_opt_list(ygdata.Id(NS_sorespo_rfs, 'backbone-interface'))), ibgp_neighbor=stratoweave_rfs__rfs__ibgp_neighbor.from_gdata(n.get_opt_list(ygdata.Id(NS_sorespo_rfs, 'ibgp-neighbor'))), vrf=stratoweave_rfs__rfs__vrf.from_gdata(n.get_opt_list(ygdata.Id(NS_sorespo_rfs, 'vrf'))), vrf_interface=stratoweave_rfs__rfs__vrf_interface.from_gdata(n.get_opt_list(ygdata.Id(NS_sorespo_rfs, 'vrf-interface'))), ebgp_customer=stratoweave_rfs__rfs__ebgp_customer.from_gdata(n.get_opt_list(ygdata.Id(NS_sorespo_rfs, 'ebgp-customer'))))
+        return stratoweave_rfs__rfs_entry(name=n.get_str(ygdata.Id(NS_stratoweave_rfs, 'name')), base_config=stratoweave_rfs__rfs__base_config.from_gdata(n.get_opt_cnt(ygdata.Id(NS_sorespo_rfs, 'base-config'))), line_interface=stratoweave_rfs__rfs__line_interface.from_gdata(n.get_opt_list(ygdata.Id(NS_sorespo_rfs, 'line-interface'))), user_interface=stratoweave_rfs__rfs__user_interface.from_gdata(n.get_opt_list(ygdata.Id(NS_sorespo_rfs, 'user-interface'))), roadm_vlan=stratoweave_rfs__rfs__roadm_vlan.from_gdata(n.get_opt_list(ygdata.Id(NS_sorespo_rfs, 'roadm-vlan'))), backbone_interface=stratoweave_rfs__rfs__backbone_interface.from_gdata(n.get_opt_list(ygdata.Id(NS_sorespo_rfs, 'backbone-interface'))), ibgp_neighbor=stratoweave_rfs__rfs__ibgp_neighbor.from_gdata(n.get_opt_list(ygdata.Id(NS_sorespo_rfs, 'ibgp-neighbor'))), vrf=stratoweave_rfs__rfs__vrf.from_gdata(n.get_opt_list(ygdata.Id(NS_sorespo_rfs, 'vrf'))), vrf_interface=stratoweave_rfs__rfs__vrf_interface.from_gdata(n.get_opt_list(ygdata.Id(NS_sorespo_rfs, 'vrf-interface'))), ebgp_customer=stratoweave_rfs__rfs__ebgp_customer.from_gdata(n.get_opt_list(ygdata.Id(NS_sorespo_rfs, 'ebgp-customer'))))
 
     mut def copy(self) -> stratoweave_rfs__rfs_entry:
         """Create a deep copy of this adata object"""
@@ -4045,7 +4061,7 @@ class stratoweave_rfs__rfs__base_config_subs(SubscriptionNode):
         return direct
 
 _breaker77: None = None
-class stratoweave_rfs__rfs__roadm_roadm_interface__remote_subs(SubscriptionNode):
+class stratoweave_rfs__rfs__line_interface__remote_subs(SubscriptionNode):
     device: SubscriptionNode
     interface: SubscriptionNode
 
@@ -4059,41 +4075,41 @@ class stratoweave_rfs__rfs__roadm_roadm_interface__remote_subs(SubscriptionNode)
         return direct
 
 _breaker78: None = None
-class stratoweave_rfs__rfs__roadm_roadm_interface_entry_subs(SubscriptionNode):
+class stratoweave_rfs__rfs__line_interface_entry_subs(SubscriptionNode):
     name: SubscriptionNode
-    remote: stratoweave_rfs__rfs__roadm_roadm_interface__remote_subs
+    remote: stratoweave_rfs__rfs__line_interface__remote_subs
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
         self.name = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'name'), parent=path))
-        self.remote = stratoweave_rfs__rfs__roadm_roadm_interface__remote_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'remote'), parent=path))
+        self.remote = stratoweave_rfs__rfs__line_interface__remote_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'remote'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
         direct: list[SubscriptionNode] = [self.name, self.remote]
         return direct
 
 _breaker79: None = None
-class stratoweave_rfs__rfs__roadm_roadm_interface_subs(SubscriptionNode):
+class stratoweave_rfs__rfs__line_interface_subs(SubscriptionNode):
     name: SubscriptionNode
-    remote: stratoweave_rfs__rfs__roadm_roadm_interface__remote_subs
+    remote: stratoweave_rfs__rfs__line_interface__remote_subs
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
         self.name = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'name'), parent=path))
-        self.remote = stratoweave_rfs__rfs__roadm_roadm_interface__remote_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'remote'), parent=path))
+        self.remote = stratoweave_rfs__rfs__line_interface__remote_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'remote'), parent=path))
 
-    pure def entry(self, name: str) -> stratoweave_rfs__rfs__roadm_roadm_interface_entry_subs:
+    pure def entry(self, name: str) -> stratoweave_rfs__rfs__line_interface_entry_subs:
         predicates = [
             ygdata.FNode(ygdata.Id(NS_sorespo_rfs, 'name'), value_match=name),
         ]
         base_path = self._path!.parent
-        return stratoweave_rfs__rfs__roadm_roadm_interface_entry_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'roadm-roadm-interface'), predicates=predicates, parent=base_path))
+        return stratoweave_rfs__rfs__line_interface_entry_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'line-interface'), predicates=predicates, parent=base_path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
         direct: list[SubscriptionNode] = [self.name, self.remote]
         return direct
 
 _breaker80: None = None
-class stratoweave_rfs__rfs__router_facing_roadm_interface__remote_subs(SubscriptionNode):
+class stratoweave_rfs__rfs__user_interface__remote_subs(SubscriptionNode):
     router: SubscriptionNode
     interface: SubscriptionNode
 
@@ -4107,37 +4123,41 @@ class stratoweave_rfs__rfs__router_facing_roadm_interface__remote_subs(Subscript
         return direct
 
 _breaker81: None = None
-class stratoweave_rfs__rfs__router_facing_roadm_interface_entry_subs(SubscriptionNode):
+class stratoweave_rfs__rfs__user_interface_entry_subs(SubscriptionNode):
     interface: SubscriptionNode
-    remote: stratoweave_rfs__rfs__router_facing_roadm_interface__remote_subs
+    vlan: SubscriptionNode
+    remote: stratoweave_rfs__rfs__user_interface__remote_subs
 
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
         self.interface = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'interface'), parent=path))
-        self.remote = stratoweave_rfs__rfs__router_facing_roadm_interface__remote_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'remote'), parent=path))
+        self.vlan = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'vlan'), parent=path))
+        self.remote = stratoweave_rfs__rfs__user_interface__remote_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'remote'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.interface, self.remote]
+        direct: list[SubscriptionNode] = [self.interface, self.vlan, self.remote]
         return direct
 
 _breaker82: None = None
-class stratoweave_rfs__rfs__router_facing_roadm_interface_subs(SubscriptionNode):
+class stratoweave_rfs__rfs__user_interface_subs(SubscriptionNode):
     interface: SubscriptionNode
-    remote: stratoweave_rfs__rfs__router_facing_roadm_interface__remote_subs
+    vlan: SubscriptionNode
+    remote: stratoweave_rfs__rfs__user_interface__remote_subs
     pure def __init__(self, path: ?SubscriptionPath=None) -> None:
         SubscriptionNode.__init__(self, path)
         self.interface = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'interface'), parent=path))
-        self.remote = stratoweave_rfs__rfs__router_facing_roadm_interface__remote_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'remote'), parent=path))
+        self.vlan = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'vlan'), parent=path))
+        self.remote = stratoweave_rfs__rfs__user_interface__remote_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'remote'), parent=path))
 
-    pure def entry(self, interface: str) -> stratoweave_rfs__rfs__router_facing_roadm_interface_entry_subs:
+    pure def entry(self, interface: str) -> stratoweave_rfs__rfs__user_interface_entry_subs:
         predicates = [
             ygdata.FNode(ygdata.Id(NS_sorespo_rfs, 'interface'), value_match=interface),
         ]
         base_path = self._path!.parent
-        return stratoweave_rfs__rfs__router_facing_roadm_interface_entry_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'router-facing-roadm-interface'), predicates=predicates, parent=base_path))
+        return stratoweave_rfs__rfs__user_interface_entry_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'user-interface'), predicates=predicates, parent=base_path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.interface, self.remote]
+        direct: list[SubscriptionNode] = [self.interface, self.vlan, self.remote]
         return direct
 
 _breaker83: None = None
@@ -4469,8 +4489,8 @@ _breaker98: None = None
 class stratoweave_rfs__rfs_entry_subs(SubscriptionNode):
     name: SubscriptionNode
     base_config: stratoweave_rfs__rfs__base_config_subs
-    roadm_roadm_interface: stratoweave_rfs__rfs__roadm_roadm_interface_subs
-    router_facing_roadm_interface: stratoweave_rfs__rfs__router_facing_roadm_interface_subs
+    line_interface: stratoweave_rfs__rfs__line_interface_subs
+    user_interface: stratoweave_rfs__rfs__user_interface_subs
     roadm_vlan: stratoweave_rfs__rfs__roadm_vlan_subs
     backbone_interface: stratoweave_rfs__rfs__backbone_interface_subs
     ibgp_neighbor: stratoweave_rfs__rfs__ibgp_neighbor_subs
@@ -4482,8 +4502,8 @@ class stratoweave_rfs__rfs_entry_subs(SubscriptionNode):
         SubscriptionNode.__init__(self, path)
         self.name = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'name'), parent=path))
         self.base_config = stratoweave_rfs__rfs__base_config_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'base-config'), parent=path))
-        self.roadm_roadm_interface = stratoweave_rfs__rfs__roadm_roadm_interface_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'roadm-roadm-interface'), parent=path))
-        self.router_facing_roadm_interface = stratoweave_rfs__rfs__router_facing_roadm_interface_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'router-facing-roadm-interface'), parent=path))
+        self.line_interface = stratoweave_rfs__rfs__line_interface_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'line-interface'), parent=path))
+        self.user_interface = stratoweave_rfs__rfs__user_interface_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'user-interface'), parent=path))
         self.roadm_vlan = stratoweave_rfs__rfs__roadm_vlan_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'roadm-vlan'), parent=path))
         self.backbone_interface = stratoweave_rfs__rfs__backbone_interface_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'backbone-interface'), parent=path))
         self.ibgp_neighbor = stratoweave_rfs__rfs__ibgp_neighbor_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'ibgp-neighbor'), parent=path))
@@ -4492,15 +4512,15 @@ class stratoweave_rfs__rfs_entry_subs(SubscriptionNode):
         self.ebgp_customer = stratoweave_rfs__rfs__ebgp_customer_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'ebgp-customer'), parent=path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.name, self.base_config, self.roadm_roadm_interface, self.router_facing_roadm_interface, self.roadm_vlan, self.backbone_interface, self.ibgp_neighbor, self.vrf, self.vrf_interface, self.ebgp_customer]
+        direct: list[SubscriptionNode] = [self.name, self.base_config, self.line_interface, self.user_interface, self.roadm_vlan, self.backbone_interface, self.ibgp_neighbor, self.vrf, self.vrf_interface, self.ebgp_customer]
         return direct
 
 _breaker99: None = None
 class stratoweave_rfs__rfs_subs(SubscriptionNode):
     name: SubscriptionNode
     base_config: stratoweave_rfs__rfs__base_config_subs
-    roadm_roadm_interface: stratoweave_rfs__rfs__roadm_roadm_interface_subs
-    router_facing_roadm_interface: stratoweave_rfs__rfs__router_facing_roadm_interface_subs
+    line_interface: stratoweave_rfs__rfs__line_interface_subs
+    user_interface: stratoweave_rfs__rfs__user_interface_subs
     roadm_vlan: stratoweave_rfs__rfs__roadm_vlan_subs
     backbone_interface: stratoweave_rfs__rfs__backbone_interface_subs
     ibgp_neighbor: stratoweave_rfs__rfs__ibgp_neighbor_subs
@@ -4511,8 +4531,8 @@ class stratoweave_rfs__rfs_subs(SubscriptionNode):
         SubscriptionNode.__init__(self, path)
         self.name = SubscriptionNode(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'name'), parent=path))
         self.base_config = stratoweave_rfs__rfs__base_config_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'base-config'), parent=path))
-        self.roadm_roadm_interface = stratoweave_rfs__rfs__roadm_roadm_interface_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'roadm-roadm-interface'), parent=path))
-        self.router_facing_roadm_interface = stratoweave_rfs__rfs__router_facing_roadm_interface_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'router-facing-roadm-interface'), parent=path))
+        self.line_interface = stratoweave_rfs__rfs__line_interface_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'line-interface'), parent=path))
+        self.user_interface = stratoweave_rfs__rfs__user_interface_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'user-interface'), parent=path))
         self.roadm_vlan = stratoweave_rfs__rfs__roadm_vlan_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'roadm-vlan'), parent=path))
         self.backbone_interface = stratoweave_rfs__rfs__backbone_interface_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'backbone-interface'), parent=path))
         self.ibgp_neighbor = stratoweave_rfs__rfs__ibgp_neighbor_subs(SubscriptionPath(ygdata.Id(NS_sorespo_rfs, 'ibgp-neighbor'), parent=path))
@@ -4528,7 +4548,7 @@ class stratoweave_rfs__rfs_subs(SubscriptionNode):
         return stratoweave_rfs__rfs_entry_subs(SubscriptionPath(ygdata.Id(NS_stratoweave_rfs, 'rfs'), predicates=predicates, parent=base_path))
 
     pure def _direct_children(self) -> list[SubscriptionNode]:
-        direct: list[SubscriptionNode] = [self.name, self.base_config, self.roadm_roadm_interface, self.router_facing_roadm_interface, self.roadm_vlan, self.backbone_interface, self.ibgp_neighbor, self.vrf, self.vrf_interface, self.ebgp_customer]
+        direct: list[SubscriptionNode] = [self.name, self.base_config, self.line_interface, self.user_interface, self.roadm_vlan, self.backbone_interface, self.ibgp_neighbor, self.vrf, self.vrf_interface, self.ebgp_customer]
         return direct
 
 _breaker100: None = None

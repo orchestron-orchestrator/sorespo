@@ -103,9 +103,6 @@ module netinfra-inter {
       key "left-router left-interface right-router right-interface";
 
       sw:transform sorespo.inter.BBLink;
-      sw:link optical-link {
-        sw:path /netinfra-inter:netinfra/netinfra-inter:optical-link;
-      }
 
       leaf left-router {
         type string;
@@ -121,6 +118,7 @@ module netinfra-inter {
       }
       
       container optical {
+        presence "Enable optical transport for this backbone link";
         description "OTN link parameters";
         leaf vlan {
           type uint16 {
@@ -175,21 +173,29 @@ module netinfra-inter {
     }
 
     list optical-link {
-      key "left-roadm left-port right-roadm right-port";
+      key "left-roadm right-roadm";
 
       sw:transform sorespo.inter.OpticalLink;
+
+      leaf-list vlan {
+        type uint16 {
+          range "1..4094";
+        }
+      }
 
       leaf left-roadm {
         type string;
       }
       leaf left-port {
         type string;
+        mandatory true;
       }
       leaf right-roadm {
         type string;
       }
       leaf right-port {
         type string;
+        mandatory true;
       }
     }
 

@@ -1,0 +1,104 @@
+import testing
+import yang.gdata as gdata
+
+import sorespo.cfs as cfs
+import sorespo.layers.y_0 as y_0
+import sorespo.layers.y_1_loose as y_1_loose
+
+
+def _test_cfs_optical_path_vlans():
+    optical = y_0.netinfra__netinfra__backbone_link__optical(
+        vlan=123,
+        left_roadm="A",
+        right_roadm="C",
+        left_port="client-a",
+        right_port="client-c",
+        otn_path=["B"],
+    )
+    backbone = y_0.netinfra__netinfra__backbone_link_entry(
+        left_router="left-router",
+        left_interface="left-interface",
+        right_router="right-router",
+        right_interface="right-interface",
+        optical=optical,
+    )
+    second_backbone = y_0.netinfra__netinfra__backbone_link_entry(
+        left_router="second-left-router",
+        left_interface="second-left-interface",
+        right_router="second-right-router",
+        right_interface="second-right-interface",
+        optical=y_0.netinfra__netinfra__backbone_link__optical(
+            vlan=456,
+            left_roadm="A",
+            right_roadm="C",
+            left_port="second-client-a",
+            right_port="second-client-c",
+            otn_path=["B"],
+        ),
+    )
+    backbone_transform = cfs.BBLink()
+    first = backbone_transform.transform(backbone)
+    second = backbone_transform.transform(second_backbone)
+    first_link = cfs.OpticalLink().transform(
+        y_0.netinfra__netinfra__optical_link_entry(
+            left_roadm="A",
+            right_roadm="B",
+            left_port="line-a",
+            right_port="line-b1",
+            latency=None,
+        ),
+    )
+    second_link = cfs.OpticalLink().transform(
+        y_0.netinfra__netinfra__optical_link_entry(
+            left_roadm="B",
+            right_roadm="C",
+            left_port="line-b2",
+            right_port="line-c",
+            latency=None,
+        ),
+    )
+    backbone_output = gdata.merge(first.to_gdata(), second.to_gdata())
+    link_output = gdata.merge(first_link.to_gdata(), second_link.to_gdata())
+    out = y_1_loose.root.from_gdata(gdata.merge(backbone_output, link_output))
+    links = out.netinfra.optical_link.elements
+
+    testing.assertEqual(len(links), 2)
+    testing.assertEqual(links[0].left_roadm, "A")
+    testing.assertEqual(links[0].right_roadm, "B")
+    testing.assertEqual(links[0].left_port, "line-a")
+    testing.assertEqual(links[0].right_port, "line-b1")
+    testing.assertEqual(links[0].vlan, [123, 456])
+    testing.assertEqual(links[1].left_roadm, "B")
+    testing.assertEqual(links[1].right_roadm, "C")
+    testing.assertEqual(links[1].left_port, "line-b2")
+    testing.assertEqual(links[1].right_port, "line-c")
+    testing.assertEqual(links[1].vlan, [123, 456])
+
+
+def _test_cfs_optical_path_seven_roadms():
+    optical = y_0.netinfra__netinfra__backbone_link__optical(
+        vlan=777,
+        left_roadm="A",
+        right_roadm="I",
+        left_port="client-a",
+        right_port="client-i",
+        otn_path=["B", "C", "D", "E", "F", "G", "H"],
+    )
+    backbone = y_0.netinfra__netinfra__backbone_link_entry(
+        left_router="left-router",
+        left_interface="left-interface",
+        right_router="right-router",
+        right_interface="right-interface",
+        optical=optical,
+    )
+
+    transformed = cfs.BBLink().transform(backbone)
+    out = y_1_loose.root.from_gdata(transformed.to_gdata())
+    links = out.netinfra.optical_link.elements
+    roadms = ["A", "B", "C", "D", "E", "F", "G", "H", "I"]
+
+    testing.assertEqual(len(links), 8)
+    for index in range(8):
+        testing.assertEqual(links[index].left_roadm, roadms[index])
+        testing.assertEqual(links[index].right_roadm, roadms[index + 1])
+        testing.assertEqual(links[index].vlan, [777])

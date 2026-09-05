@@ -6,7 +6,7 @@ import stratoweave.ttt
 import stratoweave.adapters.adapter
 
 import sorespo.rfs as rfs
-from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface__remote
+from sorespo.layers.y_2 import stratoweave_rfs__rfs__backbone_interface__remote, stratoweave_rfs__rfs__user_interface__remote
 
 proc def _test_rfs_bbinterface1(t: testing.SyncT):
     modeled_input = rfs.BBInterface.input_type()(
@@ -41,5 +41,34 @@ proc def _test_rfs_bbinterface2(t: testing.SyncT):
         {"http://xml.juniper.net/netconf/junos/1.0": stratoweave.adapters.adapter.ModCap("http://xml.juniper.net/netconf/junos/1.0", "http://xml.juniper.net/netconf/junos/1.0")}
     )
     transform = rfs.BBInterface(t.log_handler)
+    out, _ = transform.transform_xml(xml.decode(xmlin), mock_di)
+    return out.to_xmlstr()
+
+proc def _test_rfs_userinterface_vlan(t: testing.SyncT):
+    modeled_input = rfs.UserInterface.input_type()(
+        interface="ethernet-1/1",
+        vlan=321,
+        remote=stratoweave_rfs__rfs__user_interface__remote(
+            router="AMS-CORE-1",
+            interface="GigabitEthernet0/0/0/0",
+        ),
+    )
+
+    mock_di = stratoweave.ttt.DeviceInfo("AMS-ROADM-1",
+        {"srl_nokia-system": stratoweave.adapters.adapter.ModCap("srl_nokia-system", "urn:srl_nokia/system")}
+    )
+    transform = rfs.UserInterface(t.log_handler)
+    out = transform.transform(modeled_input, mock_di).to_gdata()
+    return out.to_xmlstr()
+
+proc def _test_rfs_roadm_baseconfig(t: testing.SyncT):
+    xmlin = """<base-config xmlns="http://example.com/sorespo-rfs">
+  <role>roadm</role>
+</base-config>"""
+
+    mock_di = stratoweave.ttt.DeviceInfo("AMS-ROADM-1",
+        {"srl_nokia-system": stratoweave.adapters.adapter.ModCap("srl_nokia-system", "urn:srl_nokia/system")}
+    )
+    transform = rfs.BaseConfig(t.log_handler)
     out, _ = transform.transform_xml(xml.decode(xmlin), mock_di)
     return out.to_xmlstr()

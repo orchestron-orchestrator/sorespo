@@ -47,12 +47,19 @@ class BBLink(base.BBLink):
         o = base.o_root()
         bblink = o.netinfra.backbone_link.create((i.left_router, i.left_interface, i.right_router, i.right_interface))
 
-        if i.optical is not None:
-            bblink.optical.vlan = i.optical.vlan
-            bblink.optical.left_roadm = i.optical.left_roadm
-            bblink.optical.left_port = i.optical.left_port
-            bblink.optical.right_roadm = i.optical.right_roadm
-            bblink.optical.right_port = i.optical.right_port
+        optical = i.optical
+        if isinstance(optical, y_0.netinfra__netinfra__backbone_link__optical):
+            bblink_optical = bblink.create_optical(optical.vlan, optical.left_roadm, optical.right_roadm, optical.left_port, optical.right_port)
+            bblink_optical.otn_path = optical.otn_path
+
+            roadms = [optical.left_roadm]
+            roadms.extend(optical.otn_path)
+            roadms.append(optical.right_roadm)
+            for index in range(len(roadms) - 1):
+                left_roadm = roadms[index]
+                right_roadm = roadms[index + 1]
+                ol = o.netinfra.optical_link.create((left_roadm, right_roadm))
+                ol.vlan.append(optical.vlan)
         return o
 
 
@@ -221,5 +228,7 @@ class OpticalLink(base.OpticalLink):
     def transform(self, i):
         print("CFS OpticalLink transform running %s [%s] <-> %s [%s]" % (i.left_roadm, i.left_port, i.right_roadm, i.right_port))
         o = base.o_root()
-        ol = o.netinfra.optical_link.create((i.left_roadm, i.left_port, i.right_roadm, i.right_port))
+        ol = o.netinfra.optical_link.create((i.left_roadm, i.right_roadm))
+        ol.left_port = i.left_port
+        ol.right_port = i.right_port
         return o

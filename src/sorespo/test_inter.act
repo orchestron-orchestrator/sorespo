@@ -19,6 +19,34 @@ def _test_inter_bblink():
     out, _ = transform.transform_xml(xml.decode(xmlin), ygdata.Container())
     return out.to_xmlstr()
 
+def _test_inter_bblink_optical_vlan():
+    xmlin = """
+<backbone-link>
+    <left-router>AMS-CORE-1</left-router>
+    <left-interface>GigabitEthernet0/0/0/0</left-interface>
+    <right-router>FRA-CORE-1</right-router>
+    <right-interface>GigabitEthernet0/0/0/0</right-interface>
+    <optical>
+        <vlan>321</vlan>
+        <left-roadm>AMS-ROADM-1</left-roadm>
+        <right-roadm>FRA-ROADM-1</right-roadm>
+        <left-port>ethernet-1/1</left-port>
+        <right-port>ethernet-1/2</right-port>
+    </optical>
+</backbone-link>"""
+    transform = inter.BBLink()
+    out, _ = transform.transform_xml(xml.decode(xmlin), ygdata.Container())
+    return out.to_xmlstr()
+
+def _test_inter_roadm_baseconfig():
+    xmlin = """<roadm>
+    <name>AMS-ROADM-1</name>
+    <id>1</id>
+</roadm>"""
+    transform = inter.ROADM()
+    out, _ = transform.transform_xml(xml.decode(xmlin), ygdata.Container())
+    return out.to_xmlstr()
+
 def _test_inter_ibgp_fullmesh():
     xmlin = """<ibgp-fullmesh>
     <asn>65001</asn>

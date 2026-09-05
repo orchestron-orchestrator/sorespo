@@ -1,49 +1,33 @@
 # Quicklab OTN VLAN simulation
 
-This lab contains four core routers. All of the routers run Nokia SR Linux.
+This lab connects two Nokia SR Linux routers through three Nokia SR Linux
+ROADMs. The router-facing links are untagged, while VLAN 100 is carried between
+ROADMs through a shared MAC-VRF.
 
-All the CPEs run FRRouting.
-
-Each PE router has a single CPE attached vian an access interface. All
-four CPEs belong to a single customer and are then configured into a single
-L3VPN BGP-EVPN VXLAN VPN.
-
+```text
+ams-core-1      roadm-1         roadm-2         roadm-3      sto-core-1
+ e1-2 --- e1-1  e1-2 --- e1-1  e1-2 --- e1-1  e1-2 --- e1-1
+10.0.20.1/30                                               10.0.20.2/30
 ```
-+-------------------+                                                                     +-------------------+   
-|    cust-1-frr     |                                                                     |    cust-3-frr     |   
-|    10.200.1.1     |                                                                     |    10.200.1.3     |   
-|    (FRRouting)    |                                                                     |    (FRRouting)    |   
-+----+--------------+                                                                     +--+----------------+   
-     |eth1                                                                                   |eth1       
-     |                                                                                       |                    
-     +-------------------+                                                                   |                    
-                         |                                                                   |                    
-                         |ethernet1/3.100                                                    |                    
-                      +--+----------------+                          +-------------------+   |                    
-                      |    ams-core-1     |ethernet1/2    ethernet1/1|    sto-core-1     |   |                    
-                      |     10.0.0.1      +-----[RO1]------[RO2]-----+     10.0.0.3      +---+                    
-                      |  (Nokia SR Linux) |   e1/1 e1/2  e1/1 e1/2   |  (Nokia SR Linux) |ethernet1/4.100                
-                      +--+----------------+                          +--+--------------+-+                        
-                         |ethernet1/1                                   |ethernet1/2   |ethernet1/3                          
-                         |                                              |              |                          
-                         |                                              |              |                          
-                         |                                              |              |                          
-                         |                            +-----------------+              |                          
-                         |                            |                                |                          
-                         |                            |                                |                          
-                         |                            |                                |                          
-                         |                            |                                |                          
-                         |ethernet1/1                 |                     ethernet1/2|                          
-                      +--+----------------+ethernet1/2|              +-----------------+-+                        
-                      |    fra-core-1     +-----------+              |    lju-core-1     |                        
-                      |     10.0.0.2      |ethernet1/3               |     10.0.0.4      |                        
-                      |  (Nokia SR Linux) +--------------------------+  (Nokia SR Linux) |                        
-                      +---+---------------+               ethernet1/1+--------+----------+                        
-                          |ethernet1/4.100                                    |ethernet1/3.100                           
-                          |                                                   |                                   
- +-------------------+    |                                                   |              +-------------------+
- |    cust-2-frr     |    |                                                   |              |    cust-4-frr     |
- |    10.200.1.2     +----+                                                   |          eth1|    10.200.1.4     |
- |    (FRRouting)    |eth1                                                    +--------------+    (FRRouting)    |
- +-------------------+                                                                       +-------------------+
+
+Build and run the lab from this directory:
+
+```bash
+make start
+make -C ../.. build-linux-aarch64
+make copy
+make run-and-configure
+```
+
+In another terminal, verify end-to-end connectivity through the OTN path:
+
+```bash
+make ping
+```
+
+To test every router pair in both directions from their loopback addresses and
+report the minimum, average, and maximum latency:
+
+```bash
+make test-ping
 ```

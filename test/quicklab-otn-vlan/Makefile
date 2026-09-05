@@ -1,26 +1,19 @@
 TESTENV=sorespo-quicklab-otn-vlan
 
-ROUTERS_SRL=sto-core-1 lju-core-1 ams-core-1 fra-core-1 roadm-1 roadm-2
-ROUTERS_FRR=cust-1 cust-2 cust-3 cust-4
+ROUTERS_SRL=ams-core-1 sto-core-1
+ROUTERS_FRR=
+CPE_IDS=
 
 include ../common/clab.mk
 include ../common/containers.mk
 include ../common/quicklab.mk
 
 # Each entry is "<router>:<srl-interface>". Mirrors netinfra.xml's
-# backbone-link entries (10 endpoints = 5 links * 2 sides). Use the SRL
+# backbone-link entry (2 endpoints). Use the SRL
 # interface name (ethernet-1/X), not the linux veth (e1-X).
 BB_INTERFACES = \
-    ams-core-1:ethernet-1/1 \
-    fra-core-1:ethernet-1/1 \
     ams-core-1:ethernet-1/2 \
-    sto-core-1:ethernet-1/1 \
-    fra-core-1:ethernet-1/2 \
-    sto-core-1:ethernet-1/2 \
-    fra-core-1:ethernet-1/3 \
-    lju-core-1:ethernet-1/1 \
-    sto-core-1:ethernet-1/3 \
-    lju-core-1:ethernet-1/2
+	sto-core-1:ethernet-1/1
 
 SHELL := /bin/bash
 
@@ -50,12 +43,61 @@ bb-up-all:
 	        || true; \
 	done
 
-.PHONY: otn-copy
-otn-copy:
+.PHONY: copy
+copy:
 	docker cp ../../out/bin/sorespo $(TESTENV)-sweave:/sorespo
 	docker cp netinfra.xml $(TESTENV)-sweave:/netinfra.xml
 
-.PHONY: otn-run-and-configure
-otn-run-and-configure:
+.PHONY: run
+run:
+	docker exec $(INTERACTIVE) $(TESTENV)-sweave /sorespo --rts-bt-dbg
+
+.PHONY: run-and-configure
+run-and-configure:
 	docker exec $(INTERACTIVE) $(TESTENV)-sweave /sorespo $(EXIT_ON_DONE) netinfra.xml --rts-bt-dbg
-# 	docker exec $(INTERACTIVE) $(TESTENV)-sweave /sorespo $(EXIT_ON_DONE) netinfra.xml --rts-bt-dbg > logs/clab-deploy.log 2>&1
+
+.PHONY: configure
+configure:
+	$(MAKE) send-config-wait FILE="netinfra.xml"
+
+PING_COUNT ?= 3
+
+.PHONY: ping
+ping:
+	docker exec $(TESTENV)-ams-core-1 sr_cli "ping -c $(PING_COUNT) network-instance default 10.0.20.2"
+
+.PHONY: test-ping
+test-ping::
+	@router_count=$$(xmllint --xpath 'count(//*[local-name()="router"])' netinfra.xml); \
+	routers=(); \
+	for ((index = 1; index <= router_count; index++)); do \
+		name=$$(xmllint --xpath "string((//*[local-name()='router'])[$$index]/*[local-name()='name'])" netinfra.xml); \
+		id=$$(xmllint --xpath "string((//*[local-name()='router'])[$$index]/*[local-name()='id'])" netinfra.xml); \
+		container=$$(printf '%s' "$$name" | tr '[:upper:]' '[:lower:]'); \
+		routers+=("$$name|$$container|10.0.0.$$id"); \
+	done; \
+	failed=0; \
+	for ((left = 0; left < router_count; left++)); do \
+		IFS='|' read -r left_name left_container left_ip <<< "$${routers[$$left]}"; \
+		for ((right = left + 1; right < router_count; right++)); do \
+			IFS='|' read -r right_name right_container right_ip <<< "$${routers[$$right]}"; \
+			printf '\n%s <-> %s\n' "$$left_name" "$$right_name"; \
+			for direction in \
+				"$$left_name|$$left_container|$$left_ip|$$right_name|$$right_ip" \
+				"$$right_name|$$right_container|$$right_ip|$$left_name|$$left_ip"; do \
+				IFS='|' read -r source_name source_container source_ip destination_name destination_ip <<< "$$direction"; \
+				output=$$(docker exec "$(TESTENV)-$$source_container" sr_cli \
+					"ping -c $(PING_COUNT) -I $$source_ip network-instance default $$destination_ip" 2>&1); \
+				status=$$?; \
+				latency=$$(printf '%s\n' "$$output" | sed -nE 's/^rtt min\/avg\/max\/mdev = ([0-9.]+)\/([0-9.]+)\/([0-9.]+)\/.* ms$$/min\/avg\/max \1\/\2\/\3 ms/p'); \
+				loss=$$(printf '%s\n' "$$output" | sed -nE 's/.*, ([0-9.]+)% packet loss.*/\1% loss/p'); \
+				if [[ $$status -eq 0 && -n "$$latency" ]]; then \
+					printf '  %s -> %s: %s, %s\n' "$$source_name" "$$destination_name" "$$latency" "$$loss"; \
+				else \
+					printf '  %s -> %s: FAILED (%s)\n' "$$source_name" "$$destination_name" "$${loss:-no statistics}"; \
+					failed=1; \
+				fi; \
+			done; \
+		done; \
+	done; \
+	exit $$failed

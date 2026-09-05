@@ -100,28 +100,34 @@ module netinfra {
       }
 
       container optical {
+        presence "Enable optical transport for this backbone link";
         description "OTN link parameters";
         leaf vlan {
           type uint16 {
             range "1..4094";
           }
+          mandatory true;
           description "VLAN tag for the link";
         }
         leaf left-roadm {
           type leafref {
             path "/netinfra:netinfra/netinfra:roadm/netinfra:name";
           }
+          mandatory true;
         }
         leaf right-roadm {
           type leafref {
             path "/netinfra:netinfra/netinfra:roadm/netinfra:name";
           }
+          mandatory true;
         }
         leaf left-port {
           type string;
+          mandatory true;
         }
         leaf right-port {
           type string;
+          mandatory true;
         }
         leaf-list otn-path {
           type leafref {
@@ -149,7 +155,7 @@ module netinfra {
     }
 
     list optical-link {
-      key "left-roadm left-port right-roadm right-port";
+      key "left-roadm right-roadm";
 
       sw:transform sorespo.cfs.OpticalLink;
       tmf:cfs-service "Optical Link";
@@ -159,12 +165,14 @@ module netinfra {
       }
       leaf left-port {
         type string;
+        mandatory true;
       }
       leaf right-roadm {
         type string;
       }
       leaf right-port {
         type string;
+        mandatory true;
       }
 
       leaf latency {

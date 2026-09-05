@@ -57,7 +57,7 @@ def net_from_ip_address(ip_address):
 def _bb_interface_description(remote_device: str, remote_interface: str) -> str:
     return "Link to {remote_device} [{remote_interface}]"
 
-def _roadm_roadm_interface_description(remote_device: str, remote_interface: str) -> str:
+def _line_interface_description(remote_device: str, remote_interface: str) -> str:
     return "ROADM link to ROADM {remote_device} [{remote_interface}]"
 
 def _roadm_router_interface_description(remote_device: str, remote_interface: str) -> str:
@@ -164,14 +164,29 @@ class BaseConfig(base.BaseConfig):
     def transform(self, i, di):
         print("RFS /rfs{{{di.name}}}/base-config transform running {i.role}", err=True)
 
-        net_clns_address = net_from_ip_address(i.ipv4_address)
+        if i.role == "roadm":
+            if "srl_nokia-system" in di.modules:
+                dev = srl25.root()
+                intf_mgmt = dev.interface.create("mgmt0", admin_state="enable")
+                intf_mgmt0 = intf_mgmt.subinterface.create(0, admin_state="enable")
+                intf_mgmt0.ipv4.admin_state = "enable"
+                intf_mgmt0.ipv6.admin_state = "enable"
+                ni_mgmt = dev.network_instance.create("mgmt", type=srl25.srl_nokia_network_instance_ip_vrf, admin_state="enable", description="Management network instance")
+                ni_mgmt.interface.create("mgmt0.0")
+                return dev
+            raise UnsupportedDevice()
+
+        ipv4_address = i.ipv4_address!
+        asn = i.asn!
+        ibgp_authentication_key = i.ibgp_authentication_key!
+        net_clns_address = net_from_ip_address(ipv4_address)
 
         if "Cisco-IOS-XR-um-hostname-cfg" in di.modules:
             print("RFS /rfs{{{di.name}}}/base-config transform for Cisco IOS XR", err=True)
             dev = xr25.root()
             dev.hostname.system_network_name = di.name
             intf = dev.interfaces.interface.create("Loopback0")
-            intf.ipv4.addresses.create_address(i.ipv4_address, "255.255.255.255")
+            intf.ipv4.addresses.create_address(ipv4_address, "255.255.255.255")
 
             # IS-IS global config
             ip = dev.um_router_isis_cfg_router.isis.processes.process.create("1")
@@ -185,13 +200,13 @@ class BaseConfig(base.BaseConfig):
             lo0.address_families.address_family.create(("ipv4", "unicast"))
 
             # BGP global config
-            bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(i.asn)
-            bgp_as.bgp.router_id = i.ipv4_address
+            bgp_as = dev.um_router_bgp_cfg_router.bgp.as_.create(asn)
+            bgp_as.bgp.router_id = ipv4_address
             # Create neighbor-group: IPV4-IBGP
-            bgp_ng = bgp_as.neighbor_groups.neighbor_group.create("IPV4-IBGP", remote_as=i.asn, update_source="Loopback0")
+            bgp_ng = bgp_as.neighbor_groups.neighbor_group.create("IPV4-IBGP", remote_as=asn, update_source="Loopback0")
             bgp_ng.address_families.address_family.create("vpnv4-unicast")
             bgp_ng.address_families.address_family.create("vpnv6-unicast")
-            bgp_ng.password.encrypted = cisco_type7_encrypt(i.ibgp_authentication_key, 4)
+            bgp_ng.password.encrypted = cisco_type7_encrypt(ibgp_authentication_key, 4)
 
             bgp_as.address_families.address_family.create("vpnv4-unicast")
             bgp_as.address_families.address_family.create("vpnv6-unicast")
@@ -217,7 +232,7 @@ end-policy
 
             lo0 = dev.configuration.interfaces.interface.create("lo0", description="ROLE: {i.role}")
             unit = lo0.unit.create("0")
-            unit.family.create_inet().address.create("{i.ipv4_address}/32")
+            unit.family.create_inet().address.create("{ipv4_address}/32")
             unit.family.create_iso().address.create(net_clns_address)
 
             # IS-IS global config
@@ -229,12 +244,12 @@ end-policy
             ilo0.create_passive()
 
             # BGP global config
-            dev.configuration.routing_options.autonomous_system.as_number = str(i.asn)
+            dev.configuration.routing_options.autonomous_system.as_number = str(asn)
             bgp = dev.configuration.protocols.bgp
             bgp.log_updown = True
 
             # Create neighbor-group: IPV4-IBGP
-            g1 = bgp.group.create("IPV4-IBGP", type="internal", local_address=i.ipv4_address, hold_time=90, authentication_key=junos_encrypt(i.ibgp_authentication_key, "4"))
+            g1 = bgp.group.create("IPV4-IBGP", type="internal", local_address=ipv4_address, hold_time=90, authentication_key=junos_encrypt(ibgp_authentication_key, "4"))
             g1.family.inet_vpn.create_unicast()
             g1.family.inet6_vpn.create_unicast()
             g1.family.create_route_target()
@@ -248,7 +263,7 @@ end-policy
             dev.system.name.host_name = device_name
             index = dev.interface.create("system0").subinterface.create(0)
             index.ipv4.admin_state = "enable"
-            index.ipv4.address.create("{i.ipv4_address}/32")
+            index.ipv4.address.create("{ipv4_address}/32")
 
             intf_mgmt = dev.interface.create("mgmt0", admin_state="enable")
             intf_mgmt0 = intf_mgmt.subinterface.create(0, admin_state="enable")
@@ -269,12 +284,12 @@ end-policy
             instance.interface.create("system0.0", admin_state="enable", passive=True)
 
             # BGP global config
-            bgp = ni.protocols.create_bgp(autonomous_system=i.asn, router_id=i.ipv4_address)
+            bgp = ni.protocols.create_bgp(autonomous_system=asn, router_id=ipv4_address)
             bgp.afi_safi.create(srl25.srl_nokia_common_ipv4_unicast, admin_state="enable")
             bgp.afi_safi.create(srl25.srl_nokia_common_evpn, admin_state="enable")
 
             # Create neighbor-group: IPV4-IBGP
-            bgp.group.create("IPV4-IBGP", peer_as=i.asn)
+            bgp.group.create("IPV4-IBGP", peer_as=asn)
 
             return dev
 
@@ -752,27 +767,21 @@ actor EbgpCustomerTransform(path, update_oper: proc(?y_2_oper.stratoweave_rfs__r
 
 
 # Interface between ROADMs
-class RoadmRoadmInterface(base.RoadmRoadmInterface):
+class LineInterface(base.LineInterface):
     def transform(self, i, di):
         if "srl_nokia-system" in di.modules:
             dev = srl25.root()
 
             intf = dev.interface.create(i.name)
-            intf.description = _roadm_roadm_interface_description(i.remote.device, i.remote.interface)
+            intf.description = _line_interface_description(i.remote.device, i.remote.interface)
             intf.admin_state = "enable"
             intf.vlan_tagging = True
-
-            subif = intf.subinterface.create(100, type=srl25.srl_nokia_interfaces_bridged, admin_state="enable")
-            subif.description = _roadm_roadm_interface_description(i.remote.device, i.remote.interface)
-
-            ni = dev.network_instance.create("MAC-VRF-VLAN", type=srl25.srl_nokia_network_instance_mac_vrf, admin_state="enable")
-            ni.interface.create("%s.100" % i.name)
             return dev
 
         raise UnsupportedDevice()
 
 
-class RouterFacingRoadmInterface(base.RouterFacingRoadmInterface):
+class UserInterface(base.UserInterface):
     def transform(self, i, di):
         if "srl_nokia-system" in di.modules:
             dev = srl25.root()
@@ -780,7 +789,7 @@ class RouterFacingRoadmInterface(base.RouterFacingRoadmInterface):
             subif = intf.subinterface.create(0, type=srl25.srl_nokia_interfaces_bridged, admin_state="enable")
             subif.description = _roadm_router_interface_description(i.remote.router, i.remote.interface)
 
-            ni = dev.network_instance.create("MAC-VRF-VLAN", type=srl25.srl_nokia_network_instance_mac_vrf, admin_state="enable")
+            ni = dev.network_instance.create(f"VLAN-{i.vlan}", type=srl25.srl_nokia_network_instance_mac_vrf, admin_state="enable")
             ni.interface.create("%s.0" % i.interface)
 
             return dev
@@ -791,8 +800,11 @@ class RoadmSubifaceVlan(base.RoadmSubifaceVlan):
         if "srl_nokia-system" in di.modules:
 
             dev = srl25.root()
-            subif = dev.interface.create(i.interface).subinterface.create(100)
-            subif.vlan.encap.create_single_tagged().vlan_id = int(i.vlan)
+            subif = dev.interface.create(i.interface).subinterface.create(i.vlan, type=srl25.srl_nokia_interfaces_bridged, admin_state="enable")
+            subif.vlan.encap.create_single_tagged().vlan_id = i.vlan
+
+            ni = dev.network_instance.create(f"VLAN-{i.vlan}", type=srl25.srl_nokia_network_instance_mac_vrf, admin_state="enable")
+            ni.interface.create(f"{i.interface}.{i.vlan}")
 
             return dev
         raise UnsupportedDevice()
