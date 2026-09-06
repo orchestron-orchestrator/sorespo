@@ -58,6 +58,8 @@ class BBLink(base.BBLink):
             for index in range(len(roadms) - 1):
                 left_roadm = roadms[index]
                 right_roadm = roadms[index + 1]
+                if left_roadm > right_roadm:
+                    left_roadm, right_roadm = right_roadm, left_roadm
                 ol = o.netinfra.optical_link.create((left_roadm, right_roadm))
                 ol.vlan.append(optical.vlan)
         return o
@@ -228,7 +230,13 @@ class OpticalLink(base.OpticalLink):
     def transform(self, i):
         print("CFS OpticalLink transform running %s [%s] <-> %s [%s]" % (i.left_roadm, i.left_port, i.right_roadm, i.right_port))
         o = base.o_root()
-        ol = o.netinfra.optical_link.create((i.left_roadm, i.right_roadm))
-        ol.left_port = i.left_port
-        ol.right_port = i.right_port
+        if i.left_roadm < i.right_roadm:
+            left_roadm, left_port = i.left_roadm, i.left_port
+            right_roadm, right_port = i.right_roadm, i.right_port
+        else:
+            left_roadm, left_port = i.right_roadm, i.right_port
+            right_roadm, right_port = i.left_roadm, i.left_port
+        ol = o.netinfra.optical_link.create((left_roadm, right_roadm))
+        ol.left_port = left_port
+        ol.right_port = right_port
         return o
