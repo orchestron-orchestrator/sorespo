@@ -103,44 +103,11 @@ apply-optical-latency:
 	done
 
 PING_COUNT ?= 3
+PING_WORKERS ?= 32
 
 .PHONY: ping
 ping: test-ping
 
 .PHONY: test-ping
 test-ping::
-	@router_count=$$(xmllint --xpath 'count(//*[local-name()="router"])' netinfra.xml); \
-	routers=(); \
-	for ((index = 1; index <= router_count; index++)); do \
-		name=$$(xmllint --xpath "string((//*[local-name()='router'])[$$index]/*[local-name()='name'])" netinfra.xml); \
-		id=$$(xmllint --xpath "string((//*[local-name()='router'])[$$index]/*[local-name()='id'])" netinfra.xml); \
-		container=$$(printf '%s' "$$name" | tr '[:upper:]' '[:lower:]'); \
-		routers+=("$$name|$$container|10.0.0.$$id"); \
-	done; \
-	failed=0; \
-	for ((left = 0; left < router_count; left++)); do \
-		IFS='|' read -r left_name left_container left_ip <<< "$${routers[$$left]}"; \
-		for ((right = left + 1; right < router_count; right++)); do \
-			IFS='|' read -r right_name right_container right_ip <<< "$${routers[$$right]}"; \
-			printf '\n%s <-> %s\n' "$$left_name" "$$right_name"; \
-			for direction in \
-				"$$left_name|$$left_container|$$left_ip|$$right_name|$$right_ip" \
-				"$$right_name|$$right_container|$$right_ip|$$left_name|$$left_ip"; do \
-				IFS='|' read -r source_name source_container source_ip destination_name destination_ip <<< "$$direction"; \
-				docker exec "$(TESTENV)-$$source_container" sr_cli \
-					"ping -c 1 -W 1 -I $$source_ip network-instance default $$destination_ip" >/dev/null 2>&1 || true; \
-				output=$$(docker exec "$(TESTENV)-$$source_container" sr_cli \
-					"ping -c $(PING_COUNT) -I $$source_ip network-instance default $$destination_ip" 2>&1); \
-				status=$$?; \
-				latency=$$(printf '%s\n' "$$output" | sed -nE 's/^rtt min\/avg\/max\/mdev = ([0-9.]+)\/([0-9.]+)\/([0-9.]+)\/.* ms$$/min\/avg\/max \1\/\2\/\3 ms/p'); \
-				loss=$$(printf '%s\n' "$$output" | sed -nE 's/.*, ([0-9.]+)% packet loss.*/\1% loss/p'); \
-				if [[ $$status -eq 0 && -n "$$latency" ]]; then \
-					printf '  %s -> %s: %s, %s\n' "$$source_name" "$$destination_name" "$$latency" "$$loss"; \
-				else \
-					printf '  %s -> %s: FAILED (%s)\n' "$$source_name" "$$destination_name" "$${loss:-no statistics}"; \
-					failed=1; \
-				fi; \
-			done; \
-		done; \
-	done; \
-	exit $$failed
+	@python3 ping_test.py --testenv "$(TESTENV)" --count "$(PING_COUNT)" --workers "$(PING_WORKERS)" netinfra.xml
