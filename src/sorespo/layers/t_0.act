@@ -24,15 +24,15 @@ def _build_target_links_netinfra__netinfra__router_entry(conf: ygdata.Node) -> l
     # static link: global
     res.append(ttt.TaggedPath('global', ygdata.FNode(ygdata.Id("http://example.com/netinfra", "netinfra"), children=[ygdata.FNode(ygdata.Id("http://example.com/netinfra", "global-settings"))])))
     return res
-def BBLinkTransformCtor(params: ttt.TransformActorParams) -> ?proc(ygdata.Node, ?ygdata.Node) -> None:
-    def update_oper_type_wrapper(oper: ?y_0_oper.netinfra__netinfra__backbone_link_entry):
-        params.update_oper(oper.to_gdata() if oper is not None else None)
-    act = cfs.BBLinkTransform(params.path, update_oper_type_wrapper, params.lower_tree_provider)
-    return proc lambda c, m: act.on_conf(netinfra__netinfra__backbone_link_entry.from_gdata(c))
-
-
-def L3VpnSiteTransformCtor(params: ttt.TransformActorParams) -> ?proc(ygdata.Node, ?ygdata.Node) -> None:
+def L3VpnSiteTransformCtor(params: ttt.TransformActorParams) -> proc(ygdata.Node, ?ygdata.Node) -> None:
     def update_oper_type_wrapper(oper: ?y_0_oper.ietf_l3vpn_svc__l3vpn_svc__sites__site_entry):
         params.update_oper(oper.to_gdata() if oper is not None else None)
     act = cfs.L3VpnSiteTransform(params.path, update_oper_type_wrapper, params.lower_tree_provider)
     return proc lambda c, m: act.on_conf(ietf_l3vpn_svc__l3vpn_svc__sites__site_entry.from_gdata(c))
+
+
+def BBLinkTransformCtor(params: ttt.TransformActorParams) -> proc(ygdata.Node, ?ygdata.Node) -> None:
+    def update_oper_type_wrapper(oper: ?y_0_oper.netinfra__netinfra__backbone_link_entry):
+        params.update_oper(oper.to_gdata() if oper is not None else None)
+    act = cfs.BBLinkTransform(params.path, update_oper_type_wrapper, params.lower_tree_provider)
+    return proc lambda c, m: act.on_conf(netinfra__netinfra__backbone_link_entry.from_gdata(c))
