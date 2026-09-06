@@ -1,0 +1,29 @@
+name: Advance stable branch
+
+on:
+  schedule:
+    # weekday mornings
+    - cron: '17 5 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  advance:
+    runs-on: ubuntu-latest
+    steps:
+      - id: setup-acton
+        uses: actonlang/setup-acton@v1
+        with:
+          channel: 'stable'
+      - name: "Check out main"
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - run: make build
+      - run: make test
+      - name: "Fast-forward stable to main"
+        run: |
+          git push origin HEAD:refs/heads/stable

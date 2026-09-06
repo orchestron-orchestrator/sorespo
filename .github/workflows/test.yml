@@ -7,6 +7,9 @@ on:
 permissions:
   contents: read
 
+env:
+  ACTON_CHANNEL: ${{ (github.ref == 'refs/heads/stable' || github.base_ref == 'stable') && 'stable' || 'tip' }}
+
 jobs:
   build-and-test:
     # Local push + fork PRs only (local PRs are skipped because push ran them).
@@ -16,13 +19,14 @@ jobs:
       - id: setup-acton
         uses: actonlang/setup-acton@v1
         with:
-          channel: 'tip'
+          channel: ${{ env.ACTON_CHANNEL }}
       - name: "Check out repository code"
         uses: actions/checkout@v4
       - name: "Check dependency consistency"
         run: make check-dep-consistency
       - name: "Cache acton stuff"
         uses: actions/cache@v4
+        if: env.ACTON_CHANNEL == 'tip'
         with:
           path: |
             ~/.cache/acton
