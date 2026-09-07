@@ -18,15 +18,15 @@ def get_ttt(lower: ?ttt.Layer, dev_registry: swdev.DeviceRegistry, log_handler: 
     r = ttt.Container({ygdata.Id("http://stratoweave.org/yang/stratoweave-rfs", "device"): ttt.List(ttt.Device(dev_registry, log_handler), [ygdata.Id("http://stratoweave.org/yang/stratoweave-rfs", "name")], ns='http://stratoweave.org/yang/stratoweave-rfs', module='stratoweave-rfs'), ygdata.Id("http://stratoweave.org/yang/stratoweave-rfs", "rfs"): ttt.List(ttt.Container({ygdata.Id("http://example.com/sorespo-rfs", "base-config"): ttt.RFSTransform(rfs.BaseConfig, dev_registry, None, lower, log_handler), ygdata.Id("http://example.com/sorespo-rfs", "backbone-interface"): ttt.List(ttt.RFSTransform(rfs.BBInterface, dev_registry, BBInterfaceTransformCtor, lower, log_handler), [ygdata.Id("http://example.com/sorespo-rfs", "name")], ns='http://example.com/sorespo-rfs', module='sorespo-rfs'), ygdata.Id("http://example.com/sorespo-rfs", "ibgp-neighbor"): ttt.List(ttt.RFSTransform(rfs.IbgpNeighbor, dev_registry, None, lower, log_handler), [ygdata.Id("http://example.com/sorespo-rfs", "address")], ns='http://example.com/sorespo-rfs', module='sorespo-rfs'), ygdata.Id("http://example.com/sorespo-rfs", "vrf"): ttt.List(ttt.RFSTransform(rfs.Vrf, dev_registry, None, lower, log_handler), [ygdata.Id("http://example.com/sorespo-rfs", "name")], ns='http://example.com/sorespo-rfs', module='sorespo-rfs'), ygdata.Id("http://example.com/sorespo-rfs", "vrf-interface"): ttt.List(ttt.RFSTransform(rfs.VrfInterface, dev_registry, None, lower, log_handler), [ygdata.Id("http://example.com/sorespo-rfs", "name")], ns='http://example.com/sorespo-rfs', module='sorespo-rfs'), ygdata.Id("http://example.com/sorespo-rfs", "ebgp-customer"): ttt.List(ttt.RFSTransform(rfs.EbgpCustomer, dev_registry, EbgpCustomerTransformCtor, lower, log_handler), [ygdata.Id("http://example.com/sorespo-rfs", "vrf"), ygdata.Id("http://example.com/sorespo-rfs", "address")], ns='http://example.com/sorespo-rfs', module='sorespo-rfs')}), [ygdata.Id("http://stratoweave.org/yang/stratoweave-rfs", "name")], ns='http://stratoweave.org/yang/stratoweave-rfs', module='stratoweave-rfs')})
     return r
 
-def EbgpCustomerTransformCtor(params: ttt.TransformActorParams) -> ?proc(ygdata.Node, ?ygdata.Node) -> None:
-    def update_oper_type_wrapper(oper: ?y_2_oper.stratoweave_rfs__rfs__ebgp_customer_entry):
-        params.update_oper(oper.to_gdata() if oper is not None else None)
-    act = rfs.EbgpCustomerTransform(params.path, update_oper_type_wrapper, params.dev!)
-    return proc lambda c, m: act.on_conf(stratoweave_rfs__rfs__ebgp_customer_entry.from_gdata(c))
-
-
-def BBInterfaceTransformCtor(params: ttt.TransformActorParams) -> ?proc(ygdata.Node, ?ygdata.Node) -> None:
+def BBInterfaceTransformCtor(params: ttt.TransformActorParams) -> proc(ygdata.Node, ?ygdata.Node) -> None:
     def update_oper_type_wrapper(oper: ?y_2_oper.stratoweave_rfs__rfs__backbone_interface_entry):
         params.update_oper(oper.to_gdata() if oper is not None else None)
     act = rfs.BBInterfaceTransform(params.path, update_oper_type_wrapper, params.dev!)
     return proc lambda c, m: act.on_conf(stratoweave_rfs__rfs__backbone_interface_entry.from_gdata(c))
+
+
+def EbgpCustomerTransformCtor(params: ttt.TransformActorParams) -> proc(ygdata.Node, ?ygdata.Node) -> None:
+    def update_oper_type_wrapper(oper: ?y_2_oper.stratoweave_rfs__rfs__ebgp_customer_entry):
+        params.update_oper(oper.to_gdata() if oper is not None else None)
+    act = rfs.EbgpCustomerTransform(params.path, update_oper_type_wrapper, params.dev!)
+    return proc lambda c, m: act.on_conf(stratoweave_rfs__rfs__ebgp_customer_entry.from_gdata(c))
