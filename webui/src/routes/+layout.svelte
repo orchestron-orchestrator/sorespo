@@ -12,6 +12,7 @@
   import { queuesPoll, refreshQueues } from '$lib/core/orchestron/poll-store';
   import { getServiceModule, listServiceModuleMeta } from '$lib/core/registry/service-modules';
   import { formatServiceRouteId } from '$lib/core/registry/types';
+  import NavIcon from '$lib/core/ui/NavIcon.svelte';
   import { appHref, appPathname } from '$lib/core/util/nav';
 
   let { children }: { children?: Snippet } = $props();
@@ -71,7 +72,7 @@
     operations: 'Operations',
     'config-queue': 'Config Queue',
     'global-settings': 'Global Settings',
-    layers: 'Layer Config',
+    layers: 'Layer configuration',
     configure: 'Apply Config',
     new: 'New'
   };
@@ -137,27 +138,22 @@
     </div>
     <nav class="sidebar-nav" aria-label="Primary navigation">
       <div class="nav-section">
-        <div class="nav-section-label">Overview</div>
         <a
           class="nav-item"
           class:active={currentPathname === '/'}
           href={appHref('/')}
           data-tour="nav-dashboard"
         >
-          <span class="nav-icon">◉</span>
+          <span class="nav-icon"><NavIcon name="dashboard" /></span>
           Dashboard
         </a>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-label">Network Infra</div>
         <a
           class="nav-item"
           class:active={currentPathname.startsWith('/devices')}
           href={appHref('/devices')}
           data-tour="nav-devices"
         >
-          <span class="nav-icon">⬡</span>
+          <span class="nav-icon"><NavIcon name="devices" /></span>
           Devices
         </a>
       </div>
@@ -170,7 +166,7 @@
           href={appHref('/operations/config-queue')}
           data-tour="nav-queue"
         >
-          <span class="nav-icon">◇</span>
+          <span class="nav-icon"><NavIcon name="queue" /></span>
           Config Queue
           {#if totalPendingCount > 0}
             <span class="nav-badge">{totalPendingCount}</span>
@@ -182,21 +178,17 @@
           href={appHref('/configure')}
           data-tour="nav-configure"
         >
-          <span class="nav-icon">⤴</span>
+          <span class="nav-icon"><NavIcon name="apply" /></span>
           Apply Config
         </a>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-label">Layers</div>
         <a
           class="nav-item"
           class:active={currentPathname.startsWith('/layers')}
           href={appHref('/layers')}
           data-tour="nav-layers"
         >
-          <span class="nav-icon">▤</span>
-          Config
+          <span class="nav-icon"><NavIcon name="layers" /></span>
+          Layer configuration
         </a>
       </div>
 
@@ -208,7 +200,7 @@
           href={appHref('/services')}
           data-tour="nav-services"
         >
-          <span class="nav-icon">◈</span>
+          <span class="nav-icon"><NavIcon name="services" /></span>
           Service Modules
         </a>
 
@@ -219,7 +211,6 @@
               class:active={currentPathname.startsWith(`/services/${serviceModule.id}`)}
               href={appHref(`/services/${serviceModule.id}`)}
             >
-              <span class="nav-icon">·</span>
               {serviceModule.title}
             </a>
           {/each}
@@ -230,7 +221,7 @@
             href={appHref('/global-settings')}
             data-tour="nav-global-settings"
           >
-            <span class="nav-icon nav-icon--gear">⚙</span>
+            <span class="nav-icon"><NavIcon name="settings" /></span>
             Global Settings
           </a>
         </div>
@@ -259,7 +250,7 @@
           Search <kbd>⌘K</kbd>
         </button>
         <button class="btn btn-ghost btn-sm" type="button" onclick={handleRefresh} data-tour="refresh">
-          ⟳ Refresh
+          <NavIcon name="refresh" /> Refresh
         </button>
       </div>
     </header>
@@ -291,13 +282,7 @@
   }
 
   .nav-item--sub .nav-icon {
-    width: 12px;
-    font-size: 14px;
-  }
-
-  /* The ⚙ glyph's ink sits lower than the · dots; nudge it up to align. */
-  .nav-icon--gear {
-    transform: translateY(-2px);
+    margin-left: -28px;
   }
 
   .cmdk-trigger {
@@ -311,9 +296,23 @@
     padding: 1px 5px;
     border: 1px solid var(--sw-border-subtle);
     border-radius: 4px;
-    background: rgba(13, 23, 48, 0.6);
+    background: var(--sw-bg-card);
     font-family: var(--sw-font-mono);
     font-size: 10px;
     color: var(--sw-text-muted);
+  }
+
+  @media (max-width: 900px) {
+    .nav-subsection {
+      display: contents;
+    }
+
+    .nav-item--sub {
+      padding-left: 12px;
+    }
+
+    .nav-item--sub .nav-icon {
+      margin-left: 0;
+    }
   }
 </style>
