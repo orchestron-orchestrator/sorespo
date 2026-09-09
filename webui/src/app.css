@@ -17,14 +17,15 @@
   --sw-ink-500: #7d8cac;
   --sw-ink-300: #c7d1e4;
 
-  /* Surface hierarchy — translucent over the page gradient */
+  /* Opaque surfaces keep the application chrome quiet. */
   --sw-bg-deep:        #081020;
-  --sw-bg-surface:     rgba(13, 23, 48, 0.78);
-  --sw-bg-card:        rgba(13, 23, 48, 0.52);
-  --sw-bg-elevated:    rgba(35, 52, 86, 0.45);
-  --sw-bg-input:       rgba(5, 11, 23, 0.55);
-  --sw-bg-chrome:      rgba(8, 16, 32, 0.72);
-  --sw-bg-sidebar:     rgba(8, 16, 32, 0.55);
+  --sw-bg-surface:     #111e34;
+  --sw-bg-card:        #0d1730;
+  --sw-bg-elevated:    #192943;
+  --sw-bg-hover:       #14233b;
+  --sw-bg-input:       #070f1d;
+  --sw-bg-chrome:      #0b1424;
+  --sw-bg-sidebar:     #0b1424;
 
   /* Borders */
   --sw-border-subtle:  rgba(226, 232, 240, 0.12);
@@ -46,7 +47,7 @@
   /* Primary action */
   --sw-primary:        #2563eb;
   --sw-primary-hover:  #3870f3;
-  --sw-primary-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+  --sw-primary-shadow: none;
 
   /* Semantic */
   --sw-danger:       #ef4444;
@@ -61,16 +62,15 @@
   /* Radii */
   --sw-radius-sm: 6px;
   --sw-radius-md: 8px;
-  --sw-radius-lg: 14px;
+  --sw-radius-lg: 8px;
 
   /* Typography */
   --sw-font-sans: 'Inter', 'Avenir Next', 'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --sw-font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace;
 
   /* Shadows */
-  --sw-shadow-card:     0 22px 50px rgba(0, 0, 0, 0.20);
+  --sw-shadow-card:     none;
   --sw-shadow-elevated: 0 30px 80px rgba(0, 0, 0, 0.34);
-  --sw-glow-cyan:       0 0 8px rgba(34, 211, 238, 0.30);
 
   /* Layout */
   --sw-sidebar-width: 240px;
@@ -123,29 +123,10 @@ body {
   line-height: 1.5;
   overflow: hidden;
 
-  /* Signature StratoWeave page gradient */
-  background:
-    radial-gradient(circle at 14% 10%, rgba(37, 99, 235, 0.28), rgba(0, 0, 0, 0) 26rem),
-    radial-gradient(circle at 86% 4%,  rgba(168, 85, 247, 0.24), rgba(0, 0, 0, 0) 28rem),
-    linear-gradient(180deg, #081020 0%, #050b17 100%);
-  background-attachment: fixed;
+  background: var(--sw-bg-deep);
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Very subtle neutral grid — no color cast, like the design */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(226, 232, 240, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(226, 232, 240, 0.04) 1px, transparent 1px);
-  background-size: 32px 32px;
-  background-position: -1px -1px;
-  pointer-events: none;
-  z-index: 0;
 }
 
 a { color: inherit; }
@@ -164,10 +145,10 @@ code {
 
 code {
   font-size: 0.85em;
-  background: rgba(5, 11, 23, 0.55);
+  background: var(--sw-bg-input);
   padding: 0.15em 0.4em;
   border-radius: var(--sw-radius-sm);
-  color: var(--sw-accent);
+  color: var(--sw-text-secondary);
 }
 
 /* ── App shell ── */
@@ -183,8 +164,6 @@ code {
 .sidebar {
   width: var(--sw-sidebar-width);
   background: var(--sw-bg-sidebar);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
   border-right: 1px solid var(--sw-border-subtle);
   display: flex;
   flex-direction: column;
@@ -266,7 +245,7 @@ code {
 }
 
 .nav-item:hover {
-  background: var(--sw-accent-glow);
+  background: var(--sw-bg-hover);
   color: var(--sw-text-primary);
 }
 
@@ -284,6 +263,7 @@ code {
   align-items: center;
   justify-content: center;
   opacity: 0.7;
+  flex-shrink: 0;
 }
 
 .nav-item.active .nav-icon {
@@ -328,8 +308,6 @@ code {
   gap: 16px;
   flex-shrink: 0;
   background: var(--sw-bg-chrome);
-  -webkit-backdrop-filter: blur(22px);
-  backdrop-filter: blur(22px);
 }
 
 .yang-path {
@@ -355,7 +333,7 @@ a.segment:hover {
 }
 
 .yang-path .segment.current {
-  color: var(--sw-accent);
+  color: var(--sw-text-primary);
   font-weight: 500;
 }
 
@@ -436,9 +414,9 @@ a.segment:hover {
   font-size: 10px;
   padding: 2px 8px;
   border-radius: 6px;
-  background: var(--sw-accent-glow);
-  color: var(--sw-accent);
-  border: 1px solid var(--sw-accent-glow-strong);
+  background: var(--sw-bg-elevated);
+  color: var(--sw-text-secondary);
+  border: 1px solid var(--sw-border-subtle);
   font-weight: 500;
 }
 
@@ -498,9 +476,9 @@ a.segment:hover {
 }
 
 .btn-secondary:hover {
-  border-color: var(--sw-accent-glow-strong);
-  background: var(--sw-accent-glow);
-  color: var(--sw-accent);
+  border-color: var(--sw-border-default);
+  background: var(--sw-bg-hover);
+  color: var(--sw-text-primary);
 }
 
 .btn-success {
@@ -535,8 +513,8 @@ a.segment:hover {
 }
 
 .btn-ghost:hover {
-  color: var(--sw-accent);
-  background: var(--sw-accent-glow);
+  color: var(--sw-text-primary);
+  background: var(--sw-bg-hover);
 }
 
 .btn-sm {
@@ -553,9 +531,9 @@ a.segment:hover {
   font-weight: 500;
   padding: 2px 8px;
   border-radius: 999px;
-  background: var(--sw-accent-glow);
-  color: var(--sw-accent);
-  border: 1px solid var(--sw-accent-glow-strong);
+  background: var(--sw-bg-elevated);
+  color: var(--sw-text-secondary);
+  border: 1px solid var(--sw-border-subtle);
 }
 
 .pill .dot {
@@ -563,7 +541,6 @@ a.segment:hover {
   height: 6px;
   border-radius: 50%;
   background: currentColor;
-  box-shadow: var(--sw-glow-cyan);
 }
 
 .pill.success {
@@ -572,28 +549,16 @@ a.segment:hover {
   border-color: rgba(34, 197, 94, 0.25);
 }
 
-.pill.success .dot {
-  box-shadow: 0 0 8px rgba(34, 197, 94, 0.30);
-}
-
 .pill.warning {
   background: var(--sw-warning-dim);
   color: var(--sw-warning);
   border-color: rgba(245, 158, 11, 0.25);
 }
 
-.pill.warning .dot {
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.30);
-}
-
 .pill.danger {
   background: var(--sw-danger-dim);
   color: var(--sw-danger);
   border-color: rgba(239, 68, 68, 0.25);
-}
-
-.pill.danger .dot {
-  box-shadow: 0 0 8px rgba(239, 68, 68, 0.30);
 }
 
 /* ── Notification badge ── */
@@ -695,7 +660,7 @@ td {
 }
 
 tr:last-child td { border-bottom: none; }
-tr:hover td { background: var(--sw-accent-glow); }
+tr:hover td { background: var(--sw-bg-hover); }
 
 /* ── Pre (code blocks) ── */
 pre {
@@ -739,6 +704,7 @@ pre {
 
   .sidebar-nav {
     display: flex;
+    align-items: center;
     gap: 4px;
     padding: 8px;
     overflow-x: auto;
@@ -746,8 +712,16 @@ pre {
 
   .nav-section {
     display: flex;
+    flex-shrink: 0;
     gap: 4px;
     margin: 0;
+  }
+
+  .nav-item {
+    width: auto;
+    flex-shrink: 0;
+    margin: 0;
+    white-space: nowrap;
   }
 
   .nav-section-label {

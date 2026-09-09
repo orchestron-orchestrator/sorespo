@@ -2,6 +2,7 @@
   import { invalidate } from '$app/navigation';
   import { onMount } from 'svelte';
 
+  import DeviceConfigStatus from '$lib/core/ui/DeviceConfigStatus.svelte';
   import { onGlobalRefresh } from '$lib/core/util/global-refresh';
   import { appHref } from '$lib/core/util/nav';
 
@@ -17,17 +18,12 @@
     devices.filter((device) => device.name.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  function configDotColor(device: DeviceSummary): string {
-    return device.hasRunningConfig === false ? 'var(--sw-danger)' : 'var(--sw-success)';
-  }
-
   onMount(() => onGlobalRefresh(() => invalidate('data:devices')));
 </script>
 
 <div class="page-header">
   <div>
     <h2>Devices</h2>
-    <p>Browse discovered devices and open their configuration and queue views.</p>
   </div>
 
   <label>
@@ -44,7 +40,7 @@
 {#if error}
   <div class="error-state">{error}</div>
 {:else if devices.length === 0}
-  <div class="empty-state">No devices were returned by the backend.</div>
+  <div class="empty-state">No devices found.</div>
 {:else if filteredDevices.length === 0}
   <div class="empty-state">No devices match "{searchQuery}".</div>
 {:else}
@@ -53,12 +49,11 @@
       <a class="device-card card" href={appHref(`/devices/${encodeURIComponent(device.id)}`)}>
         <div class="device-card__header">
           <h3>{device.name}</h3>
-          <span class="pill">
-            <span class="dot" style={`background: ${configDotColor(device)};`}></span>
-            Device
-          </span>
+          <DeviceConfigStatus hasRunningConfig={device.hasRunningConfig} />
         </div>
-        <p class="device-card__id">{device.id}</p>
+        {#if device.id !== device.name}
+          <p class="device-card__id">{device.id}</p>
+        {/if}
       </a>
     {/each}
   </div>
@@ -94,19 +89,24 @@
 
   .device-card {
     display: grid;
-    gap: 10px;
-    padding: 20px;
+    gap: 6px;
+    padding: 16px;
     text-decoration: none;
-    transition: border-color 0.2s, transform 0.2s;
+    transition: background-color 0.15s;
   }
 
   .device-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--sw-accent-dim);
+    background: var(--sw-bg-hover);
+  }
+
+  .device-card:focus-visible {
+    outline: 2px solid var(--sw-accent);
+    outline-offset: 2px;
   }
 
   .device-card__header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
@@ -116,13 +116,15 @@
     margin: 0;
     font-size: 15px;
     font-weight: 600;
+    overflow-wrap: anywhere;
   }
 
   .device-card__id {
     margin: 0;
     font-family: var(--sw-font-mono);
     font-size: 12px;
-    color: var(--sw-accent);
+    color: var(--sw-text-muted);
+    overflow-wrap: anywhere;
   }
 
   @media (max-width: 640px) {

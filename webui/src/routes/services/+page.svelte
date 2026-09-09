@@ -8,7 +8,6 @@
 <div class="page-header">
   <div>
     <h2>Services</h2>
-    <p>Launch a shared service workspace for each registered CFS module.</p>
   </div>
 </div>
 
@@ -25,7 +24,7 @@
 
         <div class="service-card__actions">
           <a class="btn btn-primary" href={appHref(`/services/${module.id}/new`)}>+ Create new</a>
-          <a class="btn btn-secondary" href={appHref(`/services/${module.id}`)}>Browse existing</a>
+          <a class="btn btn-secondary" href={appHref(`/services/${module.id}`)}>View {module.collectionLabel.replace(/^[A-Z](?=[a-z])/, (initial) => initial.toLowerCase())}</a>
         </div>
       </div>
     </article>

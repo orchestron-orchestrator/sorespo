@@ -6,6 +6,7 @@
   import TopologyMap from '$lib/core/topology/TopologyMap.svelte';
   import { buildTopologyGraph } from '$lib/core/topology/model';
   import { restconfGetJson } from '$lib/core/restconf/client';
+  import DeviceConfigStatus from '$lib/core/ui/DeviceConfigStatus.svelte';
   import { onGlobalRefresh } from '$lib/core/util/global-refresh';
   import { appHref } from '$lib/core/util/nav';
 
@@ -20,14 +21,6 @@
   let loadingTopology = $state(true);
   let topologyError = $state('');
   let topologyNote = $state('');
-
-  function configDotColor(device: DeviceSummary): string {
-    return device.hasRunningConfig === false ? 'var(--sw-danger)' : 'var(--sw-success)';
-  }
-
-  function configStatusLabel(device: DeviceSummary): string {
-    return device.hasRunningConfig === false ? 'No config' : 'Configured';
-  }
 
   async function loadDevices(): Promise<void> {
     try {
@@ -159,7 +152,6 @@
     <div class="section-head">
       <div>
         <h3>Devices</h3>
-        <p>Current managed devices</p>
       </div>
       <a class="btn btn-secondary btn-sm" href={appHref('/devices')}>View all devices</a>
     </div>
@@ -169,7 +161,7 @@
     {:else if loadError}
       <div class="error-state">{loadError}</div>
     {:else if devices.length === 0}
-      <div class="empty-state">No devices were returned by the backend.</div>
+      <div class="empty-state">No devices found.</div>
     {:else}
       <div class="card device-table">
         <div class="card-body no-pad">
@@ -203,10 +195,7 @@
                     {/if}
                   </td>
                   <td>
-                    <span class="pill">
-                      <span class="dot" style={`background: ${configDotColor(device)};`}></span>
-                      {configStatusLabel(device)}
-                    </span>
+                    <DeviceConfigStatus hasRunningConfig={device.hasRunningConfig} />
                   </td>
                 </tr>
               {/each}
@@ -221,7 +210,6 @@
     <div class="section-head">
       <div>
         <h3>Services</h3>
-        <p>Direct entry points for service configuration modules.</p>
       </div>
       <a class="btn btn-secondary btn-sm" href={appHref('/services')}>View all services</a>
     </div>
@@ -239,7 +227,7 @@
 
             <div class="service-card__actions">
               <a class="btn btn-primary" href={appHref(`/services/${module.id}/new`)}>Create new</a>
-              <a class="btn btn-secondary" href={appHref(`/services/${module.id}`)}>Browse existing</a>
+              <a class="btn btn-secondary" href={appHref(`/services/${module.id}`)}>View {module.collectionLabel.replace(/^[A-Z](?=[a-z])/, (initial) => initial.toLowerCase())}</a>
             </div>
           </div>
         </article>
@@ -273,12 +261,6 @@
   .section-head h3 {
     margin: 0;
     font-size: 1rem;
-  }
-
-  .section-head p {
-    margin: 0.25rem 0 0;
-    color: var(--sw-text-secondary);
-    font-size: 13px;
   }
 
   .device-table {
